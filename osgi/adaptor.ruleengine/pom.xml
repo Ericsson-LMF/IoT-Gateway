@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>com.ericsson.deviceaccess</groupId>
+        <version>1.42-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ericsson.deviceaccess</groupId>
+    <artifactId>adaptor.ruleengine</artifactId>
+    <version>1.42-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <name>GDA Rule Engine Adaptor</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ericsson.deviceaccess</groupId>
+            <artifactId>generic.device.spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 
+        <dependency>
+            <groupId>com.ericsson.osgi.base</groupId>
+            <artifactId>json</artifactId>
+            <version>${osgi.base.version}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+        </dependency>        
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.osgi.log.util</artifactId>
+            <version>${connectedhome.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.test.util</artifactId>
+            <version>1.13</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock-legacy</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock-junit4</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.5</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.name}</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Private-Package>
+                            com.ericsson.research.common.slf4jlogger.*;-split-package:=merge-last,
+                            org.slf4j.*;-split-package:=merge-first
+                        </Private-Package>
+                        <Import-Package>
+                            org.osgi.*;version="[1.0,2.0)",
+                            com.ericsson.deviceaccess.spi.*,
+                            com.ericsson.deviceaccess.api.*,
+                            org.json
+                        </Import-Package>
+                        <Bundle-Activator>com.ericsson.deviceaccess.adaptor.ruleengine.Activator</Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

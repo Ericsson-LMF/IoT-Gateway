@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.deviceaccess</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.42-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>adaptor.upnp</artifactId>
+    <packaging>bundle</packaging>
+    <name>GDA UPnP Adaptor</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ericsson.deviceaccess</groupId>
+            <artifactId>generic.device.spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 
+		<dependency>
+			<groupId>org.kxml2</groupId>
+			<artifactId>kxml2</artifactId>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>net.sf.kxml</groupId>
+			<artifactId>kxml2</artifactId>
+		</dependency>
+		<!-- 
+        <dependency>
+            <groupId>com.ericsson.osgi.base</groupId>
+            <artifactId>upnp.basedriver</artifactId>
+            <version>${osgi.base.version}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.osgi.log.util</artifactId>
+            <version>${connectedhome.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxp-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 
+		<dependency>
+            <groupId>com.ericsson.osgi.base</groupId>
+            <artifactId>json</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        -->
+		<dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <scope>provided</scope>
+        </dependency>
+                            
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta-regexp</groupId>
+            <artifactId>jakarta-regexp</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.2.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Private-Package>
+                            com.ericsson.deviceaccess.upnp.*,
+                            org.apache.regexp,
+                            com.ericsson.research.common.slf4jlogger.*;-split-package:=merge-last,
+                            org.slf4j.*;-split-package:=merge-first
+                        </Private-Package>
+                        <Import-Package>
+							org.xmlpull.v1.*,
+							org.kxml2.io.*,
+							org.json.*,
+				javax.servlet.*,
+                            com.ericsson.deviceaccess.spi.*,
+                            com.ericsson.deviceaccess.api.*,
+                            org.osgi.*;version="[1.0,4.2)"
+                        </Import-Package>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-Activator>com.ericsson.deviceaccess.upnp.UPnPAgentFactory</Bundle-Activator>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+
+<service-schema xmlns="http://xmlparser.service.deviceaccess.ericsson.com"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.cf.ericsson.net device-access-service.xsd"
+                version="1.0.0.banan">
+    <services>
+        <service name="TemperatureSensor">
+            <description>This service type enables reading of the current temperature of a temperature sensor
+            </description>
+            <category>homeautomation.hvac</category>
+            <actions>
+                <action name="GetCurrentTemperature">
+                    <description>Gets the current temperature.</description>
+                    <results>
+                        <parameter name="temperature" type="Float">
+                            <description>The temperature in degrees Celsius</description>
+                        </parameter>
+                    </results>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="CurrentTemperature" type="Float">
+                    <description>The temperature in degrees Celsius</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Dimming">
+            <description>This service-type enables the following functions: 1. Enables remote control of a dimmable
+                lighting device, 2. Defines required basic actions for dimming to a value
+            </description>
+            <category>homeautomation.lighting</category>
+            <actions>
+                <action name="SetLoadLevelTarget">
+                    <description>Sets the load level target, i.e. the dimming value.</description>
+                    <results>
+                        <parameter name="loadLevelTarget" type="Integer">
+                            <description>The load level target as a percentage.</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                    </results>
+                </action>
+            </actions>
+        </service>
+        <service name="s1">
+            <description>This is a service</description>
+            <category>home.hvac</category>
+            <actions>
+                <action name="act1">
+                    <description>This is an action</description>
+                    <arguments>
+                        <parameter name="arg1" type="Integer">
+                            <description>Description of arg1, blah blah</description>
+                            <min>-100</min>
+                            <max>100</max>
+                            <default>0</default>
+                        </parameter>
+                        <parameter name="arg2" type="Float">
+                            <description>Description of arg2, blah blah</description>
+                            <min>-100.0</min>
+                            <max>100.0</max>
+                            <default>0.0</default>
+                        </parameter>
+                        <parameter name="arg3" type="String">
+                            <description>Description of arg3, blah blah</description>
+                            <values>
+                                <value>value1</value>
+                                <value>value2</value>
+                                <value>value3</value>
+                            </values>
+                            <default>value1</default>
+                        </parameter>
+                    </arguments>
+                    <results>
+                        <parameter name="res1" type="Integer">
+                            <description>Description res1, blah blah</description>
+                            <min>-100</min>
+                            <max>100</max>
+                        </parameter>
+                        <parameter name="res2" type="Float">
+                            <description>Description of res2, blah blah</description>
+                            <min>-100.0</min>
+                            <max>100.0</max>
+                        </parameter>
+                        <parameter name="res3" type="String">
+                            <description>Description of res3, blah blah</description>
+                            <values>
+                                <value>value1</value>
+                                <value>value2</value>
+                                <value>value3</value>
+                            </values>
+                        </parameter>
+                    </results>
+                </action>
+                <action name="act2">
+                    <description>Description of act2, blah blah</description>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="prop1" type="Integer">
+                    <description>Description of prop1, blah blah</description>
+                    <min>-100</min>
+                    <max>100</max>
+                    <default>0</default>
+                </parameter>
+                <parameter name="prop2" type="Float">
+                    <description>Description of prop1, blah blah</description>
+                    <min>-100.0</min>
+                    <max>100.0</max>
+                    <default>0.0</default>
+                </parameter>
+                <parameter name="prop3" type="String">
+                    <description>Description of prop3, blah blah</description>
+                    <values>
+                        <value>value1</value>
+                        <value>value2</value>
+                        <value>value3</value>
+                    </values>
+                    <default>value1</default>
+                </parameter>
+            </properties>
+        </service>
+        <service name="s2">
+            <description>Description, blah blah</description>
+            <category>media</category>
+        </service>
+    </services>
+</service-schema>

@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+
+<service-schema version="1.0.0.banan">
+    <services>
+        <service name="s1">
+            <description>This is a service</description>
+            <category>home.hvac</category>
+            <actions>
+                <action name="act1">
+                    <description>This is an action</description>
+                    <arguments>
+                        <parameter name="arg1" type="Integer">
+                            <description>Description, blah blah</description>
+                            <min>-100</min>
+                            <max>100</max>
+                            <default>0</default>
+                        </parameter>
+                        <parameter name="arg2" type="Float">
+                            <description>Description, blah blah</description>
+                            <min>-100.0</min>
+                            <max>100.0</max>
+                            <default>0.0</default>
+                        </parameter>
+                        <parameter name="arg3" type="String">
+                            <description>Description, blah blah</description>
+                            <values>
+                                <value>value1</value>
+                                <value>value2</value>
+                                <value>value3</value>
+                            </values>
+                            <default>value1</default>
+                        </parameter>
+                    </arguments>
+                    <results>
+                        <parameter name="arg1" type="Integer">
+                            <description>Description, blah blah</description>
+                            <min>-100</min>
+                            <max>100</max>
+                        </parameter>
+                        <parameter name="arg2" type="Float">
+                            <description>Description, blah blah</description>
+                            <min>-100.0</min>
+                            <max>100.0</max>
+                        </parameter>
+                        <parameter name="arg3" type="String">
+                            <description>Description, blah blah</description>
+                            <values>
+                                <value>value1</value>
+                                <value>value2</value>
+                                <value>value3</value>
+                            </values>
+                        </parameter>
+                    </results>
+                </action>
+                <action name="act2" optional="true">
+                    <description>Description, blah blah</description>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="arg1" type="Integer">
+                    <description>Description, blah blah</description>
+                    <min>-100</min>
+                    <max>100</max>
+                    <default>0</default>
+                </parameter>
+                <parameter name="arg2" type="Float">
+                    <description>Description, blah blah</description>
+                    <min>-100.0</min>
+                    <max>100.0</max>
+                    <default>0.0</default>
+                </parameter>
+                <parameter name="arg3" type="String">
+                    <description>Description, blah blah</description>
+                    <values>
+                        <value>value1</value>
+                        <value>value2</value>
+                        <value>value3</value>
+                    </values>
+                    <default>value1</default>
+                </parameter>
+            </properties>
+        </service>
+        <service name="s2">
+            <description>Description, blah blah</description>
+            <category>media</category>
+        </service>
+    </services>
+</service-schema>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://xmlparser.service.deviceaccess.ericsson.com"
+           xmlns="http://xmlparser.service.deviceaccess.ericsson.com">
+
+    <xs:element name="service-schema">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="services"/>
+            </xs:sequence>
+            <xs:attribute name="version" use="required" type="xs:NMTOKEN"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="services">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="service"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="service">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="description"/>
+                <xs:element ref="category"/>
+                <xs:sequence minOccurs="0">
+                    <xs:element ref="actions"/>
+                    <xs:element ref="properties"/>
+                </xs:sequence>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="category" type="xs:NCName"/>
+    <xs:element name="actions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="action"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="action">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="description"/>
+                <xs:sequence minOccurs="0">
+                    <xs:element ref="arguments"/>
+                    <xs:element ref="results"/>
+                </xs:sequence>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="optional" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="arguments">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="parameter"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="results">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="parameter"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="properties">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="parameter"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="description" type="xs:string"/>
+    <xs:element name="parameter">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="description"/>
+                <xs:choice>
+                    <xs:element ref="values"/>
+                    <xs:sequence>
+                        <xs:element ref="min"/>
+                        <xs:element ref="max"/>
+                    </xs:sequence>
+                </xs:choice>
+                <xs:element minOccurs="0" ref="default"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="values">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="value"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="value" type="xs:NCName"/>
+    <xs:element name="min" type="xs:decimal"/>
+    <xs:element name="max" type="xs:decimal"/>
+    <xs:element name="default" type="xs:NMTOKEN"/>
+</xs:schema>

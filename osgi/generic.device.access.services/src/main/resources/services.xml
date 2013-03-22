@@ -1,0 +1,1583 @@
+<?xml version="1.0"?>
+<service-schema xmlns="http://xmlparser.service.deviceaccess.ericsson.com"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.cf.ericsson.net/schema/services.xsd"
+                version="1.0.0">
+    <services>
+        <!-- Generic -->
+        <service name="DeviceManagement">
+            <description>This service type enables altering parameters on the device.</description>
+            <category>device</category>
+            <actions>
+                <action name="setName">
+                    <description>Sets the name on the device.</description>
+                    <arguments>
+                        <parameter name="newName" type="String">
+                            <description>The new name.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="setURN">
+                    <description>Sets the URN on the device.</description>
+                    <arguments>
+                        <parameter name="newURN" type="String">
+                            <description>The new URN.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+
+        <!-- Home Automation -->
+        <service name="TemperatureSensor">
+            <description>This service type enables reading of the current temperature of a temperature sensor
+            </description>
+            <category>homeautomation.hvac</category>
+            <properties>
+                <parameter name="currentTemperature" type="Float">
+                    <description>The current temperature. Unit: degrees Celsius</description>
+                </parameter>
+            </properties>
+        </service>
+
+        <service name="ThermostatMode">
+            <category>homeautomation.hvac.thermostat</category>
+            <description>This service provides access the mode of a thermostat.</description>
+            <properties>
+                <parameter name="mode" type="String">
+                    <description>The current mode of the thermostat.</description>
+                    <default>Off</default>
+                    <values>
+                        <value>Off</value>
+                        <value>Heat</value>
+                        <value>Cool</value>
+                        <value>Auto</value>
+                        <value>AuxilliaryHeat</value>
+                        <value>Resume</value>
+                        <value>FanOnly</value>
+                        <value>Furnace</value>
+                        <value>DryAir</value>
+                        <value>MoistAir</value>
+                        <value>AutoChangeover</value>
+                        <value>EnergySaveHeat</value>
+                        <value>EnergySaveCool</value>
+                        <value>Away</value>
+                    </values>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setMode">
+                    <description>Sets the thermostat mode.</description>
+                    <arguments>
+                        <parameter name="mode" type="String">
+                            <description>The thermostat mode. Unit: degrees Celsius</description>
+                            <default>Off</default>
+                            <values>
+                                <value>Off</value>
+                                <value>Heat</value>
+                                <value>Cool</value>
+                                <value>Auto</value>
+                                <value>AuxilliaryHeat</value>
+                                <value>Resume</value>
+                                <value>FanOnly</value>
+                                <value>Furnace</value>
+                                <value>DryAir</value>
+                                <value>MoistAir</value>
+                                <value>AutoChangeover</value>
+                                <value>EnergySaveHeat</value>
+                                <value>EnergySaveCool</value>
+                                <value>Away</value>
+                            </values>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+
+        <service name="ThermostatFanMode">
+            <category>homeautomation.hvac.thermostat</category>
+            <description>This service provides access to fan of a thermostat.</description>
+            <properties>
+                <parameter name="currentFanMode" type="Float">
+                    <description>The current fan mode.</description>
+                    <values>
+                        <value>Auto</value>
+                        <value>AutoLow</value>
+                        <value>AutoMedium</value>
+                        <value>AutoHigh</value>
+                        <value>On</value>
+                        <value>Low</value>
+                        <value>Medium</value>
+                        <value>High</value>
+                    </values>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setFanMode">
+                    <description>Sets the fan mode.</description>
+                    <arguments>
+                        <parameter name="fanMode" type="Float">
+                            <description>The fan mode.</description>
+                            <values>
+                                <value>Auto</value>
+                                <value>AutoLow</value>
+                                <value>AutoMedium</value>
+                                <value>AutoHigh</value>
+                                <value>On</value>
+                                <value>Low</value>
+                                <value>Medium</value>
+                                <value>High</value>
+                            </values>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+
+        <service name="ThermostatSetPoint">
+            <category>homeautomation.hvac.thermostat</category>
+            <description>This service provides access to the setpoint of a thermostat.</description>
+            <properties>
+                <parameter name="currentDesiredHeatingTemperature" type="Float">
+                    <description>The current value of the desired heating temperature. Unit: degrees Celsius</description>
+                </parameter>
+                <parameter name="currentDesiredCoolingTemperature" type="Float">
+                    <description>The current value of the desired cooling temperature. Unit: degrees Celsius</description>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setDesiredHeatingTemperature">
+                    <description>Sets the desired heating temperature.</description>
+                    <arguments>
+                        <parameter name="desiredTemperature" type="Float">
+                            <description>The desired temperature. Unit: degrees Celsius</description>
+                            <default>20.0</default>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="setDesiredCoolingTemperature">
+                    <description>Sets the desired cooling temperature.</description>
+                    <arguments>
+                        <parameter name="desiredTemperature" type="Float">
+                            <description>The desired temperature. Unit: degrees Celsius</description>
+                            <default>20.0</default>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+
+        <service name="LightSensor">
+            <category>homeautomation</category>
+            <description>A sensor which detects light.</description>
+            <properties>
+                <parameter name="light" type="Integer">
+                    <description>The current luminence measured as a percentage 0=darkest, 100=lightest.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+            </properties>
+        </service>
+
+        <service name="Dimming">
+            <description>This service type enables the following functions: 1. Enables remote control of a dimmable
+                lighting device, 2. Defines required basic actions for dimming to a value
+            </description>
+            <category>homeautomation.lighting</category>
+            <actions>
+                <action name="SetLoadLevelTarget">
+                    <description>Sets the load level target, i.e. the dimming value.</description>
+                    <arguments>
+                        <parameter name="loadLevelTarget" type="Integer">
+                            <description>The load level target. Unit: percentage 0-100%.</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="SetLoadLevelTargetWithRate">
+                    <description>Sets the load level target, i.e. the dimming value.</description>
+                    <arguments>
+                        <parameter name="loadLevelTarget" type="Integer">
+                            <description>The load level target. Unit: percentage 0-100%.</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                        <parameter name="rate" type="Float">
+                            <description>The rate at which the change occurs. Unit: %/s.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="On">
+                    <description>Turns the dimming on the last set dimming value.</description>
+                </action>
+                <action name="Off">
+                    <description>Turns the dimming off.</description>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="CurrentLoadLevel" type="Integer">
+                    <description>The currently set load level target. Unit: percentage 0-100%.</description>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+            </properties>
+        </service>
+        <service name="SwitchPower">
+            <description>This service-type enables basic power switching for embedding devices.</description>
+            <category>homeautomation.power</category>
+            <actions>
+                <action name="SetTarget">
+                    <description>Requests the Power Switch Service instance output to be driven to the state indicated
+                        by 'newTarget' Value.
+                    </description>
+                    <arguments>
+                        <parameter name="newTarget" type="Integer">
+                            <description>The desired target. Unit: 0 = power-off state; 1 = power-on state.
+                            </description>
+                            <min>0</min>
+                            <max>1</max>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="CurrentTarget" type="Integer">
+                    <description>The current target. Unit: 0 = power-off state; 1 = power-on state.</description>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+            </properties>
+        </service>
+        <service name="BinarySensor">
+            <description>This service type enables reading a binary sensor.</description>
+            <category>homeautomation</category>
+            <properties>
+                <parameter name="CurrentState" type="Integer">
+                    <description>The current state of the sensor. Unit: 0=Off, 1=On.</description>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+            </properties>
+        </service>
+        <service name="PowerSensor">
+            <description>This service type enables reading a power sensor.</description>
+            <category>homeautomation.power</category>
+            <properties>
+                <parameter name="CurrentPower" type="Float">
+                    <description>The current power measured by the sensor. Unit: Watt.</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="EnergyMeter">
+            <description>This service type enables reading a energy meter.</description>
+            <category>homeautomation.power</category>
+            <properties>
+                <parameter name="CurrentEnergy" type="Float">
+                    <description>The energy meter value. Unit: kWh.</description>
+                </parameter>
+                <parameter name="AveragePower" type="Float">
+                    <description>The average power calculated from the last and current energy meter values. Unit: W.</description>
+                </parameter>
+            </properties>
+        </service>
+
+        <!-- Health -->
+        <service name="WeightScale">
+            <description>This service type enables reading a weight scale.</description>
+            <category>health</category>
+            <properties>
+                <parameter name="Weight" type="Float">
+                    <description>The measured weight: Unit: kilogram.</description>
+                </parameter>
+                <parameter name="Height" type="Float">
+                    <description>The length set on the scale. Unit: cm.</description>
+                </parameter>
+                <parameter name="BodyFatRate" type="Float">
+                    <description>The body fat rate set on the scale. Unit: %.</description>
+                </parameter>
+                <parameter name="BodyMassIndex" type="Float">
+                    <description>The body mass index set on the scale. Unit: Kg m^2.</description>
+                </parameter>
+                <parameter name="BasalMetabolism" type="Integer">
+                    <description>The basal metabolism set on the scale. Unit: kcal.</description>
+                </parameter>
+                <parameter name="SkeletalMuscleRate" type="Float">
+                    <description>The skeletal muscle rate set on the scale. Unit: %.</description>
+                </parameter>
+                <parameter name="Gender" type="String">
+                    <description>The gender set on the scale.</description>
+                    <values>
+                        <value>Male</value>
+                        <value>Female</value>
+                    </values>
+                    <default>Female</default>
+                </parameter>
+                <parameter name="Age" type="Integer">
+                    <description>The age set on the scale. Unit: year.</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="BloodPressureMonitor">
+            <description>This service type enables reading blood pressure.</description>
+            <category>health</category>
+            <properties>
+                <parameter name="SystolicPressure" type="Integer">
+                    <description>The measured systolic pressure. Unit: mmHg.</description>
+                </parameter>
+                <parameter name="DiastolicPressure" type="Integer">
+                    <description>The measured diastolic pressure. Unit: mmHg.</description>
+                </parameter>
+                <parameter name="MeanArterialPressure" type="Integer">
+                    <description>The measured mean arterial pressure. Unit: mmHg.</description>
+                </parameter>
+                <parameter name="PulseRate" type="Integer">
+                    <description>The measured pulse rate. Unit: beats per minute.</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="HeartRateMonitor">
+            <description>This service type enables reading the heart rate.</description>
+            <category>health</category>
+            <properties>
+                <parameter name="HeartBeatCount" type="Integer">
+                    <description>The measured number of beats. Unit: number of beats.</description>
+                </parameter>
+                <parameter name="HeartBeatEventTime" type="Integer">
+                    <description>Represents the time of the last valid heart beat event. Unit: milliseconds.
+                    </description>
+                </parameter>
+                <parameter name="HeartRate" type="Integer">
+                    <description>The measured heart rate. Unit: beats per minute.</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Pedometer">
+            <description>This service type enables reading a pedometer.</description>
+            <category>health</category>
+            <properties>
+                <parameter name="Steps" type="Integer">
+                    <description>The measured number of steps. Unit: number of steps.</description>
+                </parameter>
+                <parameter name="CaloriesConsumed" type="Float">
+                    <description>The alories consumed. Unit: kcal.</description>
+                </parameter>
+                <parameter name="DistanceWalked" type="Integer">
+                    <description>The distance walked. Unit: metres.</description>
+                </parameter>
+                <parameter name="FatBurn" type="Integer">
+                    <description>The amount of fat burned. Unit: gram.</description>
+                </parameter>
+            </properties>
+        </service>
+
+        <!-- Media -->
+        <service name="ContentDirectory">
+            <description>This service type enables accessing a media UPnP content directory (see ContentDirectory
+                specification, http://upnp.org/specs/av/UPnP-av-ContentDirectory-v1-Service.pdf).
+            </description>
+            <category>media</category>
+            <actions>
+                <action name="Browse">
+                    <description>Gets the content at the node, specified by the given ID, in the tree.</description>
+                    <arguments>
+                        <parameter name="ObjectID" type="String">
+                            <description>The ID of the node, in the tree, to browse.</description>
+                            <default>0</default>
+                        </parameter>
+                        <parameter name="BrowseFlag" type="String">
+                            <description>Specifies a browse option to be used for browsing the ContentDirectory service.
+                                'BrowseMetadata' indicates that the properties of the object specified by the ObjectID
+                                will be returned in the Result parameter; 'BrowseDirectChildren' indicates that first
+                                level objects under the object specified by the ObjectID will be returned in the
+                                parameter, as well as the metadata of all objects specified.
+                            </description>
+                            <values>
+                                <value>BrowseMetadata</value>
+                                <value>BrowseDirectChildren</value>
+                            </values>
+                            <default>BrowseDirectChildren</default>
+                        </parameter>
+                        <parameter name="StartingIndex" type="Integer">
+                            <description>The index, among the children of the node, from where retrieval shall start.
+                            </description>
+                        </parameter>
+                        <parameter name="RequestedCount" type="Integer">
+                            <description>The number of child items to rerieve.</description>
+                        </parameter>
+                        <parameter name="SortCriteria" type="String">
+                            <description>The sorting criteria, see ContentDirectory spec for details.</description>
+                            <default></default>
+                        </parameter>
+                        <parameter name="Filter" type="String">
+                            <description>The filter, see ContentDirectory spec for details.</description>
+                            <default>*</default>
+                        </parameter>
+                    </arguments>
+                    <results>
+                        <parameter name="DidlDocument" type="String">
+                            <description>A DIDL document, see ContentDirectory spec for details.</description>
+                        </parameter>
+                        <parameter name="NumberReturned" type="Integer">
+                            <description>Number of items returned.</description>
+                        </parameter>
+                        <parameter name="TotalMatches" type="Integer">
+                            <description>Total number of items matching the filter.</description>
+                        </parameter>
+                        <parameter name="UpdateID" type="Integer">
+                            <description>Update ID</description>
+                        </parameter>
+                    </results>
+                </action>
+                <action name="SimpleBrowse">
+                    <description>Simple method to gets the content at the node, specified by the given ID, in the tree.</description>
+                    <arguments>
+                        <parameter name="ID" type="String">
+                            <description>The ID of the node, in the tree, to browse.</description>
+                        </parameter>
+                        <parameter name="StartingIndex" type="Integer">
+                            <description>The index, among the children of the node, from where retrieval shall start.
+                            </description>
+                        </parameter>
+                        <parameter name="RequestedCount" type="Integer">
+                            <description>The number of child items to rerieve.</description>
+                        </parameter>
+                        <parameter name="SortCriteria" type="String">
+                            <description>The sorting criteria, see ContentDirectory spec for details.</description>
+                            <default></default>
+                        </parameter>
+                        
+                    </arguments>
+                    <results>
+                        <parameter name="Result" type="String">
+                            <description>A JSON array of media objects.</description>
+                        </parameter>
+                    </results>
+                </action>
+            </actions>
+        </service>
+        <service name="RenderingControl">
+            <description>This service type enables a UPnP media renderer (see RenderingControl specification,
+                http://upnp.org/specs/av/UPnP-av-RenderingControl-v1-Service.pdf).
+            </description>
+            <category>media</category>
+            <actions>
+                <action name="Play">
+                    <description>Start playback the specified item.</description>
+                    <arguments>
+                        <parameter name="Url" type="String">
+                            <description>The URL of the item to play.</description>
+                        </parameter>
+                        <parameter name="Title" type="String">
+                            <description>The title of the item to play.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="Stop">
+                    <description>Stops playback.</description>
+                </action>
+                <action name="Pause">
+                    <description>Pause playback.</description>
+                </action>
+                <action name="Resume">
+                    <description>Resumes playback.</description>
+                </action>
+                <action name="SetVolume">
+                    <description>Sets the volume.</description>
+                    <arguments>
+                        <parameter name="Volume" type="Integer">
+                            <description>The volume. Unit: percentage of max</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="CurrentVolume" type="Integer">
+                    <description>The currentvolume. Unit: percentage of max</description>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+                <parameter name="Status" type="String">
+                    <description>The current playing status.</description>
+                    <values>
+                        <value>Stopped</value>
+                        <value>Playing</value>
+                        <value>Paused</value>
+                    </values>
+                    <default>Stopped</default>
+                </parameter>
+                <parameter name="CurrentTitle" type="String">
+                    <description>The title of the currently playing media.</description>
+                </parameter>
+                <parameter name="CurrentUrl" type="String">
+                    <description>The URL of the currently playing media.</description>
+                </parameter>
+            </properties>
+        </service>
+
+        <!-- Misc -->
+        <service name="WheaterResource">
+            <description>This service type enables fetching of wheater report.</description>
+            <category>misc</category>
+            <actions>
+                <action name="getReport">
+                    <description>Fetches the latest wheather report.</description>
+                    <results>
+                        <parameter name="report" type="String">
+                            <description>The wheater report.</description>
+                        </parameter>
+                    </results>
+                </action>
+                <parameter name="latestWheaterReport" type="String">
+                    <description>The last read wheater report, either fetched using 'GetReport' or issued by the
+                        wheather resources.
+                    </description>
+                </parameter>
+            </actions>
+        </service>
+        <service name="DataLogger">
+            <description>This service logs meter readings of devices.</description>
+            <category>data</category>
+            <actions>
+                <action name="addDataStream">
+                    <description>Adds a periodic reading for a specific device.</description>
+                    <arguments>
+                        <parameter name="streamId" type="String">
+                            <description>The unique id of this data stream.</description>
+                        </parameter>
+                        <parameter name="unit" type="String">
+                            <description>The unit of this data stream, e.g. Celcius or kWh.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="addDataPoint">
+                    <description>Adds a data point to a data stream.</description>
+                    <arguments>
+                        <parameter name="streamId" type="String">
+                            <description>The unique name of the stream to add the data point to.</description>
+                        </parameter>
+                        <parameter name="value" type="String">
+                            <description>The value of the data point.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeDataStream">
+                    <description>Removes a data stream.</description>
+                    <arguments>
+                        <parameter name="streamId" type="String">
+                            <description>The unique name of the data stream to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="getDataStreams">
+                    <description>Returns a list of all data streams.</description>
+                    <results>
+                        <parameter name="dataStreams" type="String">
+                            <description>A semicolon separated list of data streams.</description>
+                        </parameter>
+                    </results>
+                </action>
+                <action name="getDataPoints">
+                    <description>Returns a list of all data points for the given stream and time period.</description>
+                    
+                    <arguments>
+                        <parameter name="streamId" type="String">
+                            <description>The unique id of this data stream.</description>
+                        </parameter>
+                        <parameter name="start" type="String">
+                            <description>The start of the time period to retrieve data points for, e.g. 2012-09-13T14:01:46Z.</description>
+                        </parameter>
+                        <parameter name="duration" type="String">
+                            <description>The duration of the time period to retrieve data points for, e.g. 2seconds, 55minutes, 6hours, 8days, 1weeks, 2months, 9years.</description>
+                        </parameter>
+                        <parameter name="interval" type="Integer">
+                            <description>Determines what interval of data is requested and is defined in seconds between the datapoints (from 0 to 86400). There is a limit of ~1000 data points per request.</description>
+                        </parameter>
+		                <parameter name="mode" type="String">
+		                    <description>If set to "Discrete" the data logger will return the values for the fixed times given by "start" and "interval", else it will return the raw data point values.</description>
+		                    <default>Values</default>
+		                    <values>
+		                        <value>Values</value>
+		                        <value>Discrete</value>
+		                    </values>
+		                </parameter>
+		                <parameter name="firstPoint" type="String">
+		                    <description>If "Before" the data logger returns the first point prior to the given start date else the first point after the give start date.</description>
+		                    <default>Before</default>
+		                    <values>
+		                        <value>Before</value>
+		                        <value>After</value>
+		                    </values>
+		                </parameter>
+                        </arguments>
+                    <results>
+                        <parameter name="dataPoints" type="String">
+                            <description>A JSON encoded list of data points and time values.</description>
+                        </parameter>
+                    </results>
+                </action>
+                
+            </actions>
+        </service>
+        <service name="DataCollector">
+            <description>This service collects meter readings of devices.</description>
+            <category>data</category>
+            <actions>
+                <action name="addPeriodicReading">
+                    <description>Adds a periodic reading for a specific device.</description>
+                    <arguments>
+                        <parameter name="name" type="String">
+                            <description>The unique name of this periodic reading.</description>
+                        </parameter>
+                        <parameter name="deviceId" type="String">
+                            <description>The device ID of the device to read.</description>
+                        </parameter>
+                        <parameter name="serviceId" type="String">
+                            <description>The service ID of the service to read.</description>
+                        </parameter>
+                        <parameter name="propertyId" type="String">
+                            <description>The property ID of the property to read.</description>
+                        </parameter>
+                        <parameter name="interval" type="Integer">
+                            <description>The reading interval in seconds.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="addPeriodicRefresh">
+                    <description>Adds a periodic refresh of service properties for a specific service and/or protocol family.</description>
+                    <arguments>
+                        <parameter name="name" type="String">
+                            <description>The unique name of this periodic refresh.</description>
+                        </parameter>
+                        <parameter name="protocol" type="String">
+                            <description>The protocol family of the devices to be refreshed (wildcard is *).</description>
+                            <default>*</default>
+                        </parameter>
+                        <parameter name="service" type="String">
+                            <description>The name of the service to be refreshed, e.g. EnergyMeter (wilcard is *).</description>
+                            <default>*</default>
+                        </parameter>
+                        <parameter name="interval" type="Integer">
+                            <description>The refresh interval in seconds.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeReading">
+                    <description>Removes a periodic reading.</description>
+                    <arguments>
+                        <parameter name="name" type="String">
+                            <description>The unique name of the periodic reading to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeRefresh">
+                    <description>Removes a periodic refresh.</description>
+                    <arguments>
+                        <parameter name="name" type="String">
+                            <description>The unique name of the periodic refresh to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+        <service name="Configuration">
+            <description>This service configures devices.</description>
+            <category>misc</category>
+            <actions>
+                <action name="setParameter">
+                    <description>Adds a periodic reading for a specific device.</description>
+                    <arguments>
+                        <parameter name="id" type="String">
+                            <description>The ID of the parameter.</description>
+                        </parameter>
+                        <parameter name="type" type="String">
+                            <description>The type of the parameter.</description>
+                            <values>
+                                <value>Hex</value>
+                                <value>String</value>
+                            </values>
+                            <default>Hex</default>
+                        </parameter>
+                        <parameter name="value" type="String">
+                            <description>The value of the parameter, e.g. 0F45BA</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="setParameterDefault">
+                    <description>Adds a periodic reading for a specific device.</description>
+                    <arguments>
+                        <parameter name="id" type="String">
+                            <description>The ID of the parameter.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="getParameter">
+                    <description>Return the value of the parameter.</description>
+                    <arguments>
+                        <parameter name="id" type="String">
+                            <description>The ID of the parameter.</description>
+                        </parameter>
+                    </arguments>
+                    <results>
+                        <parameter name="type" type="String">
+                            <description>The type of the parameter.</description>
+                        </parameter>
+                        <parameter name="value" type="String">
+                            <description>The value of the parameter, e.g. 0F45BA</description>
+                        </parameter>
+                    </results>
+                </action>
+            </actions>
+        </service>
+
+        <!-- Util -->
+        <service name="PowerMeter">
+            <description>Deprecated!!! This definition uses action to read property. It is kept for backward
+                compatibility. Consider changing to 'PowerSensor' instead. This service type enables reading the current
+                power consumption.
+            </description>
+            <category>util</category>
+            <actions>
+                <action name="GetPower">
+                    <description>Reads the current power consumption.</description>
+                    <results>
+                        <parameter name="Power" type="Float">
+                            <description>The current power consumption in Watt.</description>
+                        </parameter>
+                    </results>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="CurrentPower" type="Float">
+                    <description>The current power consumption.</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="PowerControl">
+            <description>Deprecated!!! This definition uses action to read property. It is kept for backward
+                compatibility. Consider changing to 'SwitchPower' instead.This service type enables controlling a power
+                outlet.
+            </description>
+            <category>util</category>
+            <actions>
+                <action name="On">
+                    <description>Switches the outlet on.</description>
+                </action>
+                <action name="Off">
+                    <description>Switches the outlet off.</description>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="CurrentState" type="String">
+                    <description>The current state of the outlet.</description>
+                    <values>
+                        <value>On</value>
+                        <value>Off</value>
+                    </values>
+                    <default>Off</default>
+                </parameter>
+            </properties>
+        </service>
+
+        <!-- A bit Z-Wave specific -->
+        <service name="NetworkManagement">
+            <description>This service type enables pairing or installing devices in a network.</description>
+            <category>util</category>
+            <actions>
+                <action name="reset" optional="true">
+                    <description>Removes all stored devices.</description>
+                </action>
+                <action name="startPairing" optional="true">
+                    <description>Initializes pairing. The user should then push a button or similar on the device to be
+                        paired with the controller. Once the pairing has completed a new device will have been
+                        registered in the controller (and in the OSGi service registry).
+                    </description>
+                    <arguments>
+                        <parameter name="networkWide" type="String">
+                            <description>Indicate whether pairing shall be network wide or not.</description>
+                            <values>
+                                <value>true</value>
+                                <value>false</value>
+                            </values>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="startUnpairing" optional="true">
+                    <description>Initializes unpairing. The user should then push a button or similar on the device to
+                        be unpaired from the controller. Once the unpairing has completed a new device will have been
+                        unregistered from the controller (and from the OSGi service registry).
+                    </description>
+                </action>
+                <action name="abort">
+                    <description>Aborts a currently ongoing pairing/unpairing .</description>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="isPairing" type="String">
+                    <description>Indicates whether pairing is ongoing or not.</description>
+                    <default>false</default>
+                    <values>
+                        <value>true</value>
+                        <value>false</value>
+                    </values>
+                </parameter>
+                <parameter name="isUnpairing" type="String">
+                    <description>Indicates whether unpairing is ongoing or not.</description>
+                    <default>false</default>
+                    <values>
+                        <value>true</value>
+                        <value>false</value>
+                    </values>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Associator">
+            <description>This service type enables associating two devices.</description>
+            <category>util</category>
+            <actions>
+                <action name="associate">
+                    <description>Associates the device owning this service with the device with the specified ID.
+                    </description>
+                    <arguments>
+                        <parameter name="deviceURN" type="String">
+                            <description>The URN of the device to which this device shall be associated.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="Dissociate">
+                    <description>Removes association between the device owning this service from the device with the
+                        specified ID.
+                    </description>
+                    <arguments>
+                        <parameter name="deviceURN" type="String">
+                            <description>The URN of the device from which this device shall be dissociated.
+                            </description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="currentAssociations" type="String">
+                    <description>The current set of associations. Represented with a JSON array with the URN:s of the
+                        associated devices, e.g "[urn-1,urn-2,urn-3]. Note devices that are not mapped to a GDA device
+                        are excluded."
+                    </description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Basic">
+            <category>util</category>
+            <description>Control the basic function of a device in a generic way. The actual semantics depends on the
+                device.
+            </description>
+            <actions>
+                <action name="setValue">
+                    <description>Set the value. What it really means depends on the device; will be used to set dim
+                        level, temperature, state, water level, speed etc., in a device
+                    </description>
+                    <arguments>
+                        <parameter name="value" type="Integer">
+                            <min>0</min>
+                            <max>255</max>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="currentValue" type="Integer">
+                    <description>The current value. What it really means depends on the device; can be dimming level,
+                        temperature, state, water level, speed etc., from a device
+                    </description>
+                    <min>0</min>
+                    <max>255</max>
+                </parameter>
+            </properties>
+        </service>
+
+        <!-- security -->
+        <service name="UserCode">
+            <category>security</category>
+            <description>A device which sends user codes in the form of ASCII strings.</description>
+            <actions>
+                <action name="setUserCode">
+                    <description>Sets the user code for the specified user ID.</description>
+                    <arguments>
+                        <parameter name="userCode" type="String">
+                            <description>The user code. The number of characters and valid set of characters depends in
+                                the device
+                            </description>
+                        </parameter>
+                        <parameter name="userId" type="String">
+                            <description>The user ID.</description>
+                        </parameter>
+                        <parameter name="userCodeFormat" type="String">
+                            <description>The format of the user code. Hex is represented as a sequence of 2-digit hex
+                                numbers, e.g "A0034B" would be interpreted as [0xA0, 0x03, 0x4B].
+                            </description>
+                            <values>
+                                <value>Hex</value>
+                                <value>String</value>
+                            </values>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="getUserCode">
+                    <description>Gets the user code for the specified user ID. The result will be added to the
+                        'reportedUserCodes' property.
+                    </description>
+                    <arguments>
+                        <parameter name="userId" type="String">
+                            <description>The user ID.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="reportedUserCodes" type="String">
+                    <description>The user codes that has been reported by the device. A JSON struct '{ "&lt;userid1&gt;"
+                        : { "format" : "Hex"|"String", "userCode" : "&lt;usercode1&gt;" }, "&lt;userid2&gt;" : { ... },
+                        ... }'.
+                        format = "Hex" is represented as a sequence of 2-digit hex numbers, e.g "A0034B" would be
+                        interpreted as [0xA0, 0x03, 0x4B].
+                    </description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="AlarmOld">
+            <category>security</category>
+            <description>DEPRECATED! A service that issue alarm events.</description>
+            <properties>
+                <parameter name="accessControlAlarm" type="String">
+                    <description>Information about last issued access control alarm.</description>
+                    <default>Undefined</default>
+                    <values>
+                        <value>Undefined</value>
+                        <value>KeypadUnlock</value>
+                        <value>KeypadLock</value>
+                    </values>
+                </parameter>
+                <parameter name="burglarAlarm" type="String">
+                    <description>Information about last issued access control alarm.</description>
+                    <default>Undefined</default>
+                    <values>
+                        <value>Undefined</value>
+                        <value>Intrusion</value>
+                        <value>Tampering</value>
+                    </values>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Siren">
+            <category>security</category>
+            <description>A service that controls the sound and lights of a siren.</description>
+            <properties>
+                <parameter name="volume" type="Integer">
+                    <description>The volume och the sound.</description>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+                <parameter name="state" type="String">
+                    <description>The state of the siren.</description>
+                    <default>Undefined</default>
+                    <values>
+                        <value>Undefined</value>
+                        <value>Off</value>
+                        <value>Alarming</value>
+                        <value>Warning</value>
+                    </values>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setVolume">
+                    <description>Sets the volume of the siren.</description>
+                    <arguments>
+                        <parameter name="volume" type="Integer">
+                            <description>The volume och the sound.</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="turnOn">
+                    <description>Turns on the siren.</description>
+                    <arguments>
+		                <parameter name="type" type="String">
+		                    <description>The type of siren sound.</description>
+		                    <default>Alarm</default>
+		                    <values>
+		                        <value>Alarm</value>
+		                        <value>Warn</value>
+		                    </values>
+		                </parameter>
+                    </arguments>
+                </action>
+                <action name="turnOff">
+                    <description>Turns off the siren.</description>
+                </action>
+            </actions>
+        </service>
+        <service name="MoLiTe">
+            <category>security</category>
+            <description>A triple sensor which detects Motion, Light and Temperature.</description>
+            <properties>
+                <parameter name="motionDetected" type="Integer">
+                    <description>Indicates if motion has been detected.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+                <parameter name="temperature" type="Float">
+                    <description>The current temperature measured in celsius.</description>
+                    <default>0</default>
+                </parameter>
+                <parameter name="light" type="Integer">
+                    <description>The current luminence measured as a percentage 0=darkest, 100=lightest.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+                <parameter name="temperatureOffset" type="Float">
+                    <description>The temperature offset to be added to the measured temperature.</description>
+                    <default>0</default>
+                </parameter>
+                <parameter name="motionDetectorSensitivity" type="Float">
+                    <description>The sensitivity of the motion circuit in % of max sensitivity.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setTemperatureOffset">
+                    <description>Sets the offset for the temperature sensor.</description>
+                    <arguments>
+                        <parameter name="offset" type="Float">
+                            <description>The temperature offset to be added to the measured temperature.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="setMotionDetectorSensitivity">
+                    <description>Sets the sensitivity of the motion detector.</description>
+                    <arguments>
+                        <parameter name="sensitivity" type="Float">
+                            <description>The sensitivity of the motion circuit in % of max sensitivity.</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+        <service name="MotionSensor">
+            <category>security</category>
+            <description>A sensor which detects motion.</description>
+            <properties>
+                <parameter name="motionDetected" type="Integer">
+                    <description>Indicates if motion has been detected.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+                <parameter name="motionDetectorSensitivity" type="Float">
+                    <description>The sensitivity of the motion circuit in % of max sensitivity.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setMotionDetectorSensitivity">
+                    <description>Sets the sensitivity of the motion detector.</description>
+                    <arguments>
+                        <parameter name="sensitivity" type="Float">
+                            <description>The sensitivity of the motion circuit in % of max sensitivity.</description>
+                            <min>0</min>
+                            <max>100</max>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+        <service name="DoorWindowSensor">
+            <category>security</category>
+            <description>A sensor which detects status of a door/window.</description>
+            <properties>
+                <parameter name="isOpen" type="Integer">
+                    <description>Indicates if the door/window is open; 1=open</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+            </properties>
+        </service>
+        <service name="AlarmPanel">
+            <category>security</category>
+            <description>This is a panel through which the alarm can be armed/disarmed.
+                It also supports entering new user codes to the panel.</description>
+            <actions>
+                <action name="setUserCode" optional="true">
+                    <description>Sets the user code for the specified user ID.</description>
+                    <arguments>
+                        <parameter name="userId" type="Integer">
+                            <description>The user ID.</description>
+                            <default>0</default>
+                        </parameter>
+                        <parameter name="userCode" type="String">
+                            <description>The user code as a string of two figure hex values.
+                            Example: "0A318EFE" or "31323334" (which would correspond to the ASCII values '1','2','3','4')</description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="lastUserCodeEntered" type="String">
+                    <description>The last user code that was entered.</description>
+                </parameter>
+                <parameter name="status" type="String">
+                    <description>Indicates the status of the alarm panel. In case it has been tampered it must be unlocked.</description>
+                    <default>Unlocked</default>
+                    <values>
+                        <value>Unlocked</value>
+                        <value>Locked</value>
+                        <value>Tampered</value>
+                    </values>
+                </parameter>
+                <parameter name="registeredUserCodes" type="String">
+                    <description>The set of user codes registered in this device, as a JSON object:
+                    {"1":"31313434", "2":"8E100A330000"}</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="DoorLock">
+            <category>security</category>
+            <description>This service controls deadbolts</description>
+            <properties>
+                <parameter name="mode" type="String">
+                    <description>Door mode</description>
+                    <default>Unsecured</default>
+                    <values>
+                        <value>Unsecured</value>
+                        <value>UnsecuredWithTimeout</value>
+                        <value>UnsecuredInside</value>
+                        <value>UnsecuredInsideWithTimeout</value>
+                        <value>UnsecuredOutside</value>
+                        <value>UnsecuredOutsideWithTimeout</value>
+                        <value>Secured</value>
+                    </values>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setMode" optional="true">
+                    <description>Sets the mode for the door</description>
+                    <arguments>
+		                <parameter name="mode" type="String">
+		                    <description>Door mode</description>
+		                    <default>Unsecured</default>
+		                    <values>
+		                        <value>Unsecured</value>
+		                        <value>UnsecuredWithTimeout</value>
+		                        <value>UnsecuredInside</value>
+		                        <value>UnsecuredInsideWithTimeout</value>
+		                        <value>UnsecuredOutside</value>
+		                        <value>UnsecuredOutsideWithTimeout</value>
+		                        <value>Secured</value>
+		                    </values>
+		                </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="lastUserCodeEntered" type="String">
+                    <description>The last user code that was entered.</description>
+                </parameter>
+                <parameter name="status" type="String">
+                    <description>Indicates the status of the alarm panel. In case it has been tampered it must be unlocked.</description>
+                    <default>Unlocked</default>
+                    <values>
+                        <value>Unlocked</value>
+                        <value>Locked</value>
+                        <value>Tampered</value>
+                    </values>
+                </parameter>
+                <parameter name="registeredUserCodes" type="String">
+                    <description>The set of user codes registered in this device, as a JSON object:
+                    {"1":"31313434", "2":"8E100A330000"}</description>
+                </parameter>
+            </properties>
+        </service>
+        <service name="AlarmController">
+            <category>security</category>
+            <description>An alarm controller which ges trigged detectors and issues alarms on indicators.</description>
+            <actions>
+                <action name="arm">
+                    <description>Arm this alarm controller. Used as a complement to the alarm panels to arm the alarm explicitly.</description>
+                </action>
+                <action name="disarm">
+                    <description>Disarm this alarm controller. Used as a complement to the alarm panels to disarm the alarm explicitly.</description>
+                </action>
+                <action name="addAlarmPanel">
+                    <description>Add an alarm panel to this controller</description>
+                    <arguments>
+                        <parameter name="alarmPanelUrn"  type="String">
+                            <description>The URN of the alarm panel to add.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeAlarmPanel">
+                    <description>Remove an alarm panel from this controller</description>
+                    <arguments>
+                        <parameter name="alarmPanelUrn"  type="String">
+                            <description>The URN of the alarm panel to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="addDetector">
+                    <description>Add an intrusion detector device (e.g. a window sensor or motion detector) to this controller.</description>
+                    <arguments>
+                        <parameter name="detectorUrn" type="String">
+                            <description>The URN of the detector device to add.</description>
+                        </parameter>
+                        <parameter name="service" type="String">
+                            <description>The service to supervise, in the detector device.</description>
+                        </parameter>
+                        <parameter name="propertyName" type="String">
+                            <description>The property to supervise, in the service.</description>
+                        </parameter>
+                        <parameter name="onValue" type="String">
+                            <description>The property value that indicates that the detector is on (has been tripped).</description>
+                        </parameter>
+                        <parameter name="offValue" type="String">
+                            <description>The property value that indicates that the detector is off.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeDetector">
+                    <description>Remove an intrusion detector from this controller.</description>
+                    <arguments>
+                        <parameter name="detectorUrn" type="String">
+                            <description>The URN of the detector device to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="addAlarmIndicator">
+                    <description>Adds an alarm indicator (e.g. a siren or light) to this controller.</description>
+                    <arguments>
+                        <parameter name="indicatorUrn" type="String">
+                            <description>The URN of the indicator device to add.</description>
+                        </parameter>
+                        <parameter name="service" type="String">
+                            <description>The service to operate, in the detector device.</description>
+                        </parameter>
+                        <parameter name="onActionName" type="String">
+                            <description>The action used to turn on the indication in the service.</description>
+                        </parameter>
+                        <parameter name="offActionName" type="String">
+                            <description>The action used to turn off the indication in the service.</description>
+                        </parameter>
+                        <parameter name="parameterName" type="String">
+                            <description>Optional action parameter.</description>
+                        </parameter>
+                        <parameter name="onValue" type="String">
+                            <description>Optional action parameter value that sets the indicator is on.</description>
+                        </parameter>
+                        <parameter name="offValue" type="String">
+                            <description>Optional action parameter value that sets the indicator is off.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeAlarmIndicator">
+                    <arguments>
+                        <parameter name="indicatorUrn" type="String">
+                            <description>The URN of the indicator device to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="addWarnIndicator">
+                    <description>Adds an warn indicator (e.g. a siren or light) to this controller. A warn indicator is used to warn when an intrusion occurred and the system is waiting to be disarmed.</description>
+                    <arguments>
+                        <parameter name="indicatorUrn" type="String">
+                            <description>The URN of the indicator device to add.</description>
+                        </parameter>
+                        <parameter name="service" type="String">
+                            <description>The service to operate, in the detector device.</description>
+                        </parameter>
+                        <parameter name="onActionName" type="String">
+                            <description>The action used to turn on the indication in the service.</description>
+                        </parameter>
+                        <parameter name="offActionName" type="String">
+                            <description>The action used to turn off the indication in the service.</description>
+                        </parameter>
+                        <parameter name="parameterName" type="String">
+                            <description>Optional action parameter.</description>
+                        </parameter>
+                        <parameter name="onValue" type="String">
+                            <description>Optional action parameter value that sets the indicator is on.</description>
+                        </parameter>
+                        <parameter name="offValue" type="String">
+                            <description>Optional action parameter value that sets the indicator is off.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="removeWarnIndicator">
+                    <arguments>
+                        <parameter name="indicatorUrn" type="String">
+                            <description>The URN of the indicator device to remove.</description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+            <properties>
+                <parameter name="armState" type="String">
+                    <description>Indicates the arm state of the controller.</description>
+                    <default>Disarmed</default>
+                    <values>
+                        <value>Disarmed</value>
+                        <value>Arming</value>
+                        <value>Armed</value>
+                    </values>
+                </parameter>
+                <parameter name="intrusionStatus" type="String">
+                    <description>Indicates if there is an intrusion.
+                        The 'PossibleIntrusion' state is entered when the alarm is armed and intrusion is detected for a grace period (where one should disarm the alarm) before sounding the alarm.</description>
+                    <values>
+                        <value>NoIntrusion</value>
+                        <value>PossibleIntrusion</value>
+                        <value>Intrusion</value>
+                    </values>
+                </parameter>
+                <parameter name="detectors" type="String">
+                    <description>The set of detectors wired to this alarm controller as a JSON object:
+                        {"770f26a9-891b-4243-9764-ef8bfab3a34b":{"deviceUrn":"770f26a9-891b-4243-9764-ef8bfab3a34b","service":"Basic","parameter":"currentValue","onValue":"255","offValue":"0"},"1b2c0c3f-1e3a-454c-ae0d-ff5e7d3e93a9":{"deviceUrn":"1b2c0c3f-1e3a-454c-ae0d-ff5e7d3e93a9","service":"MoLiTe","parameter":"motionDetected","onValue":"1","offValue":"0"}}
+                    </description>
+                </parameter>
+                <parameter name="alarmPanels" type="String">
+                    <description>The set of alarm panels wired to this alarm controller as a JSON object:
+                        ["b9f7c490-3206-407d-99e5-931fbabba64b"]
+                    </description>
+                </parameter>
+                <parameter name="alarmIndicators" type="String">
+                    <!-- TODO generalize to include lights etc. -->
+                    <description>The set of alarm indicators wired to this alarm controller as a JSON object:
+                        {"26474ffe-3a26-46f3-8dee-ee99c97b8987":{"deviceUrn":"26474ffe-3a26-46f3-8dee-ee99c97b8987","service":"Siren","onAction":"turnOn","offAction":"turnOff","parameter":"type","onValue":"Alarm","offValue":""}}
+                    </description>
+                </parameter>
+                <parameter name="warnIndicators" type="String">
+                    <!-- TODO generalize to include lights etc. -->
+                    <description>The set of warn indicators wired to this alarm controller as a JSON object:
+                        {"26474ffe-3a26-46f3-8dee-ee99c97b8987":{"deviceUrn":"26474ffe-3a26-46f3-8dee-ee99c97b8987","service":"Siren","onAction":"turnOn","offAction":"turnOff","parameter":"type","onValue":"Warn","offValue":""}}
+                    </description>
+                </parameter>
+            </properties>
+        </service>
+
+        <!-- Z-Wave -->
+        <service name="BinarySwitch">
+            <category>zwave</category>
+            <description>This service represents a generic Z-Wave binary switch.</description>
+            <properties>
+                <parameter name="state" type="Integer">
+                    <description>The state of the switch</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="Set">
+                    <description>Requests the Binary Switch Service instance output to be driven to the state indicated
+                        by 'state' Value.
+                    </description>
+                    <arguments>
+                        <parameter name="state" type="Integer">
+                            <description>The desired state. Unit: 0 = power-off state; 1 = power-on state.
+                            </description>
+                            <min>0</min>
+                            <max>1</max>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+        <service name="Alarm">
+            <category>zwave</category>
+            <description>This service provides alarm status information.</description>
+            <properties>
+                <parameter name="alarmType" type="Integer">
+                    <description>The type of alarm. Manufacturer specific for Version 1 and described in SDS11060 for Version 2.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>255</max>
+                </parameter>
+                <parameter name="alarmStatus" type="Integer">
+                    <description>The status/level of alarm. Manufacturer specific for Version 1 and described in SDS11060 for Version 2.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>255</max>
+                </parameter>
+                <parameter name="alarmEvent" type="Integer">
+                    <description>The event type. Described in SDS11060 for Version 2.</description>
+                    <default>0</default>
+                    <min>0</min>
+                    <max>255</max>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Battery">
+            <description>This service provides battery status information.</description>
+            <category>zwave</category>
+            <properties>
+                <parameter name="batteryLevel" type="Integer">
+                    <description>The battery level.</description>
+                    <min>0</min>
+                    <max>100</max>
+                </parameter>
+                <parameter name="lowBatteryWarning" type="Integer">
+                    <description>Indicates that the battery is running dangerously low.</description>
+                    <min>0</min>
+                    <max>1</max>
+                </parameter>
+            </properties>
+        </service>
+        <service name="Wakeup">
+            <description>This service makes it possible to get/set wakeup interval and receive wakeup notifications.
+            </description>
+            <category>zwave</category>
+            <properties>
+                <parameter name="awakeNotificationCounter" type="Integer">
+                    <description>A counter that is incremented each time a wake-up notification has been received.
+                        Subscribe for changes in this property to be notified about wake-ups.
+                    </description>
+                </parameter>
+                <parameter name="currentWakeupInterval" type="Integer">
+                    <description>Specifies how often the device wakes up. Unit: seconds</description>
+                    <min>0</min>
+                    <max>16777215</max>
+                </parameter>
+                <parameter name="currentNodeId" type="Integer">
+                    <description>Specifies the ID of the node receiving the wakeup command. 0 means broadcast.
+                    </description>
+                    <min>0</min>
+                    <max>255</max>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="setWakeupInterval">
+                    <description>Set the wakeup interval.</description>
+                    <arguments>
+                        <parameter name="wakeupInterval" type="Integer">
+                            <description>Specifies how often the device wakes up. Unit: seconds</description>
+                            <min>0</min>
+                            <max>16777215</max>
+                            <default>3600</default>
+                        </parameter>
+                        <parameter name="nodeId" type="Integer">
+                            <description>Specifies the ID of the node receiving the wakeup command. 255 means broadcast.
+                            </description>
+                            <min>0</min>
+                            <max>255</max>
+                            <default>255</default>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+        <service name="MultiChannel">
+            <category>zwave</category>
+            <description>The Multi Channel service is used to control one or more end points in a given device that
+                supports the same command class for more than one sensor.
+            </description>
+            <properties>
+                <parameter name="channelsForCommandClass" type="String">
+                    <description>The number of channels for each command class queried using 'getNumberOfChannels'. A
+                        JSON object {"&lt;command class&gt;":"&lt;number of channels&gt;"*}, e.g. {"31":"2","20":"1"}.
+                    </description>
+                </parameter>
+                <parameter name="encapsulatedReports" type="String">
+                    <description>The reports for each channel/end point queried using 'executeEncapsulatedCommand'.
+                        A JSON object
+                        {
+                            "&lt;channel&gt;":
+                            {
+                                "&lt;command class&gt;":
+                                {
+                                    "&lt;command&gt;" : [ &lt;command parameter&gt;* ]
+                                }*
+                            }*
+                        },
+                        Example:
+                        {
+                            "1":
+                            {
+                                "42":
+                                {
+                                    "3" : [0,1,2,3,4],
+                                }
+                            },
+                            "2":
+                            {
+                                "49":
+                                {
+                                    "3" : [0,1,2,3,4],
+                                    "5" : [5,6,7,8]
+                                },
+                                "52":
+                                {
+                                    "2 : [0,1]
+                                }
+                            },
+                        }
+                    </description>
+                </parameter>
+            </properties>
+            <actions>
+                <action name="getNumberOfChannels">
+                    <description>Gets the number of end points/channels for the specified command class. The result is
+                        reported in the property 'channelsForCommandClass'.
+                    </description>
+                    <arguments>
+                        <parameter name="commandClass" type="Integer">
+                            <description>The command class to check.</description>
+                            <min>0</min>
+                            <max>255</max>
+                        </parameter>
+                    </arguments>
+                </action>
+                <action name="executeEncapsulatedCommand">
+                    <description>Executes the encapsulated command on the specified channel/end point.</description>
+                    <arguments>
+                        <parameter name="channel" type="Integer">
+                            <description>The channel/end point to send the encapsulated command to.</description>
+                        </parameter>
+                        <parameter name="commandClass" type="Integer">
+                            <description>The command class to execute as encapsulated.</description>
+                            <min>0</min>
+                            <max>255</max>
+                        </parameter>
+                        <parameter name="command" type="Integer">
+                            <description>The command to execute as encapsulated.</description>
+                            <min>0</min>
+                            <max>255</max>
+                        </parameter>
+                        <parameter name="commandParameters" type="String">
+                            <description>The parameter of the encapsulated command. A JSON array with byte values, e.g
+                                [1, 127, 200, 255].
+                            </description>
+                        </parameter>
+                    </arguments>
+                </action>
+            </actions>
+        </service>
+        <service name="MultiLevelSensor">
+            <category>zwave</category>
+            <description>An analog sensor.</description>
+            <properties>
+                <parameter name="currentValue" type="Float">
+                    <description>The current value. Unit: dimensionless</description>
+                </parameter>
+            </properties>
+        </service>
+    </services>
+</service-schema>

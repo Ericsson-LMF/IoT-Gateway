@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>com.ericsson.deviceaccess</groupId>
+        <version>1.42-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ericsson.deviceaccess</groupId>
+    <artifactId>basedriver.upnp.lite</artifactId>
+    <version>1.42-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+    <name>GDA UPnP Lite Basedriver</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <!-- 
+		<dependency>
+			<groupId>org.kxml2</groupId>
+			<artifactId>kxml2</artifactId>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>net.sf.kxml</groupId>
+			<artifactId>kxml2</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.osgi.log.util</artifactId>
+            <version>${connectedhome.version}</version>
+        </dependency>
+  		<dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.2.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>com.ericsson.deviceaccess.basedriver.upnp.lite.activator.Activator
+                        </Bundle-Activator>
+                        <Private-Package>
+                            com.ericsson.research.common.slf4jlogger.*;-split-package:=merge-last,
+                            org.slf4j.*;-split-package:=merge-first,
+                            com.ericsson.deviceaccess.basedriver.upnp.lite.*
+                        </Private-Package>
+                        <Import-Package>
+							org.xmlpull.v1.*,
+							org.kxml2.io.*,
+                            org.osgi.*;version="[1.0,4.0)",
+              				javax.servlet.*
+                        </Import-Package>
+                    </instructions>
+                    <Bundle-Name>${project.artifactId}</Bundle-Name>
+                    <Bundle-Version>${project.version}</Bundle-Version>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

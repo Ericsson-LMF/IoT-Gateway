@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.ericsson.deviceaccess</groupId>
+    <artifactId>generic.device.api</artifactId>
+    <packaging>bundle</packaging>
+    <name>Generic Device API package</name>
+
+    <parent>
+        <groupId>com.ericsson.deviceaccess</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.42-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ericsson.deviceaccess</groupId>
+            <artifactId>generic.device.access</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ericsson.deviceaccess</groupId>
+            <artifactId>generic.device.access.services</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>serviceschema.codegenerator</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>serviceschema.xmlparser</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.2.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Private-Package>
+                            com.ericsson.deviceaccess.api.*;-split-package:=merge-first
+                        </Private-Package>
+                        <Export-Package>
+                            com.ericsson.deviceaccess.api.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>javadoc-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!-- switch on dependency-driven aggregation -->
+                            <includeDependencySources>true</includeDependencySources>
+                            <dependencySourceExcludes>
+                                <dependencySourceExclude>
+                                    com.ericsson.deviceaccess:serviceschema.codegenerator
+                                </dependencySourceExclude>
+                                <dependencySourceExclude>
+                                    com.ericsson.deviceaccess:serviceschema.xmlparser
+                                </dependencySourceExclude>
+                            </dependencySourceExcludes>
+
+                            <dependencySourceIncludes>
+                                <dependencySourceInclude>
+                                    com.ericsson.deviceaccess:generic.device.access
+                                </dependencySourceInclude>
+                                <dependencySourceInclude>
+                                    com.ericsson.deviceaccess:generic.device.access.services
+                                </dependencySourceInclude>
+                            </dependencySourceIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
