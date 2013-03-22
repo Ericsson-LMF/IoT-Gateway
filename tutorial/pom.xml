@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>com.ericsson.deviceaccess</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.42-SNAPSHOT</version>
+        <relativePath>../osgi/pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+    <artifactId>parent</artifactId>
+
+    <name>Ericsson OSGi Device Access tutorial</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>basedriver.tutorial</module>
+        <module>adaptor.tutorial</module>
+        <module>rest.servlet</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>build.android</id>
+            <activation>
+                <file>
+                    <exists>${android.sdk.home}</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>basedriver.tutorial</module>
+                <module>adaptor.tutorial</module>
+                <module>rest.servlet</module>
+                <!--module>android.tutorial</module-->
+            </modules>
+        </profile>
+    </profiles>
+
+
+</project>

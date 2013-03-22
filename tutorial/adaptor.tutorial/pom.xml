@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.42-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>adaptor.tutorial</artifactId>
+    <packaging>bundle</packaging>
+    <name>Tutorial: GDA adaptor for a pseudo protocol</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ericsson.deviceaccess</groupId>
+            <artifactId>generic.device.spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+            <artifactId>basedriver.tutorial</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.2.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Private-Package>
+                            com.ericsson.deviceaccess.tutorial
+                        </Private-Package>
+                        <Import-Package>
+                            com.ericsson.deviceaccess.*,
+                            org.osgi.*;version="[1.0,4.0)"
+                        </Import-Package>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-Activator>com.ericsson.deviceaccess.tutorial.DeviceFactory</Bundle-Activator>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
