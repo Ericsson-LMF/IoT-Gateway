@@ -19,54 +19,6 @@
         <module>common.test.util</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>http://www.cf.ericsson.net/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>central-1</id>
-            <url>http://www.cf.ericsson.net/nexus/content/groups/public-snapshots
-            </url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://www.cf.ericsson.net/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>central-1</id>
-            <url>http://www.cf.ericsson.net/nexus/content/groups/public-snapshots
-            </url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
-
     <build>
         <extensions>
             <extension>
@@ -130,18 +82,6 @@
                 </configuration>
             </plugin>
             <!-- Maven release plugin. -->
-            <!-- Maven release plugin. -->
-            <!-- Maven release plugin. -->
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.0-beta-9</version>
-                <configuration>
-                    <!-- note: run mvn release:prepare -Dusername=<user name> -->
-                    <tagBase>
-                        http://dev.cf.ericsson.net/svn/common/tags
-                    </tagBase>
-                </configuration>
-            </plugin>
             <!-- Plugin to generate eclipse project files. -->
             <plugin>
                 <artifactId>maven-eclipse-plugin</artifactId>
@@ -274,58 +214,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-
-    <issueManagement>
-        <system>Jira</system>
-        <url>http://www.cf.ericsson.net/jira/secure/BrowseProjects.jspa#all</url>
-    </issueManagement>
-
-    <ciManagement>
-        <system>Hudson</system>
-        <url>http://www.cf.ericsson.net/nexus/index.html</url>
-        <notifiers>
-            <notifier>
-                <type>mail</type>
-                <sendOnError>true</sendOnError>
-                <sendOnFailure>true</sendOnFailure>
-                <sendOnSuccess>fail</sendOnSuccess>
-                <sendOnWarning>fail</sendOnWarning>
-                <configuration>
-                    <address>jenkinslmeresearch@hotmail.com</address>
-                </configuration>
-            </notifier>
-        </notifiers>
-    </ciManagement>
-
-    <scm>
-        <developerConnection>
-            scm:svn:http://dev.cf.ericsson.net/svn/common/trunk
-        </developerConnection>
-    </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>nexus</id>
-            <name>Nexus Release Repository</name>
-            <url>
-                scp://www.cf.ericsson.net/usr/local/nexus-data/storage/EmbeddedRelease
-            </url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus</id>
-            <name>Internal Snapshots</name>
-            <uniqueVersion>false</uniqueVersion>
-            <url>
-                scp://www.cf.ericsson.net/usr/local/nexus-data/storage/EmbeddedSnapshot
-            </url>
-        </snapshotRepository>
-        <site>
-            <id>nexus</id>
-            <url>scp://www.cf.ericsson.net/var/www/javadoc/common/</url>
-        </site>
-
-    </distributionManagement>
 
 </project>
 
