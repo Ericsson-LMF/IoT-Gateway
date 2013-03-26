@@ -26,14 +26,6 @@
         </dependency>
 
         <!-- Test -->
-        <!-- 
-        <dependency>
-            <groupId>com.ericsson.osgi.base</groupId>
-            <artifactId>json</artifactId>
-            <version>${osgi.base.version}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>com.ericsson.deviceaccess</groupId>
             <artifactId>common.packages</artifactId>
@@ -43,7 +35,7 @@
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.test.util</artifactId>
-            <version>1.13</version>
+            <version>${connectedhome.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

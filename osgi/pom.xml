@@ -21,7 +21,7 @@
 
     <properties>
         <osgi.base.version>1.72</osgi.base.version>
-      	<connectedhome.version>1.19</connectedhome.version>
+      	<connectedhome.version>1.20-SNAPSHOT</connectedhome.version>
       	<warp.version>1.29</warp.version>
       	<output.dir>target</output.dir>
     </properties>
@@ -137,18 +137,8 @@
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.osgi.log.util</artifactId>
-            <version>1.19</version>
+            <version>${connectedhome.version}</version>
         </dependency>
-        
-        	<!-- (nrjmata) To be removed. -->
-        	<!-- 
-            <dependency>
-                <groupId>com.ericsson.osgi.base</groupId>
-                <artifactId>json</artifactId>
-                <version>1.75</version>
-            </dependency>
-            -->    
-       <!-- nrjmata Added to replace osgi.base json-->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -168,55 +158,9 @@
         <module>generic.device.access.services</module>
         <module>generic.device.api</module>
         <module>generic.device.spi</module>
-
-        <!-- 130214(nrjmata) commented out all the adaptors, basedrivers, and connectors. -->
-        <!--  
-        <module>basedriver.zwave</module>
-        <module>basedriver.coap</module>
-        <module>basedriver.upnp</module>
-        -->
         <module>basedriver.upnp.lite</module>
-        <!-- 
-        <module>basedriver.xbee</module>
-        -->
-        <!--module>basedriver.zigbee</module-->
-
-        <!-- 
-        <module>adaptor.zwave</module>
-        <module>adaptor.datacollector</module>
-        -->
         <module>adaptor.ruleengine</module>
-        <!-- 
-        <module>adaptor.homealarm</module>
-        -->
-        <!--module>adaptor.coap</module-->
         <module>adaptor.upnp</module>
-        <!-- 
-        <module>adaptor.bonjour</module>
-        <module>adaptor.phidget</module>
-        <module>adaptor.bluetooth</module>
-        <module>adaptor.currentcost</module>
-        <module>adaptor.nexa</module>
-        <module>adaptor.httpproxy</module>
-        <module>adaptor.camera</module>
-        <module>adaptor.xbee</module>
-        <module>adaptor.cosm</module>
-        -->
-        <!--module>adaptor.zigbee</module-->
-        <!-- 
-        <module>connector.resourcecore</module>
-        <module>connector.cwmp</module>
-        <module>connector.sdk</module>
-        <module>connector.rest</module>
-        -->
-        <!-- module>connector.wdc</module-->
-        <!-- 
-        <module>serialdevice.api</module>
-        <module>serialdevice.microedition</module>
-        <module>serialdevice.rxtx</module>
-        <module>serialdriver.rxtx</module>
-        <module>serialdevice.javaxcomm</module>
-        -->
     </modules>
     
     <build>
@@ -226,91 +170,6 @@
                 <artifactId>maven-install-plugin</artifactId>
                 <version>2.2</version>
             </plugin>
-
-			<!-- nrjmata added this plugin to copy all submodule projects' artifacts into a single directory. -->
-			<!-- 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.7</version>
-				<executions>
-					<execution>
-						<id>copy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>					
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>serviceschema.xmlparser</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>serviceschema.codegenerator</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>generic.device.access</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>generic.device.access.services</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>generic.device.api</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>generic.device.spi</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>basedriver.upnp.lite</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>adaptor.ruleengine</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>		
-								<artifactItem>
-									<groupId>com.ericsson.deviceaccess</groupId>
-									<artifactId>adaptor.upnp</artifactId>
-									<version>${project.version}</version>
-									<type>jar</type>
-									<outputDirectory>${output.dir}</outputDirectory>
-								</artifactItem>															
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
         </plugins>
     </build>
     
@@ -328,60 +187,4 @@
 		    <url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>    
     </repositories>
-
-<!-- nrjmata commented out -->
-<!-- 
-    <issueManagement>
-        <system>Jira</system>
-        <url>http://www.cf.ericsson.net/jira/secure/BrowseProjects.jspa#all</url>
-    </issueManagement>
-
-    <ciManagement>
-        <system>Hudson</system>
-        <url>http://www.cf.ericsson.net/nexus/index.html</url>
-        <notifiers>
-            <notifier>
-                <type>mail</type>
-                <sendOnError>true</sendOnError>
-                <sendOnFailure>true</sendOnFailure>
-                <sendOnSuccess>fail</sendOnSuccess>
-                <sendOnWarning>fail</sendOnWarning>
-                <configuration>
-                    <address>jenkinslmeresearch@hotmail.com</address>
-                </configuration>
-            </notifier>
-        </notifiers>
-    </ciManagement>
-
-    <repositories>
-        <repository>
-            <id>public</id>
-            <url>http://www.cf.ericsson.net/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>embedded-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>
-                http://www.cf.ericsson.net/nexus/content/repositories/EmbeddedRelease/
-            </url>
-        </repository>
-        <snapshotRepository>
-            <id>embedded-snapshots</id>
-            <name>Internal Snapshots</name>
-            <uniqueVersion>false</uniqueVersion>
-            <url>
-                http://www.cf.ericsson.net/nexus/content/repositories/EmbeddedSnapshot/
-            </url>
-        </snapshotRepository>
-        -->
-        <!--DISABLING THIS BECAUSE SCP IS NOT AUTHORIZED: site>
-            <id>nexus</id>
-            <url>scp://cf.tgb.verkstad.net/var/www/javadoc/deviceaccess/</url>
-        </site-->
-    <!-- 
-    </distributionManagement>
-    -->
 </project>

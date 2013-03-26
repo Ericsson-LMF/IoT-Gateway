@@ -56,7 +56,7 @@
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.test.util</artifactId>
-            <version>1.13</version>
+            <version>${connectedhome.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
