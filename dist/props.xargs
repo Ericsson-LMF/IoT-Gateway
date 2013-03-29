@@ -30,18 +30,18 @@
 #-Foscar.repository.url=http://www.knopflerfish.org/releases/current/repository.xml
 
 # Various debug flags
--Forg.knopflerfish.framework.debug.packages=true
+#-Forg.knopflerfish.framework.debug.packages=true
 -Forg.knopflerfish.framework.debug.errors=true
--Forg.knopflerfish.framework.debug.warnings=true
--Forg.knopflerfish.framework.debug.classloader=true
--Forg.knopflerfish.framework.debug.startlevel=true
--Forg.knopflerfish.framework.debug.ldap=true
--Forg.knopflerfish.framework.debug.service_reference=true
--Forg.knopflerfish.framework.debug.bundle_resource=true
--Forg.knopflerfish.framework.debug.permissions=true
--Forg.knopflerfish.framework.debug.lazy_activation=true
--Forg.knopflerfish.framework.debug.framework=true
--Forg.knopflerfish.framework.debug.certificates=true
+#-Forg.knopflerfish.framework.debug.warnings=true
+#-Forg.knopflerfish.framework.debug.classloader=true
+#-Forg.knopflerfish.framework.debug.startlevel=true
+#-Forg.knopflerfish.framework.debug.ldap=true
+#-Forg.knopflerfish.framework.debug.service_reference=true
+#-Forg.knopflerfish.framework.debug.bundle_resource=true
+#-Forg.knopflerfish.framework.debug.permissions=true
+#-Forg.knopflerfish.framework.debug.lazy_activation=true
+#-Forg.knopflerfish.framework.debug.framework=true
+#-Forg.knopflerfish.framework.debug.certificates=true
 
 # Complete comma-separated list of packages exported by the system bundle
 # 
@@ -79,8 +79,8 @@
 -Forg.osgi.service.http.port=8080
 
 # Log service properties
--Forg.knopflerfish.log.out=true
--Forg.knopflerfish.log.level=debug
+-Forg.knopflerfish.log.out=false
+-Forg.knopflerfish.log.level=info
 -Forg.knopflerfish.log.grabio=true
 -Forg.knopflerfish.log.file=true
 -Forg.knopflerfish.log.memory.size=250
