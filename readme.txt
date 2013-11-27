@@ -54,8 +54,19 @@ The project was built on a host with the following development environment
 * Java 1.6.0_41  
 Ii is assumed that any host platform that supports Java 1.6 or later and Maven 3.0.4 or later would be fine. 
 
-Steps to build the project
-Execute "mvn clean install" in the top level folder where the parent POM file exists. This should build all the required modules apart from the ones in the "dist" folder. The dist module can be build separately _after_ building the whole project by executing "mvn clean install" in the dist folder. The dist module needs to be build after the whole project since the building process needs the JAR files from the other modules in order to create the single bundle to be deployed to the target machine. 
+Building the bare bones project
+-------------------------------
+Execute "mvn clean install" in the top level folder where the parent POM file exists. 
+This should build all the required modules apart from the ones in the "dist" folder. 
+The dist module can be build separately _after_ building the whole project by executing "mvn clean install" in the dist folder. 
+The dist module needs to be build after the whole project since the building process needs the JAR files from the other modules in order to create the single bundle to be deployed to the target machine. 
+When building the "dist" module the build process creates the environment for a bare bones OSGi environment without the GDA components.
+Typically one must install and start the appropriate bundles manually after this step or edit the init.xargs and props.xargs files in order to configure the OSGi environment to install and start the necessary bundles.
+
+Building the tutorial
+---------------------
+The pom.xml file in the "dist" folder contains a profile called "tutorial" which can be invoked by "mvn -P tutorial clean install". 
+This profile will set up the appropriate bundles in the "dist/jars" folder and make sure that the right init.xargs file is in place for running the tutorial. Please note that there are two init*.xargs files which overwrite (depending on the target) the init.xargs file which is used by the execution scripts start.sh and start.bat.
 
 Troubleshooting
 ---------------
@@ -94,8 +105,30 @@ The project was executed on the following platforms
 
 Command line execution
 ----------------------
-First build the "dist" module and then run "java -jar framework-X.Y.Z.jar" where X.Y.Z is currenlty 5.3.3. This will run the OSGi framework with a set of example bundles. In the same folder as the framework-X.Y.Z.jar there are two OSGi framework configuration files "init.xargs" and "props.xargs". The "init.xargs" is used for initiating specific framwork bundles apart from the default ones and the "props.xargs" contain directives or properties for the OSGi framework. Please change these files accordingle to suit your requirements. Please also note that user defined ".xargs" files could also be created. e.g. "raspberry_pi.xargs" and then called from "init.xargs" with the following line:
+First build the "dist" module and then run "./start.sh on *nix environments or start.bat on Windows.  
+This will run the OSGi framework with the bare minimum set of example bundles that don't include the GDA bundles. 
+In the same folder as the framework-X.Y.Z.jar there are two OSGi framework configuration files "init.xargs" and "props.xargs". The "init.xargs" is used for initiating specific framwork bundles apart from the default ones and the "props.xargs" contain directives or properties for the OSGi framework. 
+Typically one must add manually the additional bundles JAR files in the dist/jars folder and update these .xargs files to make sure that the OSGi environment installs and starts all the desired bundles. However by modifying the pom.xml file to follow a similar practice as the tutorial these manual steps could be automated a little bit using the power ov Maven to resolve dependencies. 
+Please also note that user defined ".xargs" files could also be created. e.g. "raspberry_pi.xargs" and then called from "init.xargs" with the following line:
 -xargs raspberry_pi.xargs 
+
+ Running the tutorial 
+---------------------
+The tutorial can be run by invoking ./start.sh on a *nix target or start.bat on a windows target. 
+The appropriate init.xargs has already been put in place by the build process.
+
+Testing the tutorial 
+---------------------
+The tutorial uses a UPnP basedriver, UPnP adaptor, and the an HTTP restlet connector which listens for HTTP requests on port localhost:8090.
+The UPnP basedriver discovers UPnP devices in the Local Area Network and the adaptor registers them the GDA framework as GDA devices
+One can from a web browser access the webpage "http://localhost:8090/devices" to check which UPnP devices are discovered. 
+If none are discovred an empty JSON string will be displayed "{}", otherwise a JSON document with the description of the UPnP devices will be displayed.  
+
+If one would like to test with simulated UPnP devices one can install XBMC 
+http://xbmc.org/
+
+or the Intel Developer Tools for UPnP:
+http://software.intel.com/en-us/articles/intel-tools-for-upnp-technologies
 
 --------------
 5. TERMINOLOGY
