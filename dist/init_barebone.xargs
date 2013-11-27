@@ -45,20 +45,6 @@
 
 -install consoletty-IMPL-3.0.1.jar
 
-
--install common.osgi.log.util-1.20-SNAPSHOT.jar
--install common.packages-1.42-SNAPSHOT.jar
--install generic.device.access-1.42-SNAPSHOT.jar
--install generic.device.access.services-1.42-SNAPSHOT.jar
--install generic.device.spi-1.42-SNAPSHOT.jar
--install basedriver.upnp.lite-1.42-SNAPSHOT.jar
--install adaptor.upnp-1.42-SNAPSHOT.jar
--install com.springsource.org.apache.commons.logging-1.1.1.jar
--install com.springsource.org.apache.log4j-1.2.15.jar
--install org.osgi.compendium-4.2.0.jar
--install json-20090211.jar
--install rest.servlet-1.42-SNAPSHOT.jar
-
 # Start of these bundles are delayed since this makes start
 # order dependencies much easier
 
@@ -77,21 +63,6 @@
 -start event-3.0.8.jar
 -start component-3.1.14.jar
 
-
--start common.osgi.log.util-1.20-SNAPSHOT.jar
--start common.packages-1.42-SNAPSHOT.jar
--start generic.device.access-1.42-SNAPSHOT.jar
--start generic.device.access.services-1.42-SNAPSHOT.jar
--start generic.device.spi-1.42-SNAPSHOT.jar
--start basedriver.upnp.lite-1.42-SNAPSHOT.jar
--start adaptor.upnp-1.42-SNAPSHOT.jar
--start com.springsource.org.apache.commons.logging-1.1.1.jar
--start com.springsource.org.apache.log4j-1.2.15.jar
--start org.osgi.compendium-4.2.0.jar
--start json-20090211.jar
--start rest.servlet-1.42-SNAPSHOT.jar
-
 -startlevel 8
 
 -launch
-
