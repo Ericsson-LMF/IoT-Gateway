@@ -93,6 +93,7 @@ configuration in a file "settings.xml" in $HOME/.m2 or in the host machine
 folder that maven uses for storing already built JAR packages.
 The "settings.xml" file should contain the following XML code
 
+```
   <proxies>
    <proxy>
       <active>true</active>
@@ -107,6 +108,7 @@ The "settings.xml" file should contain the following XML code
       <port>YOUR_HTTPS_PROXY_PORT</port>
     </proxy>
   </proxies>
+```
 
 
 4. EXECUTION
@@ -147,7 +149,9 @@ dependencies.
 
 Please also note that user defined ".xargs" files could also be created. e.g.
 "raspberry_pi.xargs" and then called from "init.xargs" with the following line:
-> -xargs raspberry_pi.xargs
+```
+-xargs raspberry_pi.xargs
+```
 
 ### Running the tutorial
 
@@ -173,10 +177,12 @@ If one would like to test with simulated UPnP devices one can install XBMC
 http://xbmc.org/
 
 or the Intel Developer Tools for UPnP:
+
 http://software.intel.com/en-us/articles/intel-tools-for-upnp-technologies
 
 5. TERMINOLOGY
 --------------
 
 Host: This is the machine is where the compilation of the project occurs
+
 Target: This is the machine where the compiled Java bytecode executes
