@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,15 +29,19 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.research.commonutil;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Various string utilities that are not supported in CDC.
  */
 public class StringUtil {
+
     private StringUtil() {
     }
 
@@ -49,89 +53,23 @@ public class StringUtil {
      * @return the string with the escaped values.
      */
     public static String escapeAmpersand(String string) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < string.length(); i++) {
-            char ch = string.charAt(i);
-            if (ch == '&') {
-                sb.append("&amp;");
-            } else {
-                sb.append(ch);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Creates string of array.
-     * @param objectArray
-     * @return
-     */
-    public static String toString(Object[] objectArray) {
-        StringBuffer sb = new StringBuffer("[");
-        for (int i = 0; i < objectArray.length; i++) {
-            sb.append(objectArray[i]);
-            if (i < objectArray.length - 1) {
-                sb.append(',');
-            }
-        }
-        sb.append(']');
-        return sb.toString();
+        return string.replace("&", "&amp;");
     }
 
     public static String toHexString(byte byteValue) {
-        return Integer.toHexString(((int)byteValue) & 0xFF);
+        return Integer.toHexString(((int) byteValue) & 0xFF);
     }
 
     public static String toHexString(byte[] bytes) {
-        if (bytes == null) {
-            return "null";
-        }
-        StringBuffer sb = new StringBuffer();
-        sb.append('[');
-        for (int i = 0; i < bytes.length; i++) {
-            byte byteValue = bytes[i];
-            sb.append(' ').append(Integer.toHexString(byteValue & 0xFF));
-        }
-        sb.append(" ]");
-        return sb.toString();
+        return Arrays.asList(bytes).stream()
+                .map(StringUtil::toHexString)
+                .collect(Collectors.toList()).toString();
     }
 
     public static String toHexString(int[] ints) {
-        if (ints == null) {
-            return "null";
-        }
-        StringBuffer sb = new StringBuffer();
-        sb.append('[');
-        for (int i = 0; i < ints.length; i++) {
-            int intValue = ints[i];
-            sb.append(' ').append(Integer.toHexString(intValue));
-        }
-        sb.append(" ]");
-        return sb.toString();
-    }
-
-    public static String toString(byte[] arr) {
-        StringBuffer sb = new StringBuffer();
-        sb.append('[');
-        for (int i = 0; i < arr.length; i++) {
-            sb.append(arr[i]).append(',');
-        }
-
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append(']');
-        return sb.toString();
-    }
-
-    public static String toString(int[] arr) {
-        StringBuffer sb = new StringBuffer();
-        sb.append('[');
-        for (int i = 0; i < arr.length; i++) {
-            sb.append(arr[i]).append(',');
-        }
-
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append(']');
-        return sb.toString();
+        return Arrays.stream(ints)
+                .mapToObj(Integer::toHexString)
+                .collect(Collectors.toList()).toString();
     }
 
 }
