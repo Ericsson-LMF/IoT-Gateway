@@ -335,67 +335,47 @@ public class Rule {
         timer = new Timer();
 
         if (startTime != null && !startTime.trim().isEmpty()) {
-            try {
-                int idx = startTime.indexOf(":");
-                if (idx <= 0) {
-                    throw new Exception("Illegal start time");
-                }
+            callTimer(startTime, "start");
+        }
+        if (stopTime != null && !stopTime.trim().isEmpty()) {
+            callTimer(stopTime, "stop");
+        }
+    }
 
-                int hours = Integer.parseInt(startTime.substring(0, idx));
-                int minutes = Integer.parseInt(startTime.substring(idx + 1));
-                Calendar date = Calendar.getInstance();
-                date.set(Calendar.HOUR_OF_DAY, hours);
-                date.set(Calendar.MINUTE, minutes);
-                date.set(Calendar.SECOND, 1);
-                Date triggerDate = date.getTime();
-                if (triggerDate.getTime() <= new Date().getTime()) {
-                    triggerDate = new Date(triggerDate.getTime() + 24 * 3600000);
-                }
-                System.out.println(triggerDate);
-                TimerTask task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (ldapFilter.evaluate(PropertyManager.INSTANCE.getDeviceProperties(), true)) {
+    private void callTimer(String time, String condition) {
+        try {
+            int idx = time.indexOf(":");
+            if (idx <= 0) {
+                throw new Exception("Illegal " + condition + " time");
+            }
+
+            int hours = Integer.parseInt(time.substring(0, idx));
+            int minutes = Integer.parseInt(time.substring(idx + 1));
+            Calendar date = Calendar.getInstance();
+            date.set(Calendar.HOUR_OF_DAY, hours);
+            date.set(Calendar.MINUTE, minutes);
+            date.set(Calendar.SECOND, 1);
+            Date triggerDate = date.getTime();
+            if (triggerDate.getTime() <= new Date().getTime()) {
+                triggerDate = new Date(triggerDate.getTime() + 24 * 3600000);
+            }
+            System.out.println(triggerDate);
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    if (ldapFilter.evaluate(PropertyManager.INSTANCE.getDeviceProperties(), true)) {
+                        if (condition.equals("start")) {
                             invokeStart();
                         }
-                    }
-                };
-                timer.scheduleAtFixedRate(task, triggerDate, 24 * 3600000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (stopTime != null && !stopTime.trim().isEmpty()) {
-            try {
-                int idx = stopTime.indexOf(":");
-                if (idx <= 0) {
-                    throw new Exception("Illegal stop time");
-                }
-
-                int hours = Integer.parseInt(stopTime.substring(0, idx));
-                int minutes = Integer.parseInt(stopTime.substring(idx + 1));
-                Calendar date = Calendar.getInstance();
-                date.set(Calendar.HOUR_OF_DAY, hours);
-                date.set(Calendar.MINUTE, minutes);
-                date.set(Calendar.SECOND, 1);
-                Date triggerDate = date.getTime();
-                if (triggerDate.getTime() <= new Date().getTime()) {
-                    triggerDate = new Date(triggerDate.getTime() + 24 * 3600000);
-                }
-                System.out.println(triggerDate);
-                TimerTask task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (ldapFilter.evaluate(PropertyManager.INSTANCE.getDeviceProperties(), true)) {
+                        if (condition.equals("stop")) {
                             invokeStop();
                         }
                     }
-                };
-                timer.scheduleAtFixedRate(task, triggerDate, 24 * 3600000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                }
+            };
+            timer.scheduleAtFixedRate(task, triggerDate, 24 * 3600000);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
