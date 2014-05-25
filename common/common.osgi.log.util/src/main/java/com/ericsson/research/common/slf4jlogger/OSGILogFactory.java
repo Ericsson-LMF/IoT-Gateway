@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ILoggerFactory} over {@link LogService}.
- * <p/>
+ * 
  * {@inheritDoc}
  */
 public class OSGILogFactory implements ILoggerFactory {
@@ -85,7 +85,7 @@ public class OSGILogFactory implements ILoggerFactory {
      * {@inheritDoc}
      *
      * @param name
-     * @return
+     * @return logger
      */
     @Override
     public Logger getLogger(String name) {
