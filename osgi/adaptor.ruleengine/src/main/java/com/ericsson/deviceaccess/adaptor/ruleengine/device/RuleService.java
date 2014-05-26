@@ -58,7 +58,7 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
     private final HashMap<String, ParameterSchema> ruleProperties = new HashMap<>();
     private HashMap<String, Rule> rules = new HashMap<>();
     private final HashMap<String, List<Rule>> ruleMap = new HashMap<>();
-    private ConfigurationManager cm;
+    private ConfigurationManager configManager;
 
     // Define schema for this device
     private static final ActionSchema SET_RULE_ACTION = new ActionSchema.Builder("setRule").
@@ -176,15 +176,15 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
 
     public void start(BundleContext context, ConfigurationManager configurationManager) {
         this.context = context;
-        this.cm = configurationManager;
+        this.configManager = configurationManager;
         this.context = context;
 
-        cm.registerListener(this);
+        configManager.registerListener(this);
     }
 
     public void stop() {
         rules.values().forEach(r -> r.stop());
-        cm.unregisterListener(this);
+        configManager.unregisterListener(this);
     }
 
     public final void setRule(String id, String name, String conditions, String startTime, String stopTime, String weekDays, String actionsThen, String actionsElse, String actionsStart, String actionsStop) throws Exception {
@@ -245,9 +245,8 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
 
             String value = json.toString().replace('\r', '\n').replace('\n', ' ');
             getProperties().setStringValue(id, value);
-            cm.setParameter(id, value);
+            configManager.setParameter(id, value);
         } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
@@ -267,7 +266,7 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
                     .map(attrName -> ruleMap.getOrDefault(attrName, Collections.emptyList()))
                     .forEach(ruleList -> ruleList.remove(rule));
         }
-        cm.unsetParameter(id);
+        configManager.unsetParameter(id);
     }
 
     public void handlePropertyUpdate(Dictionary properties, String deviceId, String serviceName, String propertyName) {

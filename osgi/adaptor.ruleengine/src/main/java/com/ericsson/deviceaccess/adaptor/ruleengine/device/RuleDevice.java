@@ -42,14 +42,14 @@ import org.osgi.framework.ServiceRegistration;
 public class RuleDevice extends SchemaBasedGenericDevice {
 
     private final BundleContext context;
-    private ServiceRegistration sr;
-    private final ConfigurationManager cm;
+    private ServiceRegistration serviceReg;
+    private final ConfigurationManager configManager;
     private final RuleService ruleService;
     private final PropertyManager propertyManager;
 
     public RuleDevice(BundleContext context, ConfigurationManager cm) {
         this.context = context;
-        this.cm = cm;
+        this.configManager = cm;
 
         setId("RuleEngine");
         setURN("RuleEngine");
@@ -65,13 +65,13 @@ public class RuleDevice extends SchemaBasedGenericDevice {
     }
 
     public void start() {
-        ruleService.start(context, cm);
+        ruleService.start(context, configManager);
         propertyManager.start(context, ruleService);
-        sr = context.registerService(GenericDevice.class.getName(), this, getDeviceProperties());
+        serviceReg = context.registerService(GenericDevice.class.getName(), this, getDeviceProperties());
     }
 
     public void stop() {
-        sr.unregister();
+        serviceReg.unregister();
         ruleService.stop();
         propertyManager.stop();
     }

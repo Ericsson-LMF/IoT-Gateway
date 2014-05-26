@@ -59,13 +59,13 @@ public class Rule {
 
     final static HashMap<String, Integer> WEEKDAYS = new HashMap<String, Integer>() {
         {
-            put("sun", new Integer(0));
-            put("mon", new Integer(1));
-            put("tue", new Integer(2));
-            put("wed", new Integer(3));
-            put("thu", new Integer(4));
-            put("fri", new Integer(5));
-            put("sat", new Integer(6));
+            put("sun", 0);
+            put("mon", 1);
+            put("tue", 2);
+            put("wed", 3);
+            put("thu", 4);
+            put("fri", 5);
+            put("sat", 6);
         }
     };
     private final String id;
@@ -175,7 +175,7 @@ public class Rule {
                 throw new IllegalArgumentException("Invalid weekday: " + weekDay);
             }
 
-            weekDaysBool[weekDayIdx.intValue()] = true;
+            weekDaysBool[weekDayIdx] = true;
         }
 
         this.weekDays = weekDays;
@@ -227,8 +227,9 @@ public class Rule {
     public boolean checkTimeOfDay() {
         Calendar date = Calendar.getInstance();
         int hourOfDay = date.get(Calendar.HOUR_OF_DAY);
-        int minute = (int) ((float) date.get(Calendar.MINUTE));
-        float time = hourOfDay + ((float) minute) / 60;
+        //Removed casting
+        int minute =  date.get(Calendar.MINUTE);
+        float time = hourOfDay + minute / 60;
 
         if (startTimeFloat < stopTimeFloat) {
             return (time >= startTimeFloat && time < stopTimeFloat);
@@ -264,7 +265,6 @@ public class Rule {
                 try {
                     action.execute(args);
                 } catch (GenericDeviceException e) {
-                    e.printStackTrace();
                 }
             }
         });
@@ -337,7 +337,7 @@ public class Rule {
         if (startTime != null && !startTime.trim().isEmpty()) {
             callTimer(startTime, "start");
         }
-        if (stopTime != null && !stopTime.trim().isEmpty()) {
+        else if (stopTime != null && !stopTime.trim().isEmpty()) {
             callTimer(stopTime, "stop");
         }
     }
@@ -364,18 +364,19 @@ public class Rule {
                 @Override
                 public void run() {
                     if (ldapFilter.evaluate(PropertyManager.INSTANCE.getDeviceProperties(), true)) {
-                        if (condition.equals("start")) {
-                            invokeStart();
-                        }
-                        if (condition.equals("stop")) {
-                            invokeStop();
+                        switch (condition) {
+                            case "start":
+                                invokeStart();
+                                break;
+                            case "stop":
+                                invokeStop();
+                                break;
                         }
                     }
                 }
             };
             timer.scheduleAtFixedRate(task, triggerDate, 24 * 3600000);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
