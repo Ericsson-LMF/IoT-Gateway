@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
  *
  * @author delma
  */
-final class JavadocBuilder {
+public final class JavadocBuilder {
 
     private StringBuilder builder;
     private static final String JAVADOC_START = "/**";
@@ -22,15 +22,17 @@ final class JavadocBuilder {
     /**
      * New builder
      */
-    JavadocBuilder() {
+    public JavadocBuilder() {
         builder = new StringBuilder();
         builder.append(JAVADOC_START);
     }
 
     /**
      * New builder with object in it
+     *
+     * @param object
      */
-    JavadocBuilder(Object object) {
+    public JavadocBuilder(Object object) {
         this();
         line(object);
     }
@@ -41,8 +43,10 @@ final class JavadocBuilder {
      * @param object to be appended
      * @return this
      */
-    JavadocBuilder line(Object object) {
-        builder.append(LINE_END).append(LINE_START).append(object);
+    public JavadocBuilder line(Object object) {
+        if (object != null) {
+            builder.append(LINE_END).append(LINE_START).append(object);
+        }
         return this;
     }
 
@@ -52,8 +56,10 @@ final class JavadocBuilder {
      * @param builder to be appended
      * @return this
      */
-    JavadocBuilder line(JavadocBuilder builder) {
-        builder.append(LINE_END).append(LINE_START).append(builder.builder);
+    public JavadocBuilder line(JavadocBuilder builder) {
+        if (builder != null) {
+            builder.append(LINE_END).append(LINE_START).append(builder.builder);
+        }
         return this;
     }
 
@@ -62,7 +68,7 @@ final class JavadocBuilder {
      *
      * @return this
      */
-    JavadocBuilder line() {
+    public JavadocBuilder line() {
         builder.append(LINE_END).append(LINE_START);
         return this;
     }
@@ -73,8 +79,10 @@ final class JavadocBuilder {
      * @param object to be appended
      * @return this
      */
-    JavadocBuilder append(Object object) {
-        builder.append(Objects.toString(object));
+    public JavadocBuilder append(Object object) {
+        if (object != null) {
+            builder.append(object.toString());
+        }
         return this;
     }
 
@@ -84,8 +92,10 @@ final class JavadocBuilder {
      * @param builder to be appended
      * @return this
      */
-    JavadocBuilder append(JavadocBuilder builder) {
-        builder.append(Objects.toString(builder.builder));
+    public JavadocBuilder append(JavadocBuilder builder) {
+        if (builder != null) {
+            builder.append(Objects.toString(builder.builder));
+        }
         return this;
     }
 
@@ -95,8 +105,10 @@ final class JavadocBuilder {
      * @param function in which editing current builder happends.
      * @return this
      */
-    JavadocBuilder append(UnaryOperator<JavadocBuilder> function) {
-        function.apply(this);
+    public JavadocBuilder append(UnaryOperator<JavadocBuilder> function) {
+        if (function != null) {
+            function.apply(this);
+        }
         return this;
     }
 
@@ -105,21 +117,22 @@ final class JavadocBuilder {
      *
      * @return this
      */
-    JavadocBuilder inherit() {
+    public JavadocBuilder inherit() {
         return line(TAG_INHERITED);
     }
 
     /**
      * Adds parameter tag to Javadoc
      *
-     * @param parameter
+     * @param name
+     * @param description
      * @return this
      */
-    JavadocBuilder parameter(Object name, Object description) {
+    public JavadocBuilder parameter(Object name, Object description) {
         return line(TAG_PARAMETER).append(name).append(" ").append(description);
     }
 
-    JavadocBuilder result(Object object) {
+    public JavadocBuilder result(Object object) {
         return line(TAG_RETURN).append(object);
     }
 
@@ -129,7 +142,7 @@ final class JavadocBuilder {
      * @see toString does the same.
      * @return Javadoc comment in string form
      */
-    String build() {
+    public String build() {
         return builder.append(LINE_END).append(JAVADOC_END).append(LINE_END).toString();
     }
 

@@ -26,8 +26,7 @@
             </properties>
         </service>
         <service name="Dimming">
-            <description>This service-type enables the following functions: 1. Enables remote control of a dimmable
-                lighting device, 2. Defines required basic actions for dimming to a value
+            <description>This service-type enables the following functions: 1. Enables remote control of a dimmable lighting device, 2. Defines required basic actions for dimming to a value
             </description>
             <category>homeautomation.lighting</category>
             <actions>
