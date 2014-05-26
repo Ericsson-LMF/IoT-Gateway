@@ -46,7 +46,7 @@ import java.text.MessageFormat;
 
 /**
  * Interface towards the warp authentication manager.
- * <p/>
+ * 
  * Uses the web API:
  * <ul>
  * <li>GET /AuthenticationProviderView/api/users
@@ -54,11 +54,11 @@ import java.text.MessageFormat;
  * <li>GET /AuthenticationProviderView/api/users/{user}
  * <li>PUT /AuthenticationProviderView/api/users/{user}
  * <li>DELETE /AuthenticationProviderView/api/users/{user}
- * <ul>
+ * </ul>
  * Auth = Basic<br>
  * User = admin<br>
  * PW (default) = lamepass<br>
- * <p/>
+ * 
  * When doing put, Content Type must be "application/json" or "application/xml".
  * For all methods except delete, the Accept header shall be set to
  * "application/json" or "application/xml".

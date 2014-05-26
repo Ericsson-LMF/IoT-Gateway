@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,13 +29,13 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.research.common.testutil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -43,63 +43,70 @@ import java.util.Arrays;
  * Utilities for reflection.
  */
 public class ReflectionTestUtil {
+
     private ReflectionTestUtil() {
     }
 
     /**
-     * Set the field value of the field with the given name of the specified object.
-     * If the object is a class, then it is assumed to be a static field.
+     * Set the field value of the field with the given name of the specified
+     * object. If the object is a class, then it is assumed to be a static
+     * field.
      *
-     * @param object    the object
+     * @param object the object
      * @param fieldName the field name
-     * @param value     the value to set
+     * @param value the value to set
      */
     public static void setField(Object object, String fieldName, Object value) {
         try {
+            Field field;
             if (object instanceof Class) {
-                Field field = findField((Class) object, fieldName, null);
-                field.setAccessible(true);
-                field.set(null, value);
+                field = findField((Class) object, fieldName, null);
+                object = null;
             } else {
-                Field field = findField(object.getClass(), fieldName, null);
-                field.setAccessible(true);
-                field.set(object, value);
+                field = findField(object.getClass(), fieldName, null);
             }
-        } catch (Exception e) {
+            field.setAccessible(true);
+            field.set(object, value);
+        } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
             throw new Error(e);
         }
     }
 
     /**
-     * Gets the field value of the field with the given name of the specified object.
-     * If the object is a class, then it is assumed to be a static field.
+     * Gets the field value of the field with the given name of the specified
+     * object. If the object is a class, then it is assumed to be a static
+     * field.
      *
-     * @param object    the object
+     * @param <T>
+     * @param object the object
      * @param fieldName the name of the field
      *
-     * @return the field value of the field with the given name of the specified object
+     * @return the field value of the field with the given name of the specified
+     * object
      */
     public static <T> T getField(Object object, String fieldName) {
         try {
+            Field field;
             if (object instanceof Class) {
-                Field field = findField((Class) object, fieldName, null);
-                field.setAccessible(true);
-                return (T) field.get(null);
+                field = findField((Class) object, fieldName, null);
+                object = null;
             } else {
-                Field field = findField(object.getClass(), fieldName, null);
-                field.setAccessible(true);
-                return (T) field.get(object);
+                field = findField(object.getClass(), fieldName, null);
             }
-        } catch (Exception e) {
+            field.setAccessible(true);
+            return (T) field.get(object);
+        } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
             throw new Error(e);
         }
     }
 
     /**
-     * Invokes the method with the given name of the specified object, with the specified parameters.
-     * If the object is a class, then it is assumed to be a static method.
+     * Invokes the method with the given name of the specified object, with the
+     * specified parameters. If the object is a class, then it is assumed to be
+     * a static method.
      *
-     * @param object     the object
+     * @param <T>
+     * @param object the object
      * @param methodName the
      * @param parameters the parameters
      *
@@ -112,30 +119,31 @@ public class ReflectionTestUtil {
                 Object arg = parameters[i];
                 parameterTypes[i] = arg.getClass();
             }
-
+            Method method;
             if (object instanceof Class) {
-                Method method = findMethod((Class) object, methodName, parameterTypes);
-                method.setAccessible(true);
-                return (T) method.invoke(null, parameters);
+                method = findMethod((Class) object, methodName, parameterTypes);
+                object = null;
             } else {
-                Method method = findMethod(object.getClass(), methodName, parameterTypes);
-                method.setAccessible(true);
-                return (T) method.invoke(object, parameters);
+                method = findMethod(object.getClass(), methodName, parameterTypes);
             }
-        } catch (Exception e) {
+            method.setAccessible(true);
+            return (T) method.invoke(object, parameters);
+        } catch (IllegalAccessException | IllegalArgumentException | SecurityException | InvocationTargetException e) {
             throw new Error(e);
         }
     }
 
     /**
-     * Attempt to find a {@link Method} on the supplied class with the supplied name
-     * and parameter types. Searches all superclasses up to <code>Object</code>.
-     * <p>Returns <code>null</code> if no {@link Method} can be found.
+     * Attempt to find a {@link Method} on the supplied class with the supplied
+     * name and parameter types. Searches all superclasses up to
+     * <code>Object</code>.
+     * <p>
+     * Returns <code>null</code> if no {@link Method} can be found.
      *
-     * @param clazz      the class to introspect
-     * @param name       the name of the method
-     * @param paramTypes the parameter types of the method
-     *                   (may be <code>null</code> to indicate any signature)
+     * @param clazz the class to introspect
+     * @param name the name of the method
+     * @param paramTypes the parameter types of the method (may be
+     * <code>null</code> to indicate any signature)
      *
      * @return the Method object, or <code>null</code> if none found
      */
@@ -145,7 +153,7 @@ public class ReflectionTestUtil {
             Method[] methods = (searchType.isInterface() ? searchType.getMethods() : searchType.getDeclaredMethods());
             for (Method method : methods) {
                 if (name.equals(method.getName())
-                    && (paramTypes == null || Arrays.equals(paramTypes, method.getParameterTypes()))) {
+                        && (paramTypes == null || Arrays.equals(paramTypes, method.getParameterTypes()))) {
                     return method;
                 }
             }
@@ -160,8 +168,10 @@ public class ReflectionTestUtil {
      * superclasses up to {@link Object}.
      *
      * @param clazz the class to introspect
-     * @param name  the name of the field (may be <code>null</code> if type is specified)
-     * @param type  the type of the field (may be <code>null</code> if name is specified)
+     * @param name the name of the field (may be <code>null</code> if type is
+     * specified)
+     * @param type the type of the field (may be <code>null</code> if name is
+     * specified)
      *
      * @return the corresponding Field object, or <code>null</code> if not found
      */

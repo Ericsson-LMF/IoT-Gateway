@@ -44,18 +44,22 @@
                     <execution>
                         <id>default-compile</id>
                         <configuration>
-                            <source>1.4</source>
-                            <target>1.4</target>
+                            <source>1.8</source>
+                            <target>1.8</target>
                         </configuration>
                     </execution>
                     <execution>
                         <id>default-testCompile</id>
                         <configuration>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>1.8</source>
+                            <target>1.8</target>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -18,12 +18,10 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.ericsson.deviceaccess</groupId>
@@ -44,7 +42,6 @@
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.osgi.log.util</artifactId>
-            <version>${connectedhome.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -62,7 +59,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -109,6 +105,15 @@
                         </Import-Package>
                         <Bundle-Activator>com.ericsson.deviceaccess.adaptor.ruleengine.Activator</Bundle-Activator>
                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

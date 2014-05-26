@@ -34,74 +34,77 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.xml;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.upnp.UPnPAction;
 
 public class XmlNode {
-	protected String name = null;
-	protected String text = "";
-	protected Vector children = null;
-	public Hashtable attributes = null;
 
-	public XmlNode() {
-		this.children = new Vector();
-		this.attributes = new Hashtable();
-	}
+    protected String name = null;
+    protected String text = "";
+    protected List<XmlNode> children = null;
+    public ConcurrentHashMap attributes = null;
 
-	public String getText() {
-		return text;
-	}
+    public XmlNode() {
+        this.children = Collections.synchronizedList(new ArrayList<XmlNode>());
+        this.attributes = new ConcurrentHashMap();
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getText() {
+        return text;
+    }
 
-	public Hashtable getAttributes() {
-		return attributes;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String[] getAttributeNames() {
-		String[] names = new String[attributes.size()];
+    public ConcurrentHashMap getAttributes() {
+        return attributes;
+    }
 
-		Enumeration e = attributes.keys();
+    public String[] getAttributeNames() {
+        String[] names = new String[attributes.size()];
 
-		int i = 0;
+        Enumeration e = attributes.keys();
 
-		while (e.hasMoreElements()) {
-			names[i] = (String) e.nextElement();
+        int i = 0;
 
-			i++;
-		}
-		return names;
-	}
+        while (e.hasMoreElements()) {
+            names[i] = (String) e.nextElement();
 
-	public String getAttribute(String key) {
-		return (String) attributes.get(key);
-	}
+            i++;
+        }
+        return names;
+    }
 
-	public XmlNode[] getChildren() {
-		return (XmlNode[]) children.toArray(new XmlNode[0]);
-	}
-	
-	public XmlNode[] getChildren(String name) {
-		Vector matches = new Vector();
-		for(int i = 0; i < children.size(); i++) {
-			XmlNode node = (XmlNode) children.elementAt(i);
-			if (name.equals(node.name))
-				matches.add(node);
-		}
-		return (XmlNode[]) matches.toArray(new XmlNode[0]);
-	}
-	
-	public XmlNode getChild(String name) {
-		for(int i = 0; i < children.size(); i++) {
-			XmlNode node = (XmlNode) children.elementAt(i);
-			if (name.equals(node.name))
-				return node;
-		}
-		return null;
-	}
+    public String getAttribute(String key) {
+        return (String) attributes.get(key);
+    }
+
+    public XmlNode[] getChildren() {
+        return (XmlNode[]) children.toArray(new XmlNode[0]);
+    }
+
+    public XmlNode[] getChildren(String name) {
+        List<XmlNode> matches = Collections.synchronizedList(new ArrayList<XmlNode>());
+        //TODO synchronization if needed.
+        for (XmlNode node : children) {
+            if (name.equals(node.name)) {
+                matches.add(node);
+            }
+        }
+        return (XmlNode[]) matches.toArray(new XmlNode[0]);
+    }
+
+    public XmlNode getChild(String name) {
+        for (XmlNode node : children) {
+            if (name.equals(node.name)) {
+                return node;
+            }
+        }
+        return null;
+    }
 }
