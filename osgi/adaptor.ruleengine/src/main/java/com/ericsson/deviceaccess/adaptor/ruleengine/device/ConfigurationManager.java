@@ -54,7 +54,7 @@ public class ConfigurationManager implements ManagedService {
     private final BundleContext context;
     private final String pid;
     private final Dictionary configProperties = new Properties();
-    private ServiceRegistration sr;
+    private ServiceRegistration serviceReg;
     private final Queue<ConfigurationManagerListener> listeners = new ConcurrentLinkedQueue<>();
 
     public ConfigurationManager(BundleContext context, String pid) {
@@ -70,11 +70,11 @@ public class ConfigurationManager implements ManagedService {
     public void start() {
         Dictionary properties = new Properties();
         properties.put(Constants.SERVICE_PID, pid);
-        sr = context.registerService(ManagedService.class.getName(), this, properties);
+        serviceReg = context.registerService(ManagedService.class.getName(), this, properties);
     }
 
     public void stop() {
-        sr.unregister();
+        serviceReg.unregister();
     }
 
     public void registerListener(ConfigurationManagerListener listener) {
@@ -151,7 +151,6 @@ public class ConfigurationManager implements ManagedService {
                 Configuration config = cfgAdm.getConfiguration(pid);
                 config.update(updatedConfig);
             } catch (IOException e) {
-                e.printStackTrace();
             }
         } else {
             System.err.println("ConfigurationAdmin is not found");
