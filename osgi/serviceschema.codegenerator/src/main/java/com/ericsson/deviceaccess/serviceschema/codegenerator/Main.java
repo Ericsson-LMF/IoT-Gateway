@@ -37,11 +37,10 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
-import org.apache.xmlbeans.XmlException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import org.apache.xmlbeans.XmlException;
 
 /**
  * Main class of this application.
@@ -61,36 +60,36 @@ public class Main {
         String version = serviceSchemaDocument.getServiceSchema().getVersion();
         Services services = serviceSchemaDocument.getServiceSchema().getServices();
         ServicePrinter sp = new ServicePrinter();
-        Service[] serviceArray = (Service[]) services.getServiceArray();
+        Service[] serviceArray = services.getServiceArray();
         // Generate schema definition
         File schemaDefSourceFile = new File(spiBaseDir, "SchemaDefinitions.java");
-        PrintStream schemaDefStream = new PrintStream(schemaDefSourceFile);
-        sp.printSchemaDefinitionStart(schemaDefStream, version);
-        for (Service service : serviceArray) {
-
-            sp.printSchemaDefinitionForService(schemaDefStream, service);
-
-            PrintStream spiPrintStream = null;
-            PrintStream apiPrintStream = null;
-            File spiPackageDir = new File(spiBaseDir, makePath(service));
-            spiPackageDir.mkdirs();
-            File spiSourceFile = new File(spiPackageDir, capitalize(service.getName() + "Base") + ".java");
-            spiPrintStream = new PrintStream(spiSourceFile);
-            sp.printServiceImpl(spiPrintStream, version, service);
-            spiPrintStream.close();
-            System.out.printf("Generated SPI base for '%s' to %s\n", service.getName(), spiSourceFile.getAbsolutePath());
-
-            File apiPackageDir = new File(apiBaseDir, makePath(service));
-            apiPackageDir.mkdirs();
-            File apiSourceFile = new File(apiPackageDir, capitalize(service.getName()) + ".java");
-            apiPrintStream = new PrintStream(apiSourceFile);
-            sp.printServiceInterface(apiPrintStream, version, service);
-            apiPrintStream.close();
-            System.out.printf("Generated API for '%s' to %s\n", service.getName(), apiSourceFile.getAbsolutePath());
+        try (PrintStream schemaDefStream = new PrintStream(schemaDefSourceFile)) {
+            sp.printSchemaDefinitionStart(schemaDefStream, version);
+            for (Service service : serviceArray) {
+                
+                sp.printSchemaDefinitionForService(schemaDefStream, service);
+                
+                PrintStream spiPrintStream;
+                PrintStream apiPrintStream;
+                File spiPackageDir = new File(spiBaseDir, makePath(service));
+                spiPackageDir.mkdirs();
+                File spiSourceFile = new File(spiPackageDir, capitalize(service.getName() + "Base") + ".java");
+                spiPrintStream = new PrintStream(spiSourceFile);
+                sp.printServiceImpl(spiPrintStream, version, service);
+                spiPrintStream.close();
+                System.out.printf("Generated SPI base for '%s' to %s\n", service.getName(), spiSourceFile.getAbsolutePath());
+                
+                File apiPackageDir = new File(apiBaseDir, makePath(service));
+                apiPackageDir.mkdirs();
+                File apiSourceFile = new File(apiPackageDir, capitalize(service.getName()) + ".java");
+                apiPrintStream = new PrintStream(apiSourceFile);
+                sp.printServiceInterface(apiPrintStream, version, service);
+                apiPrintStream.close();
+                System.out.printf("Generated API for '%s' to %s\n", service.getName(), apiSourceFile.getAbsolutePath());
+            }
+            
+            sp.printSchemaDefinitionEnd(schemaDefStream);
         }
-
-        sp.printSchemaDefinitionEnd(schemaDefStream);
-        schemaDefStream.close();
 
         System.out.println("Code generation completed!");
     }
@@ -105,7 +104,7 @@ public class Main {
     }
 
     private String capitalize(String string) {
-        StringBuffer sb = new StringBuffer(string);
+        StringBuilder sb = new StringBuilder(string);
         sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         return sb.toString();
     }
