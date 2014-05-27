@@ -24,7 +24,6 @@ public final class JavadocBuilder {
      */
     public JavadocBuilder() {
         builder = new StringBuilder();
-        builder.append(JAVADOC_START);
     }
 
     /**
@@ -35,6 +34,16 @@ public final class JavadocBuilder {
     public JavadocBuilder(Object object) {
         this();
         line(object);
+    }
+
+    /**
+     * New builder with existing builder in it
+     *
+     * @param builder
+     */
+    public JavadocBuilder(JavadocBuilder builder) {
+        this();
+        append(builder);
     }
 
     /**
@@ -53,12 +62,12 @@ public final class JavadocBuilder {
     /**
      * Appends new line
      *
-     * @param builder to be appended
+     * @param javadoc to be appended
      * @return this
      */
-    public JavadocBuilder line(JavadocBuilder builder) {
-        if (builder != null) {
-            builder.append(LINE_END).append(LINE_START).append(builder.builder);
+    public JavadocBuilder line(JavadocBuilder javadoc) {
+        if (javadoc != null) {
+            line(javadoc.builder);
         }
         return this;
     }
@@ -89,12 +98,12 @@ public final class JavadocBuilder {
     /**
      * Appends to the last line
      *
-     * @param builder to be appended
+     * @param javadoc to be appended
      * @return this
      */
-    public JavadocBuilder append(JavadocBuilder builder) {
-        if (builder != null) {
-            builder.append(Objects.toString(builder.builder));
+    public JavadocBuilder append(JavadocBuilder javadoc) {
+        if (javadoc != null) {
+            builder.append(javadoc.builder);
         }
         return this;
     }
@@ -143,11 +152,25 @@ public final class JavadocBuilder {
      * @return Javadoc comment in string form
      */
     public String build() {
-        return builder.append(LINE_END).append(JAVADOC_END).append(LINE_END).toString();
+        return JAVADOC_START + builder.toString() + LINE_END + JAVADOC_END + LINE_END;
     }
 
     @Override
     public String toString() {
         return build();
+    }
+
+    /**
+     * Builds the Javadoc comment with specified indent.
+     *
+     * @param indent
+     * @return Javadoc comment in string form
+     */
+    String build(int indent) {
+        StringBuilder result = new StringBuilder();
+        for (String line : build().split(LINE_END)) {
+            JavaHelper.indent(result, indent).append(line).append(LINE_END);
+        }
+        return result.toString();
     }
 }

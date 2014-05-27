@@ -9,25 +9,27 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.JavaHelper.*
  *
  * @author delma
  */
-public class Method {
+public class Constructor {
 
     private AccessModifier accessModifier;
-    private final String name;
-    private final String type;
     private final List<Param> parameters;
     private final List<String> lines;
     private JavadocBuilder javadoc;
+    private JavaBuilder owner;
 
-    public Method(String type, String name) {
-        this.type = type;
-        this.name = name;
+    public Constructor() {
         parameters = new ArrayList<>();
         lines = new ArrayList<>();
         accessModifier = AccessModifier.PUBLIC;
         javadoc = null;
     }
 
-    public Method setAccessModifier(AccessModifier modifier) {
+    public Constructor setOwner(JavaBuilder owner) {
+        this.owner = owner;
+        return this;
+    }
+
+    public Constructor setAccessModifier(AccessModifier modifier) {
         accessModifier = modifier;
         return this;
     }
@@ -37,23 +39,29 @@ public class Method {
     }
 
     public String getName() {
-        return name;
+        if (owner == null) {
+            return "unknown";
+        }
+        return owner.getName();
     }
 
     public String getType() {
-        return type;
+        if (owner == null) {
+            return "unknown";
+        }
+        return owner.getName();
     }
 
-    public Method addParameter(String type, String name, String description) {
+    public Constructor addParameter(String type, String name, String description) {
         return addParameter(new Param(type, name).setDescription(description));
     }
 
-    public Method addParameter(Param parameter) {
+    public Constructor addParameter(Param parameter) {
         parameters.add(parameter);
         return this;
     }
 
-    public Method addLine(String line) {
+    public Constructor addLine(String line) {
         lines.add(line);
         return this;
     }
@@ -66,7 +74,7 @@ public class Method {
         return lines;
     }
 
-    public Method setJavadoc(JavadocBuilder javadoc) {
+    public Constructor setJavadoc(JavadocBuilder javadoc) {
         this.javadoc = javadoc;
         return this;
     }
@@ -75,9 +83,12 @@ public class Method {
         StringBuilder builder = new StringBuilder();
         //JAVADOC
         builder.append(new JavadocBuilder(javadoc).append(this::parameterJavadocs).build(indent));
-        //METHOD DECLARATION
+        //CONSTRUCTOR DECLARATION
         String access = accessModifier.get();
-        indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
+        if(owner.isSingleton()){
+            access = AccessModifier.PRIVATE.get();
+        }
+        indent(builder, indent).append(access).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
         //CODE
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);
@@ -102,8 +113,8 @@ public class Method {
         indent(builder, indent).append(BLOCK_END).append(LINE_END);
         return builder.toString();
     }
-    
-    public JavadocBuilder parameterJavadocs(JavadocBuilder builder){
+
+    public JavadocBuilder parameterJavadocs(JavadocBuilder builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }

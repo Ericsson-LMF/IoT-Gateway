@@ -92,13 +92,18 @@ public class ServicePrinter {
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ServiceSchemaError");
 
         builder.setName("SchemaDefinitions");
+        builder.setJavadoc(new JavadocBuilder("Defines service schemas."));
         builder.setSigleton(true);
-        builder.addVariable(new Variable(AccessModifier.PRIVATE, "Map<String, ServiceSchema>", "serviceType"));
+
+        builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceType").initialise("HashMap<>"));
 
         builder.addMethod(
-                new Method(AccessModifier.PUBLIC, "ServiceSchema", "getServiceSchema")
-                .addParameter(new Param("String", "name"))
-                .addLine("return serviceSchemas.get(%0%)"));
+                new Method("ServiceSchema", "getServiceSchema")
+                .setJavadoc(new JavadocBuilder("Gets ServiceSchema based on it's name."))
+                .addParameter("String", "name", "name of schema")
+                .addLine("return serviceSchemas.get(#0)"));
+        
+        builder.addConstructor(new Constructor());
     }
 
     /**
@@ -505,7 +510,7 @@ public class ServicePrinter {
 
         JavaBuilder builder = new JavaBuilder();
         sp.doit(builder);
-        System.out.print(builder.build());
+        System.out.print(builder.build(ServicePrinter.class));
         System.out.println("=============================================");
 
         sp.printSchemaDefinitionStart(System.out, version);

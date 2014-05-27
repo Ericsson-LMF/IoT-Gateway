@@ -8,6 +8,7 @@ public class Param {
 
     private final String name;
     private final String type;
+    private String description;
 
     public Param(String type, String name) {
         this.name = name;
@@ -20,6 +21,15 @@ public class Param {
 
     public String getType() {
         return type;
+    }
+
+    public Param setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
 }
