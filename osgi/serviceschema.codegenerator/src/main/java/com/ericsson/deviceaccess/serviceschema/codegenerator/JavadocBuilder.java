@@ -1,6 +1,9 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /**
@@ -11,19 +14,21 @@ import java.util.function.UnaryOperator;
 public final class JavadocBuilder {
 
     private StringBuilder builder;
+    private Map<String, List<String>> tags;
     private static final String JAVADOC_START = "/**";
     private static final String JAVADOC_END = " */";
     private static final String LINE_START = " * ";
     private static final String LINE_END = "\n";
     private static final String TAG_INHERITED = "{@inheritDoc}";
-    private static final String TAG_PARAMETER = "@param ";
-    private static final String TAG_RETURN = "@return ";
+    private static final String TAG_PARAMETER = "@param";
+    private static final String TAG_RETURN = "@return";
 
     /**
      * New builder
      */
     public JavadocBuilder() {
         builder = new StringBuilder();
+        tags = new HashMap<>();
     }
 
     /**
@@ -54,9 +59,13 @@ public final class JavadocBuilder {
      */
     public JavadocBuilder line(Object object) {
         if (object != null) {
-            builder.append(LINE_END).append(LINE_START).append(object);
+            line(builder, object);
         }
         return this;
+    }
+
+    private StringBuilder line(StringBuilder builder, Object object) {
+        return builder.append(LINE_END).append(LINE_START).append(object);
     }
 
     /**
@@ -68,6 +77,7 @@ public final class JavadocBuilder {
     public JavadocBuilder line(JavadocBuilder javadoc) {
         if (javadoc != null) {
             line(javadoc.builder);
+            tags.putAll(javadoc.tags);
         }
         return this;
     }
@@ -77,9 +87,13 @@ public final class JavadocBuilder {
      *
      * @return this
      */
-    public JavadocBuilder line() {
-        builder.append(LINE_END).append(LINE_START);
+    public JavadocBuilder emptyLine() {
+        emptyLine(builder);
         return this;
+    }
+
+    private StringBuilder emptyLine(StringBuilder builder) {
+        return line(builder, "");
     }
 
     /**
@@ -90,7 +104,7 @@ public final class JavadocBuilder {
      */
     public JavadocBuilder append(Object object) {
         if (object != null) {
-            builder.append(object.toString());
+            builder.append(object);
         }
         return this;
     }
@@ -104,6 +118,7 @@ public final class JavadocBuilder {
     public JavadocBuilder append(JavadocBuilder javadoc) {
         if (javadoc != null) {
             builder.append(javadoc.builder);
+            tags.putAll(javadoc.tags);
         }
         return this;
     }
@@ -127,7 +142,8 @@ public final class JavadocBuilder {
      * @return this
      */
     public JavadocBuilder inherit() {
-        return line(TAG_INHERITED);
+        addTag(TAG_INHERITED, "");
+        return this;
     }
 
     /**
@@ -138,11 +154,18 @@ public final class JavadocBuilder {
      * @return this
      */
     public JavadocBuilder parameter(Object name, Object description) {
-        return line(TAG_PARAMETER).append(name).append(" ").append(description);
+        addTag(TAG_PARAMETER, name + " " + description);
+        return this;
     }
 
     public JavadocBuilder result(Object object) {
-        return line(TAG_RETURN).append(object);
+        addTag(TAG_RETURN, object);
+        return this;
+    }
+
+    private void addTag(String tag, Object value) {
+        tags.putIfAbsent(tag, new ArrayList<>());
+        tags.get(tag).add(value.toString());
     }
 
     /**
@@ -152,7 +175,7 @@ public final class JavadocBuilder {
      * @return Javadoc comment in string form
      */
     public String build() {
-        return JAVADOC_START + builder.toString() + LINE_END + JAVADOC_END + LINE_END;
+        return JAVADOC_START + inBuild() + LINE_END + JAVADOC_END + LINE_END;
     }
 
     @Override
@@ -171,6 +194,17 @@ public final class JavadocBuilder {
         for (String line : build().split(LINE_END)) {
             JavaHelper.indent(result, indent).append(line).append(LINE_END);
         }
+        return result.toString();
+    }
+
+    private String inBuild() {
+        StringBuilder result = new StringBuilder(builder);
+        if (!tags.isEmpty()) {
+            emptyLine(result);
+        }
+        tags.forEach((k, v) -> {
+            v.forEach(s -> line(result, k).append(" ").append(s));
+        });
         return result.toString();
     }
 }

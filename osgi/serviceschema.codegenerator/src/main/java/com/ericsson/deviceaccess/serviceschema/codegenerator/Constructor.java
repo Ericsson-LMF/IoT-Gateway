@@ -9,7 +9,7 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.JavaHelper.*
  *
  * @author delma
  */
-public class Constructor {
+public class Constructor implements CodeBlock {
 
     private AccessModifier accessModifier;
     private final List<Param> parameters;
@@ -61,8 +61,16 @@ public class Constructor {
         return this;
     }
 
-    public Constructor addLine(String line) {
-        lines.add(line);
+    @Override
+    public Constructor add(String code) {
+        lines.add(code);
+        return this;
+    }
+
+    @Override
+    public Constructor append(Object object) {
+        int index = lines.size() - 1;
+        lines.set(index, lines.get(index) + object);
         return this;
     }
 
@@ -85,7 +93,7 @@ public class Constructor {
         builder.append(new JavadocBuilder(javadoc).append(this::parameterJavadocs).build(indent));
         //CONSTRUCTOR DECLARATION
         String access = accessModifier.get();
-        if(owner.isSingleton()){
+        if (owner.isSingleton()) {
             access = AccessModifier.PRIVATE.get();
         }
         indent(builder, indent).append(access).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);

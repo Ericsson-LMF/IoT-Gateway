@@ -9,7 +9,7 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.JavaHelper.*
  *
  * @author delma
  */
-public class Method {
+public class Method implements CodeBlock {
 
     private AccessModifier accessModifier;
     private final String name;
@@ -53,8 +53,16 @@ public class Method {
         return this;
     }
 
-    public Method addLine(String line) {
+    @Override
+    public Method add(String line) {
         lines.add(line);
+        return this;
+    }
+
+    @Override
+    public Method append(Object object) {
+        int index = lines.size() - 1;
+        lines.set(index, lines.get(index) + object);
         return this;
     }
 
@@ -102,8 +110,8 @@ public class Method {
         indent(builder, indent).append(BLOCK_END).append(LINE_END);
         return builder.toString();
     }
-    
-    public JavadocBuilder parameterJavadocs(JavadocBuilder builder){
+
+    public JavadocBuilder parameterJavadocs(JavadocBuilder builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }

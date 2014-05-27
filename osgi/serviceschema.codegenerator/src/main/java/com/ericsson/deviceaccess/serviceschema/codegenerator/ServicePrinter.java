@@ -43,6 +43,7 @@ import com.ericsson.deviceaccess.service.xmlparser.ResultsDocument.Results;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
+import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -82,8 +83,9 @@ public class ServicePrinter {
         out.println("    ServiceSchema.Builder serviceSchemaBuilder = null;");
     }
 
-    public void doit(JavaBuilder builder) {
+    public void buildSchemaDefinitions(JavaBuilder builder, Service[] serviceArray) {
         builder.setPackage("com.ericsson.deviceaccess.spi.service");
+        //IMPORTS
         builder.addImport("java.util.HashMap");
         builder.addImport("java.util.Map");
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ServiceSchema");
@@ -91,19 +93,112 @@ public class ServicePrinter {
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ParameterSchema");
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ServiceSchemaError");
 
-        builder.setName("SchemaDefinitions");
-        builder.setJavadoc(new JavadocBuilder("Defines service schemas."));
+        //CLASS DEFINITION
         builder.setSigleton(true);
+        builder.setName("SchemaDefinitions");
+        builder.setJavadoc(new JavadocBuilder("Defines service schemata"));
 
-        builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceType").initialise("HashMap<>"));
+        //VARIABLES
+        builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceType").init("HashMap<>"));
 
+        //CONSTRUCTORS
+        Constructor code = new Constructor().setJavadoc(new JavadocBuilder("Constructor which generates schemata."));
+        builder.addConstructor(code);
+        code.add("ActionSchema.Builder actionBuilder = null;");
+        code.add("ParameterSchema.Builder parameterBuilder = null;");
+        code.add("ServiceSchema.Builder serviceBuilder = null;");
+        for (Service service : serviceArray) {
+            code.add("");
+            String name = service.getName();
+            code.add("//CREATING SCHEMA FOR: ").append(name);
+            code.add("serviceBuilder = new ServiceSchema.Builder(\"").append(name).append("\");");
+            addActions(code, service.getActions());
+            addProperties(code, service.getProperties());
+            code.add("INSTANCE.serviceSchemas.put(\"").append(name).append("\", serviceBuilder.build());");
+        }
+
+        //METHODS
         builder.addMethod(
                 new Method("ServiceSchema", "getServiceSchema")
                 .setJavadoc(new JavadocBuilder("Gets ServiceSchema based on it's name."))
                 .addParameter("String", "name", "name of schema")
-                .addLine("return serviceSchemas.get(#0)"));
-        
-        builder.addConstructor(new Constructor());
+                .add("return serviceSchemas.get(#0)"));
+    }
+
+    public void addActions(CodeBlock code, Actions actions) {
+        if (actions == null) {
+            return;
+        }
+        for (Action action : actions.getActionArray()) {
+            String name = action.getName();
+            boolean mandatory = !action.getOptional();
+            code.add("actionBuilder = new ActionSchema.Builder(\"").append(name).append("\").setMandatory(").append(mandatory).append(");");
+            Arguments arguments = action.getArguments();
+            if (arguments != null) {
+                for (Parameter argument : arguments.getParameterArray()) {
+                    addParameter(code, argument);
+                    code.add("actionBuilder.addArgumentSchema(parameterBuilder.build());");
+                }
+            }
+            Results results = action.getResults();
+            if (results != null) {
+                for (Parameter result : results.getParameterArray()) {
+                    addParameter(code, result);
+                    code.add("actionBuilder.addResultSchema(parameterBuilder.build());");
+                }
+            }
+            code.add("serviceBuilder.addActionSchema(actionBuilder.build());");
+        }
+    }
+
+    private void addProperties(CodeBlock code, Properties properties) {
+        if (properties == null) {
+            return;
+        }
+        for (Parameter property : properties.getParameterArray()) {
+            addParameter(code, property);
+            code.add("serviceBuilder.addPropertySchema(parameterBuilder.build());");
+        }
+    }
+
+    /**
+     * @param out
+     * @param action
+     */
+    private void addParameter(CodeBlock code, Parameter parameter) {
+        String name = parameter.getName();
+        String type = parameter.getType();
+        String default0 = parameter.getDefault();
+        if ("String".equals(getType(parameter.getType()))) {
+            ValuesDocument.Values values = parameter.getValues();
+            if (parameter.getValues() != null && values.getValueArray().length > 0) {
+                if (default0 == null) {
+                    default0 = values.getValueArray()[0];
+                }
+                code.add("parameterBuilder = new ParameterSchema.Builder(\"").append(name).append("\").setType(String.class).setDefaultValue(\"").append(default0).append("\");");
+                code.add("parameterBuilder.setValidValues(new String[]{");
+                for (String value : values.getValueArray()) {
+                    code.add("\"" + value + "\",");
+                }
+                code.add("});");
+            } else {
+                if (default0 == null) {
+                    default0 = "";
+                }
+                code.add("parameterBuilder = new ParameterSchema.Builder(\"").append(name).append("\").setType(String.class).setDefaultValue(\"").append(default0).append("\");");
+            }
+        } else {
+            if (default0 == null) {
+                default0 = "0";
+            }
+            code.add("parameterBuilder = new ParameterSchema.Builder(\"").append(name).append("\").setType(").append(type).append(".class).setDefaultValue(new ").append(type).append("(").append(default0).append("));");
+            if (parameter.getMin() != null) {
+                code.add("parameterBuilder.setMinValue(\"").append(parameter.getMin()).append("\");");
+            }
+            if (parameter.getMax() != null) {
+                code.add("parameterBuilder.setMaxValue(\"").append(parameter.getMax()).append("\");");
+            }
+        }
     }
 
     /**
@@ -431,14 +526,14 @@ public class ServicePrinter {
                 builder.line("Execute the action '").append(action.getName()).append("'.");
                 builder.line("Action description: ").append(action.getDescription());
                 if (action.getArguments() != null && action.getArguments().getParameterArray().length > 0) {
-                    builder.line();
+                    builder.emptyLine();
                     for (Parameter arg : action.getArguments().getParameterArray()) {
                         builder.parameter(arg.getName(), arg.getDescription());
                     }
                 }
 
                 if (action.getResults() != null) {
-                    builder.line();
+                    builder.emptyLine();
                     builder.result("{@link ").append(capitalize(action.getName())).append("Result}");
                 }
                 out.print(builder);
@@ -509,7 +604,7 @@ public class ServicePrinter {
         Service[] serviceArray = services.getServiceArray();
 
         JavaBuilder builder = new JavaBuilder();
-        sp.doit(builder);
+        sp.buildSchemaDefinitions(builder, serviceArray);
         System.out.print(builder.build(ServicePrinter.class));
         System.out.println("=============================================");
 

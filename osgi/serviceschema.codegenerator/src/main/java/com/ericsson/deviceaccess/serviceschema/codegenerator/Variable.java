@@ -35,7 +35,7 @@ public class Variable {
         return type;
     }
 
-    public Variable initialise(String type) {
+    public Variable init(String type) {
         creationType = type;
         return this;
     }
