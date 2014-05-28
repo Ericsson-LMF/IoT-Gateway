@@ -98,8 +98,8 @@ public class EventManagerTest {
         
         context.checking(new Expectations() {{
             oneOf(bundleContext).createFilter(with(aNonNull(String.class)));
-            allowing(bundleContext).addServiceListener((ServiceListener) with(anything()), with(aNonNull(String.class)));
-            allowing(bundleContext).removeServiceListener((ServiceListener) with(anything()));
+            allowing(bundleContext).addServiceListener(with(any(ServiceListener.class)), with(aNonNull(String.class)));
+            allowing(bundleContext).removeServiceListener(with(any(ServiceListener.class)));
             allowing(bundleContext).getServiceReferences(with("com.ericsson.deviceaccess.api.GenericDevice"), with(aNull(String.class)));
         }});
         

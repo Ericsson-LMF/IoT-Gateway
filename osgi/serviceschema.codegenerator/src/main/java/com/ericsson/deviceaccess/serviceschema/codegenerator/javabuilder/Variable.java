@@ -1,6 +1,6 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.JavaHelper.*;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
 
 /**
  *
@@ -45,10 +45,10 @@ public class Variable {
         String access = modifier.get();
         indent(result, indent).append(access).append(" ").append(type).append(" ").append(name);
         if (creationType != null) {
-            //TODO: Chande intialization thingy so you can add parameters
+            //TODO: Change intialization thingy so you can add parameters
             result.append(" = new ").append(creationType).append("(").append("").append(")");
         }
-        return result.append(STATEMENT_END).toString();
+        return result.append(STATEMENT_END).append(LINE_END).toString();
     }
 
 }

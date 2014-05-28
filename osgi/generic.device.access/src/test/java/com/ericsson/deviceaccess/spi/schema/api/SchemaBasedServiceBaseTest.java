@@ -32,10 +32,8 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema.api;
 
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceProperties;
 import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
@@ -60,6 +58,7 @@ import static org.junit.Assert.fail;
  *
  */
 public class SchemaBasedServiceBaseTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -75,33 +74,29 @@ public class SchemaBasedServiceBaseTest {
     @Before
     public void setup() {
         device = context.mock(GenericDeviceImpl.class);
-        context.checking(new Expectations() {{
-            allowing(device).getId();
-            will(returnValue("device"));
-        }});
+        context.checking(new Expectations() {
+            {
+                allowing(device).getId();
+                will(returnValue("device"));
+            }
+        });
 
         serviceSchema = new ServiceSchema.Builder("@@TEST@@").
                 addActionSchema(new ActionSchema.Builder("action").
                         setMandatory(true).
-                        addArgumentSchema(new ParameterSchema.Builder("arg").
-                                setType(Integer.class).
-                                setDefaultValue(new Integer(0)).
+                        addArgumentSchema(new ParameterSchema.Builder("arg", Integer.class).
                                 setMinValue("-10").
                                 setMaxValue("10").
                                 build()).
-                        addArgumentSchema(new ParameterSchema.Builder("arg2").
-                                setType(Integer.class).
-                                setDefaultValue(new Integer(0)).
+                        addArgumentSchema(new ParameterSchema.Builder("arg2", Integer.class).
                                 setMinValue("-10").
                                 setMaxValue("10").
                                 build()).
-                        addResultSchema(new ParameterSchema.Builder("res1").
-                                setType(Integer.class).
-                                setDefaultValue(new Integer(0)).
+                        addResultSchema(new ParameterSchema.Builder("res1", Integer.class).
                                 build()).
                         build()).
                 addActionSchema(new ActionSchema.Builder("optionalAction").build()).
-                addPropertySchema(new ParameterSchema.Builder("prop1").setType(Integer.class).setDefaultValue(new Integer(0)).build()).
+                addPropertySchema(new ParameterSchema.Builder("prop1", Integer.class).build()).
                 build();
         actionSchema = context.mock(ActionSchema.class);
         ParameterSchemaImpl1 = context.mock(ParameterSchema.class, "ParameterSchemaImpl1");
@@ -124,11 +119,7 @@ public class SchemaBasedServiceBaseTest {
     public void testDefineAction() throws GenericDeviceException {
 
         final int[] ctr = new int[1];
-        service.defineAction("action", new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                ctr[0]++;
-            }
-        });
+        service.defineAction("action", context1 -> ctr[0]++);
 
         service.getAction("action").execute((GenericDeviceProperties) null);
         assertEquals(1, ctr[0]);
@@ -137,9 +128,7 @@ public class SchemaBasedServiceBaseTest {
     @Test
     public void testDefineAction_noActionSchema() {
         try {
-            service.defineAction("notInSchema", new ActionDefinition() {
-                public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                }
+            service.defineAction("notInSchema", context1 -> {
             });
             fail("should have been exception here");
         } catch (ServiceSchemaError e) {
@@ -150,13 +139,9 @@ public class SchemaBasedServiceBaseTest {
     @Test
     public void testDefineAction_alreadyDefined() {
         try {
-            service.defineAction("action", new ActionDefinition() {
-                public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                }
+            service.defineAction("action", context1 -> {
             });
-            service.defineAction("action", new ActionDefinition() {
-                public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                }
+            service.defineAction("action", context1 -> {
             });
             fail("should have been exception here");
         } catch (ServiceSchemaError e) {
@@ -183,11 +168,7 @@ public class SchemaBasedServiceBaseTest {
         SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema);
         ReflectionTestUtil.setField(service, "parentDevice", device);
         final int[] ctr = new int[1];
-        service.defineCustomAction(actionSchema, new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                ctr[0]++;
-            }
-        });
+        service.defineCustomAction(actionSchema, context1 -> ctr[0]++);
 
         service.getAction("customAction").execute((GenericDeviceProperties) null);
 
@@ -208,9 +189,7 @@ public class SchemaBasedServiceBaseTest {
         SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema);
         ReflectionTestUtil.setField(service, "parentDevice", device);
         try {
-            service.defineCustomAction(actionSchema, new ActionDefinition() {
-                public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                }
+            service.defineCustomAction(actionSchema, context1 -> {
             });
             fail("should have been exception here");
         } catch (ServiceSchemaError e) {
@@ -223,11 +202,7 @@ public class SchemaBasedServiceBaseTest {
     @Test
     public void testValidateSchema_ok() {
         final int[] ctr = new int[1];
-        service.defineAction("action", new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                ctr[0]++;
-            }
-        });
+        service.defineAction("action", context1 -> ctr[0]++);
 
         try {
             service.validateSchema();
@@ -255,15 +230,21 @@ public class SchemaBasedServiceBaseTest {
     public void testDefineDynamicProperty() throws GenericDeviceException {
         final EventManager eventManager = context.mock(EventManager.class);
         ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
-        context.checking(new Expectations() {{
-            oneOf(device).notifyEvent("@@TEST@@", new Properties() {{
-                put("dyn", 42);
-            }});
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(device).notifyEvent("@@TEST@@", new Properties() {
+                    {
+                        put("dyn", 42);
+                    }
+                });
+            }
+        });
 
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema) {{
-            addDynamicProperty(new ParameterSchema.Builder("dyn").setType(Integer.class).build());
-        }};
+        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema) {
+            {
+                addDynamicProperty(new ParameterSchema.Builder("dyn", Integer.class).build());
+            }
+        };
         ReflectionTestUtil.setField(service, "parentDevice", device);
         service.getProperties().setIntValue("dyn", 42);
 
@@ -275,36 +256,38 @@ public class SchemaBasedServiceBaseTest {
     public void testRefreshProperties() throws GenericDeviceException {
         final EventManager eventManager = context.mock(EventManager.class);
         ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
-        context.checking(new Expectations() {{
-            allowing(eventManager).notifyGenericDeviceEvent(with(any(String.class)), with(any(String.class)), with(any(Dictionary.class)));
-        }});
+        context.checking(new Expectations() {
+            {
+                allowing(eventManager).notifyGenericDeviceEvent(with(any(String.class)), with(any(String.class)), with(any(Dictionary.class)));
+            }
+        });
 
         context.checking(new Expectations() {
             {
                 // define custom action
-                allowing(device).getId();will(returnValue("id"));
-                allowing(device).getProtocol();will(returnValue("protocol"));
-                allowing(device).isOnline();will(returnValue(true));
-                allowing(device).getURN();will(returnValue("urn"));
-                allowing(device).getName();will(returnValue("name"));
+                allowing(device).getId();
+                will(returnValue("id"));
+                allowing(device).getProtocol();
+                will(returnValue("protocol"));
+                allowing(device).isOnline();
+                will(returnValue(true));
+                allowing(device).getURN();
+                will(returnValue("urn"));
+                allowing(device).getName();
+                will(returnValue("name"));
             }
         });
 
         ReflectionTestUtil.setField(service, "parentDevice", device);
 
         final boolean[] actionDone = new boolean[1];
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema) {{
-            defineAction(REFRESH_PROPERTIES, new ActionDefinition() {
-                public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                    actionDone[0] = true;
-                }
-            });
-            defineAction("action", new ActionDefinition() {
-                public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                    // needed since schema says it is mandatory
-                }
-            });
-        }};
+        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema) {
+            {
+                defineAction(REFRESH_PROPERTIES, context1 -> actionDone[0] = true);
+                defineAction("action", context -> {
+                });
+            }
+        };
         service.validateSchema();
         service.getAction(SchemaBasedServiceBase.REFRESH_PROPERTIES).execute((GenericDeviceProperties) null);
 

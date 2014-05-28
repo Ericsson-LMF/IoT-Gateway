@@ -39,7 +39,6 @@
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.osgi.log.util</artifactId>
-            <version>${connectedhome.version}</version>
         </dependency>
   		<dependency>
             <groupId>junit</groupId>

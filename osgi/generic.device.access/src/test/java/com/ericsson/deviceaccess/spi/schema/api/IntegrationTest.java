@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import com.ericsson.deviceaccess.api.GenericDeviceAction;
@@ -46,9 +45,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * 
+ *
  */
 public class IntegrationTest {
+
     private static final String RESULT_NAME = "result";
     private static final String ARGUMENT_NAME = "argument1";
     private static final String PARAMETER_NAME = "parameter1";
@@ -60,23 +60,18 @@ public class IntegrationTest {
     public static void setup() {
         serviceSchema = new ServiceSchema.Builder(SERVICE_NAME).
                 addActionSchema(new ActionSchema.Builder(ACTION_NAME).
-                    setMandatory(true).
-                    addArgumentSchema(new ParameterSchema.Builder(ARGUMENT_NAME).
-                        setType(Integer.class).
-                        setDefaultValue(0)
-                        .setMinValue("-100").
-                        setMaxValue("100").
+                        setMandatory(true).
+                        addArgumentSchema(new ParameterSchema.Builder(ARGUMENT_NAME, Integer.class)
+                                .setMinValue("-100").
+                                setMaxValue("100").
+                                build()).
+                        addResultSchema(new ParameterSchema.Builder(RESULT_NAME, String.class).
+                                setDefaultValue("banan").
+                                setValidValues(new String[]{"result=42", "banan"}).
+                                build()).
                         build()).
-                    addResultSchema(new ParameterSchema.Builder(RESULT_NAME).
-                        setType(String.class).
-                        setDefaultValue("banan").
-                        setValidValues(new String[]{"result=42", "banan"}).
+                addPropertySchema(new ParameterSchema.Builder(PARAMETER_NAME, Integer.class).
                         build()).
-                    build()).
-                addPropertySchema(new ParameterSchema.Builder(PARAMETER_NAME).
-                    setType(Integer.class).
-                    setDefaultValue(0).
-                    build()).
                 build();
     }
 
@@ -86,26 +81,21 @@ public class IntegrationTest {
                 build();
         final ActionSchema actionSchema = new ActionSchema.Builder("CustomAction").
                 setMandatory(true).
-                addArgumentSchema(new ParameterSchema.Builder("CustomArgument").
-                    setType(Integer.class).
-                    setDefaultValue(0).
-                    build()).
-                addResultSchema(new ParameterSchema.Builder("CustomResult").
-                    setType(String.class).
-                    setDefaultValue("apa").
-                    setValidValues(new String[]{"apa", "result=47"}).
-                    build()).
+                addArgumentSchema(new ParameterSchema.Builder("CustomArgument", Integer.class).
+                        build()).
+                addResultSchema(new ParameterSchema.Builder("CustomResult", String.class).
+                        setDefaultValue("apa").
+                        setValidValues(new String[]{"apa", "result=47"}).
+                        build()).
                 build();
         SchemaBasedGenericDevice myGenericDevice = new SchemaBasedGenericDevice() {
             {
                 addSchemaBasedService(createService(serviceSchema).
-                    defineCustomAction(actionSchema, new ActionDefinition() {
-                        public void invoke(GenericDeviceActionContext context) {
+                        defineCustomAction(actionSchema, context -> {
                             int input = context.getArguments().getIntValue("CustomArgument");
-                            String result = "result="+input;
+                            String result = "result=" + input;
                             context.getResult().getValue().setStringValue("CustomResult", result);
-                        }
-                    }));
+                        }));
             }
         };
 
@@ -115,7 +105,6 @@ public class IntegrationTest {
         assertEquals("result=47", ac.getResult().getValue().getStringValue("CustomResult"));
     }
 
-    
     /**
      * @param device
      * @param serviceName

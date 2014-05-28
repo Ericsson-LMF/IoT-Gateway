@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import java.util.HashMap;
@@ -52,7 +51,7 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
 
     /**
      * Creates instance based on specified schema.
-     * 
+     *
      * @param serviceSchema the schema
      */
     public SchemaBasedServiceBase(ServiceSchema serviceSchema) {
@@ -64,15 +63,16 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final SchemaBasedService defineAction(String name, ActionDefinition actionDefinition) {
         if (getAction(name) == null) {
             throw new ServiceSchemaError("The action: '" + name + "' is not specified in the service schema");
         }
-        
+
         if (actionDefinitions.containsKey(name)) {
             throw new ServiceSchemaError("The action: '" + name + "' has already been defined");
         }
-        
+
         actionDefinitions.put(name, actionDefinition);
         return this;
     }
@@ -80,6 +80,7 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final SchemaBasedService defineCustomAction(final ActionSchema actionSchema, ActionDefinition actionDefinition) {
         String name = actionSchema.getName();
         if (getAction(name) != null) {
@@ -90,42 +91,37 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
         createAction(actionSchema);
 
         actionDefinitions.put(name, actionDefinition);
-        
+
         return this;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void validateSchema() {
-        ActionSchema[] actionSchemas = serviceSchema.getActionSchemas();
-        for (int i = 0; i < actionSchemas.length; i++) {
-            ActionSchema action = actionSchemas[i];
+        for (ActionSchema action : serviceSchema.getActionSchemas()) {
             String name = action.getName();
             if (action.isMandatory() && !actionDefinitions.containsKey(name)) {
-                throw new ServiceSchemaError("The action: '"+name+"' in service: '"+getName()+"' is mandatory, but lacks definition.");
+                throw new ServiceSchemaError("The action: '" + name + "' in service: '" + getName() + "' is mandatory, but lacks definition.");
             }
         }
     }
-    
+
     /**
      * Creates the actions and parameters based on the specified schema.
-     * 
+     *
      * @param serviceSchema
      */
     private void init(ServiceSchema serviceSchema) {
-        ActionSchema[] actionSchemas = serviceSchema.getActionSchemas();
-        for (int i = 0; i < actionSchemas.length; i++) {
-            final ActionSchema actionSchema = actionSchemas[i];
+        for (ActionSchema actionSchema : serviceSchema.getActionSchemas()) {
             createAction(actionSchema);
         }
 
         createAction(new ActionSchema.Builder(REFRESH_PROPERTIES).setMandatory(true).build());
 
-        ParameterSchema[] ParameterSchemaImpls = serviceSchema.getPropertiesSchemas();
-        for (int i = 0; i < ParameterSchemaImpls.length; i++) {
-            final ParameterSchema ParameterSchemaImpl = ParameterSchemaImpls[i];
-            getProperties().setStringValue(ParameterSchemaImpl.getName(), ParameterSchemaImpl.getDefaultStringValue());
+        for (ParameterSchema schema : serviceSchema.getPropertiesSchemas()) {
+            getProperties().setStringValue(schema.getName(), schema.getDefaultStringValue());
         }
     }
 
@@ -140,7 +136,7 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
         putAction(genericDeviceActionImpl);
     }
 
-	ActionDefinition getActionDefinitions(String name) {
-		return (ActionDefinition) actionDefinitions.get(name);
-	}
+    ActionDefinition getActionDefinitions(String name) {
+        return (ActionDefinition) actionDefinitions.get(name);
+    }
 }

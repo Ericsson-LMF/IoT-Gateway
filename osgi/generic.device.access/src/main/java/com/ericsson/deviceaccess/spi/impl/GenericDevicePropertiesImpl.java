@@ -115,6 +115,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setStringValue(String key, String value) {
         if (metadata.get(key) == null) {
             throw new GenericDeviceError("There is no property: " + key

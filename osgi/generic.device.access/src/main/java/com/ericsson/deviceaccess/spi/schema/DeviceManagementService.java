@@ -32,33 +32,28 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
-
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
 
 /**
  * Implementation of the device management service.
  */
 public class DeviceManagementService extends SchemaBasedServiceBase {
+
     public static final String SET_NAME = "setName";
     public static final String DEVICE_MANAGEMENT = "DeviceManagement";
     public static final String NEW_NAME = "newName";
     public static final String SET_URN = "setURN";
     public static final String NEW_URN = "newURN";
-    private static final ServiceSchema SERVICE_SCHEMA =
-        new ServiceSchema.Builder(DEVICE_MANAGEMENT)
+    private static final ServiceSchema SERVICE_SCHEMA
+            = new ServiceSchema.Builder(DEVICE_MANAGEMENT)
             .addActionSchema(new ActionSchema.Builder(SET_NAME)
-                .addArgumentSchema(new ParameterSchema.Builder(NEW_NAME)
-                    .setType(String.class)
+                    .addArgumentSchema(new ParameterSchema.Builder(NEW_NAME, String.class)
+                            .build())
                     .build())
-                .build())
             .addActionSchema(new ActionSchema.Builder(SET_URN)
-                .addArgumentSchema(new ParameterSchema.Builder(NEW_URN)
-                    .setType(String.class)
+                    .addArgumentSchema(new ParameterSchema.Builder(NEW_URN, String.class)
+                            .build())
                     .build())
-                .build())
             .build();
 
     /**
@@ -66,17 +61,13 @@ public class DeviceManagementService extends SchemaBasedServiceBase {
      */
     public DeviceManagementService() {
         super(SERVICE_SCHEMA);
-        defineAction(SET_NAME, new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                String newName = context.getArguments().getStringValue(NEW_NAME);
-                getParentDevice().setName(newName);
-            }
+        defineAction(SET_NAME, context -> {
+            String newName = context.getArguments().getStringValue(NEW_NAME);
+            getParentDevice().setName(newName);
         });
-        defineAction(SET_URN, new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                String newUrn = context.getArguments().getStringValue(NEW_URN);
-                getParentDevice().setURN(newUrn);
-            }
+        defineAction(SET_URN, context -> {
+            String newUrn = context.getArguments().getStringValue(NEW_URN);
+            getParentDevice().setURN(newUrn);
         });
     }
 }

@@ -1,35 +1,34 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.JavaHelper.*;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
+import java.util.Collections;
 
 /**
  *
  * @author delma
  */
-public class Constructor implements CodeBlock {
+public class Method implements CodeBlock {
 
     private AccessModifier accessModifier;
+    private final String name;
+    private final String type;
     private final List<Param> parameters;
     private final List<String> lines;
     private JavadocBuilder javadoc;
-    private JavaBuilder owner;
 
-    public Constructor() {
+    public Method(String type, String name) {
+        this.type = type;
+        this.name = name;
         parameters = new ArrayList<>();
         lines = new ArrayList<>();
         accessModifier = AccessModifier.PUBLIC;
         javadoc = null;
     }
 
-    public Constructor setOwner(JavaBuilder owner) {
-        this.owner = owner;
-        return this;
-    }
-
-    public Constructor setAccessModifier(AccessModifier modifier) {
+    public Method setAccessModifier(AccessModifier modifier) {
         accessModifier = modifier;
         return this;
     }
@@ -39,50 +38,44 @@ public class Constructor implements CodeBlock {
     }
 
     public String getName() {
-        if (owner == null) {
-            return "unknown";
-        }
-        return owner.getName();
+        return name;
     }
 
     public String getType() {
-        if (owner == null) {
-            return "unknown";
-        }
-        return owner.getName();
+        return type;
     }
 
-    public Constructor addParameter(String type, String name, String description) {
+    public Method addParameter(String type, String name, String description) {
         return addParameter(new Param(type, name).setDescription(description));
     }
 
-    public Constructor addParameter(Param parameter) {
+    public Method addParameter(Param parameter) {
         parameters.add(parameter);
         return this;
     }
 
     @Override
-    public Constructor add(String code) {
+    public Method add(String code) {
         lines.add(code);
         return this;
     }
 
     @Override
-    public Constructor append(Object object) {
+    public Method append(Object code) {
         int index = lines.size() - 1;
-        lines.set(index, lines.get(index) + object);
+        lines.set(index, lines.get(index) + code);
         return this;
     }
 
     public List<Param> getParameters() {
-        return parameters;
+        return Collections.unmodifiableList(parameters);
     }
 
     public Iterable<String> getCodeLines() {
         return lines;
     }
 
-    public Constructor setJavadoc(JavadocBuilder javadoc) {
+    public Method setJavadoc(JavadocBuilder javadoc) {
         this.javadoc = javadoc;
         return this;
     }
@@ -91,12 +84,9 @@ public class Constructor implements CodeBlock {
         StringBuilder builder = new StringBuilder();
         //JAVADOC
         builder.append(new JavadocBuilder(javadoc).append(this::parameterJavadocs).build(indent));
-        //CONSTRUCTOR DECLARATION
+        //METHOD DECLARATION
         String access = accessModifier.get();
-        if (owner.isSingleton()) {
-            access = AccessModifier.PRIVATE.get();
-        }
-        indent(builder, indent).append(access).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
+        indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
         //CODE
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);

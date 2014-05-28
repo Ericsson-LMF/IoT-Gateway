@@ -68,28 +68,20 @@ public class TestSerialization {
     ServiceSchema serviceSchema = new ServiceSchema.Builder("@@TEST@@").
             addActionSchema(new ActionSchema.Builder("action").
                     setMandatory(true).
-                    addArgumentSchema(new ParameterSchema.Builder("arg").
-                            setType(Integer.class).
-                            setDefaultValue(new Integer(0)).
+                    addArgumentSchema(new ParameterSchema.Builder("arg", Integer.class).
                             setMinValue("-10").
                             setMaxValue("10").
                             build()).
-                    addArgumentSchema(new ParameterSchema.Builder("arg2").
-                            setType(Integer.class).
-                            setDefaultValue(new Integer(0)).
+                    addArgumentSchema(new ParameterSchema.Builder("arg2", Integer.class).
                             setMinValue("-10").
                             setMaxValue("10").
                             build()).
-                    addResultSchema(new ParameterSchema.Builder("res1").
-                            setType(Integer.class).
-                            setDefaultValue(new Integer(0)).
+                    addResultSchema(new ParameterSchema.Builder("res1", Integer.class).
                             build()).
                     build()).
             addActionSchema(new ActionSchema.Builder("optionalAction").
                     build()).
-            addPropertySchema(new ParameterSchema.Builder("prop1").
-                    setType(Integer.class).
-                    setDefaultValue(new Integer(0)).
+            addPropertySchema(new ParameterSchema.Builder("prop1", Integer.class).
                     build()).
             build();
 

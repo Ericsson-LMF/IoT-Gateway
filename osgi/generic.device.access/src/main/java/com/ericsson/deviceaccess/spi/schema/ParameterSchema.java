@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import java.util.Arrays;
@@ -44,7 +43,7 @@ import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 import com.ericsson.deviceaccess.spi.utility.Utils;
 
 /**
- * 
+ *
  */
 public class ParameterSchema implements GenericDevicePropertyMetadata {
 
@@ -58,24 +57,26 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
 
     /**
      * @param name
-     * @param type one of {@link String.class}, {@link Integer.class}, {@link Long.class} or {@link Float.class}
+     * @param type one of
+     * {@link String.class}, {@link Integer.class}, {@link Long.class} or
+     * {@link Float.class}
      * @param defaultValue
      */
     private ParameterSchema(String name, Class type, Object defaultValue) {
         if (!(Long.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type) || String.class.isAssignableFrom(type))) {
             throw new ServiceSchemaError("Parameter must be of type Long, Integer, Float or String");
         }
-        
+
         if (defaultValue != null && !type.isAssignableFrom(defaultValue.getClass())) {
             throw new ServiceSchemaError("Default value is not of type: " + type);
         }
-        
+
         if (Float.class.isAssignableFrom(type)) {
             minValue = new Float(Float.NEGATIVE_INFINITY);
             maxValue = new Float(Float.POSITIVE_INFINITY);
         } else if (Integer.class.isAssignableFrom(type)) {
             minValue = new Integer(Integer.MIN_VALUE);
-            maxValue = new Integer(Integer.MAX_VALUE); 
+            maxValue = new Integer(Integer.MAX_VALUE);
         } else if (Long.class.isAssignableFrom(type)) {
             minValue = new Long(Long.MIN_VALUE);
             maxValue = new Long(Long.MAX_VALUE);
@@ -99,24 +100,24 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     public Class getType() {
         return type;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-	public String getTypeName() {
-		if (type == String.class) {
-			return "String";
-		} else if (type == Float.class) {
-			return "Float";
-		} else if (type == Integer.class) {
-			return "Integer";
+    public String getTypeName() {
+        if (type == String.class) {
+            return "String";
+        } else if (type == Float.class) {
+            return "Float";
+        } else if (type == Integer.class) {
+            return "Integer";
         } else if (type == Long.class) {
             return "Long";
-		} else {
-			//TODO: Should we cast an exception if the argument type is not string, float or integer?
-			return type.getName();
-		}
-	}
+        } else {
+            //TODO: Should we cast an exception if the argument type is not string, float or integer?
+            return type.getName();
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -168,8 +169,9 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      * {@inheritDoc}
      */
     public String getSerializedNode(String path, int format) throws GenericDeviceException {
-        if (path == null)
+        if (path == null) {
             throw new GenericDeviceException(405, "Path cannot be null");
+        }
 
         if (path.length() == 0) {
             return serialize(format);
@@ -204,7 +206,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
             json.append("],");
         }
         // remove last ','
-        json.setLength(json.length()-1);
+        json.setLength(json.length() - 1);
         json.append("}");
         return json.toString();
     }
@@ -231,95 +233,99 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
         GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
         this.path = path;
     }
-    
+
     public static class Builder {
+
         private String name;
         private Number minValue;
         private Number maxValue;
         private Object defaultValue;
-        private Class type = String.class;
+        private Class type;
         private String[] validValues;
-        
+
         /**
          * Creates a builder for a parameter with the specified name.
+         *
          * @param parameterName
-         * @return the builder
          */
-        public Builder(String parameterName) {
+        public Builder(String parameterName, Class type) {
             this.name = parameterName;
+            this.type = type;
         }
-        
+
         /**
-         * Sets the min value. 
-         * The string will be interpreted according to the type of the parameter schema.
-         * 
+         * Sets the min value. The string will be interpreted according to the
+         * type of the parameter schema.
+         *
          * @param minValue
          * @return this parameter schema
          */
         public Builder setMinValue(String minValue) {
-            if (Float.class.isAssignableFrom(type)) {
+            if (isSuperOf(Float.class, type)) {
                 this.minValue = Float.valueOf(minValue);
-            } else if (Integer.class.isAssignableFrom(type)) {
+            } else if (isSuperOf(Integer.class, type)) {
                 this.minValue = Integer.decode(minValue);
-            } else if (Long.class.isAssignableFrom(type)) {
+            } else if (isSuperOf(Long.class, type)) {
                 this.minValue = Long.decode(minValue);
             } else {
-                throw new ServiceSchemaError("Cannot set min value when the parameter type is "+type);
+                throw new ServiceSchemaError("Cannot set min value when the parameter type is " + type);
             }
             return this;
         }
-       
+
         /**
-         * Sets the max value. The string will be interpreted according to the type of the parameter schema.
-         * 
+         * Sets the max value. The string will be interpreted according to the
+         * type of the parameter schema.
+         *
          * @param maxValue
          * @return this parameter schema
          */
         public Builder setMaxValue(String maxValue) {
-            if (Float.class.isAssignableFrom(type)) {
+            if (isSuperOf(Float.class, type)) {
                 this.maxValue = Float.valueOf(maxValue);
-            } else if (Integer.class.isAssignableFrom(type)) {
+            } else if (isSuperOf(Integer.class, type)) {
                 this.maxValue = Integer.decode(maxValue);
-            } else if (Long.class.isAssignableFrom(type)) {
+            } else if (isSuperOf(Long.class, type)) {
                 this.maxValue = Long.decode(maxValue);
             } else {
-                throw new ServiceSchemaError("Cannot set max value when the parameter type is "+type);
+                throw new ServiceSchemaError("Cannot set max value when the parameter type is " + type);
             }
             return this;
         }
-        
+
         /**
          * @param defaultValue the defaultValue to set
-         * @return 
          * @return the builder
          */
-        public Builder setDefaultValue(Object defaultValue) {
-            this.defaultValue = defaultValue;
+        public Builder setDefaultValue(String defaultValue) {
+            try {
+                if (isSuperOf(Float.class, type)) {
+                    this.defaultValue = Float.valueOf(defaultValue);
+                } else if (isSuperOf(Integer.class, type)) {
+                    this.defaultValue = Integer.decode(defaultValue);
+                } else if (isSuperOf(Long.class, type)) {
+                    this.defaultValue = Long.decode(defaultValue);
+                } else {
+                    this.defaultValue = defaultValue;
+                }
+            } catch (NumberFormatException ex) {
+                throw new ServiceSchemaError(ex);
+            }
             return this;
         }
-        
-        /**
-         * @param type the type to set
-         * @return 
-         * @return the builder
-         */
-        public Builder setType(Class type) {
-            this.type = type;
-            return this;
-        }
-        
+
         /**
          * @param validValues the validValues to set
-         * @return 
          * @return the builder
          */
         public Builder setValidValues(String[] validValues) {
             this.validValues = validValues;
             return this;
         }
-        
+
         /**
          * Builds the schema.
+         *
          * @return the built schema
          */
         public ParameterSchema build() {
@@ -327,59 +333,64 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
                 throw new ServiceSchemaError("Name must be specified");
             }
 
-            if (!(Long.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type) || String.class.isAssignableFrom(type))) {
+            if (!(isSuperOf(Long.class, type) || isSuperOf(Integer.class, type) || isSuperOf(Float.class, type) || isSuperOf(String.class, type))) {
                 throw new ServiceSchemaError("Parameter must be of type Long, Integer, Float or String");
             }
-            
-            if (defaultValue != null && !type.isAssignableFrom(defaultValue.getClass())) {
-                throw new ServiceSchemaError("Default value is not of type: " + type);
+
+            if (defaultValue == null) {
+                if (isSuperOf(String.class, type)) {
+                    defaultValue = "";
+                } else if (isSuperOf(Integer.class, type)) {
+                    defaultValue = 0;
+                } else if (isSuperOf(Long.class, type)) {
+                    defaultValue = 0l;
+                } else if (isSuperOf(Float.class, type)) {
+                    defaultValue = 0.0f;
+                }
             }
-            
+
             ParameterSchema parameterSchema = new ParameterSchema(name, type, defaultValue);
 
-            if (Float.class.isAssignableFrom(type)) {
+            if (isSuperOf(Float.class, type)) {
                 minValue = minValue == null ? new Float(Float.NEGATIVE_INFINITY) : minValue;
-                if (!Float.class.isAssignableFrom(minValue.getClass())) {
-                    throw new ServiceSchemaError("Min value type ("+minValue.getClass()+") does not match parameter type ("+type+")");
+                if (!isSuperOf(Float.class, minValue.getClass())) {
+                    throw new ServiceSchemaError("Min value type (" + minValue.getClass() + ") does not match parameter type (" + type + ")");
                 }
                 parameterSchema.minValue = minValue;
                 maxValue = maxValue == null ? new Float(Float.POSITIVE_INFINITY) : maxValue;
-                if (!Float.class.isAssignableFrom(maxValue.getClass())) {
-                    throw new ServiceSchemaError("Max value type ("+maxValue.getClass()+") does not match parameter type ("+type+")");
+                if (!isSuperOf(Float.class, maxValue.getClass())) {
+                    throw new ServiceSchemaError("Max value type (" + maxValue.getClass() + ") does not match parameter type (" + type + ")");
                 }
                 parameterSchema.maxValue = maxValue;
-            } else if (Integer.class.isAssignableFrom(type)) {
+            } else if (isSuperOf(Integer.class, type)) {
                 minValue = minValue == null ? new Integer(Integer.MIN_VALUE) : minValue;
-                if (!Integer.class.isAssignableFrom(minValue.getClass())) {
-                    throw new ServiceSchemaError("Min value type ("+minValue.getClass()+") does not match parameter type ("+type+")");
+                if (!isSuperOf(Integer.class, minValue.getClass())) {
+                    throw new ServiceSchemaError("Min value type (" + minValue.getClass() + ") does not match parameter type (" + type + ")");
                 }
                 parameterSchema.minValue = minValue;
-                maxValue = maxValue == null ? new Integer(Integer.MAX_VALUE) : maxValue; 
-                if (!Integer.class.isAssignableFrom(maxValue.getClass())) {
-                    throw new ServiceSchemaError("Max value type ("+maxValue.getClass()+") does not match parameter type ("+type+")");
+                maxValue = maxValue == null ? new Integer(Integer.MAX_VALUE) : maxValue;
+                if (!isSuperOf(Integer.class, maxValue.getClass())) {
+                    throw new ServiceSchemaError("Max value type (" + maxValue.getClass() + ") does not match parameter type (" + type + ")");
                 }
                 parameterSchema.maxValue = maxValue;
-            } else if (Long.class.isAssignableFrom(type)) {
+            } else if (isSuperOf(Long.class, type)) {
                 minValue = minValue == null ? new Long(Long.MIN_VALUE) : minValue;
-                if (!Long.class.isAssignableFrom(minValue.getClass())) {
-                    throw new ServiceSchemaError("Min value type ("+minValue.getClass()+") does not match parameter type ("+type+")");
+                if (!isSuperOf(Long.class, minValue.getClass())) {
+                    throw new ServiceSchemaError("Min value type (" + minValue.getClass() + ") does not match parameter type (" + type + ")");
                 }
                 parameterSchema.minValue = minValue;
                 maxValue = maxValue == null ? new Long(Long.MAX_VALUE) : maxValue;
-                if (!Long.class.isAssignableFrom(maxValue.getClass())) {
-                    throw new ServiceSchemaError("Max value type ("+maxValue.getClass()+") does not match parameter type ("+type+")");
+                if (!isSuperOf(Long.class, maxValue.getClass())) {
+                    throw new ServiceSchemaError("Max value type (" + maxValue.getClass() + ") does not match parameter type (" + type + ")");
                 }
                 parameterSchema.maxValue = maxValue;
             }
-            
-            if (String.class.isAssignableFrom(type)) {
+
+            if (isSuperOf(String.class, type)) {
                 if (validValues != null) {
-                    if (defaultValue == null) {
-                        throw new ServiceSchemaError("Default value ("+defaultValue+") is not among valid values.");
-                    }
                     Arrays.sort(validValues);
                     if (Arrays.binarySearch(validValues, defaultValue) < 0) {
-                        throw new ServiceSchemaError("Default value ("+defaultValue+") is not among valid values.");
+                        throw new ServiceSchemaError("Default value (" + defaultValue + ") is not among valid values.");
                     }
                     parameterSchema.validValues = validValues;
                 }
@@ -388,8 +399,12 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
                     throw new ServiceSchemaError("Valid values are set on a non-string schema");
                 }
             }
-            
+
             return parameterSchema;
+        }
+
+        private boolean isSuperOf(Class a, Class b) {
+            return a.isAssignableFrom(b);
         }
     }
 }

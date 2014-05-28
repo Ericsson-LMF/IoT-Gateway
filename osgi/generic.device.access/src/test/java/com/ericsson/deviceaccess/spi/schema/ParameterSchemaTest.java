@@ -40,6 +40,7 @@ import com.ericsson.deviceaccess.api.GenericDeviceException;
 import junit.framework.Assert;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -61,20 +62,17 @@ public class ParameterSchemaTest {
 
     @Before
     public void setUp() throws Exception {
-        intParameterSchema = new ParameterSchema.Builder("intPar").
-                setType(Integer.class).
-                setDefaultValue(10).
+        intParameterSchema = new ParameterSchema.Builder("intPar", Integer.class).
+                setDefaultValue("10").
                 setMinValue("-10").
                 setMaxValue("10").
                 build();
-        floatParameterSchema = new ParameterSchema.Builder("floatPar").
-                setType(Float.class).
-                setDefaultValue(42.0f).
+        floatParameterSchema = new ParameterSchema.Builder("floatPar", Float.class).
+                setDefaultValue("42.0f").
                 setMinValue("-10.0").
                 setMaxValue("10.0").
                 build();
-        stringParameterSchema = new ParameterSchema.Builder("stringPar").
-                setType(String.class).
+        stringParameterSchema = new ParameterSchema.Builder("stringPar", String.class).
                 setDefaultValue("apa").
                 setValidValues(new String[]{"apa", "banan"}).
                 build();
@@ -94,7 +92,7 @@ public class ParameterSchemaTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -109,7 +107,7 @@ public class ParameterSchemaTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -124,7 +122,7 @@ public class ParameterSchemaTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }

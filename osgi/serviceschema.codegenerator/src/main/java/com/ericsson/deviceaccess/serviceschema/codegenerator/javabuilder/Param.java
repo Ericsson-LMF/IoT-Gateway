@@ -1,4 +1,4 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
 /**
  *

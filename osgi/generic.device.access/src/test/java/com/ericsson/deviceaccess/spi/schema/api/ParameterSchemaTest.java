@@ -52,9 +52,8 @@ public class ParameterSchemaTest {
 
     @Test
     public void testNumber() {
-        ParameterSchema parameterSchema = new ParameterSchema.Builder("par1").
-                setType(Integer.class).
-                setDefaultValue(new Integer(21)).
+        ParameterSchema parameterSchema = new ParameterSchema.Builder("par1", Integer.class).
+                setDefaultValue("21").
                 setMaxValue("99").
                 setMinValue("4").
                 build();
@@ -69,8 +68,7 @@ public class ParameterSchemaTest {
 
     @Test
     public void testString() {
-        ParameterSchema parameterSchema = new ParameterSchema.Builder("par1").
-                setType(String.class).
+        ParameterSchema parameterSchema = new ParameterSchema.Builder("par1", String.class).
                 setDefaultValue("banan").
                 setValidValues(new String[] { "orange", "banan" }).
                 build();
@@ -84,9 +82,8 @@ public class ParameterSchemaTest {
     @Test
     public void testWrongDefault() {
         try {
-            ParameterSchema parameterSchema = new ParameterSchema.Builder("par1").
-                    setType(String.class).
-                    setDefaultValue(new Integer(2)).
+            ParameterSchema parameterSchema = new ParameterSchema.Builder("par1", Integer.class).
+                    setDefaultValue("a").
                     build();
             fail("should cause exception");
         } catch (ServiceSchemaError e) {
