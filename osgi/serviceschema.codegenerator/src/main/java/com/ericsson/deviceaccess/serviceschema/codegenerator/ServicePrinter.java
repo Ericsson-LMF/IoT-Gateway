@@ -110,7 +110,7 @@ public class ServicePrinter {
         builder.setJavadoc(new JavadocBuilder("Defines service schemata"));
 
         //VARIABLES
-        builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceType").init("HashMap<>"));
+        builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceSchemas").init("HashMap<>"));
 
         //CONSTRUCTORS
         Constructor code = new Constructor().setJavadoc(new JavadocBuilder("Constructor which generates schemata."));
