@@ -32,16 +32,16 @@
             <version>${project.version}</version>
         </dependency>
         <!-- 
-		<dependency>
-			<groupId>org.kxml2</groupId>
-			<artifactId>kxml2</artifactId>
-		</dependency>
-		-->
-		<dependency>
-			<groupId>net.sf.kxml</groupId>
-			<artifactId>kxml2</artifactId>
-		</dependency>
-		<!-- 
+        <dependency>
+                <groupId>org.kxml2</groupId>
+                <artifactId>kxml2</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>net.sf.kxml</groupId>
+            <artifactId>kxml2</artifactId>
+        </dependency>
+        <!-- 
         <dependency>
             <groupId>com.ericsson.osgi.base</groupId>
             <artifactId>upnp.basedriver</artifactId>
@@ -58,13 +58,13 @@
             <scope>provided</scope>
         </dependency>
         <!-- 
-		<dependency>
+                <dependency>
             <groupId>com.ericsson.osgi.base</groupId>
             <artifactId>json</artifactId>
             <scope>provided</scope>
         </dependency>
         -->
-		<dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <scope>provided</scope>
@@ -111,10 +111,10 @@
                             org.slf4j.*;-split-package:=merge-first
                         </Private-Package>
                         <Import-Package>
-							org.xmlpull.v1.*,
-							org.kxml2.io.*,
-							org.json.*,
-				javax.servlet.*,
+                            org.xmlpull.v1.*,
+                            org.kxml2.io.*,
+                            org.json.*,
+                            javax.servlet.*,
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.api.*,
                             org.osgi.*;version="[1.0,4.2)"

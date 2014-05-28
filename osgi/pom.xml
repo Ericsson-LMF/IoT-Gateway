@@ -103,16 +103,16 @@
                 <version>1.2.15</version>
             </dependency>
             -->
-	    <dependency>
-              <groupId>org.apache.commons</groupId>
-              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              <version>1.1.1</version>
-	    </dependency>
-	    	<dependency>
-			    <groupId>org.apache.log4j</groupId>
-			    <artifactId>com.springsource.org.apache.log4j</artifactId>
-			    <version>1.2.15</version>
-			</dependency>            
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.log4j</groupId>
+                <artifactId>com.springsource.org.apache.log4j</artifactId>
+                <version>1.2.15</version>
+            </dependency>            
             <!-- nrjmata: Replaced by net.sf.kxml as org.kxml2.kxml2 seems not existing in the maven central repo. -->
             <!-- 
             <dependency>
@@ -130,29 +130,29 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.8.1</version>
-		<scope>test</scope>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
                 <version>1.8.1</version>
-		<scope>test</scope>
+                <scope>test</scope>
             </dependency>
-        <dependency>
-            <groupId>com.ericsson.research.connectedhome</groupId>
-            <artifactId>common.osgi.log.util</artifactId>
-            <version>${connectedhome.version}</version>
-        </dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20090211</version>
-		</dependency>
+            <dependency>
+                <groupId>com.ericsson.research.connectedhome</groupId>
+                <artifactId>common.osgi.log.util</artifactId>
+                <version>${connectedhome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20090211</version>
+            </dependency>
                 
         </dependencies>
     </dependencyManagement>
     <modules>
-    	<!-- nrjmata added the common.packages module including json, -->
+        <!-- nrjmata added the common.packages module including json, -->
         <module>common.packages</module>
         
         <module>serviceschema.xmlparser</module>
@@ -195,16 +195,16 @@
     
     <!-- nrjmata added -->
     <repositories>
-		<repository>
-		    <id>com.springsource.repository.bundles.release</id>
-		    <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-		    <url>http://repository.springsource.com/maven/bundles/release</url>
-		</repository>
+        <repository>
+            <id>com.springsource.repository.bundles.release</id>
+            <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/release</url>
+        </repository>
 		
-		<repository>
-		    <id>com.springsource.repository.bundles.external</id>
-		    <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-		    <url>http://repository.springsource.com/maven/bundles/external</url>
-		</repository>    
+        <repository>
+            <id>com.springsource.repository.bundles.external</id>
+            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>    
     </repositories>
 </project>

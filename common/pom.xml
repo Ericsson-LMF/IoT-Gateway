@@ -95,7 +95,7 @@
                 <version>2.3</version>
             </plugin>
             <!-- The Resources Plugin handles the copying of project resources to
-         the output directory -->
+            the output directory -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.4</version>
@@ -104,7 +104,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
                         <phase>deploy</phase>
