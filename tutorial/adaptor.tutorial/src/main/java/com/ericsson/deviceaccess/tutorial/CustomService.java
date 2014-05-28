@@ -35,8 +35,6 @@
 
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.spi.schema.*;
 
 /**
@@ -59,22 +57,17 @@ public class CustomService extends SchemaBasedServiceBase {
      * <li>res2:String with valid values: "On" and "Off"</li>
      * </ul>
      */
-    private static ActionSchema MY_ACTION = new ActionSchema.Builder("MyCustomAction").
-            addArgumentSchema(new ParameterSchema.Builder("arg1").
-                    setType(String.class).
+    private final static ActionSchema MY_ACTION = new ActionSchema.Builder("MyCustomAction").
+            addArgumentSchema(new ParameterSchema.Builder("arg1", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("arg2").
-                    setType(Integer.class).
-                    setDefaultValue(new Integer(20)).
+            addArgumentSchema(new ParameterSchema.Builder("arg2", Integer.class).
+                    setDefaultValue("20").
                     setMinValue("10").
                     setMaxValue("45").
                     build()).
-            addResultSchema(new ParameterSchema.Builder("res1").
-                    setType(Float.class).
-                    setDefaultValue(new Float(0.0)).
+            addResultSchema(new ParameterSchema.Builder("res1", Float.class).
                     build()).
-            addResultSchema(new ParameterSchema.Builder("res2").
-                    setType(String.class)
+            addResultSchema(new ParameterSchema.Builder("res2", String.class)
                     .setDefaultValue("On")
                     .setValidValues(new String[]{"On", "Off"}).
                             build()).
@@ -91,8 +84,7 @@ public class CustomService extends SchemaBasedServiceBase {
      */
     private static ServiceSchema SERVICE_SCHEMA = new ServiceSchema.Builder(SERVICE_NAME).
             addActionSchema(MY_ACTION).
-            addPropertySchema(new ParameterSchema.Builder("prop1").
-                    setType(String.class).
+            addPropertySchema(new ParameterSchema.Builder("prop1", String.class).
                     setDefaultValue("Active").
                     setValidValues(new String[]{"Active", "Inactive"}).
                     build()).
@@ -105,13 +97,11 @@ public class CustomService extends SchemaBasedServiceBase {
         super(SERVICE_SCHEMA);
 
         // Define the action 
-        defineAction("MyCustomAction", new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                String arg1 = context.getArguments().getStringValue("arg1");
-                int arg2 = context.getArguments().getIntValue("arg2");
-                context.getResult().getValue().setFloatValue("res1", arg2 + arg1.length());
-                context.getResult().getValue().setStringValue("res2", arg2 + arg1.length() > 30 ? "On" : "Off");
-            }
+        defineAction("MyCustomAction", context -> {
+            String arg1 = context.getArguments().getStringValue("arg1");
+            int arg2 = context.getArguments().getIntValue("arg2");
+            context.getResult().getValue().setFloatValue("res1", arg2 + arg1.length());
+            context.getResult().getValue().setStringValue("res2", arg2 + arg1.length() > 30 ? "On" : "Off");
         });
     }
 

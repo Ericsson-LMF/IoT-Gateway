@@ -62,60 +62,45 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
 
     // Define schema for this device
     private static final ActionSchema SET_RULE_ACTION = new ActionSchema.Builder("setRule").
-            addArgumentSchema(new ParameterSchema.Builder("id").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("id", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("name").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("name", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("conditions").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("conditions", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("startTime").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("startTime", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("stopTime").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("stopTime", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("weekDays").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("weekDays", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("actionsThen").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("actionsThen", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("actionsElse").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("actionsElse", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("actionsStart").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("actionsStart", String.class).
                     build()).
-            addArgumentSchema(new ParameterSchema.Builder("actionsStop").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("actionsStop", String.class).
                     build()).
             build();
     private static final ActionSchema UNSET_RULE_ACTION = new ActionSchema.Builder("unsetRule").
-            addArgumentSchema(new ParameterSchema.Builder("id").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("id", String.class).
                     build()).
             build();
     private static final ActionSchema INVOKE_RULE_ACTION_THEN = new ActionSchema.Builder("invokeThen").
-            addArgumentSchema(new ParameterSchema.Builder("id").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("id", String.class).
                     build()).
             build();
     private static final ActionSchema INVOKE_RULE_ACTION_ELSE = new ActionSchema.Builder("invokeElse").
-            addArgumentSchema(new ParameterSchema.Builder("id").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("id", String.class).
                     build()).
             build();
     private static final ActionSchema INVOKE_RULE_ACTION_START = new ActionSchema.Builder("invokeStart").
-            addArgumentSchema(new ParameterSchema.Builder("id").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("id", String.class).
                     build()).
             build();
     private static final ActionSchema INVOKE_RULE_ACTION_STOP = new ActionSchema.Builder("invokeStop").
-            addArgumentSchema(new ParameterSchema.Builder("id").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("id", String.class).
                     build()).
             build();
     private static final ServiceSchema SERVICE_SCHEMA = new ServiceSchema.Builder("RuleService").
@@ -223,32 +208,30 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
         });
 
         ruleProperties.computeIfAbsent(id, key -> {
-            ParameterSchema ruleProperty = new ParameterSchema.Builder(key)
-                    .setType(String.class)
-                    .setDefaultValue("")
+            ParameterSchema ruleProperty = new ParameterSchema.Builder(key, String.class)
                     .build();
             addDynamicProperty(ruleProperty);
-            return ruleProperty;
-        });
+                return ruleProperty ;
+            });
 
-        try {
-            JSONObject json = new JSONObject();
-            json.put("name", name);
-            json.put("conditions", conditions);
-            json.put("startTime", startTime);
-            json.put("stopTime", stopTime);
-            json.put("weekDays", weekDays);
-            json.put("actionsThen", actionsThen);
-            json.put("actionsElse", actionsElse);
-            json.put("actionsStart", actionsStart);
-            json.put("actionsStop", actionsStop);
+            try {
+                JSONObject json = new JSONObject();
+                json.put("name", name);
+                json.put("conditions", conditions);
+                json.put("startTime", startTime);
+                json.put("stopTime", stopTime);
+                json.put("weekDays", weekDays);
+                json.put("actionsThen", actionsThen);
+                json.put("actionsElse", actionsElse);
+                json.put("actionsStart", actionsStart);
+                json.put("actionsStop", actionsStop);
 
-            String value = json.toString().replace('\r', '\n').replace('\n', ' ');
-            getProperties().setStringValue(id, value);
-            configManager.setParameter(id, value);
-        } catch (JSONException e) {
+                String value = json.toString().replace('\r', '\n').replace('\n', ' ');
+                getProperties().setStringValue(id, value);
+                configManager.setParameter(id, value);
+            } catch (JSONException e) {
+            }
         }
-    }
 
     public final void unsetRule(String id) {
         Rule rule = rules.remove(id);

@@ -93,7 +93,7 @@ public class Constructor implements CodeBlock {
         builder.append(new JavadocBuilder(javadoc).append(this::parameterJavadocs).build(indent));
         //CONSTRUCTOR DECLARATION
         String access = accessModifier.get();
-        if (owner.isSingleton()) {
+        if (owner.getClassModifier() == ClassModifier.SINGLETON || owner.getClassModifier() == ClassModifier.ENUM) {
             access = AccessModifier.PRIVATE.get();
         }
         indent(builder, indent).append(access).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);

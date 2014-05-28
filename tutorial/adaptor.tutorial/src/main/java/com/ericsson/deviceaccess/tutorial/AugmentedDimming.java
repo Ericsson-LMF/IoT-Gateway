@@ -48,12 +48,9 @@ import com.ericsson.deviceaccess.spi.service.homeautomation.lighting.DimmingBase
  */
 public class AugmentedDimming extends DimmingBase {
     private static ActionSchema MY_ACTION = new ActionSchema.Builder("MyAugmentAction").
-            addArgumentSchema(new ParameterSchema.Builder("arg1").
-                    setType(String.class).
+            addArgumentSchema(new ParameterSchema.Builder("arg1", String.class).
                     build()).
-            addResultSchema(new ParameterSchema.Builder("res1").
-                    setType(Integer.class).
-                    setDefaultValue(new Integer(0)).
+            addResultSchema(new ParameterSchema.Builder("res1", Integer.class).
                     build()).
             build();
     private int currentLoadLevel;
@@ -64,14 +61,13 @@ public class AugmentedDimming extends DimmingBase {
      */
     public AugmentedDimming() {
         // Define the custom action which augments this service
-        defineCustomAction(MY_ACTION, new ActionDefinition() {
-            public void invoke(GenericDeviceActionContext context) throws GenericDeviceException {
-                String arg1 = context.getArguments().getStringValue("arg1");
-                context.getResult().getValue().setIntValue("res1", arg1.length());
-            }
+        defineCustomAction(MY_ACTION, context -> {
+            String arg1 = context.getArguments().getStringValue("arg1");
+            context.getResult().getValue().setIntValue("res1", arg1.length());
         });
     }
 
+    @Override
     protected void refreshProperties() {
         updateCurrentLoadLevel(Math.min((int) (currentLoadLevel + ((Math.random() * 10) - 5)), 100));
     }
@@ -83,20 +79,24 @@ public class AugmentedDimming extends DimmingBase {
      * <p/>
      * It will be called by the base class when a client invokes the action.
      */
+    @Override
     public void executeSetLoadLevelTarget(int loadLevelTarget) throws GenericDeviceException {
         currentLoadLevel = loadLevelTarget;
         System.out.println("Set load level target: " + loadLevelTarget);
     }
 
+    @Override
     public void executeSetLoadLevelTargetWithRate(int loadLevelTarget, float rate) throws GenericDeviceException {
         currentLoadLevel = loadLevelTarget;
         System.out.println("Set load level target: " + loadLevelTarget +" with rate: "+rate);
     }
 
+    @Override
     public void executeOn() throws GenericDeviceException {
         System.out.println("Execute ON");
     }
 
+    @Override
     public void executeOff() throws GenericDeviceException {
         System.out.println("Execute OFF");
     }

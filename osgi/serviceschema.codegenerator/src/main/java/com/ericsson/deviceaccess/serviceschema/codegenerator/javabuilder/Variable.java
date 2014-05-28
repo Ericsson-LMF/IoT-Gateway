@@ -11,7 +11,7 @@ public class Variable {
     private AccessModifier modifier;
     private final String name;
     private final String type;
-    private String creationType;
+    private String initCode;
 
     public Variable(String type, String name) {
         this.modifier = AccessModifier.PRIVATE;
@@ -19,8 +19,9 @@ public class Variable {
         this.name = name;
     }
 
-    public void setAccessModifier(AccessModifier modifier) {
+    public Variable setAccessModifier(AccessModifier modifier) {
         this.modifier = modifier;
+        return this;
     }
 
     public AccessModifier getAccessModifier() {
@@ -36,7 +37,7 @@ public class Variable {
     }
 
     public Variable init(String type) {
-        creationType = type;
+        initCode = type;
         return this;
     }
 
@@ -44,9 +45,8 @@ public class Variable {
         StringBuilder result = new StringBuilder();
         String access = modifier.get();
         indent(result, indent).append(access).append(" ").append(type).append(" ").append(name);
-        if (creationType != null) {
-            //TODO: Change intialization thingy so you can add parameters
-            result.append(" = new ").append(creationType).append("(").append("").append(")");
+        if (initCode != null) {
+            result.append(" = ").append(initCode);
         }
         return result.append(STATEMENT_END).append(LINE_END).toString();
     }
