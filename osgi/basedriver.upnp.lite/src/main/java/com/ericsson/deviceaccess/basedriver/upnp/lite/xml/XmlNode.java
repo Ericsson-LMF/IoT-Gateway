@@ -36,8 +36,9 @@ package com.ericsson.deviceaccess.basedriver.upnp.lite.xml;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -46,7 +47,7 @@ public class XmlNode {
     protected String name = null;
     protected String text = "";
     protected List<XmlNode> children = null;
-    public ConcurrentHashMap attributes = null;
+    public Map<String, String> attributes = null;
 
     public XmlNode() {
         this.children = Collections.synchronizedList(new ArrayList<XmlNode>());
@@ -61,21 +62,17 @@ public class XmlNode {
         return name;
     }
 
-    public ConcurrentHashMap getAttributes() {
+    public Map getAttributes() {
         return attributes;
     }
 
     public String[] getAttributeNames() {
         String[] names = new String[attributes.size()];
+        
+        Iterator<Map.Entry<String, String>> iterator = attributes.entrySet().iterator();
 
-        Enumeration e = attributes.keys();
-
-        int i = 0;
-
-        while (e.hasMoreElements()) {
-            names[i] = (String) e.nextElement();
-
-            i++;
+        for (int i = 0; iterator.hasNext(); i++) {
+            names[i] = iterator.next().getValue();
         }
         return names;
     }
