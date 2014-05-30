@@ -1,4 +1,4 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers;
 
 /**
  *
@@ -8,7 +8,7 @@ public enum ClassModifier {
 
     CLASS, INTERFACE, ENUM, SINGLETON, ANNOTATION;
 
-    String get() {
+    public String get() {
         if (this == SINGLETON) {
             return ENUM.get();
         }

@@ -1,4 +1,4 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers;
 
 /**
  *
@@ -8,7 +8,7 @@ public enum AccessModifier {
 
     PUBLIC, PROTECTED, PRIVATE;
 
-    String get() {
+    public String get() {
         return toString().toLowerCase();
     }
 }

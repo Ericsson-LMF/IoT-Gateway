@@ -1,5 +1,7 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,8 +20,8 @@ public class Method implements CodeBlock {
     private final List<Param> parameters;
     private final List<String> throwList;
     private final List<String> lines;
-    private JavadocBuilder javadoc;
-    private JavaBuilder owner;
+    private Javadoc javadoc;
+    private JavaClass owner;
 
     public Method(String type, String name) {
         this.type = type;
@@ -31,7 +33,7 @@ public class Method implements CodeBlock {
         javadoc = null;
     }
 
-    public Method setOwner(JavaBuilder owner) {
+    public Method setOwner(JavaClass owner) {
         this.owner = owner;
         return this;
     }
@@ -83,7 +85,7 @@ public class Method implements CodeBlock {
         return lines;
     }
 
-    public Method setJavadoc(JavadocBuilder javadoc) {
+    public Method setJavadoc(Javadoc javadoc) {
         this.javadoc = javadoc;
         return this;
     }
@@ -91,7 +93,7 @@ public class Method implements CodeBlock {
     public String build(int indent) {
         StringBuilder builder = new StringBuilder();
         //JAVADOC
-        builder.append(new JavadocBuilder(javadoc).append(this::parameterJavadocs).build(indent));
+        builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
         //METHOD DECLARATION
         String access = accessModifier.get();
         indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
@@ -131,7 +133,7 @@ public class Method implements CodeBlock {
         return builder.toString();
     }
 
-    private JavadocBuilder parameterJavadocs(JavadocBuilder builder) {
+    private Javadoc parameterJavadocs(Javadoc builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }

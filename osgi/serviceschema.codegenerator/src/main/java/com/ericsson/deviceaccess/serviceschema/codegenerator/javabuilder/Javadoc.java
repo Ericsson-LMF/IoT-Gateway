@@ -11,7 +11,7 @@ import java.util.function.UnaryOperator;
  *
  * @author delma
  */
-public final class JavadocBuilder {
+public final class Javadoc {
 
     private StringBuilder builder;
     private Map<String, List<String>> tags;
@@ -26,7 +26,7 @@ public final class JavadocBuilder {
     /**
      * New builder
      */
-    public JavadocBuilder() {
+    public Javadoc() {
         builder = new StringBuilder();
         tags = new HashMap<>();
     }
@@ -36,7 +36,7 @@ public final class JavadocBuilder {
      *
      * @param object
      */
-    public JavadocBuilder(Object object) {
+    public Javadoc(Object object) {
         this();
         line(object);
     }
@@ -46,7 +46,7 @@ public final class JavadocBuilder {
      *
      * @param builder
      */
-    public JavadocBuilder(JavadocBuilder builder) {
+    public Javadoc(Javadoc builder) {
         this();
         append(builder);
     }
@@ -57,7 +57,7 @@ public final class JavadocBuilder {
      * @param object to be appended
      * @return this
      */
-    public JavadocBuilder line(Object object) {
+    public Javadoc line(Object object) {
         if (object != null) {
             line(builder, object);
         }
@@ -74,7 +74,7 @@ public final class JavadocBuilder {
      * @param javadoc to be appended
      * @return this
      */
-    public JavadocBuilder line(JavadocBuilder javadoc) {
+    public Javadoc line(Javadoc javadoc) {
         if (javadoc != null) {
             line(javadoc.builder);
             tags.putAll(javadoc.tags);
@@ -87,7 +87,7 @@ public final class JavadocBuilder {
      *
      * @return this
      */
-    public JavadocBuilder emptyLine() {
+    public Javadoc emptyLine() {
         emptyLine(builder);
         return this;
     }
@@ -102,7 +102,7 @@ public final class JavadocBuilder {
      * @param object to be appended
      * @return this
      */
-    public JavadocBuilder append(Object object) {
+    public Javadoc append(Object object) {
         if (object != null) {
             builder.append(object);
         }
@@ -115,7 +115,7 @@ public final class JavadocBuilder {
      * @param javadoc to be appended
      * @return this
      */
-    public JavadocBuilder append(JavadocBuilder javadoc) {
+    public Javadoc append(Javadoc javadoc) {
         if (javadoc != null) {
             builder.append(javadoc.builder);
             tags.putAll(javadoc.tags);
@@ -129,7 +129,7 @@ public final class JavadocBuilder {
      * @param function in which editing current builder happends.
      * @return this
      */
-    public JavadocBuilder append(UnaryOperator<JavadocBuilder> function) {
+    public Javadoc append(UnaryOperator<Javadoc> function) {
         if (function != null) {
             function.apply(this);
         }
@@ -141,7 +141,7 @@ public final class JavadocBuilder {
      *
      * @return this
      */
-    public JavadocBuilder inherit() {
+    public Javadoc inherit() {
         addTag(TAG_INHERITED, "");
         return this;
     }
@@ -153,12 +153,12 @@ public final class JavadocBuilder {
      * @param description
      * @return this
      */
-    public JavadocBuilder parameter(Object name, Object description) {
+    public Javadoc parameter(Object name, Object description) {
         addTag(TAG_PARAMETER, name + " " + description);
         return this;
     }
 
-    public JavadocBuilder result(Object object) {
+    public Javadoc result(Object object) {
         addTag(TAG_RETURN, object);
         return this;
     }

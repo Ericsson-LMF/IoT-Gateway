@@ -40,8 +40,8 @@ import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaBuilder;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavadocBuilder;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -62,14 +62,14 @@ public class ServicePrinter {
         out.printf("import com.ericsson.deviceaccess.spi.schema.ActionDefinition;\n");
         out.printf("import com.ericsson.deviceaccess.api.service.%s.%s;\n", service.getCategory(), StringHelper.capitalize(service.getName()));
         out.println();
-        out.print(new JavadocBuilder(GENERATION_WARNING).line(StringHelper.setEndPunctuation(service.getDescription())));
+        out.print(new Javadoc(GENERATION_WARNING).line(StringHelper.setEndPunctuation(service.getDescription())));
         out.printf("public abstract class %sBase extends SchemaBasedServiceBase implements %s {\n", StringHelper.capitalize(name), StringHelper.capitalize(name));
         printConstructor(service, out);
         printSetActionsResultsOnContextMethods(service, out);
         printPropertyGettersAndUpdaters(service, out);
         // Mandatory refresh properties action
         out.println();
-        out.print(new JavadocBuilder("Refresh all properties."));
+        out.print(new Javadoc("Refresh all properties."));
         out.println("  protected abstract void refreshProperties();\n");
 
         out.printf("}\n", StringHelper.capitalize(name));
@@ -78,7 +78,7 @@ public class ServicePrinter {
     
     
     private void printConstructor(Service service, PrintStream out) {
-        out.print(new JavadocBuilder("Creates the service and maps actions to methods that shall be defined by subclass."));
+        out.print(new Javadoc("Creates the service and maps actions to methods that shall be defined by subclass."));
         out.printf("  protected %sBase(){\n", StringHelper.capitalize(service.getName()));
         out.println("    super(SchemaDefinitions.INSTANCE.getServiceSchema(SERVICE_NAME));");
 
@@ -125,7 +125,7 @@ public class ServicePrinter {
             for (Action action : service.getActions().getActionArray()) {
                 if (action.getResults() != null && action.getResults().getParameterArray().length > 0) {
                     out.println();
-                    out.print(new JavadocBuilder("Sets the result from the '").append(action.getName()).append("' action on the specified context."));
+                    out.print(new Javadoc("Sets the result from the '").append(action.getName()).append("' action on the specified context."));
                     out.printf("  private final void set%sResultOnContext(GenericDeviceActionContext context, %sResult result) {\n", StringHelper.capitalize(action.getName()), StringHelper.capitalize(action.getName()));
                     for (Parameter result : action.getResults().getParameterArray()) {
                         out.printf("    context.getResult().getValue().set%sValue(ACTION_%s_RES_%s, result.%s);\n", StringHelper.capitalize(StringHelper.getType(result.getType())), action.getName(), result.getName(), result.getName());
@@ -142,14 +142,14 @@ public class ServicePrinter {
             for (Parameter property : service.getProperties().getParameterArray()) {
                 out.println();
                 String getterSignature = getPropertyGetterSignature(property);
-                out.print(new JavadocBuilder().inherit());
+                out.print(new Javadoc().inherit());
                 out.printf("  public final %s {\n", getterSignature);
                 out.printf("    return getProperties().get%sValue(PROP_%s);\n", StringHelper.capitalize(StringHelper.getType(property.getType())), property.getName());
                 out.printf("  }\n");
                 out.println();
 
                 String updaterSignature = getPropertyUpdateSignature(property);
-                out.print(new JavadocBuilder("Update the '").append(property.getName()).append("' property. To be used by concrete implementations of the service."));
+                out.print(new Javadoc("Update the '").append(property.getName()).append("' property. To be used by concrete implementations of the service."));
                 out.printf("  protected final %s {\n", updaterSignature);
                 out.printf("    getProperties().set%sValue(PROP_%s, value);\n", StringHelper.capitalize(StringHelper.getType(property.getType())), property.getName());
                 out.printf("  }\n");
@@ -180,7 +180,7 @@ public class ServicePrinter {
         ServicePrinter sp = new ServicePrinter();
         Service[] serviceArray = services.getServiceArray();
 
-        JavaBuilder builder = new JavaBuilder();
+        JavaClass builder = new JavaClass();
         CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
         for (Service service : serviceArray) {
             DefinitionsAdder.addService(code, service);
@@ -194,7 +194,7 @@ public class ServicePrinter {
 
         for (Service service : serviceArray) {
             System.out.println("#############################################");
-            builder = new JavaBuilder();
+            builder = new JavaClass();
             InterfaceAdder.addServiceInterface(builder, version, service);
             System.out.print(builder.build(ServicePrinter.class));
             System.out.println("=============================================");

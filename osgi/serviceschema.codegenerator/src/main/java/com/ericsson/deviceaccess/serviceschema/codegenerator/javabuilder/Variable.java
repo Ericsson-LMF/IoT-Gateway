@@ -1,5 +1,7 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
 import java.util.EnumSet;
 
@@ -14,7 +16,7 @@ public class Variable {
     private final String type;
     private String initCode;
     private final EnumSet<OptionalModifier> modifiers;
-    private JavadocBuilder javadoc;
+    private Javadoc javadoc;
 
     public Variable(String type, String name) {
         this.modifier = AccessModifier.PRIVATE;
@@ -65,7 +67,7 @@ public class Variable {
         return this;
     }
 
-    public Variable setJavadoc(JavadocBuilder javadoc) {
+    public Variable setJavadoc(Javadoc javadoc) {
         this.javadoc = javadoc;
         return this;
     }

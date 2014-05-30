@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaBuilder;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -67,7 +67,7 @@ public class Main {
         // Generate schema definition
         File schemaDefSourceFile = new File(spiBaseDir, "SchemaDefinitions.java");
         try (PrintStream schemaDefStream = new PrintStream(schemaDefSourceFile)) {
-            JavaBuilder builder = new JavaBuilder();
+            JavaClass builder = new JavaClass();
             CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
             for (Service service : serviceArray) {
                 DefinitionsAdder.addService(code, service);
@@ -85,7 +85,7 @@ public class Main {
                 apiPackageDir.mkdirs();
                 File apiSourceFile = new File(apiPackageDir, capitalize(service.getName()) + ".java");
                 try (PrintStream apiPrintStream = new PrintStream(apiSourceFile)) {
-                    JavaBuilder interfaceBuilder = new JavaBuilder();
+                    JavaClass interfaceBuilder = new JavaClass();
                     InterfaceAdder.addServiceInterface(interfaceBuilder, version, service);
                     apiPrintStream.append(interfaceBuilder.build(Main.class));
                 }

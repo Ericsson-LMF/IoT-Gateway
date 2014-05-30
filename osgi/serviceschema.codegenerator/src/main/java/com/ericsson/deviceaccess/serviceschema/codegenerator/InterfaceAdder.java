@@ -3,13 +3,13 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AccessModifier;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constant;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaBuilder;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavadocBuilder;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.OptionalModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
 
@@ -21,13 +21,13 @@ public enum InterfaceAdder {
 
     INSTANCE;
 
-    public static void addServiceInterface(JavaBuilder builder, String version, ServiceDocument.Service service) {
+    public static void addServiceInterface(JavaClass builder, String version, ServiceDocument.Service service) {
         builder.setPackage("com.ericsson.deviceaccess.api.service." + service.getCategory());
 
         builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceService");
         builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
 
-        builder.setJavadoc(new JavadocBuilder(StringHelper.setEndPunctuation(service.getDescription())));
+        builder.setJavadoc(new Javadoc(StringHelper.setEndPunctuation(service.getDescription())));
         builder.setClassModifier(ClassModifier.INTERFACE);
         builder.setName(service.getName());
         builder.setExtends("GenericDeviceService");
@@ -39,7 +39,7 @@ public enum InterfaceAdder {
         addActionsResultTypes(builder, service);
     }
 
-    private static void addConstants(JavaBuilder builder, ServiceDocument.Service service) {
+    private static void addConstants(JavaClass builder, ServiceDocument.Service service) {
         builder.addVariable(new Constant("String", "SERVICE_NAME", "\"" + service.getName() + "\""));
 
         // Mandatory refresh properties action
@@ -71,7 +71,7 @@ public enum InterfaceAdder {
         }
     }
 
-    private static void addParameterConstants(JavaBuilder builder, ParameterDocument.Parameter[] parameterArray, String prefix) {
+    private static void addParameterConstants(JavaClass builder, ParameterDocument.Parameter[] parameterArray, String prefix) {
         for (ParameterDocument.Parameter parameter : parameterArray) {
             String name = parameter.getName();
             builder.addVariable(new Constant("String", prefix + "_" + name, "\"" + name + "\""));
@@ -83,12 +83,12 @@ public enum InterfaceAdder {
         }
     }
 
-    private static void addPropertyGetters(JavaBuilder builder, ServiceDocument.Service service) {
+    private static void addPropertyGetters(JavaClass builder, ServiceDocument.Service service) {
         if (service.isSetProperties()) {
             for (ParameterDocument.Parameter property : service.getProperties().getParameterArray()) {
                 String name = property.getName();
                 Method method = new Method(StringHelper.getType(property.getType()), "get" + StringHelper.capitalize(name));
-                method.setJavadoc(new JavadocBuilder("Gets the property '").append(name).append("'.")
+                method.setJavadoc(new Javadoc("Gets the property '").append(name).append("'.")
                         .line("Property description: ").append(StringHelper.setEndPunctuation(property.getDescription()))
                         .append(b -> getValidValuesJavadoc(b, property)));
                 builder.addMethod(method);
@@ -96,7 +96,7 @@ public enum InterfaceAdder {
         }
     }
 
-    private static JavadocBuilder getValidValuesJavadoc(JavadocBuilder builder, ParameterDocument.Parameter property) {
+    private static Javadoc getValidValuesJavadoc(Javadoc builder, ParameterDocument.Parameter property) {
         if ("String".equals(StringHelper.getType(property.getType()))) {
             if (property.isSetValues()) {
                 builder.line("Valid values:");
@@ -113,7 +113,7 @@ public enum InterfaceAdder {
         return builder;
     }
 
-    private static JavadocBuilder getValidValuesString(JavadocBuilder builder, String[] valueArray) {
+    private static Javadoc getValidValuesString(Javadoc builder, String[] valueArray) {
         builder.line("<ul>");
         for (String value : valueArray) {
             builder.line("<li>\"").append(value).append("\"</li>");
@@ -121,11 +121,11 @@ public enum InterfaceAdder {
         return builder.line("</ul>");
     }
 
-    private static void addActionDefinitions(JavaBuilder builder, ServiceDocument.Service service) {
+    private static void addActionDefinitions(JavaClass builder, ServiceDocument.Service service) {
         if (service.isSetActions()) {
             for (ActionDocument.Action action : service.getActions().getActionArray()) {
                 String name = StringHelper.capitalize(action.getName());
-                JavadocBuilder javadoc = new JavadocBuilder();
+                Javadoc javadoc = new Javadoc();
 
                 String result = "void";
                 if (action.isSetResults()) {
@@ -148,20 +148,20 @@ public enum InterfaceAdder {
         }
     }
 
-    private static void addActionsResultTypes(JavaBuilder builder, ServiceDocument.Service service) {
+    private static void addActionsResultTypes(JavaClass builder, ServiceDocument.Service service) {
         if (service.isSetActions()) {
             for (ActionDocument.Action action : service.getActions().getActionArray()) {
                 if (action.isSetResults()) {
                     String name = action.getName();
                     builder.addInnerClass(inner -> {
-                        inner.setJavadoc(new JavadocBuilder("Result from action ").append(name));
+                        inner.setJavadoc(new Javadoc("Result from action ").append(name));
                         inner.setName(StringHelper.capitalize(name) + "Result");
                         inner.addModifier(OptionalModifier.FINAL);
                         inner.addModifier(OptionalModifier.STATIC);
                         for (ParameterDocument.Parameter result : action.getResults().getParameterArray()) {
                             Variable variable = new Variable(StringHelper.getType(result.getType()), result.getName());
                             variable.setAccessModifier(AccessModifier.PUBLIC);
-                            variable.setJavadoc(new JavadocBuilder(StringHelper.setEndPunctuation(result.getDescription())));
+                            variable.setJavadoc(new Javadoc(StringHelper.setEndPunctuation(result.getDescription())));
                             inner.addVariable(variable);
                         }
                         return inner;

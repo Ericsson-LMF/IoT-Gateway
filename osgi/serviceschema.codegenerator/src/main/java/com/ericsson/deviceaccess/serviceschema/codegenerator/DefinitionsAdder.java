@@ -9,11 +9,11 @@ import com.ericsson.deviceaccess.service.xmlparser.PropertiesDocument.Properties
 import com.ericsson.deviceaccess.service.xmlparser.ResultsDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constructor;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaBuilder;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavadocBuilder;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
 
@@ -29,7 +29,7 @@ public enum DefinitionsAdder {
     private static final String PARAMETER_SB = "parameter";
     private static final String ACTION_SB = "action";
 
-    public static CodeBlock addDefinitionsStart(JavaBuilder builder) {
+    public static CodeBlock addDefinitionsStart(JavaClass builder) {
         builder.setPackage("com.ericsson.deviceaccess.spi.service");
         builder.addImport("java.util.HashMap");
         builder.addImport("java.util.Map");
@@ -39,14 +39,14 @@ public enum DefinitionsAdder {
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ServiceSchemaError");
         builder.setClassModifier(ClassModifier.SINGLETON);
         builder.setName("SchemaDefinitions");
-        builder.setJavadoc(new JavadocBuilder("Defines service schemata"));
+        builder.setJavadoc(new Javadoc("Defines service schemata"));
         builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceSchemas").init("new HashMap<>()"));
-        Constructor code = new Constructor().setJavadoc(new JavadocBuilder("Constructor which generates schemata."));
+        Constructor code = new Constructor().setJavadoc(new Javadoc("Constructor which generates schemata."));
         builder.addConstructor(code);
         code.add("ActionSchema.Builder ").append(ACTION_SB).append(";");
         code.add("ParameterSchema.Builder ").append(PARAMETER_SB).append(";");
         code.add("ServiceSchema.Builder ").append(SERVICE_SB).append(";");
-        builder.addMethod(new Method("ServiceSchema", "getServiceSchema").setJavadoc(new JavadocBuilder("Gets ServiceSchema based on it's name.").result("Service schema")).addParameter("String", "name", "name of schema").add("return serviceSchemas.get(#0);"));
+        builder.addMethod(new Method("ServiceSchema", "getServiceSchema").setJavadoc(new Javadoc("Gets ServiceSchema based on it's name.").result("Service schema")).addParameter("String", "name", "name of schema").add("return serviceSchemas.get(#0);"));
         return code;
     }
 

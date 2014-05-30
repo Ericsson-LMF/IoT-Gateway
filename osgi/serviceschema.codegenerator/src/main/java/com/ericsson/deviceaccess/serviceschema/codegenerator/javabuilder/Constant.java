@@ -1,5 +1,8 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
+
 /**
  *
  * @author delma
