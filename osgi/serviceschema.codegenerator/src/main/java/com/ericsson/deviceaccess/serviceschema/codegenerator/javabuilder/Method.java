@@ -10,23 +10,26 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
  *
  * @author delma
  */
-public class Method implements CodeBlock {
+public class Method extends AbstractCodeBlock {
 
     private AccessModifier accessModifier;
     private final String name;
     private final String type;
     private final List<Param> parameters;
     private final List<String> throwList;
-    private final List<String> lines;
+    private final EnumSet<OptionalModifier> modifiers;
     private Javadoc javadoc;
     private JavaClass owner;
 
@@ -34,8 +37,8 @@ public class Method implements CodeBlock {
         this.type = type;
         this.name = name;
         parameters = new ArrayList<>();
-        lines = new ArrayList<>();
         throwList = new ArrayList<>();
+        modifiers = EnumSet.noneOf(OptionalModifier.class);
         accessModifier = AccessModifier.PUBLIC;
         javadoc = null;
     }
@@ -71,19 +74,6 @@ public class Method implements CodeBlock {
         return this;
     }
 
-    @Override
-    public Method add(String code) {
-        lines.add(code);
-        return this;
-    }
-
-    @Override
-    public Method append(Object code) {
-        int index = lines.size() - 1;
-        lines.set(index, lines.get(index) + code);
-        return this;
-    }
-
     public List<Param> getParameters() {
         return Collections.unmodifiableList(parameters);
     }
@@ -103,14 +93,16 @@ public class Method implements CodeBlock {
         builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
         //METHOD DECLARATION
         String access = accessModifier.get();
-        indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
+        indent(builder, indent).append(access).append(" ");
+        modifiers.forEach(m -> builder.append(m.get()).append(" "));
+        builder.append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
         if (!throwList.isEmpty()) {
             builder.append(" throws ");
             throwList.forEach(t -> builder.append(t).append(", "));
             builder.setLength(builder.length() - 2);
         }
-        boolean inInterface = owner != null && owner.getClassModifier() == ClassModifier.INTERFACE;
-        if (inInterface) {
+        boolean isAbstract = modifiers.contains(OptionalModifier.ABSTRACT) || (owner != null && owner.getClassModifier() == ClassModifier.INTERFACE);
+        if (isAbstract) {
             builder.append(STATEMENT_END).append(LINE_END);
             return builder.toString();
         }
@@ -156,6 +148,29 @@ public class Method implements CodeBlock {
 
     public Method addThrow(String exception) {
         throwList.add(exception);
+        return this;
+    }
+
+    @Override
+    public Method add(String code) {
+        super.add(code);
+        return this;
+    }
+
+    @Override
+    public Method append(Object code) {
+        super.append(code);
+        return this;
+    }
+
+    @Override
+    public Method addBlock(Object object, Consumer<CodeBlock> block) {
+        super.addBlock(object, block);
+        return this;
+    }
+
+    public Method addModifier(OptionalModifier modifier) {
+        modifiers.add(modifier);
         return this;
     }
 }

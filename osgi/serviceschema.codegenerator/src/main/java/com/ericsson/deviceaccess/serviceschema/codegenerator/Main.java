@@ -76,7 +76,10 @@ public class Main {
                 spiPackageDir.mkdirs();
                 File spiSourceFile = new File(spiPackageDir, capitalize(service.getName() + "Base") + ".java");
                 try (PrintStream spiPrintStream = new PrintStream(spiSourceFile)) {
-                    sp.printServiceImpl(spiPrintStream, version, service);
+                    JavaClass implementationBuilder = new JavaClass();
+                    ImplementationAdder.addServiceImplementation(implementationBuilder, version, service);
+                    spiPrintStream.append(implementationBuilder.build(Main.class));
+//                    sp.printServiceImpl(spiPrintStream, version, service);
                 }
 
                 System.out.printf("Generated SPI base for '%s' to %s\n", service.getName(), spiSourceFile.getAbsolutePath());

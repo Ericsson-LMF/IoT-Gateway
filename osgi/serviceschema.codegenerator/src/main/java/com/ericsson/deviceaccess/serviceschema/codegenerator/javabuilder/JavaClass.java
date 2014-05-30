@@ -16,20 +16,21 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
  *
  * @author delma
  */
-public class JavaClass implements CodeBlock {
+public class JavaClass extends AbstractCodeBlock {
 
     private final List<JavaClass> innerClasses;
     private final List<String> imports;
     private final List<Variable> variables;
     private final List<Method> methods;
     private final List<Constructor> constructors;
-    private final List<String> lines;
+    private final List<String> interfaces;
     private String packageString;
     private Javadoc javadoc;
     private AccessModifier accessModifier;
@@ -45,7 +46,7 @@ public class JavaClass implements CodeBlock {
         variables = new ArrayList<>();
         methods = new ArrayList<>();
         constructors = new ArrayList<>();
-        lines = new ArrayList<>();
+        interfaces = new ArrayList<>();
         modifiers = EnumSet.noneOf(OptionalModifier.class);
         javadoc = null;
         accessModifier = AccessModifier.PUBLIC;
@@ -119,6 +120,12 @@ public class JavaClass implements CodeBlock {
         if (superType != null) {
             builder.append("extends ").append(superType).append(" ");
         }
+        if (!interfaces.isEmpty()) {
+            builder.append("implements ");
+            interfaces.forEach(i -> builder.append(i).append(", "));
+            builder.setLength(builder.length() - 2);
+            builder.append(" ");
+        }
         builder.append(BLOCK_START).append(LINE_END);
         {
             int classIndent = indent + 1;
@@ -166,19 +173,6 @@ public class JavaClass implements CodeBlock {
         return name;
     }
 
-    @Override
-    public JavaClass add(String code) {
-        lines.add(code);
-        return this;
-    }
-
-    @Override
-    public JavaClass append(Object code) {
-        int index = lines.size() - 1;
-        lines.set(index, lines.get(index) + code);
-        return this;
-    }
-
     public JavaClass setClassModifier(ClassModifier type) {
         classModifier = type;
         return this;
@@ -195,6 +189,29 @@ public class JavaClass implements CodeBlock {
 
     public JavaClass addModifier(OptionalModifier modifier) {
         modifiers.add(modifier);
+        return this;
+    }
+
+    public JavaClass addImplements(String interfaceString) {
+        interfaces.add(interfaceString);
+        return this;
+    }
+
+    @Override
+    public JavaClass add(String code) {
+        super.add(code);
+        return this;
+    }
+
+    @Override
+    public JavaClass append(Object code) {
+        super.append(code);
+        return this;
+    }
+
+    @Override
+    public JavaClass addBlock(Object object, Consumer<CodeBlock> block) {
+        super.addBlock(object, block);
         return this;
     }
 

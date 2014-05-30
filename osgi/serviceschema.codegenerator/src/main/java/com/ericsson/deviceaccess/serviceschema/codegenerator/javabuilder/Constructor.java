@@ -12,23 +12,22 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
  *
  * @author delma
  */
-public class Constructor implements CodeBlock {
+public class Constructor extends AbstractCodeBlock {
 
     private AccessModifier accessModifier;
     private final List<Param> parameters;
-    private final List<String> lines;
     private Javadoc javadoc;
     private JavaClass owner;
 
     public Constructor() {
         parameters = new ArrayList<>();
-        lines = new ArrayList<>();
         accessModifier = AccessModifier.PUBLIC;
         javadoc = null;
     }
@@ -67,19 +66,6 @@ public class Constructor implements CodeBlock {
 
     public Constructor addParameter(Param parameter) {
         parameters.add(parameter);
-        return this;
-    }
-
-    @Override
-    public Constructor add(String code) {
-        lines.add(code);
-        return this;
-    }
-
-    @Override
-    public Constructor append(Object object) {
-        int index = lines.size() - 1;
-        lines.set(index, lines.get(index) + object);
         return this;
     }
 
@@ -135,5 +121,23 @@ public class Constructor implements CodeBlock {
             builder.setLength(builder.length() - 2);
         }
         return builder;
+    }
+
+    @Override
+    public Constructor add(String code) {
+        super.add(code);
+        return this;
+    }
+
+    @Override
+    public Constructor append(Object code) {
+        super.append(code);
+        return this;
+    }
+
+    @Override
+    public Constructor addBlock(Object object, Consumer<CodeBlock> block) {
+        super.addBlock(object, block);
+        return this;
     }
 }

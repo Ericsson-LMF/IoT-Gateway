@@ -6,7 +6,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifi
  */
 public enum OptionalModifier {
 
-    STATIC, TRANSIENT, VOLATILE, FINAL;
+    STATIC, TRANSIENT, VOLATILE, FINAL, ABSTRACT;
 
     public String get() {
         return toString().toLowerCase();
