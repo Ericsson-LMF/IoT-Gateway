@@ -68,11 +68,9 @@ public class Main {
         File schemaDefSourceFile = new File(spiBaseDir, "SchemaDefinitions.java");
         try (PrintStream schemaDefStream = new PrintStream(schemaDefSourceFile)) {
             JavaBuilder builder = new JavaBuilder();
-            CodeBlock code = sp.addDefinitionsStart(builder);
-//            sp.printSchemaDefinitionStart(schemaDefStream, version);
+            CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
             for (Service service : serviceArray) {
-                sp.addService(code, service);
-//                sp.printSchemaDefinitionForService(schemaDefStream, service);
+                DefinitionsAdder.addService(code, service);
 
                 File spiPackageDir = new File(spiBaseDir, makePath(service));
                 spiPackageDir.mkdirs();
@@ -88,14 +86,12 @@ public class Main {
                 File apiSourceFile = new File(apiPackageDir, capitalize(service.getName()) + ".java");
                 try (PrintStream apiPrintStream = new PrintStream(apiSourceFile)) {
                     JavaBuilder interfaceBuilder = new JavaBuilder();
-                    sp.addServiceInterface(interfaceBuilder, version, service);
+                    InterfaceAdder.addServiceInterface(interfaceBuilder, version, service);
                     apiPrintStream.append(interfaceBuilder.build(Main.class));
-//                    sp.printServiceInterface(apiPrintStream, version, service);
                 }
                 System.out.printf("Generated API for '%s' to %s\n", service.getName(), apiSourceFile.getAbsolutePath());
             }
             schemaDefStream.append(builder.build(Main.class));
-//            sp.printSchemaDefinitionEnd(schemaDefStream);
         }
 
         System.out.println("Code generation completed!");
