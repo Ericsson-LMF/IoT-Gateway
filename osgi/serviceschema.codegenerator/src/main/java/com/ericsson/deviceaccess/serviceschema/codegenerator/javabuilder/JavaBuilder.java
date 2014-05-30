@@ -2,6 +2,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -23,6 +24,7 @@ public class JavaBuilder implements CodeBlock {
     private String name;
     private String superType;
     private ClassModifier classModifier;
+    private final EnumSet<OptionalModifier> modifiers;
 
     public JavaBuilder() {
         packageString = null;
@@ -32,8 +34,10 @@ public class JavaBuilder implements CodeBlock {
         methods = new ArrayList<>();
         constructors = new ArrayList<>();
         lines = new ArrayList<>();
+        modifiers = EnumSet.noneOf(OptionalModifier.class);
         javadoc = null;
         accessModifier = AccessModifier.PUBLIC;
+        classModifier = ClassModifier.CLASS;
     }
 
     public JavaBuilder setPackage(String packageString) {
@@ -63,6 +67,7 @@ public class JavaBuilder implements CodeBlock {
 
     public JavaBuilder addMethod(Method method) {
         methods.add(method);
+        method.setOwner(this);
         return this;
     }
 
@@ -77,23 +82,30 @@ public class JavaBuilder implements CodeBlock {
     }
 
     public String build(Class<?> caller) {
-        return build(caller, new StringBuilder(), 0);
+        return build(caller, 0);
     }
 
-    private String build(Class<?> caller, StringBuilder builder, int indent) {
+    private String build(Class<?> caller, int indent) {
+        StringBuilder builder = new StringBuilder();
         //PACKAGE
-        indent(builder, indent).append(PACKAGE).append(" ").append(packageString).append(STATEMENT_END).append(LINE_END);
-        emptyLine(builder);
+        if (packageString != null) {
+            indent(builder, indent).append(PACKAGE).append(" ").append(packageString).append(STATEMENT_END).append(LINE_END);
+            emptyLine(builder);
+        }
         //IMPORTS
-        imports.forEach(i -> indent(builder, indent).append(IMPORT).append(" ").append(i).append(STATEMENT_END).append(LINE_END));
-        emptyLine(builder);
+        if (!imports.isEmpty()) {
+            imports.forEach(i -> indent(builder, indent).append(IMPORT).append(" ").append(i).append(STATEMENT_END).append(LINE_END));
+            emptyLine(builder);
+        }
         //JAVADOC
         builder.append(new JavadocBuilder(getGenerationWarning(this.getClass(), caller)).append(javadoc).build(indent));
         //CLASS DECLARATION
         String access = accessModifier.get();
-        indent(builder, indent).append(access).append(" ").append(classModifier.get()).append(" ").append(name);
-        if(superType != null){
-            builder.append(" extends ").append(superType).append(" ");
+        indent(builder, indent).append(access).append(" ");
+        modifiers.forEach(m -> builder.append(m.get()).append(" "));
+        builder.append(classModifier.get()).append(" ").append(name).append(" ");
+        if (superType != null) {
+            builder.append("extends ").append(superType).append(" ");
         }
         builder.append(BLOCK_START).append(LINE_END);
         {
@@ -103,8 +115,10 @@ public class JavaBuilder implements CodeBlock {
             }
             emptyLine(builder);
             //VARIABLES
-            variables.forEach(v -> builder.append(v.build(classIndent)));
-            emptyLine(builder);
+            if (!variables.isEmpty()) {
+                variables.forEach(v -> builder.append(v.build(classIndent)));
+                emptyLine(builder);
+            }
             //STATIC BLOCK
             if (!lines.isEmpty()) {
                 indent(builder, classIndent).append("static").append(BLOCK_START).append(LINE_END);
@@ -113,16 +127,21 @@ public class JavaBuilder implements CodeBlock {
                 emptyLine(builder);
             }
             //CONSTRUCTORS
-            constructors.forEach(c -> builder.append(c.build(classIndent)));
-            emptyLine(builder);
+            if (!constructors.isEmpty()) {
+                constructors.forEach(c -> builder.append(c.build(classIndent)).append(LINE_END));
+                emptyLine(builder);
+            }
             //METHODS
-            methods.forEach(m -> builder.append(m.build(classIndent)));
-            emptyLine(builder);
+            if (!methods.isEmpty()) {
+                methods.forEach(m -> builder.append(m.build(classIndent)).append(LINE_END));
+                emptyLine(builder);
+            }
             //INNER CLASSES
-            innerClasses.forEach(c -> builder.append(c.build(caller, builder, classIndent)));
-            indent(builder, indent);
+            if (!innerClasses.isEmpty()) {
+                innerClasses.forEach(c -> builder.append(c.build(caller, classIndent)).append(LINE_END));
+            }
         }
-        builder.append(BLOCK_END).append(LINE_END);
+        indent(builder, indent).append(BLOCK_END).append(LINE_END);
         return builder.toString();
     }
 
@@ -160,6 +179,11 @@ public class JavaBuilder implements CodeBlock {
 
     public ClassModifier getClassModifier() {
         return classModifier;
+    }
+
+    public JavaBuilder addModifier(OptionalModifier modifier) {
+        modifiers.add(modifier);
+        return this;
     }
 
     private class InnerJavaBuilder extends JavaBuilder {

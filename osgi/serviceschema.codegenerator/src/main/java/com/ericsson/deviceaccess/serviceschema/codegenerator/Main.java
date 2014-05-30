@@ -73,7 +73,7 @@ public class Main {
             for (Service service : serviceArray) {
                 sp.addService(code, service);
 //                sp.printSchemaDefinitionForService(schemaDefStream, service);
-                
+
                 File spiPackageDir = new File(spiBaseDir, makePath(service));
                 spiPackageDir.mkdirs();
                 File spiSourceFile = new File(spiPackageDir, capitalize(service.getName() + "Base") + ".java");
@@ -87,7 +87,10 @@ public class Main {
                 apiPackageDir.mkdirs();
                 File apiSourceFile = new File(apiPackageDir, capitalize(service.getName()) + ".java");
                 try (PrintStream apiPrintStream = new PrintStream(apiSourceFile)) {
-                    sp.printServiceInterface(apiPrintStream, version, service);
+                    JavaBuilder interfaceBuilder = new JavaBuilder();
+                    sp.addServiceInterface(interfaceBuilder, version, service);
+                    apiPrintStream.append(interfaceBuilder.build(Main.class));
+//                    sp.printServiceInterface(apiPrintStream, version, service);
                 }
                 System.out.printf("Generated API for '%s' to %s\n", service.getName(), apiSourceFile.getAbsolutePath());
             }

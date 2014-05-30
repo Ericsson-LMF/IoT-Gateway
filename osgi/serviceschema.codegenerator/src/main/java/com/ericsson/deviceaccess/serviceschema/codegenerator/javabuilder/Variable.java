@@ -1,6 +1,7 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
+import java.util.EnumSet;
 
 /**
  *
@@ -12,11 +13,14 @@ public class Variable {
     private final String name;
     private final String type;
     private String initCode;
+    private final EnumSet<OptionalModifier> modifiers;
+    private JavadocBuilder javadoc;
 
     public Variable(String type, String name) {
         this.modifier = AccessModifier.PRIVATE;
         this.type = type;
         this.name = name;
+        modifiers = EnumSet.noneOf(OptionalModifier.class);
     }
 
     public Variable setAccessModifier(AccessModifier modifier) {
@@ -42,13 +46,27 @@ public class Variable {
     }
 
     public String build(int indent) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         String access = modifier.get();
-        indent(result, indent).append(access).append(" ").append(type).append(" ").append(name);
-        if (initCode != null) {
-            result.append(" = ").append(initCode);
+        if (javadoc != null) {
+            builder.append(javadoc.build(indent));
         }
-        return result.append(STATEMENT_END).append(LINE_END).toString();
+        indent(builder, indent).append(access).append(" ");
+        modifiers.forEach(m -> builder.append(m.get()).append(" "));
+        builder.append(type).append(" ").append(name);
+        if (initCode != null) {
+            builder.append(" = ").append(initCode);
+        }
+        return builder.append(STATEMENT_END).append(LINE_END).toString();
     }
 
+    public Variable addModifier(OptionalModifier modifier) {
+        modifiers.add(modifier);
+        return this;
+    }
+
+    public Variable setJavadoc(JavadocBuilder javadoc) {
+        this.javadoc = javadoc;
+        return this;
+    }
 }

@@ -16,16 +16,24 @@ public class Method implements CodeBlock {
     private final String name;
     private final String type;
     private final List<Param> parameters;
+    private final List<String> throwList;
     private final List<String> lines;
     private JavadocBuilder javadoc;
+    private JavaBuilder owner;
 
     public Method(String type, String name) {
         this.type = type;
         this.name = name;
         parameters = new ArrayList<>();
         lines = new ArrayList<>();
+        throwList = new ArrayList<>();
         accessModifier = AccessModifier.PUBLIC;
         javadoc = null;
+    }
+
+    public Method setOwner(JavaBuilder owner) {
+        this.owner = owner;
+        return this;
     }
 
     public Method setAccessModifier(AccessModifier modifier) {
@@ -86,7 +94,18 @@ public class Method implements CodeBlock {
         builder.append(new JavadocBuilder(javadoc).append(this::parameterJavadocs).build(indent));
         //METHOD DECLARATION
         String access = accessModifier.get();
-        indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
+        indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
+        if(!throwList.isEmpty()){
+            builder.append(" throws ");
+            throwList.forEach(t -> builder.append(t).append(", "));
+            builder.setLength(builder.length() - 2);
+        }
+        boolean inInterface = owner != null && owner.getClassModifier() == ClassModifier.INTERFACE;
+        if (inInterface) {
+            builder.append(STATEMENT_END).append(LINE_END);
+            return builder.toString();
+        }
+        builder.append(" ").append(BLOCK_START).append(LINE_END);
         //CODE
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);
@@ -112,17 +131,22 @@ public class Method implements CodeBlock {
         return builder.toString();
     }
 
-    public JavadocBuilder parameterJavadocs(JavadocBuilder builder) {
+    private JavadocBuilder parameterJavadocs(JavadocBuilder builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }
 
     private StringBuilder buildParameters() {
         StringBuilder builder = new StringBuilder();
-        parameters.forEach(p -> builder.append(capitalize(p.getType())).append(" ").append(p.getName().toLowerCase()).append(", "));
+        parameters.forEach(p -> builder.append(p.getType()).append(" ").append(p.getName().toLowerCase()).append(", "));
         if (builder.length() > 0) {
             builder.setLength(builder.length() - 2);
         }
         return builder;
+    }
+
+    public Method addThrow(String exception) {
+        throwList.add(exception);
+        return this;
     }
 }

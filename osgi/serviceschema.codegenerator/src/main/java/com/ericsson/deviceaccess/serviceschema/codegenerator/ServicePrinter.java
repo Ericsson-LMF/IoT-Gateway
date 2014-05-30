@@ -34,12 +34,6 @@
  */
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavadocBuilder;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constructor;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaBuilder;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ActionsDocument.Actions;
 import com.ericsson.deviceaccess.service.xmlparser.ArgumentsDocument.Arguments;
@@ -52,6 +46,15 @@ import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constant;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constructor;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaBuilder;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavadocBuilder;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.OptionalModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -327,34 +330,14 @@ public class ServicePrinter {
         out.printf("}\n", capitalize(name));
     }
 
-    public void printServiceInterface(PrintStream out, String version, Service service) {
-        String name = service.getName();
-        out.printf("package com.ericsson.deviceaccess.api.service.%s;\n", service.getCategory());
-        out.println();
-        out.printf("import com.ericsson.deviceaccess.api.GenericDeviceService;\n");
-        out.printf("import com.ericsson.deviceaccess.api.GenericDeviceException;\n");
-        out.println();
-        out.print(new JavadocBuilder(GENERATION_WARNING).line(setEndPunctuation(service.getDescription())));
-        out.printf("public interface %s extends GenericDeviceService {\n", capitalize(name));
-        out.printf("  public static final String SCHEMA_VERSION=\"%s\";\n", version);
-        printConstants(service, out);
-        printPropertyGetters(service, out);
-        printActionDefinitions(service, out);
-        printActionsResultTypes(service, out);
-        out.println("}");
-    }
-
-    public void addServiceInterface(JavaBuilder builder, String version, Service service) {
-        builder.setPackage("com.ericsson.deviceaccess.api.service." + service.getCategory());
-        
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceService");
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
+//    public void printServiceInterface(PrintStream out, String version, Service service) {
+//        String name = service.getName();
+//        out.printf("package com.ericsson.deviceaccess.api.service.%s;\n", service.getCategory());
+//        out.println();
+//        out.printf("import com.ericsson.deviceaccess.api.GenericDeviceService;\n");
+//        out.printf("import com.ericsson.deviceaccess.api.GenericDeviceException;\n");
+//        out.println();
 //        out.print(new JavadocBuilder(GENERATION_WARNING).line(setEndPunctuation(service.getDescription())));
-        builder.setJavadoc(new JavadocBuilder(setEndPunctuation(service.getDescription())));
-        builder.setClassModifier(ClassModifier.INTERFACE);
-        builder.setName(service.getName());
-        builder.setExtends("GenericDeviceService");
-        builder.addVariable(new Variable("String", "SCHEMA_VERSION").setAccessModifier(AccessModifier.PUBLIC).init("\"" + version + "\""));
 //        out.printf("public interface %s extends GenericDeviceService {\n", capitalize(name));
 //        out.printf("  public static final String SCHEMA_VERSION=\"%s\";\n", version);
 //        printConstants(service, out);
@@ -362,50 +345,175 @@ public class ServicePrinter {
 //        printActionDefinitions(service, out);
 //        printActionsResultTypes(service, out);
 //        out.println("}");
+//    }
+
+    public void addServiceInterface(JavaBuilder builder, String version, Service service) {
+        builder.setPackage("com.ericsson.deviceaccess.api.service." + service.getCategory());
+
+        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceService");
+        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
+
+        builder.setJavadoc(new JavadocBuilder(setEndPunctuation(service.getDescription())));
+        builder.setClassModifier(ClassModifier.INTERFACE);
+        builder.setName(service.getName());
+        builder.setExtends("GenericDeviceService");
+
+        builder.addVariable(new Constant("String", "SCHEMA_VERSION", "\"" + version + "\""));
+        addConstants(builder, service);
+        addPropertyGetters(builder, service);
+        addActionDefinitions(builder, service);
+        addActionsResultTypes(builder, service);
     }
 
-    private void printConstants(Service service, PrintStream out) {
-        out.printf("  public static final String SERVICE_NAME = \"%s\";\n", service.getName());
-        Actions actions = service.getActions();
+    private void addConstants(JavaBuilder builder, Service service) {
+        builder.addVariable(new Constant("String", "SERVICE_NAME", "\"" + service.getName() + "\""));
+
         // Mandatory refresh properties action
-        out.printf("  public static final String ACTION_refreshProperties = \"refreshProperties\";\n");
-        if (actions != null) {
-            for (Action action : actions.getActionArray()) {
-                out.printf("  public static final String ACTION_%s = \"%s\";\n", action.getName(), action.getName());
-                Arguments arguments = action.getArguments();
-                if (arguments != null) {
-                    printParameterConstants(out, arguments.getParameterArray(), "ACTION_" + action.getName() + "_ARG");
+        builder.addVariable(new Constant("String", "ACTION_refreshProperties", "\"refreshProperties\""));
+
+        if (service.isSetActions()) {
+            for (Action action : service.getActions().getActionArray()) {
+                String name = action.getName();
+                builder.addVariable(new Constant("String", "ACTION_" + name, "\"" + name + "\""));
+
+                if (action.isSetArguments()) {
+                    Parameter[] arguments = action.getArguments().getParameterArray();
+                    addParameterConstants(builder, arguments, "ACTION_" + name + "_ARG");
                 }
 
-                Results results = action.getResults();
-                if (results != null) {
-                    printParameterConstants(out, results.getParameterArray(), "ACTION_" + action.getName() + "_RES");
+                if (action.isSetResults()) {
+                    Parameter[] results = action.getResults().getParameterArray();
+                    addParameterConstants(builder, results, "ACTION_" + name + "_RES");
                 }
             }
         }
 
         // Mandatory last update time property
-        out.printf("  public static final String PROP_lastUpdateTime = \"lastUpdateTime\";\n");
-        Properties properties = service.getProperties();
-        if (properties != null) {
-            printParameterConstants(out, properties.getParameterArray(), "PROP");
+        builder.addVariable(new Constant("String", "PROP_lastUpdateTime", "\"lastUpdateTime\""));
+
+        if (service.isSetProperties()) {
+            Parameter[] properties = service.getProperties().getParameterArray();
+            addParameterConstants(builder, properties, "PROP");
         }
     }
 
-    /**
-     * @param out
-     * @param arguments
-     */
-    private void printParameterConstants(PrintStream out, Parameter[] parameterArray, String prefix) {
+    private void addParameterConstants(JavaBuilder builder, Parameter[] parameterArray, String prefix) {
         for (Parameter parameter : parameterArray) {
-            out.printf("  public static final String " + prefix + "_%s = \"%s\";\n", parameter.getName(), parameter.getName());
-            if (parameter.getValues() != null && parameter.getValues().getValueArray().length > 0) {
+            String name = parameter.getName();
+            builder.addVariable(new Constant("String", prefix + "_" + name, "\"" + name + "\""));
+            if (parameter.isSetValues()) {
                 for (String value : parameter.getValues().getValueArray()) {
-                    out.printf("  public static final String VALUE_" + prefix + "_%s_%s = \"%s\";\n", parameter.getName(), value, value);
+                    builder.addVariable(new Constant("String", "VALUE_" + prefix + "_" + name + "_" + value, "\"" + value + "\""));
                 }
             }
         }
     }
+
+    private void addPropertyGetters(JavaBuilder builder, Service service) {
+        if (service.isSetProperties()) {
+            for (Parameter property : service.getProperties().getParameterArray()) {
+                String name = property.getName();
+                Method method = new Method(getType(property.getType()), "get" + capitalize(name));
+                method.setJavadoc(new JavadocBuilder("Gets the property '").append(name).append("'.")
+                        .line("Property description: ").append(setEndPunctuation(property.getDescription()))
+                        .append(b -> getValidValuesJavadoc(b, property)));
+                builder.addMethod(method);
+            }
+        }
+    }
+
+    private void addActionDefinitions(JavaBuilder builder, Service service) {
+        if (service.isSetActions()) {
+            for (Action action : service.getActions().getActionArray()) {
+                String name = capitalize(action.getName());
+                JavadocBuilder javadoc = new JavadocBuilder();
+
+                String result = "void";
+                if (action.isSetResults()) {
+                    result = name + "Result";
+                    javadoc.result("{@link " + result + "}");
+                }
+                javadoc.line("Execute the action '").append(action.getName()).append("'.");
+                javadoc.line("Action description: ").append(action.getDescription());
+                Method method = new Method(result, "execute" + name);
+                if (action.isSetArguments()) {
+                    for (Parameter parameter : action.getArguments().getParameterArray()) {
+                        Param param = new Param(getType(parameter.getType()), parameter.getName());
+                        param.setDescription(parameter.getDescription());
+                        method.addParameter(param);
+                    }
+                }
+                method.addThrow("GenericDeviceException");
+                builder.addMethod(method.setJavadoc(javadoc));
+            }
+        }
+    }
+
+    private void addActionsResultTypes(JavaBuilder builder, Service service) {
+        if (service.isSetActions()) {
+            for (Action action : service.getActions().getActionArray()) {
+                if (action.isSetResults()) {
+                    String name = action.getName();
+                    builder.addInnerClass(inner -> {
+                        inner.setJavadoc(new JavadocBuilder("Result from action ").append(name));
+                        inner.setName(capitalize(name) + "Result");
+                        inner.addModifier(OptionalModifier.FINAL);
+                        inner.addModifier(OptionalModifier.STATIC);
+                        for (Parameter result : action.getResults().getParameterArray()) {
+                            Variable variable = new Variable(getType(result.getType()), result.getName());
+                            variable.setAccessModifier(AccessModifier.PUBLIC);
+                            variable.setJavadoc(new JavadocBuilder(setEndPunctuation(result.getDescription())));
+                            inner.addVariable(variable);
+                        }
+                        return inner;
+                    });
+                }
+            }
+        }
+    }
+
+//    private void printConstants(Service service, PrintStream out) {
+//        out.printf("  public static final String SERVICE_NAME = \"%s\";\n", service.getName());
+//        Actions actions = service.getActions();
+//        // Mandatory refresh properties action
+//        out.printf("  public static final String ACTION_refreshProperties = \"refreshProperties\";\n");
+//        if (actions != null) {
+//            for (Action action : actions.getActionArray()) {
+//                out.printf("  public static final String ACTION_%s = \"%s\";\n", action.getName(), action.getName());
+//                Arguments arguments = action.getArguments();
+//                if (arguments != null) {
+//                    printParameterConstants(out, arguments.getParameterArray(), "ACTION_" + action.getName() + "_ARG");
+//                }
+//
+//                Results results = action.getResults();
+//                if (results != null) {
+//                    printParameterConstants(out, results.getParameterArray(), "ACTION_" + action.getName() + "_RES");
+//                }
+//            }
+//        }
+//
+//        // Mandatory last update time property
+//        out.printf("  public static final String PROP_lastUpdateTime = \"lastUpdateTime\";\n");
+//        Properties properties = service.getProperties();
+//        if (properties != null) {
+//            printParameterConstants(out, properties.getParameterArray(), "PROP");
+//        }
+//    }
+
+//    /**
+//     * @param out
+//     * @param arguments
+//     */
+//    private void printParameterConstants(PrintStream out, Parameter[] parameterArray, String prefix) {
+//        for (Parameter parameter : parameterArray) {
+//            out.printf("  public static final String " + prefix + "_%s = \"%s\";\n", parameter.getName(), parameter.getName());
+//            if (parameter.getValues() != null && parameter.getValues().getValueArray().length > 0) {
+//                for (String value : parameter.getValues().getValueArray()) {
+//                    out.printf("  public static final String VALUE_" + prefix + "_%s_%s = \"%s\";\n", parameter.getName(), value, value);
+//                }
+//            }
+//        }
+//    }
 
     private void printConstructor(Service service, PrintStream out) {
         out.print(new JavadocBuilder("Creates the service and maps actions to methods that shall be defined by subclass."));
@@ -451,22 +559,22 @@ public class ServicePrinter {
         return "";
     }
 
-    private void printActionsResultTypes(Service service, PrintStream out) {
-        if (service.getActions() != null) {
-            for (Action action : service.getActions().getActionArray()) {
-                if (action.getResults() != null && action.getResults().getParameterArray().length > 0) {
-                    out.println();
-                    out.print(new JavadocBuilder(GENERATION_WARNING).line("Result from action ").append(action.getName()));
-                    out.printf("  public final static class %sResult {\n", capitalize(action.getName()));
-                    for (Parameter result : action.getResults().getParameterArray()) {
-                        out.print(new JavadocBuilder(setEndPunctuation(result.getDescription())));
-                        out.printf("    public %s %s;\n", getType(result.getType()), result.getName());
-                    }
-                    out.printf("  }\n");
-                }
-            }
-        }
-    }
+//    private void printActionsResultTypes(Service service, PrintStream out) {
+//        if (service.getActions() != null) {
+//            for (Action action : service.getActions().getActionArray()) {
+//                if (action.getResults() != null && action.getResults().getParameterArray().length > 0) {
+//                    out.println();
+//                    out.print(new JavadocBuilder(GENERATION_WARNING).line("Result from action ").append(action.getName()));
+//                    out.printf("  public final static class %sResult {\n", capitalize(action.getName()));
+//                    for (Parameter result : action.getResults().getParameterArray()) {
+//                        out.print(new JavadocBuilder(setEndPunctuation(result.getDescription())));
+//                        out.printf("    public %s %s;\n", getType(result.getType()), result.getName());
+//                    }
+//                    out.printf("  }\n");
+//                }
+//            }
+//        }
+//    }
 
     private void printSetActionsResultsOnContextMethods(Service service, PrintStream out) {
         if (service.getActions() != null) {
@@ -505,22 +613,22 @@ public class ServicePrinter {
         }
     }
 
-    private void printPropertyGetters(Service service, PrintStream out) {
-        if (service.getProperties() != null && service.getProperties().getParameterArray().length > 0) {
-            for (Parameter property : service.getProperties().getParameterArray()) {
-                out.println();
-                String getterSignature = getPropertyGetterSignature(property);
-                out.print(new JavadocBuilder("Gets the property '").append(property.getName()).append("'.")
-                        .line("Property description: ").append(setEndPunctuation(property.getDescription()))
-                        .append(builder -> getValidValuesJavadoc(builder, property)));
-                out.printf("  %s;\n", getterSignature);
-            }
-        }
-    }
+//    private void printPropertyGetters(Service service, PrintStream out) {
+//        if (service.getProperties() != null && service.getProperties().getParameterArray().length > 0) {
+//            for (Parameter property : service.getProperties().getParameterArray()) {
+//                out.println();
+//                String getterSignature = getPropertyGetterSignature(property);
+//                out.print(new JavadocBuilder("Gets the property '").append(property.getName()).append("'.")
+//                        .line("Property description: ").append(setEndPunctuation(property.getDescription()))
+//                        .append(builder -> getValidValuesJavadoc(builder, property)));
+//                out.printf("  %s;\n", getterSignature);
+//            }
+//        }
+//    }
 
     private JavadocBuilder getValidValuesJavadoc(JavadocBuilder builder, Parameter property) {
         if ("String".equals(getType(property.getType()))) {
-            if (property.getValues() != null && property.getValues().getValueArray().length > 0) {
+            if (property.isSetValues()) {
                 builder.line("Valid values:");
                 getValidValuesString(builder, property.getValues().getValueArray());
             }
@@ -543,33 +651,33 @@ public class ServicePrinter {
         return builder.line("</ul>");
     }
 
-    private void printActionDefinitions(Service service, PrintStream out) {
-        if (service.getActions() != null) {
-            for (Action action : service.getActions().getActionArray()) {
-                String result = "void";
-                if (action.getResults() != null && action.getResults().getParameterArray().length > 0) {
-                    result = capitalize(action.getName()) + "Result";
-                }
-                out.println();
-                JavadocBuilder builder = new JavadocBuilder();
-                builder.line("Execute the action '").append(action.getName()).append("'.");
-                builder.line("Action description: ").append(action.getDescription());
-                if (action.getArguments() != null && action.getArguments().getParameterArray().length > 0) {
-                    builder.emptyLine();
-                    for (Parameter arg : action.getArguments().getParameterArray()) {
-                        builder.parameter(arg.getName(), arg.getDescription());
-                    }
-                }
-
-                if (action.getResults() != null) {
-                    builder.emptyLine();
-                    builder.result("{@link ").append(capitalize(action.getName())).append("Result}");
-                }
-                out.print(builder);
-                out.printf("  %s execute%s(%s) throws GenericDeviceException;\n", result, capitalize(action.getName()), getSignature(action));
-            }
-        }
-    }
+//    private void printActionDefinitions(Service service, PrintStream out) {
+//        if (service.getActions() != null) {
+//            for (Action action : service.getActions().getActionArray()) {
+//                String result = "void";
+//                if (action.getResults() != null && action.getResults().getParameterArray().length > 0) {
+//                    result = capitalize(action.getName()) + "Result";
+//                }
+//                out.println();
+//                JavadocBuilder builder = new JavadocBuilder();
+//                builder.line("Execute the action '").append(action.getName()).append("'.");
+//                builder.line("Action description: ").append(action.getDescription());
+//                if (action.getArguments() != null && action.getArguments().getParameterArray().length > 0) {
+//                    builder.emptyLine();
+//                    for (Parameter arg : action.getArguments().getParameterArray()) {
+//                        builder.parameter(arg.getName(), arg.getDescription());
+//                    }
+//                }
+//
+//                if (action.getResults() != null) {
+//                    builder.emptyLine();
+//                    builder.result("{@link ").append(capitalize(action.getName())).append("Result}");
+//                }
+//                out.print(builder);
+//                out.printf("  %s execute%s(%s) throws GenericDeviceException;\n", result, capitalize(action.getName()), getSignature(action));
+//            }
+//        }
+//    }
 
     private String getResultDecl(Action action) {
         if (action.getResults() != null && action.getResults().getParameterArray().length != 0) {
@@ -578,20 +686,20 @@ public class ServicePrinter {
         return "";
     }
 
-    private String getSignature(Action action) {
-        if (action.getArguments() != null && action.getArguments().getParameterArray().length > 0) {
-            StringBuilder signature = new StringBuilder();
-            for (com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter argument : action.getArguments().getParameterArray()) {
-                signature.append(getType(argument.getType()))
-                        .append(" ")
-                        .append(argument.getName())
-                        .append(", ");
-            }
-            signature.setLength(signature.length() - 2);
-            return signature.toString();
-        }
-        return "";
-    }
+//    private String getSignature(Action action) {
+//        if (action.getArguments() != null && action.getArguments().getParameterArray().length > 0) {
+//            StringBuilder signature = new StringBuilder();
+//            for (com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter argument : action.getArguments().getParameterArray()) {
+//                signature.append(getType(argument.getType()))
+//                        .append(" ")
+//                        .append(argument.getName())
+//                        .append(", ");
+//            }
+//            signature.setLength(signature.length() - 2);
+//            return signature.toString();
+//        }
+//        return "";
+//    }
 
     private String getType(String type) {
         if (type.toLowerCase().startsWith("int")) {
@@ -638,14 +746,14 @@ public class ServicePrinter {
             sp.addService(code, service);
         }
 //        System.out.print(builder.build(ServicePrinter.class));
-        
+
         System.out.println("=============================================");
         System.out.println("=============================================");
         System.out.println("=============================================");
         System.out.println("=============================================");
 
         for (Service service : serviceArray) {
-            System.out.println("=============================================");
+            System.out.println("#############################################");
             builder = new JavaBuilder();
             sp.addServiceInterface(builder, version, service);
             System.out.print(builder.build(ServicePrinter.class));
@@ -656,7 +764,7 @@ public class ServicePrinter {
         System.out.println("=============================================");
 
         for (Service service : serviceArray) {
-            sp.printServiceInterface(System.out, version, service);
+//            sp.printServiceInterface(System.out, version, service);
             System.out.println("=============================================");
             sp.printServiceImpl(System.out, version, service);
             System.out.println("=============================================");
