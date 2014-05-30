@@ -9,13 +9,13 @@ import com.ericsson.deviceaccess.service.xmlparser.PropertiesDocument.Properties
 import com.ericsson.deviceaccess.service.xmlparser.ResultsDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constructor;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 
 /**
  *

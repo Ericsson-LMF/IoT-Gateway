@@ -1,8 +1,10 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
 import java.util.EnumSet;
 
 /**

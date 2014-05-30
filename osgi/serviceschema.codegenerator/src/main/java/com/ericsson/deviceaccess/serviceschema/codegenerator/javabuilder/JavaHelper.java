@@ -6,8 +6,9 @@ import java.util.regex.Pattern;
  *
  * @author delma
  */
-public class JavaHelper {
+public enum JavaHelper {
 
+    INSTANSE;
     public static final String INDENT = "    ";
     public static final String LINE_END = "\n";
     public static final String STATEMENT_END = ";";
@@ -35,13 +36,6 @@ public class JavaHelper {
 
     public static StringBuilder emptyLine(StringBuilder builder) {
         return builder.append(LINE_END);
-    }
-
-    //TODO: This wrecks camelCasing
-    public static String capitalize(String string) {
-        StringBuilder sb = new StringBuilder(string);
-        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-        return sb.toString();
     }
 
 }

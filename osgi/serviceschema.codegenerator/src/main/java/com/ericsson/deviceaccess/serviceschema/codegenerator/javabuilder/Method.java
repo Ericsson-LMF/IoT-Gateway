@@ -1,12 +1,19 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.PARAMETER_PATTERN;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_START;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
-import java.util.Collections;
 
 /**
  *
@@ -97,7 +104,7 @@ public class Method implements CodeBlock {
         //METHOD DECLARATION
         String access = accessModifier.get();
         indent(builder, indent).append(access).append(" ").append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
-        if(!throwList.isEmpty()){
+        if (!throwList.isEmpty()) {
             builder.append(" throws ");
             throwList.forEach(t -> builder.append(t).append(", "));
             builder.setLength(builder.length() - 2);

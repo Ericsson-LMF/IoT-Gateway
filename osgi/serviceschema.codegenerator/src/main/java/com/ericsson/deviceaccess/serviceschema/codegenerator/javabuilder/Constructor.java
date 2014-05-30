@@ -1,11 +1,18 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.PARAMETER_PATTERN;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_START;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
 
 /**
  *
@@ -76,14 +83,6 @@ public class Constructor implements CodeBlock {
         return this;
     }
 
-    public List<Param> getParameters() {
-        return parameters;
-    }
-
-    public Iterable<String> getCodeLines() {
-        return lines;
-    }
-
     public Constructor setJavadoc(Javadoc javadoc) {
         this.javadoc = javadoc;
         return this;
@@ -131,7 +130,7 @@ public class Constructor implements CodeBlock {
 
     private StringBuilder buildParameters() {
         StringBuilder builder = new StringBuilder();
-        parameters.forEach(p -> builder.append(capitalize(p.getType())).append(" ").append(p.getName().toLowerCase()).append(", "));
+        parameters.forEach(p -> builder.append(StringHelper.capitalize(p.getType())).append(" ").append(p.getName().toLowerCase()).append(", "));
         if (builder.length() > 0) {
             builder.setLength(builder.length() - 2);
         }

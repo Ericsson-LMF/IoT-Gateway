@@ -1,9 +1,18 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.IMPORT;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.PACKAGE;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.emptyLine;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.getGenerationWarning;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.*;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -59,7 +68,7 @@ public class JavaClass implements CodeBlock {
     }
 
     public JavaClass setName(String name) {
-        this.name = capitalize(name);
+        this.name = StringHelper.capitalize(name);
         return this;
     }
 

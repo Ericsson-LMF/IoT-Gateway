@@ -3,15 +3,15 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constant;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 
 /**
  *
