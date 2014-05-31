@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess;
 
 import com.ericsson.deviceaccess.api.GenericDeviceException;
@@ -57,6 +56,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestSerialization {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -123,12 +123,10 @@ public class TestSerialization {
      * ().getStringValue("testArg"),
      * test.getAction("test").getArguments().getStringValue("testArg")); }
      */
-
 //    @Test
 //    public void testInterfaceUnmarshal() {
 //        GenericDeviceAction action = JSON.decode(template, GenericDeviceActionImpl.class);
 //    }
-
     @Test
     public void testGetLeafNode() throws Exception {
         GenericDeviceImpl dev = new GenericDeviceImpl() {
@@ -175,9 +173,11 @@ public class TestSerialization {
         };
         final EventManager eventManager = context.mock(EventManager.class);
         ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
-        context.checking(new Expectations() {{
-            oneOf(eventManager).notifyGenericDeviceEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Dictionary.class)));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(eventManager).addEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Dictionary.class)));
+            }
+        });
 
         dev.setName("dev");
         Object node = null;
@@ -233,7 +233,6 @@ public class TestSerialization {
      * ; GenericDeviceActionContextImpl cont = JSON.decode(encoded,
      * GenericDeviceActionContextImpl.class); }
      */
-
     class TestService extends GenericDeviceServiceImpl {
 
         public TestService() {
@@ -246,6 +245,7 @@ public class TestSerialization {
         }
 
         class TestAction extends GenericDeviceActionImpl {
+
             public TestAction() {
                 super("action", serviceSchema.getActionSchemas()[0].getArgumentsSchemas(), serviceSchema.getActionSchemas()[0].getResultSchema());
             }

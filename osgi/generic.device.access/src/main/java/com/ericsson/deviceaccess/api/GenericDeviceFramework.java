@@ -32,24 +32,22 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 import java.util.List;
 
 /**
- * This interface is intended to be used when using
- * GDA on non-OSGi platform, e.g. Android.
- * It mimics OSGi service framework interface without
- * dependency to OSGi specific API.
+ * This interface is intended to be used when using GDA on non-OSGi platform,
+ * e.g. Android. It mimics OSGi service framework interface without dependency
+ * to OSGi specific API.
  *
  * @author ekenyas
  */
 public interface GenericDeviceFramework {
 
     /**
-     * This method should be called when a new device is discovered
-     * and to be registered. It corresonds to
+     * This method should be called when a new device is discovered and to be
+     * registered. It corresonds to
      *
      * @param dev The device to be registered
      * @throws GenericDeviceException
@@ -57,18 +55,19 @@ public interface GenericDeviceFramework {
     public void register(GenericDevice dev) throws GenericDeviceException;
 
     /**
-     * This method should be called when an update occurs on the
-     * concerning device, e.g. update on sensor reading.
+     * This method should be called when an update occurs on the concerning
+     * device, e.g. update on sensor reading.
      *
-     * @param dev          The concerned device
-     * @param updatedPaths Comma separated list of paths that the event concerns.
+     * @param dev The concerned device
+     * @param updatedPaths Comma separated list of paths that the event
+     * concerns.
      * @throws GenericDeviceException
      */
     public void update(GenericDevice dev, String updatedPaths) throws GenericDeviceException;
 
     /**
-     * Method to be called when the concerned device gets unavailable
-     * and should be removed from the framework
+     * Method to be called when the concerned device gets unavailable and should
+     * be removed from the framework
      *
      * @param dev the device to be unregistered.
      * @throws GenericDeviceException
@@ -77,6 +76,8 @@ public interface GenericDeviceFramework {
 
     /**
      * Method to get the list of all the devices registered to the framework
+     *
+     * @return
      */
     List getAllDevices();
 
@@ -84,8 +85,8 @@ public interface GenericDeviceFramework {
      * Method to get a device registered in the framework.
      *
      * @param id The ID of the device in question
-     * @return GenericDevice instance that has the specified id. Returns null
-     *         if no such device is found.
+     * @return GenericDevice instance that has the specified id. Returns null if
+     * no such device is found.
      */
     GenericDevice getDevice(String id);
 
@@ -102,6 +103,5 @@ public interface GenericDeviceFramework {
      * @param listener
      */
     public void removeListener(GenericDeviceFrameworkListener listener);
-
 
 }

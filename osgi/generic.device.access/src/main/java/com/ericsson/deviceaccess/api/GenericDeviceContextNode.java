@@ -32,29 +32,30 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 /**
- * GenericDeviceContextNode represents a node in a tree built by Generic devices and their services and actions.
- * This class provides operations to identify a generic device, a service, or an action in the tree.
- * 
+ * GenericDeviceContextNode represents a node in a tree built by Generic devices
+ * and their services and actions. This class provides operations to identify a
+ * generic device, a service, or an action in the tree.
+ *
  */
 public interface GenericDeviceContextNode extends Serializable {
 
     /**
-     * @param isAbsolute true if it is supposed to return absolute path from the root.
-     *                   false if relative path from the device node is wanted.
+     * @param isAbsolute true if it is supposed to return absolute path from the
+     * root. false if relative path from the device node is wanted.
      * @return path to the node with "/" as delimiter.
-     * @deprecate Method to get path to this node. This method is used in Web Device Connectivity,
-     * but is deprecated. getPath() without an argument should be used instead.
+     * @deprecate Method to get path to this node. This method is used in Web
+     * Device Connectivity, but is deprecated. getPath() without an argument
+     * should be used instead.
      */
     public String getPath(boolean isAbsolute);
 
     /**
      * @param pathToParent
-     * @deprecate Method to update path until the node's parent by the specified value. This method is used in
-     * Web Device Connectivity, but is deprecated.
+     * @deprecate Method to update path until the node's parent by the specified
+     * value. This method is used in Web Device Connectivity, but is deprecated.
      */
     public void updatePath(String pathToParent);
 
@@ -64,7 +65,6 @@ public interface GenericDeviceContextNode extends Serializable {
      * @return path from the device node to the node with "/" as delimiter.
      */
     public String getPath();
-
 
     String getSerializedNode(String path, int format) throws GenericDeviceException;
 }

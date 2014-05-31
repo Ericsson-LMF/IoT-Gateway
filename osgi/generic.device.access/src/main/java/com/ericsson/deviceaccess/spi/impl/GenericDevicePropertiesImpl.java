@@ -48,6 +48,7 @@ import java.util.Properties;
 
 public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         implements GenericDeviceProperties {
+
     private static MetadataUtil metadataUtil = MetadataUtil.getInstance();
     public static final String LAST_UPDATE_TIME = "lastUpdateTime";
     private Map map;
@@ -58,16 +59,16 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         this.parentService = parentService;
         this.metadata = new HashMap();
         this.map = new HashMap();
-        if(metadataArray != null){
-        	for (int i = 0; i < metadataArray.length; i++) {
-        		GenericDevicePropertyMetadata metadata = metadataArray[i];
-        		this.metadata.put(metadata.getName(), metadata);
-        		if (metadata.getType() == String.class) {
-        			map.put(metadata.getName(), metadata.getDefaultStringValue());
-        		} else {
-        			map.put(metadata.getName(), metadata.getDefaultNumberValue());
-        		}
-        	}
+        if (metadataArray != null) {
+            for (int i = 0; i < metadataArray.length; i++) {
+                GenericDevicePropertyMetadata metadata = metadataArray[i];
+                this.metadata.put(metadata.getName(), metadata);
+                if (metadata.getType() == String.class) {
+                    map.put(metadata.getName(), metadata.getDefaultStringValue());
+                } else {
+                    map.put(metadata.getName(), metadata.getDefaultNumberValue());
+                }
+            }
         }
     }
 
@@ -104,10 +105,11 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
                 .get(key)).getDefaultStringValue();
         if (map.containsKey(key)) {
             Object value = map.get(key);
-            if (value == null)
+            if (value == null) {
                 return defaultValue;
-            else
+            } else {
                 return String.valueOf(value);
+            }
         }
         return defaultValue;
     }
@@ -168,15 +170,17 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     }
 
     private void tryNotifyChange(final String key, Object oldValue,
-                                 final Object value) {
+            final Object value) {
         if (metadata.containsKey(LAST_UPDATE_TIME)) {
             map.put(LAST_UPDATE_TIME, new Long(System.currentTimeMillis()));
         }
         if (parentService != null && parentService.getParentDevice() != null) {
             if ((value == null && oldValue != null) || (value != null && !value.equals(oldValue))) {
-                parentService.notifyEvent(new Properties() {{
-                    put(key, value);
-                }});
+                parentService.notifyEvent(new Properties() {
+                    {
+                        put(key, value);
+                    }
+                });
             }
         }
     }
@@ -308,16 +312,16 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
             String name = getNames()[i];
             sb.append("\"").append(name).append("\":{");
             sb.append("\"currentValue\":\"").append(Utils.escapeJSON(getStringValue(name))).append("\",");
-            if(metadata.containsKey(name)){
-            	sb.append("\"metadata\":");
-            	String serializedMetadata = ((GenericDevicePropertyMetadata)metadata.get(name)).serialize(format);
-            	if(serializedMetadata != null && serializedMetadata.indexOf("{") >= 0){
-            		sb.append(serializedMetadata);
-            	} else {
-            		sb.append("null");
-            	}
+            if (metadata.containsKey(name)) {
+                sb.append("\"metadata\":");
+                String serializedMetadata = ((GenericDevicePropertyMetadata) metadata.get(name)).serialize(format);
+                if (serializedMetadata != null && serializedMetadata.indexOf("{") >= 0) {
+                    sb.append(serializedMetadata);
+                } else {
+                    sb.append("null");
+                }
             } else {
-            	sb.append("\"metadata\":null");
+                sb.append("\"metadata\":null");
             }
             sb.append("},");
         }
@@ -333,9 +337,9 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     public void addDynamicProperty(GenericDevicePropertyMetadata propertyMetadata) {
         this.metadata.put(propertyMetadata.getName(), propertyMetadata);
         if (propertyMetadata.getType() == String.class) {
-        	map.put(propertyMetadata.getName(), propertyMetadata.getDefaultStringValue());
+            map.put(propertyMetadata.getName(), propertyMetadata.getDefaultStringValue());
         } else if (propertyMetadata.getType() == Number.class) {
-        	map.put(propertyMetadata.getName(), propertyMetadata.getDefaultNumberValue());
+            map.put(propertyMetadata.getName(), propertyMetadata.getDefaultNumberValue());
         }
         parentService.notifyEventAdded(propertyMetadata.getName());
     }

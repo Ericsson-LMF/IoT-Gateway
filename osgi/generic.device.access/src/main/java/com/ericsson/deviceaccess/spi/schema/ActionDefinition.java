@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
@@ -42,5 +41,6 @@ import com.ericsson.deviceaccess.api.GenericDeviceException;
  * An action implementation.
  */
 public interface ActionDefinition {
+
     void invoke(GenericDeviceActionContext context) throws GenericDeviceException;
 }

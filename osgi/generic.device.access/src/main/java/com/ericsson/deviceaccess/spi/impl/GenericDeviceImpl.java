@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.*;
@@ -47,8 +46,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-
 public abstract class GenericDeviceImpl extends GenericDevice.Stub implements GenericDevice {
+
     private String id = "undefined";
     private String urn = "undefined";
     private String name = "undefined";
@@ -70,17 +69,15 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     private Map service = new HashMap();
     private boolean isReady = false;
 
-
     /**
      *
      */
     protected GenericDeviceImpl() {
     }
 
-
     /**
-     * Returns a service instance if the device has a service with
-     * the specified name or null, otherwise.
+     * Returns a service instance if the device has a service with the specified
+     * name or null, otherwise.
      *
      * @param name The name of service that is in question.
      * @return device instance or null
@@ -90,10 +87,10 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return (GenericDeviceService) service.get(name);
     }
 
-	public GenericDeviceServiceImpl getServiceImpl(String svcName) {
+    public GenericDeviceServiceImpl getServiceImpl(String svcName) {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-        return (GenericDeviceServiceImpl)service.get(name);
-	}
+        return (GenericDeviceServiceImpl) service.get(name);
+    }
 
     /**
      * Returns a Map of all the services that the device instance has.
@@ -106,8 +103,8 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     }
 
     /**
-     * Puts an instance of a service. If an instance which has
-     * the same name is already registered, the instance is updated.
+     * Puts an instance of a service. If an instance which has the same name is
+     * already registered, the instance is updated.
      *
      * @param svc A service instance which is being put.
      */
@@ -155,9 +152,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         String oldUrn = this.urn;
         this.urn = urn;
         if (isReady && urn != null && !urn.equals(oldUrn)) {
-            notifyEvent("DeviceProperties", new Properties() {{
-                put(GenericDeviceEventListener.DEVICE_URN, new String(GenericDeviceImpl.this.urn));
-            }});
+            notifyEvent("DeviceProperties", new Properties() {
+                {
+                    put(GenericDeviceEventListener.DEVICE_URN, new String(GenericDeviceImpl.this.urn));
+                }
+            });
         }
     }
 
@@ -169,9 +168,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         String oldName = this.name;
         this.name = name;
         if (isReady && name != null && !name.equals(oldName)) {
-            notifyEvent("DeviceProperties", new Properties() {{
-                put(GenericDeviceEventListener.DEVICE_NAME, new String(GenericDeviceImpl.this.name));
-            }});
+            notifyEvent("DeviceProperties", new Properties() {
+                {
+                    put(GenericDeviceEventListener.DEVICE_NAME, new String(GenericDeviceImpl.this.name));
+                }
+            });
         }
     }
 
@@ -215,9 +216,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         boolean oldOnline = this.online;
         this.online = online;
         if (isReady && online != oldOnline) {
-            notifyEvent("DeviceProperties", new Properties() {{
-                put(GenericDeviceEventListener.DEVICE_ONLINE, new Boolean(GenericDeviceImpl.this.online));
-            }});
+            notifyEvent("DeviceProperties", new Properties() {
+                {
+                    put(GenericDeviceEventListener.DEVICE_ONLINE, new Boolean(GenericDeviceImpl.this.online));
+                }
+            });
         }
     }
 
@@ -246,9 +249,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         String oldState = this.state;
         this.state = state;
         if (isReady && ((state == null && oldState != null) || (state != null && !state.equals(oldState)))) {
-            notifyEvent("DeviceProperties", new Properties() {{
-                put(GenericDeviceEventListener.DEVICE_STATE, new String(GenericDeviceImpl.this.state));
-            }});
+            notifyEvent("DeviceProperties", new Properties() {
+                {
+                    put(GenericDeviceEventListener.DEVICE_STATE, new String(GenericDeviceImpl.this.state));
+                }
+            });
         }
     }
 
@@ -265,7 +270,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     public void updatePath(String path) {
         GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
         this.path = path;
-        for (Iterator i = service.values().iterator(); i.hasNext(); ) {
+        for (Iterator i = service.values().iterator(); i.hasNext();) {
             GenericDeviceService svc = (GenericDeviceService) i.next();
             svc.updatePath(getPath(true));
         }
@@ -281,9 +286,9 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return contact;
     }
 
-
     /**
-     * Sets the list of services in the device instance. Returns a HashMap of all the services that the device has.
+     * Sets the list of services in the device instance. Returns a HashMap of
+     * all the services that the device has.
      *
      * @return HashMap of service instances with their names as key.
      */
@@ -291,7 +296,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
         this.service = service;
     }
-
 
     public void setManufacturer(String manufacturer) {
         GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
@@ -347,7 +351,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return productClass;
     }
 
-
     public String serialize(int format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
 
@@ -365,7 +368,9 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     public String getSerializedNode(String path, int format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-        if (path == null) throw new GenericDeviceException(405, "Path cannot be null");
+        if (path == null) {
+            throw new GenericDeviceException(405, "Path cannot be null");
+        }
         if (path.length() == 0) {
             return serialize(format);
         } else if (path.startsWith("service") && service != null) {
@@ -407,42 +412,48 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     }
 
     /**
-     * Static utility method which generates a Properties object from GenericDevice object.
-     * It is for making it easy to register the instance to OSGi framework
-     * as a service.
+     * Static utility method which generates a Properties object from
+     * GenericDevice object. It is for making it easy to register the instance
+     * to OSGi framework as a service.
      *
      * @return Properties object that can be used in registerService() method.
      */
     public static Properties getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
         GenericDeviceAccessSecurity.checkGetPermission(GenericDevice.class.getName());
         Properties props = new Properties();
-        if (dev.getURN() != null)
+        if (dev.getURN() != null) {
             props.setProperty(Constants.PARAM_DEVICE_URN, dev.getURN());
-        if (dev.getId() != null)
+        }
+        if (dev.getId() != null) {
             props.setProperty(Constants.PARAM_DEVICE_ID, dev.getId());
-        if (dev.getType() != null)
+        }
+        if (dev.getType() != null) {
             props.setProperty(Constants.PARAM_DEVICE_TYPE, dev.getType());
-        if (dev.getProtocol() != null)
+        }
+        if (dev.getProtocol() != null) {
             props.setProperty(Constants.PARAM_DEVICE_PROTOCOL, dev.getProtocol());
+        }
         return props;
     }
 
     public void notifyEvent(String serviceId, final Properties parameters) {
-        GenericDeviceActivator.getEventManager().notifyGenericDeviceEvent(id, serviceId, parameters);
+        GenericDeviceActivator.getEventManager().addEvent(id, serviceId, parameters);
     }
 
-	public void notifyEventRemoved(String serviceId, String propertyId) {
-        GenericDeviceActivator.getEventManager().notifyGenericDeviceEventRemoved(id, serviceId, propertyId);
-	}
+    public void notifyEventRemoved(String serviceId, String propertyId) {
+        GenericDeviceActivator.getEventManager().addRemoveEvent(id, serviceId, propertyId);
+    }
 
-	public void notifyEventAdded(String serviceId, String propertyId) {
-        GenericDeviceActivator.getEventManager().notifyGenericDeviceEventAdded(id, serviceId, propertyId);
-	}
+    public void notifyEventAdded(String serviceId, String propertyId) {
+        GenericDeviceActivator.getEventManager().addAddEvent(id, serviceId, propertyId);
+    }
 
     private String serializeServiceList(int format) throws GenericDeviceException {
         if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
             int indent = 0;
-            if (format == Serializable.FORMAT_JSON_WDC) indent = 3;
+            if (format == Serializable.FORMAT_JSON_WDC) {
+                indent = 3;
+            }
             return getServiceListJsonString(format, indent, false);
         } else {
             throw new GenericDeviceException(405, "No such format supported");
@@ -480,13 +491,14 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
             GenericDeviceService svc = (GenericDeviceService) service.get(key);
             json += "\"" + Utils.escapeJSON(svc.getName()) + "\":";
             json += (stateOnly ? svc.serializeState() : svc.serialize(format));
-            if (it.hasNext()) json += ",";
+            if (it.hasNext()) {
+                json += ",";
+            }
         }
         json += "";
         return json;
 
     }
-
 
     private Object getFieldValue(String name) throws GenericDeviceException {
         Method method;
@@ -501,7 +513,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return null;
     }
 
-
     private String makeFirstCharToUpperCase(String value) {
         if (value != null && value.length() > 0) {
             return value.substring(0, 1).toUpperCase() + value.substring(1);
@@ -509,12 +520,9 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return "";
     }
 
-
     public String[] getServiceNames() {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         return (String[]) service.keySet().toArray(new String[0]);
     }
-
-
 
 }

@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
@@ -50,9 +49,10 @@ import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
 import static junit.framework.Assert.fail;
 
 /**
- * 
+ *
  */
 public class GenericDeviceActionImplTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -69,29 +69,35 @@ public class GenericDeviceActionImplTest {
         floatPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "floatPropMetadata");
         intPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "intPropMetadata");
         stringPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "stringPropMetadata");
-        GenericDevicePropertyMetadata[] resultMetadata = new GenericDevicePropertyMetadata[] {
-                floatPropMetadata, 
-                intPropMetadata, 
-                stringPropMetadata, 
-            };
-        GenericDevicePropertyMetadata[] argumentsMetadata = new GenericDevicePropertyMetadata[] { 
-                floatPropMetadata, 
-                intPropMetadata, 
-                stringPropMetadata, 
-            };
-        context.checking(new Expectations() {{
-            allowing(intPropMetadata).getName();will(returnValue("int"));
-            allowing(intPropMetadata).getSerializedNode("",GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"int\"}"));
-            allowing(floatPropMetadata).getName();will(returnValue("float"));
-            allowing(floatPropMetadata).getSerializedNode("",GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"float\"}"));
-            allowing(stringPropMetadata).getName();will(returnValue("string"));
-            allowing(stringPropMetadata).getSerializedNode("",GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"string\"}"));
+        GenericDevicePropertyMetadata[] resultMetadata = new GenericDevicePropertyMetadata[]{
+            floatPropMetadata,
+            intPropMetadata,
+            stringPropMetadata,};
+        GenericDevicePropertyMetadata[] argumentsMetadata = new GenericDevicePropertyMetadata[]{
+            floatPropMetadata,
+            intPropMetadata,
+            stringPropMetadata,};
+        context.checking(new Expectations() {
+            {
+                allowing(intPropMetadata).getName();
+                will(returnValue("int"));
+                allowing(intPropMetadata).getSerializedNode("", GenericDevice.FORMAT_JSON);
+                will(returnValue("{\"type\":\"int\"}"));
+                allowing(floatPropMetadata).getName();
+                will(returnValue("float"));
+                allowing(floatPropMetadata).getSerializedNode("", GenericDevice.FORMAT_JSON);
+                will(returnValue("{\"type\":\"float\"}"));
+                allowing(stringPropMetadata).getName();
+                will(returnValue("string"));
+                allowing(stringPropMetadata).getSerializedNode("", GenericDevice.FORMAT_JSON);
+                will(returnValue("{\"type\":\"string\"}"));
 
-        }});
-    
+            }
+        });
+
         action = new GenericDeviceActionImpl("action", argumentsMetadata, resultMetadata);
     }
-    
+
     @Test
     public void testSerialize() throws GenericDeviceException, JSONException {
         String json = action.serialize(GenericDevice.FORMAT_JSON);

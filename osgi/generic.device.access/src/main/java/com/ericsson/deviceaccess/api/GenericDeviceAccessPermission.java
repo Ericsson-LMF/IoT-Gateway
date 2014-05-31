@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 import java.security.BasicPermission;
@@ -43,6 +42,7 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 public final class GenericDeviceAccessPermission extends BasicPermission {
+
     /**
      *
      */
@@ -60,8 +60,9 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
     private int actionMask;
 
     /**
-     * Construct a named GenericDeviceAccessPermission for a set of actions to be permitted.
-     * 
+     * Construct a named GenericDeviceAccessPermission for a set of actions to
+     * be permitted.
+     *
      * @param name
      * @param actions A comma separated string of actions: GET, SET and EXECUTE.
      */
@@ -77,7 +78,9 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
 
     private int getActionMask(String actStr) {
         int mask = 0;
-        if (actStr == null) return mask;
+        if (actStr == null) {
+            return mask;
+        }
         StringTokenizer st = new StringTokenizer(actStr, ",");
         while (st.hasMoreElements()) {
             // TODO: Check if this works properly
@@ -98,6 +101,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
         return actionMask;
     }
 
+    @Override
     public boolean implies(Permission p) {
         if (p instanceof GenericDeviceAccessPermission) {
             GenericDeviceAccessPermission target = (GenericDeviceAccessPermission) p;
@@ -108,22 +112,28 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
         return (false);
     }
 
+    @Override
     public String getActions() {
         String actions = "";
         if ((actionMask & ACTION_GET) == ACTION_GET) {
             actions += GET;
         }
         if ((actionMask & ACTION_SET) == ACTION_SET) {
-            if (actions.length() > 0) actions += ",";
+            if (actions.length() > 0) {
+                actions += ",";
+            }
             actions += SET;
         }
         if ((actionMask & ACTION_EXECUTE) == ACTION_EXECUTE) {
-            if (actions.length() > 0) actions += ",";
+            if (actions.length() > 0) {
+                actions += ",";
+            }
             actions += EXECUTE;
         }
         return actions;
     }
 
+    @Override
     public PermissionCollection newPermissionCollection() {
         return new GenericDeviceAccessPermissionCollection();
     }
@@ -150,6 +160,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
             permissions = new Hashtable();
         }
 
+        @Override
         public void add(Permission perm) {
             if (!(perm instanceof GenericDeviceAccessPermission)) {
                 throw new IllegalArgumentException("invalid permission: "
@@ -175,15 +186,18 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
             }
 
             if (!allAllowed) {
-                if (name.equals("*"))
+                if (name.equals("*")) {
                     allAllowed = true;
+                }
             }
         }
 
+        @Override
         public Enumeration elements() {
             return permissions.elements();
         }
 
+        @Override
         public boolean implies(Permission perm) {
             if (!(perm instanceof GenericDeviceAccessPermission)) {
                 return false;
@@ -199,27 +213,28 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
                 x = (GenericDeviceAccessPermission) permissions.get("*");
                 if (x != null) {
                     effective |= x.getMask();
-                    if ((effective & desired) == desired)
+                    if ((effective & desired) == desired) {
                         return (true);
+                    }
                 }
             }
-
 
             x = (GenericDeviceAccessPermission) permissions.get(gdaPerm.getName());
 
             if (x != null) {
                 // we have a direct hit!
                 effective |= x.getMask();
-                if ((effective & desired) == desired)
+                if ((effective & desired) == desired) {
                     return (true);
+                }
             }
             /*
-                * We only care direct match for now since all concerned classes
-                * are under com.ericsson.deviceaccess.api. We may need to
-                * consider to implement handling of package names and wild cards.
-                * See BundlePermision implementation in Knopflerfish, for example.
-                * -- Kenta
-                */
+             * We only care direct match for now since all concerned classes
+             * are under com.ericsson.deviceaccess.api. We may need to
+             * consider to implement handling of package names and wild cards.
+             * See BundlePermision implementation in Knopflerfish, for example.
+             * -- Kenta
+             */
 
             return false;
         }

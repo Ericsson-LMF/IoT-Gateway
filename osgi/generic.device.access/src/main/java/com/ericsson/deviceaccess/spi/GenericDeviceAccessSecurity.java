@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi;
 
 import com.ericsson.deviceaccess.api.GenericDeviceAccessPermission;
@@ -42,27 +41,28 @@ import com.ericsson.deviceaccess.api.GenericDeviceAccessPermission;
  * GenericDeviceServiceImpl, each method call checks if the caller is authorized
  * to call the method by using this class. A call may have GET, SET, and EXECUTE
  * permissions corresponding to retrieving information from a device, setting
- * information to a device, and executing an action of a service on a device respectively.
+ * information to a device, and executing an action of a service on a device
+ * respectively.
  */
 public class GenericDeviceAccessSecurity {
 
-	public static void checkGetPermission(String clazz) {
-		checkPermission(clazz, GenericDeviceAccessPermission.GET);
-	}
+    public static void checkGetPermission(String clazz) {
+        checkPermission(clazz, GenericDeviceAccessPermission.GET);
+    }
 
-	public static void checkSetPermission(String clazz) {
-		checkPermission(clazz, GenericDeviceAccessPermission.SET);
-	}
+    public static void checkSetPermission(String clazz) {
+        checkPermission(clazz, GenericDeviceAccessPermission.SET);
+    }
 
-	public static void checkExecutePermission(String clazz) {
-		checkPermission(clazz, GenericDeviceAccessPermission.EXECUTE);
-	}
+    public static void checkExecutePermission(String clazz) {
+        checkPermission(clazz, GenericDeviceAccessPermission.EXECUTE);
+    }
 
-	private static void checkPermission(String clazz, String action) {
-		SecurityManager sm = System.getSecurityManager();
-		if (null != sm) {
-			sm.checkPermission(new GenericDeviceAccessPermission(clazz, action));
-		}
-	}
+    private static void checkPermission(String clazz, String action) {
+        SecurityManager sm = System.getSecurityManager();
+        if (null != sm) {
+            sm.checkPermission(new GenericDeviceAccessPermission(clazz, action));
+        }
+    }
 
 }

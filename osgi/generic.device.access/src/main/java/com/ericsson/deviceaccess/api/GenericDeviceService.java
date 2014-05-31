@@ -35,11 +35,12 @@
 package com.ericsson.deviceaccess.api;
 
 /**
- * A GenericDeviceService represents a service provided by a generic device.
- * A GenericDeviceService can have zero or more properties and actions.
- * 
+ * A GenericDeviceService represents a service provided by a generic device. A
+ * GenericDeviceService can have zero or more properties and actions.
+ *
  */
 public interface GenericDeviceService extends GenericDeviceContextNode {
+
     /**
      * Placeholder for Android to replace with the stub implementation for this
      * interface
@@ -88,10 +89,11 @@ public interface GenericDeviceService extends GenericDeviceContextNode {
     public String[] getActionNames();
 
     /**
-     * Serializes the state (i.e. values of all properties in the service) to JSON
-     * @return JSON of the state.
-     *         Example:
-     *         <code>{"property1" : "99","property2" : "99"}</code>
+     * Serializes the state (i.e. values of all properties in the service) to
+     * JSON
+     *
+     * @return JSON of the state. Example:
+     * <code>{"property1" : "99","property2" : "99"}</code>
      *
      */
     public String serializeState();

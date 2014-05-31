@@ -41,8 +41,8 @@ import com.ericsson.deviceaccess.api.GenericDeviceProperties;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 
-
 public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.Stub implements GenericDeviceActionContext {
+
     private String requester;
     private String requesterContact;
     private String owner;
@@ -66,7 +66,6 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         this.arguments = arguments;
         this.result = new GenericDeviceActionResultImpl(result);
     }
-
 
     public void setRequester(String requester) {
         this.requester = requester;
@@ -120,7 +119,6 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         }
     }
 
-
     public void setFirstTime(boolean isFirstTime) {
         this.isFirstTime = isFirstTime;
     }
@@ -128,7 +126,6 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
     public boolean isFirstTime() {
         return isFirstTime;
     }
-
 
     public long getMessageThreadId() {
         return messageThreadId;
@@ -170,14 +167,12 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         return arguments;
     }
 
+    public void setResult(GenericDeviceActionResult result) {
+        this.result = result;
+    }
 
-	public void setResult(GenericDeviceActionResult result) {
-		this.result = result;		
-	}
-
-
-	public String serialize(int format) throws GenericDeviceException {
-		GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+    public String serialize(int format) throws GenericDeviceException {
+        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         if (format == Serializable.FORMAT_JSON
                 || format == Serializable.FORMAT_JSON_WDC) {
             StringBuffer sb = new StringBuffer("{");
@@ -189,22 +184,21 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
             sb.append("\"firstTime\":\"").append(isFirstTime()).append("\",");
             sb.append("\"authorized\":\"").append(isAuthorized()).append("\",");
             sb.append("\"requesterContact\":\"").append(getRequesterContact()).append("\",");
-            if(arguments != null){
-            	sb.append("\"arguments\":").append(getArguments().serialize(format)).append(",");
+            if (arguments != null) {
+                sb.append("\"arguments\":").append(getArguments().serialize(format)).append(",");
             } else {
-            	sb.append("\"arguments\":null,");
+                sb.append("\"arguments\":null,");
             }
-            if(result != null){
-            	sb.append("\"result\":").append(getResult().serialize(format));
+            if (result != null) {
+                sb.append("\"result\":").append(getResult().serialize(format));
             } else {
-            	sb.append("\"result\":null");
+                sb.append("\"result\":null");
             }
             sb.append("}");
-            
-            return sb.toString();
-        } 
-        throw new GenericDeviceException(405, "No such format supported");
-	}
 
+            return sb.toString();
+        }
+        throw new GenericDeviceException(405, "No such format supported");
+    }
 
 }

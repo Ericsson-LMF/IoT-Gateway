@@ -32,38 +32,42 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
-
 public interface GenericDevice extends GenericDeviceContextNode {
+
     /**
-     * Non-mandatory transient state to signal that the device has been added/paired
+     * Non-mandatory transient state to signal that the device has been
+     * added/paired
      */
     public static final String STATE_ADDED = "Added";
 
     /**
-     * Non-mandatory state to indicate that the device is being initialized (typically after a pairing)
+     * Non-mandatory state to indicate that the device is being initialized
+     * (typically after a pairing)
      */
-	public static final String STATE_STARTING = "Starting";
-	
-	/**
-	 * Default and mandatory value to indicate that the device is ready to be used
-	 */
+    public static final String STATE_STARTING = "Starting";
+
+    /**
+     * Default and mandatory value to indicate that the device is ready to be
+     * used
+     */
     public static final String STATE_READY = "Ready";
-    
+
     /**
      * State to indicate that the device has failed to initialize
      */
     public static final String STATE_FAILED = "Failed";
-    
+
     /**
-     * Non-mandatory transient state to signal that the device has been permanently removed/unpaired
+     * Non-mandatory transient state to signal that the device has been
+     * permanently removed/unpaired
      */
     public static final String STATE_REMOVED = "Removed";
 
     /**
-     * Placeholder for Android to replace with the stub implementation for this interface
+     * Placeholder for Android to replace with the stub implementation for this
+     * interface
      *
      * @author knt
      */
@@ -73,6 +77,8 @@ public interface GenericDevice extends GenericDeviceContextNode {
 
     /**
      * Sets the name of this device.
+     *
+     * @param name
      */
     public void setName(String name);
 
@@ -80,13 +86,14 @@ public interface GenericDevice extends GenericDeviceContextNode {
      * Method to query a service offered by the device by its name.
      *
      * @param name Name of the service in question.
-     * @return GenericDeviceService object if the device offers the queried service. Null otherwise.
+     * @return GenericDeviceService object if the device offers the queried
+     * service. Null otherwise.
      */
     public GenericDeviceService getService(String name);
 
     /**
-     * Method to return an array of service names to iterate services
-     * offered by the device.
+     * Method to return an array of service names to iterate services offered by
+     * the device.
      *
      * @return array of service names
      */
@@ -101,12 +108,14 @@ public interface GenericDevice extends GenericDeviceContextNode {
 
     /**
      * Sets the URN of this device. The URN will be persisted.
+     *
      * @param URN
      */
     public void setURN(String URN);
 
     /**
      * Gets the URN of this device.
+     *
      * @return
      */
     public String getURN();
@@ -126,9 +135,9 @@ public interface GenericDevice extends GenericDeviceContextNode {
     public String getType();
 
     /**
-     * Getter for the name of protocol used for discovery of the device. The value should be
-     * one of constant properties defined in com.ericsson.deviceaccess.api.Constants that
-     * start with prefix "PROTO_".
+     * Getter for the name of protocol used for discovery of the device. The
+     * value should be one of constant properties defined in
+     * com.ericsson.deviceaccess.api.Constants that start with prefix "PROTO_".
      *
      * @return Name of the protocol used for discovery of the device.
      */
@@ -150,14 +159,18 @@ public interface GenericDevice extends GenericDeviceContextNode {
     public boolean isOnline();
 
     /**
-     * Gets the running state of the device: {@link STATE_ADDED}, {@link STATE_REMOVED}, {@link #STATE_READY} or {@link #STATE_STARTING}.
+     * Gets the running state of the device:
+     * {@link STATE_ADDED}, {@link STATE_REMOVED}, {@link #STATE_READY} or
+     * {@link #STATE_STARTING}.
+     *
      * @return
      */
     public String getState();
 
     /**
-     * Getter for the icon url field. The value should be URL for an icon image of the device
-     * that is available for the clients to fetch, i.e. image file on an HTTP server.
+     * Getter for the icon url field. The value should be URL for an icon image
+     * of the device that is available for the clients to fetch, i.e. image file
+     * on an HTTP server.
      *
      * @return URL for an icon image of the device.
      */
@@ -165,9 +178,10 @@ public interface GenericDevice extends GenericDeviceContextNode {
 
     /**
      * @return Contact URL of the device.
-     * @deprecate Getter for contact URL of the device that is used in Web Device Connectivity. This method
-     * should be removed because each application should have its own way of exposing the device and
-     * thus the contact URL of the device depends.
+     * @deprecate Getter for contact URL of the device that is used in Web
+     * Device Connectivity. This method should be removed because each
+     * application should have its own way of exposing the device and thus the
+     * contact URL of the device depends.
      */
     public String getContact();
 
@@ -207,11 +221,12 @@ public interface GenericDevice extends GenericDeviceContextNode {
     public String getModelName();
 
     /**
-     * Serializes the state (i.e. values of all properties in all services) to JSON
+     * Serializes the state (i.e. values of all properties in all services) to
+     * JSON
      *
-     * @return JSON of the state.
-     *         Example:
-     *         <code>{"Service1" : {"property1" : "99","property2" : "99"},"Service2" : {"property3" : "99","property4" : "99"}}</code>
+     * @return JSON of the state. Example:
+     * <code>{"Service1" : {"property1" : "99","property2" : "99"},"Service2" : {"property3" : "99","property4" : "99"}}</code>
+     * @throws com.ericsson.deviceaccess.api.GenericDeviceException
      */
     public String serializeState() throws GenericDeviceException;
 }

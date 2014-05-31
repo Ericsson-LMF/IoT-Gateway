@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -46,7 +45,7 @@ import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 
 /**
- * 
+ *
  */
 public class ParameterSchemaTest {
 
@@ -70,13 +69,13 @@ public class ParameterSchemaTest {
     public void testString() {
         ParameterSchema parameterSchema = new ParameterSchema.Builder("par1", String.class).
                 setDefaultValue("banan").
-                setValidValues(new String[] { "orange", "banan" }).
+                setValidValues(new String[]{"orange", "banan"}).
                 build();
 
         assertEquals("par1", parameterSchema.getName());
         assertSame(String.class, parameterSchema.getType());
         assertEquals("banan", parameterSchema.getDefaultStringValue());
-        assertArrayEquals(new String[] { "banan", "orange" }, parameterSchema.getValidValues());
+        assertArrayEquals(new String[]{"banan", "orange"}, parameterSchema.getValidValues());
     }
 
     @Test

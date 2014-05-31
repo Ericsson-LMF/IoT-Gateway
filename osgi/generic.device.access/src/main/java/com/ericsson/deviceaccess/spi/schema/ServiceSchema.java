@@ -32,13 +32,11 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 
 /**
  * Implementation of a service schema.
@@ -51,7 +49,7 @@ public class ServiceSchema {
 
     /**
      * Creates schema with specified name.
-     * 
+     *
      * @param name
      */
     private ServiceSchema(String name) {
@@ -60,6 +58,7 @@ public class ServiceSchema {
 
     /**
      * Returns the name of the service.
+     *
      * @return the name of the service
      */
     public String getName() {
@@ -68,6 +67,7 @@ public class ServiceSchema {
 
     /**
      * Gets the action schemas defined for this schema.
+     *
      * @return the actions defined for this schema
      */
     public ActionSchema[] getActionSchemas() {
@@ -76,6 +76,7 @@ public class ServiceSchema {
 
     /**
      * Gets the parameters for this service
+     *
      * @return
      */
     public ParameterSchema[] getPropertiesSchemas() {
@@ -86,22 +87,24 @@ public class ServiceSchema {
      * Builder for creating ServiceSchema instances.
      */
     public static class Builder {
+
         private String name;
         private List actionSchemas = new ArrayList();
         private List propertieSchemas = new ArrayList();
 
         /**
          * Create builder for a service with the specified name.
+         *
          * @param serviceName
          * @return the builder
          */
         public Builder(String serviceName) {
             this.name = serviceName;
         }
-        
+
         /**
          * Adds an action schema.
-         * 
+         *
          * @param actionSchema
          * @return the builder
          */
@@ -109,9 +112,10 @@ public class ServiceSchema {
             actionSchemas.add(actionSchema);
             return this;
         }
-        
+
         /**
          * Adds a parameter schema.
+         *
          * @param parameterSchema
          * @return the builder
          */
@@ -119,9 +123,10 @@ public class ServiceSchema {
             propertieSchemas.add(parameterSchema);
             return this;
         }
-        
+
         /**
          * Builds the schema.
+         *
          * @return the built schema
          */
         public ServiceSchema build() {
@@ -134,12 +139,12 @@ public class ServiceSchema {
                 ActionSchema actionSchema = (ActionSchema) iterator.next();
                 serviceSchema.actionSchemas.add(actionSchema);
             }
-            
+
             for (Iterator iterator = propertieSchemas.iterator(); iterator.hasNext();) {
                 ParameterSchema propertySchema = (ParameterSchema) iterator.next();
                 serviceSchema.propertySchemas.add(propertySchema);
             }
-            
+
             return serviceSchema;
         }
     }

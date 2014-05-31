@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.*;
@@ -44,9 +43,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Checker for checking {@link GenericDeviceProperties} against {@link GenericDevicePropertyMetadata}.
+ * Checker for checking {@link GenericDeviceProperties} against
+ * {@link GenericDevicePropertyMetadata}.
  */
 class MetadataUtil {
+
     private static MetadataUtil instance = new MetadataUtil();
 
     private MetadataUtil() {
@@ -61,7 +62,8 @@ class MetadataUtil {
      *
      * @param props
      * @param metadataMap name:String -> {@link GenericDevicePropertyMetadata}
-     * @throws GenericDeviceError thrown if value does not adhere to the metadata
+     * @throws GenericDeviceError thrown if value does not adhere to the
+     * metadata
      */
     void verifyPropertiesAgainstMetadata(GenericDeviceProperties props, Map metadataMap) throws GenericDeviceError {
         if (metadataMap == null) {
@@ -76,44 +78,48 @@ class MetadataUtil {
     }
 
     /**
-     * Verifies the specified property, with the specified name, against the specified metadata.
+     * Verifies the specified property, with the specified name, against the
+     * specified metadata.
      *
-     * @param metadataMap   name:String -> {@link GenericDevicePropertyMetadata}
+     * @param metadataMap name:String -> {@link GenericDevicePropertyMetadata}
      * @param propertyName
      * @param propertyValue
-     * @throws GenericDeviceError thrown if value does not adhere to the metadata
+     * @throws GenericDeviceError thrown if value does not adhere to the
+     * metadata
      */
     void verifyPropertyAgainstMetadata(Map metadataMap, String propertyName, Object propertyValue) throws GenericDeviceError {
         GenericDevicePropertyMetadata metadata = (GenericDevicePropertyMetadata) metadataMap.get(propertyName);
-        
-        if(metadata == null) return;
-        
+
+        if (metadata == null) {
+            return;
+        }
+
         if (Number.class.isAssignableFrom(metadata.getType())) {
             if (propertyValue instanceof String) {
                 try {
                     Float.parseFloat((String) propertyValue);
                 } catch (NumberFormatException e) {
                     throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not parsable to '" + metadata.getType() + "'");
+                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
+                            + "' which not parsable to '" + metadata.getType() + "'");
                 }
             } else if (Float.class.isAssignableFrom(metadata.getType())) {
                 if (!(propertyValue instanceof Float)) {
                     throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not assignable to '" + metadata.getType() + "'");
+                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
+                            + "' which not assignable to '" + metadata.getType() + "'");
                 }
             } else if (Long.class.isAssignableFrom(metadata.getType())) {
                 if (!(propertyValue instanceof Long)) {
                     throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not assignable to '" + metadata.getType() + "'");
+                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
+                            + "' which not assignable to '" + metadata.getType() + "'");
                 }
             } else {
                 if (!(propertyValue instanceof Integer || propertyValue instanceof Short || propertyValue instanceof Byte)) {
                     throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not assignable to '" + metadata.getType() + "'");
+                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
+                            + "' which not assignable to '" + metadata.getType() + "'");
                 }
             }
 
@@ -132,33 +138,35 @@ class MetadataUtil {
                 Arrays.sort(validValues);
                 if (Arrays.binarySearch(validValues, value) < 0) {
                     throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " with the value '" + value +
-                                    "' is not among the allowed values '" + arrayToString(validValues) + "'");
+                            "The property: '" + propertyName + "'=" + propertyValue + " with the value '" + value
+                            + "' is not among the allowed values '" + arrayToString(validValues) + "'");
                 }
             }
         }
     }
 
     /**
-     * Checks that the specified value is within the range specified in the metadata.
+     * Checks that the specified value is within the range specified in the
+     * metadata.
      *
      * @param metadata
      * @param propertyName
      * @param propertyValue
      * @param valueToBeChecked
-     * @throws GenericDeviceError thrown if value does not adhere to the metadata
+     * @throws GenericDeviceError thrown if value does not adhere to the
+     * metadata
      */
     private static void checkRange(GenericDevicePropertyMetadata metadata, String propertyName, Object propertyValue, double valueToBeChecked) throws GenericDeviceError {
         if (valueToBeChecked > metadata.getMaxValue().doubleValue()) {
             throw new GenericDeviceError(
-                    "The property: '" + propertyName + "'=" + propertyValue +
-                            " is above the max value '" + metadata.getMaxValue() + "'");
+                    "The property: '" + propertyName + "'=" + propertyValue
+                    + " is above the max value '" + metadata.getMaxValue() + "'");
         }
 
         if (valueToBeChecked < metadata.getMinValue().doubleValue()) {
             throw new GenericDeviceError(
-                    "The property: '" + propertyName + "'=" + propertyValue +
-                            " is below the min value '" + metadata.getMinValue() + "'");
+                    "The property: '" + propertyName + "'=" + propertyValue
+                    + " is below the min value '" + metadata.getMinValue() + "'");
         }
     }
 
@@ -201,7 +209,7 @@ class MetadataUtil {
             if (metadata.size() > 0) {
                 StringBuffer sb = new StringBuffer();
                 sb.append('"').append(name).append("\": {");
-                for (Iterator iterator = metadata.iterator(); iterator.hasNext(); ) {
+                for (Iterator iterator = metadata.iterator(); iterator.hasNext();) {
                     GenericDevicePropertyMetadata md = (GenericDevicePropertyMetadata) iterator.next();
                     if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
                         sb.append('"').append(md.getName()).append("\":").append(md.getSerializedNode(path.substring(path.indexOf(Constants.PATH_DELIMITER)), format));

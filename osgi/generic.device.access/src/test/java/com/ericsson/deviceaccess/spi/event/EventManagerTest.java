@@ -133,7 +133,7 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("dev", "srv", new Properties() {{
+        eventManager.addEvent("dev", "srv", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_ONLINE, true);
         }});
 
@@ -164,19 +164,19 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", 100);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave32", "srv", new Properties() {{
+        eventManager.addEvent("zwave32", "srv", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("temp", 101);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("temp", 29);
         }});
 
@@ -207,16 +207,16 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv1", new Properties() {{
+        eventManager.addEvent("zwave31", "srv1", new Properties() {{
             put("power", 100);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave32", "srv2", new Properties() {{
+        eventManager.addEvent("zwave32", "srv2", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv1", new Properties() {{
+        eventManager.addEvent("zwave31", "srv1", new Properties() {{
             put("temp", 101);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave32", "srv2", new Properties() {{
+        eventManager.addEvent("zwave32", "srv2", new Properties() {{
             put("temp", 29);
         }});
 
@@ -247,19 +247,19 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", 100);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave32", "srv", new Properties() {{
+        eventManager.addEvent("zwave32", "srv", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave33", "srv5", new Properties() {{
+        eventManager.addEvent("zwave33", "srv5", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave34", "srv", new Properties() {{
+        eventManager.addEvent("zwave34", "srv", new Properties() {{
             put("temp", 101);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave35", "srv", new Properties() {{
+        eventManager.addEvent("zwave35", "srv", new Properties() {{
             put("temp", 29);
         }});
 
@@ -287,20 +287,20 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", 100);
         }});
         
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv2", new Properties() {{
+        eventManager.addEvent("zwave31", "srv2", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave33", "srv5", new Properties() {{
+        eventManager.addEvent("zwave33", "srv5", new Properties() {{
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave34", "srv", new Properties() {{
+        eventManager.addEvent("zwave34", "srv", new Properties() {{
             put("temp", 101);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave35", "srv", new Properties() {{
+        eventManager.addEvent("zwave35", "srv", new Properties() {{
             put("temp", 29);
         }});
 
@@ -329,15 +329,15 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_ONLINE, true);
             put("power", 100);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave32", "srv2", new Properties() {{
+        eventManager.addEvent("zwave32", "srv2", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_ONLINE, true);
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave33", "srv5", new Properties() {{
+        eventManager.addEvent("zwave33", "srv5", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_ONLINE, false);
             put("temp", 30);
         }});
@@ -367,15 +367,15 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_PROTOCOL, "banan");
             put("power", 100);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave32", "srv2", new Properties() {{
+        eventManager.addEvent("zwave32", "srv2", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_PROTOCOL, "banan");
             put("temp", 30);
         }});
-        eventManager.notifyGenericDeviceEvent("zwave33", "srv5", new Properties() {{
+        eventManager.addEvent("zwave33", "srv5", new Properties() {{
             put(GenericDeviceEventListener.DEVICE_PROTOCOL, "apa");
             put("temp", 30);
         }});
@@ -403,7 +403,7 @@ public class EventManagerTest {
             will(returnValue(listenerFilter));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("temp", 29);
         }});
 
@@ -434,11 +434,11 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", new Float(100.10));
         }});
         
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", new Float(104.34));
         }});
         
@@ -470,11 +470,11 @@ public class EventManagerTest {
             will(shutdown(eventManager));
         }});
 
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", 96);
         }});
         
-        eventManager.notifyGenericDeviceEvent("zwave31", "srv", new Properties() {{
+        eventManager.addEvent("zwave31", "srv", new Properties() {{
             put("power", 100);
         }});
         

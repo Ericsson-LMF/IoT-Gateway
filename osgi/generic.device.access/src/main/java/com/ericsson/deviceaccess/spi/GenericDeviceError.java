@@ -32,8 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
-
 package com.ericsson.deviceaccess.spi;
 
 /**
@@ -41,7 +39,7 @@ package com.ericsson.deviceaccess.spi;
  */
 public class GenericDeviceError extends Error {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public GenericDeviceError() {
     }

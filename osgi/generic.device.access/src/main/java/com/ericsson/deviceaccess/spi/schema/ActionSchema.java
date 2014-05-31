@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import java.util.ArrayList;
@@ -40,9 +39,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 
+ *
  */
 public class ActionSchema {
+
     private String name;
     private List argumentSchemas = new ArrayList();
     private List resultSchemas = new ArrayList();
@@ -50,7 +50,7 @@ public class ActionSchema {
 
     /**
      * Creates an instance.
-     * 
+     *
      * @param name
      * @param isMandatory
      */
@@ -61,7 +61,7 @@ public class ActionSchema {
 
     /**
      * Returns the name of the action.
-     * 
+     *
      * @return the name of the action
      */
     public String getName() {
@@ -70,7 +70,7 @@ public class ActionSchema {
 
     /**
      * Gets the schemas of the arguments of this action.
-     * 
+     *
      * @return the arguments of this action
      */
     public ParameterSchema[] getArgumentsSchemas() {
@@ -79,7 +79,7 @@ public class ActionSchema {
 
     /**
      * Gets the schemas of the arguments of this action.
-     * 
+     *
      * @return the arguments of this action
      */
     public ParameterSchema[] getResultSchema() {
@@ -88,17 +88,18 @@ public class ActionSchema {
 
     /**
      * Indicates that this action must be implemented.
-     * 
+     *
      * @return
      */
     public boolean isMandatory() {
         return isMandatory;
     }
-    
+
     /**
      * Builder for building action schemas.
      */
     public static class Builder {
+
         private String name;
         private List argumentSchemas = new ArrayList();
         private List resultSchemas = new ArrayList();
@@ -106,6 +107,7 @@ public class ActionSchema {
 
         /**
          * Create builder for action with the specified name.
+         *
          * @param actionName
          */
         public Builder(String actionName) {
@@ -115,6 +117,7 @@ public class ActionSchema {
 
         /**
          * Specify that the action is mandatory.
+         *
          * @param mandatory
          * @return the builder
          */
@@ -122,10 +125,10 @@ public class ActionSchema {
             isMandatory = mandatory;
             return this;
         }
-        
+
         /**
          * Adds an argument to the action schema.
-         * 
+         *
          * @param ParameterSchema
          * @return the builder
          */
@@ -136,7 +139,7 @@ public class ActionSchema {
 
         /**
          * Adds a result to the action schema.
-         * 
+         *
          * @param ParameterSchema
          * @return the builder
          */
@@ -147,6 +150,7 @@ public class ActionSchema {
 
         /**
          * Builds the schema.
+         *
          * @return the build schema.
          */
         public ActionSchema build() {

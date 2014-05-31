@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -47,9 +46,10 @@ import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 
 /**
- * 
+ *
  */
 public class ActionSchemaTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -62,7 +62,7 @@ public class ActionSchemaTest {
         ParameterSchema a2 = context.mock(ParameterSchema.class, "a2");
         ParameterSchema r1 = context.mock(ParameterSchema.class, "r1");
         ParameterSchema r2 = context.mock(ParameterSchema.class, "r2");
-        
+
         ActionSchema actionSchema = new ActionSchema.Builder("act1").
                 setMandatory(true).
                 addArgumentSchema(a1).
@@ -70,8 +70,7 @@ public class ActionSchemaTest {
                 addResultSchema(r1).
                 addResultSchema(r2).
                 build();
-        
-        
+
         assertEquals("act1", actionSchema.getName());
         assertTrue(actionSchema.isMandatory());
         assertArrayEquals(new ParameterSchema[]{a1, a2}, actionSchema.getArgumentsSchemas());

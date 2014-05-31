@@ -30,20 +30,19 @@
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGES. 
+ DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 /**
- * Error thrown when instantiating a service from a schema.  
+ * Error thrown when instantiating a service from a schema.
  */
 public class ServiceSchemaError extends Error {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public ServiceSchemaError() {
+    public ServiceSchemaError() {
     }
 
     public ServiceSchemaError(String message, Throwable cause) {

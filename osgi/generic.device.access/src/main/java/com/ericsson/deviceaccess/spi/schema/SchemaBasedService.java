@@ -32,26 +32,27 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import com.ericsson.deviceaccess.spi.GenericDeviceService;
 
-
 /**
- * 
+ *
  */
 public interface SchemaBasedService extends GenericDeviceService {
+
     /**
      * Add action implementation to the service.
+     *
      * @param name action name
      * @param actionDefinition the action implementation
      * @return the service
      */
     SchemaBasedService defineAction(String name, ActionDefinition actionDefinition);
-    
+
     /**
      * Defines a custom action that is not included in the service schema.
+     *
      * @param actionSchema
      * @param actionDefinition
      * @return
@@ -60,7 +61,7 @@ public interface SchemaBasedService extends GenericDeviceService {
 
     /**
      * Verifies that the schema is valid.
-     * 
+     *
      * @throws in case the schema is invalid
      */
     void validateSchema() throws ServiceSchemaError;

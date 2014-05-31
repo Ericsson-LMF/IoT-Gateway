@@ -32,13 +32,13 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 /**
  * Interface of something that shall be possible to serialize.
  */
 public interface Serializable {
+
     public static final int FORMAT_JSON = 0;
     public static final int FORMAT_JSON_WDC = 1;
     public static final int FORMAT_XML = 2;

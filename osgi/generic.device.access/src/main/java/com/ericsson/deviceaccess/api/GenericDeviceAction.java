@@ -32,16 +32,16 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 /**
  * GenericDeviceAction represents an action of a service provided by a device.
- * The action can be executed in a GenericDeviceActionContext specified at the execution time, 
- * or the action can be executed without any action context.
- * 
+ * The action can be executed in a GenericDeviceActionContext specified at the
+ * execution time, or the action can be executed without any action context.
+ *
  */
 public interface GenericDeviceAction extends GenericDeviceContextNode {
+
     /**
      * Placeholder for Android to replace with the stub implementation for this
      * interface
@@ -66,8 +66,7 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      * propagating action result to the invoker.
      *
      * @param sac An instance of GenericDeviceActionContext which cannot be
-     *            null. The object is used for propagting action result or error
-     *            message.
+     * null. The object is used for propagting action result or error message.
      * @throws GenericDeviceException Thrown on failure of the action.
      * @deprecated use {@link #execute(GenericDeviceProperties)} instead.
      */
@@ -90,7 +89,7 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      * action.
      *
      * @return a fresh properties pre-populated with default values according to
-     *         the schema.
+     * the schema.
      */
     public GenericDeviceProperties createArguments();
 
@@ -98,7 +97,8 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      * Creates a context to be used in an invocation of this action.
      *
      * @return a fresh context
-     * @deprecated use {@link #execute(GenericDeviceProperties)} instead, then no context is needed.
+     * @deprecated use {@link #execute(GenericDeviceProperties)} instead, then
+     * no context is needed.
      */
     public GenericDeviceActionContext createActionContext();
 

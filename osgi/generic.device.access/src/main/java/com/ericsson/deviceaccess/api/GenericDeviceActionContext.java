@@ -32,15 +32,16 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 /**
  * The context for an action invocation.
  */
 public interface GenericDeviceActionContext extends Serializable {
+
     /**
-     * Placeholder for Android to replace with the stub implementation for this interface
+     * Placeholder for Android to replace with the stub implementation for this
+     * interface
      *
      * @author knt
      */

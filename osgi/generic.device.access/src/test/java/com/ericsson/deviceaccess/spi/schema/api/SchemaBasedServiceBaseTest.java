@@ -258,7 +258,7 @@ public class SchemaBasedServiceBaseTest {
         ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
-                allowing(eventManager).notifyGenericDeviceEvent(with(any(String.class)), with(any(String.class)), with(any(Dictionary.class)));
+                allowing(eventManager).addEvent(with(any(String.class)), with(any(String.class)), with(any(Dictionary.class)));
             }
         });
 

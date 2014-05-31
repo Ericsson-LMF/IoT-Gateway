@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.*;
@@ -43,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements GenericDeviceAction {
+
     private static MetadataUtil metadataUtil = MetadataUtil.getInstance();
     private String path;
     protected String name;
@@ -53,8 +53,10 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      * Creates action with metadata for arguments and result.
      *
      * @param name
-     * @param argumentsMetadata a Map name:String -> metadata:{@link GenericDevicePropertyMetadata}
-     * @param resultMetadata    a Map name:String -> metadata:{@link GenericDevicePropertyMetadata}
+     * @param argumentsMetadata a Map name:String ->
+     * metadata:{@link GenericDevicePropertyMetadata}
+     * @param resultMetadata a Map name:String ->
+     * metadata:{@link GenericDevicePropertyMetadata}
      */
     protected GenericDeviceActionImpl(String name, GenericDevicePropertyMetadata[] argumentsMetadata, GenericDevicePropertyMetadata[] resultMetadata) {
         this.name = name;
@@ -89,7 +91,7 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      */
     public void execute(GenericDeviceActionContext sac)
             throws GenericDeviceException {
-    	GenericDeviceAccessSecurity.checkExecutePermission(getClass().getName());
+        GenericDeviceAccessSecurity.checkExecutePermission(getClass().getName());
     }
 
     /**
@@ -97,40 +99,45 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      */
     public final GenericDeviceActionResult execute(GenericDeviceProperties arguments)
             throws GenericDeviceException {
-    	GenericDeviceAccessSecurity.checkExecutePermission(getClass().getName());
-    	
+        GenericDeviceAccessSecurity.checkExecutePermission(getClass().getName());
+
         GenericDeviceActionContextImpl context = new GenericDeviceActionContextImpl(getVerifiedArguments(arguments), createResult());
         execute(context);
         return context.getResult();
     }
 
     private GenericDeviceProperties getVerifiedArguments(
-			GenericDeviceProperties input) {
-    	
-    	GenericDeviceProperties output = createArguments();
-    	if(input == null) return output;
-    	
-    	String keys[] = output.getNames();
-    	for (int i = 0; i < keys.length; i++){
-    		if(! input.hasProperty(keys[i])) continue;
-    		
-    		Object value = input.getValue(keys[i]);
-    		if (value instanceof String)
-    			output.setStringValue(keys[i], (String)value);
-    		else if (value instanceof Integer)
-    			output.setIntValue(keys[i], ((Integer)value).intValue());
-    		else if (value instanceof Float)
-    			output.setFloatValue(keys[i], ((Float)value).floatValue());
-    		else if (value instanceof Long)
-    			output.setLongValue(keys[i], ((Long)value).longValue());
-    	}
-    	
-    	metadataUtil.verifyPropertiesAgainstMetadata(output, argumentsMetadata);
-        
-		return output;
-	}
+            GenericDeviceProperties input) {
 
-	/**
+        GenericDeviceProperties output = createArguments();
+        if (input == null) {
+            return output;
+        }
+
+        String keys[] = output.getNames();
+        for (int i = 0; i < keys.length; i++) {
+            if (!input.hasProperty(keys[i])) {
+                continue;
+            }
+
+            Object value = input.getValue(keys[i]);
+            if (value instanceof String) {
+                output.setStringValue(keys[i], (String) value);
+            } else if (value instanceof Integer) {
+                output.setIntValue(keys[i], ((Integer) value).intValue());
+            } else if (value instanceof Float) {
+                output.setFloatValue(keys[i], ((Float) value).floatValue());
+            } else if (value instanceof Long) {
+                output.setLongValue(keys[i], ((Long) value).longValue());
+            }
+        }
+
+        metadataUtil.verifyPropertiesAgainstMetadata(output, argumentsMetadata);
+
+        return output;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public GenericDevicePropertyMetadata[] getResultMetadata() {
@@ -171,7 +178,6 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
         return new GenericDeviceActionContextImpl(createArguments(), createResult());
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -186,7 +192,6 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         return path + "/action/" + this.getName();
     }
-
 
     /**
      * {@inheritDoc}
@@ -215,8 +220,9 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
     public String getSerializedNode(String path, int format)
             throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-        if (path == null)
+        if (path == null) {
             throw new GenericDeviceException(405, "Path cannot be null");
+        }
 
         if (path.length() == 0) {
             return serialize(format);

@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
@@ -50,6 +49,7 @@ import static org.junit.Assert.*;
  *
  */
 public class SchemaBasedGenericDeviceTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);

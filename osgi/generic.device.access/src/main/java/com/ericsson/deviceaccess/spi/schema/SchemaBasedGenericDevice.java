@@ -30,10 +30,9 @@
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGES. 
+ DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
 import java.util.HashMap;
@@ -46,13 +45,14 @@ import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
  * Base class for devices implemented in adaptors.
  */
 public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
+
     protected SchemaBasedGenericDevice() {
         addSchemaBasedService(new DeviceManagementService());
     }
 
     /**
      * Adds a schema based service to this device.
-     * 
+     *
      * @param service
      */
     protected void addSchemaBasedService(SchemaBasedService service) {
@@ -60,13 +60,11 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
         if (getService(name) != null) {
             throw new ServiceSchemaError("Service: '" + name + "' is already defined on the device: '" + getName() + "'(id=" + getId() + ")");
         }
-        
+
         service.validateSchema();
         super.putService(name, service);
     }
-    
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -79,9 +77,9 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
      */
     public void putService(String name, GenericDeviceService svc) {
         if (!(svc instanceof SchemaBasedService)) {
-            throw new ServiceSchemaError("Trying to add a service '" + name + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a "+SchemaBasedService.class);
+            throw new ServiceSchemaError("Trying to add a service '" + name + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SchemaBasedService.class);
         }
-        addSchemaBasedService((SchemaBasedService)svc);
+        addSchemaBasedService((SchemaBasedService) svc);
     }
 
     /**
@@ -90,15 +88,13 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
     public void setService(HashMap services) {
         for (Iterator iterator = services.values().iterator(); iterator.hasNext();) {
             GenericDeviceService service = (GenericDeviceService) iterator.next();
-            putService(service); 
-        } 
+            putService(service);
+        }
     }
-
-
 
     /**
      * Creates a custom service.
-     * 
+     *
      * @param schema the service schema
      * @return the service
      */

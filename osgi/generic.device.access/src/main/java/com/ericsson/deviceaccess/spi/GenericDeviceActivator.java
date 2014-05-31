@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi;
 
 import com.ericsson.deviceaccess.spi.event.EventManager;
@@ -48,28 +47,25 @@ import org.osgi.framework.FrameworkUtil;
  */
 public class GenericDeviceActivator implements BundleActivator {
 
-	private static EventManager eventManager;
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(GenericDeviceActivator.class);
-		eventManager = new EventManager();
-	}
+    private static EventManager eventManager = new EventManager();
 
-	{
-		Bundle bundle = FrameworkUtil.getBundle(GenericDeviceActivator.class);
-		OSGILogFactory.initOSGI(bundle != null ? bundle.getBundleContext()
-				: null);
-	}
+    static {
+        Bundle bundle = FrameworkUtil.getBundle(GenericDeviceActivator.class);
+        OSGILogFactory.initOSGI(bundle != null ? bundle.getBundleContext() : null);
+    }
 
-	public void start(BundleContext context) throws Exception {
-		eventManager.setContext(context);
-		eventManager.start();
-	}
+    @Override
+    public void start(BundleContext context) throws Exception {
+        eventManager.setContext(context);
+        eventManager.start();
+    }
 
-	public void stop(BundleContext context) throws Exception {
-		eventManager.shutdown();
-	}
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        eventManager.shutdown();
+    }
 
-	public static EventManager getEventManager() {
-		return eventManager;
-	}
+    public static EventManager getEventManager() {
+        return eventManager;
+    }
 }

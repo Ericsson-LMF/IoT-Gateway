@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
@@ -47,12 +46,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * GenericDevicePropertiesImpl Tester.
  *
  */
 public class GenericDevicePropertiesImplTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -67,22 +66,24 @@ public class GenericDevicePropertiesImplTest {
         metadataFloat = context.mock(GenericDevicePropertyMetadata.class, "metadataFloat");
         metadataArr = new GenericDevicePropertyMetadata[]{metadataFloat};
 
-        context.checking(new Expectations() {{
-            allowing(metadataFloat).getDefaultNumberValue();
-            will(returnValue(42.0f));
-            allowing(metadataFloat).getDefaultStringValue();
-            will(returnValue("42.0"));
-            allowing(metadataFloat).getName();
-            will(returnValue("fProp"));
-            allowing(metadataFloat).getType();
-            will(returnValue(Float.class));
-            allowing(metadataFloat).getMinValue();
-            will(returnValue(Float.NEGATIVE_INFINITY));
-            allowing(metadataFloat).getMaxValue();
-            will(returnValue(Float.POSITIVE_INFINITY));
-            allowing(metadataFloat).serialize(GenericDevice.FORMAT_JSON);
-            will(returnValue("{\"type\":\"float\"}"));
-        }});
+        context.checking(new Expectations() {
+            {
+                allowing(metadataFloat).getDefaultNumberValue();
+                will(returnValue(42.0f));
+                allowing(metadataFloat).getDefaultStringValue();
+                will(returnValue("42.0"));
+                allowing(metadataFloat).getName();
+                will(returnValue("fProp"));
+                allowing(metadataFloat).getType();
+                will(returnValue(Float.class));
+                allowing(metadataFloat).getMinValue();
+                will(returnValue(Float.NEGATIVE_INFINITY));
+                allowing(metadataFloat).getMaxValue();
+                will(returnValue(Float.POSITIVE_INFINITY));
+                allowing(metadataFloat).serialize(GenericDevice.FORMAT_JSON);
+                will(returnValue("{\"type\":\"float\"}"));
+            }
+        });
 
         props = new GenericDevicePropertiesImpl(metadataArr, null);
     }
@@ -93,8 +94,10 @@ public class GenericDevicePropertiesImplTest {
 
     @Test
     public void testSerialize() throws GenericDeviceException {
-        context.checking(new Expectations() {{
-        }});
+        context.checking(new Expectations() {
+            {
+            }
+        });
         String json = props.serialize(GenericDevice.FORMAT_JSON);
         System.out.println(json);
 

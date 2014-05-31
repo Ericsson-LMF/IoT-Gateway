@@ -32,15 +32,12 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
-
 /**
- * This interface is intended to be used when using
- * GDA on non-OSGi platform, e.g. Android.
- * It mimics OSGi service tracker interface without
- * dependency to OSGi specific API.
+ * This interface is intended to be used when using GDA on non-OSGi platform,
+ * e.g. Android. It mimics OSGi service tracker interface without dependency to
+ * OSGi specific API.
  *
  * @author ekenyas
  */
@@ -50,7 +47,8 @@ public interface GenericDeviceFrameworkListener {
      * Invoked when a new device is discovered.
      *
      * @param dev a newly discovered device.
-     * @return true if the listener wants to be posted on the events occured on the device, e.g. update, unregister.
+     * @return true if the listener wants to be posted on the events occured on
+     * the device, e.g. update, unregister.
      * @throws GenericDeviceFrameworkException
      *
      */
@@ -59,8 +57,9 @@ public interface GenericDeviceFrameworkListener {
     /**
      * Invoked when a parameter update occurs on the device.
      *
-     * @param dev          the concerned device.
-     * @param updatedPaths comma-separated list of paths that the event concerns.
+     * @param dev the concerned device.
+     * @param updatedPaths comma-separated list of paths that the event
+     * concerns.
      * @throws GenericDeviceFrameworkException
      *
      */

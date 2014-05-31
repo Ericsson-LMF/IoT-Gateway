@@ -32,29 +32,24 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess;
 
 import java.util.*;
 
 /**
- * Test to implement support for. Sending a request and filling in the result in a provided object.
- * write something like
+ * Test to implement support for. Sending a request and filling in the result in
+ * a provided object. write something like
  * <p/>
- * my actor {
- * on request from client:
- * send request request to request.device
- * on response from device
- * send response to client
+ * my actor { on request from client: send request request to request.device on
+ * response from device send response to client
  * <p/>
  * <p/>
- * action context innehåller
- * 1) device:service:action+arguments
- * 2) sender + empty result
+ * action context innehåller 1) device:service:action+arguments 2) sender +
+ * empty result
  * <p/>
- * 1. Hitta device.service.action och anropa executeAsync(ac): släpper direkt
- * 2. Adaptor utför action och fyller i resultat
- * 2. Adaptor anropar AC.reply(), vilken kommer att anropa mekanism given från client att sända resultatet
+ * 1. Hitta device.service.action och anropa executeAsync(ac): släpper direkt 2.
+ * Adaptor utför action och fyller i resultat 2. Adaptor anropar AC.reply(),
+ * vilken kommer att anropa mekanism given från client att sända resultatet
  * <p/>
  * <p/>
  * }
@@ -62,10 +57,12 @@ import java.util.*;
 public class AsyncActions {
 
     interface Device {
+
         Service getService(String serviceName);
     }
 
     interface Service {
+
         Action getAction(String actionName);
     }
 
@@ -74,6 +71,7 @@ public class AsyncActions {
     }
 
     interface Actions {
+
         void setResultRecipient(ResultRecipient recipient);
 
         void aggregateResults(boolean aggregate);
@@ -81,10 +79,12 @@ public class AsyncActions {
         List getActionContexts();
 
         interface ResultRecipient {
+
             void onCompleted(List<? extends ActionContext> completedActions);
         }
 
         class SerializationSupport {
+
             public static Actions deserialize(String data) {
                 return new TestActions();
             }
@@ -92,6 +92,7 @@ public class AsyncActions {
     }
 
     interface ActionContext {
+
         void sendResult(); // does recipient.accept(this);
 
         Result getResult();
@@ -109,12 +110,14 @@ public class AsyncActions {
         void setFailure(Throwable e);
 
         interface ResultRecipient {
+
             void onCompleted(ActionContext ctx);
         }
 
     }
 
     interface Action {
+
         void executeAsyncWith(ActionContext ctx);
         // put ctx into jobQueue
         // notify exec thread
@@ -135,7 +138,7 @@ public class AsyncActions {
 
         public void setResultRecipient(ResultRecipient recipient) {
             this.recipient = recipient;
-            for (Iterator iterator = contexts.iterator(); iterator.hasNext(); ) {
+            for (Iterator iterator = contexts.iterator(); iterator.hasNext();) {
                 ActionContext actionContext = (ActionContext) iterator.next();
                 actionContext.setResultRecipient(this);
             }
@@ -227,63 +230,65 @@ public class AsyncActions {
         }
     }
 
-
     static class Executor {
-        Map<String, Device> devices = new HashMap<String, Device>() {{
-            put("d2", new Device() {
-                final List<Runnable> jobs = new ArrayList<Runnable>();
-                final Thread runner = new Thread() {
-                    public void run() {
-                        while (true) {
-                            ArrayList<Runnable> tmpJobs = new ArrayList<Runnable>();
-                            synchronized (jobs) {
-                                try {
-                                    jobs.wait();
-                                } catch (InterruptedException e) {
-                                    continue;
-                                }
-                                tmpJobs.addAll(jobs);
-                                jobs.clear();
-                            }
 
-                            for (Runnable job : tmpJobs) {
-                                job.run();
-                            }
-                        }
-                    }
-                };
-
-                {
-                    runner.start();
-                }
-
-                public Service getService(String serviceName) {
-                    return new Service() {
-                        public Action getAction(String actionName) {
-                            return new Action() {
-                                public void executeAsyncWith(final ActionContext ctx) {
-                                    synchronized (jobs) {
-                                        jobs.add(new Runnable() {
-                                            public void run() {
-                                                System.out.println("Starting job on " + ctx);
-                                                try {
-                                                    Thread.sleep(10000);
-                                                } catch (InterruptedException e) {
-                                                    // ignore
-                                                }
-                                                System.out.println("Completed job on " + ctx);
-                                                ctx.sendResult();
-                                            }
-                                        });
-                                        jobs.notifyAll();
+        Map<String, Device> devices = new HashMap<String, Device>() {
+            {
+                put("d2", new Device() {
+                    final List<Runnable> jobs = new ArrayList<Runnable>();
+                    final Thread runner = new Thread() {
+                        public void run() {
+                            while (true) {
+                                ArrayList<Runnable> tmpJobs = new ArrayList<Runnable>();
+                                synchronized (jobs) {
+                                    try {
+                                        jobs.wait();
+                                    } catch (InterruptedException e) {
+                                        continue;
                                     }
+                                    tmpJobs.addAll(jobs);
+                                    jobs.clear();
                                 }
-                            };
+
+                                for (Runnable job : tmpJobs) {
+                                    job.run();
+                                }
+                            }
                         }
                     };
-                }
-            });
-        }};
+
+                    {
+                        runner.start();
+                    }
+
+                    public Service getService(String serviceName) {
+                        return new Service() {
+                            public Action getAction(String actionName) {
+                                return new Action() {
+                                    public void executeAsyncWith(final ActionContext ctx) {
+                                        synchronized (jobs) {
+                                            jobs.add(new Runnable() {
+                                                public void run() {
+                                                    System.out.println("Starting job on " + ctx);
+                                                    try {
+                                                        Thread.sleep(10000);
+                                                    } catch (InterruptedException e) {
+                                                        // ignore
+                                                    }
+                                                    System.out.println("Completed job on " + ctx);
+                                                    ctx.sendResult();
+                                                }
+                                            });
+                                            jobs.notifyAll();
+                                        }
+                                    }
+                                };
+                            }
+                        };
+                    }
+                });
+            }
+        };
         private static final Device DEFAULT_DEVICE = new Device() {
             public Service getService(String serviceName) {
                 return DEFAULT_SERVICE;
@@ -298,9 +303,10 @@ public class AsyncActions {
             private int seq;
 
             /**
-             * This method must be implemented by the adaptor. Either it
-             * - executes several actions in parallel (e.g. UPnP), or
-             * - sends them to queue for execution one at the time (e.g Z-wave)
+             * This method must be implemented by the adaptor. Either it -
+             * executes several actions in parallel (e.g. UPnP), or - sends them
+             * to queue for execution one at the time (e.g Z-wave)
+             *
              * @param ctx
              */
             public void executeAsyncWith(final ActionContext ctx) {
@@ -319,7 +325,7 @@ public class AsyncActions {
         };
 
         public void execute(Actions actions) {
-            for (Iterator iterator = actions.getActionContexts().iterator(); iterator.hasNext(); ) {
+            for (Iterator iterator = actions.getActionContexts().iterator(); iterator.hasNext();) {
                 final ActionContext actionContext = (ActionContext) iterator.next();
                 final Action action = getDevice(actionContext.getDeviceId()).
                         getService(actionContext.getServiceName()).
@@ -337,6 +343,7 @@ public class AsyncActions {
     }
 
     static class WarpConnection implements Actions.ResultRecipient {
+
         Executor executor = new Executor();
         private boolean aggr;
 

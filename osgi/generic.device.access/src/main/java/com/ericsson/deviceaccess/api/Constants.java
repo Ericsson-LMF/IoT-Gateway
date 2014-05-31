@@ -32,10 +32,15 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
-public class Constants {
+public enum Constants {
+
+    /**
+     * Singleton
+     */
+    INSTANCE;
+
     public static final String UPDATED_PATH = "updated.path";
     public static final String PARAM_DEVICE_ID = "device.id";
     public static final String PARAM_DEVICE_URN = "device.urn";

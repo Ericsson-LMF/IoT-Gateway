@@ -32,19 +32,19 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.api;
 
 /**
  * Metadata about a property.
  */
 public interface GenericDevicePropertyMetadata extends GenericDeviceContextNode {
-	static final String NAME = "name";
-	static final String TYPE = "type";
-	static final String MIN_VALUE = "minValue";
-	static final String MAX_VALUE = "maxValue";
-	static final String DEFAULT_VALUE = "defaultValue";
-	
+
+    static final String NAME = "name";
+    static final String TYPE = "type";
+    static final String MIN_VALUE = "minValue";
+    static final String MAX_VALUE = "maxValue";
+    static final String DEFAULT_VALUE = "defaultValue";
+
     /**
      * Gets the name of the property.
      *
@@ -72,7 +72,7 @@ public interface GenericDevicePropertyMetadata extends GenericDeviceContextNode 
      * Use when it describes a string property.
      *
      * @return default value for this property when it describes a string
-     *         property
+     * property
      */
     String getDefaultStringValue();
 
@@ -82,7 +82,7 @@ public interface GenericDevicePropertyMetadata extends GenericDeviceContextNode 
      * Use when it describes a string property.
      *
      * @return the valid values for the associated property, or null if all
-     *         values are OK
+     * values are OK
      */
     String[] getValidValues();
 
@@ -92,7 +92,7 @@ public interface GenericDevicePropertyMetadata extends GenericDeviceContextNode 
      * Use when it describes a number property.
      *
      * @return default value for this property when it describes a string
-     *         property
+     * property
      */
     Number getDefaultNumberValue();
 

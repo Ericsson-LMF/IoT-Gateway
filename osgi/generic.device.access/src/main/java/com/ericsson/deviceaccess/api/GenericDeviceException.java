@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.api;
 
-
 public class GenericDeviceException extends Exception {
 
     /**
@@ -56,12 +55,12 @@ public class GenericDeviceException extends Exception {
     public GenericDeviceException(String msg, Exception e) {
         this(500, msg, e);
     }
-    
+
     public GenericDeviceException(String msg) {
         this(500, msg);
     }
 
     public int getCode() {
-    	return code;
+        return code;
     }
 }

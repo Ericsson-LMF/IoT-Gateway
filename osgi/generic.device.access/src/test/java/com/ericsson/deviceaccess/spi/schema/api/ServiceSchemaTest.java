@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -47,15 +46,15 @@ import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 
 /**
- * 
+ *
  */
 public class ServiceSchemaTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
     };
-
 
     @Test
     public void test() {
@@ -70,7 +69,7 @@ public class ServiceSchemaTest {
                 addPropertySchema(property1).
                 addPropertySchema(property2).
                 build();
-        
+
         assertArrayEquals(new ActionSchema[]{action1, action2}, serviceSchema.getActionSchemas());
         assertArrayEquals(new ParameterSchema[]{property1, property2}, serviceSchema.getPropertiesSchemas());
         assertEquals("service", serviceSchema.getName());

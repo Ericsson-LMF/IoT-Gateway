@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
@@ -56,12 +55,12 @@ import java.util.Properties;
 
 import static junit.framework.Assert.fail;
 
-
 /**
  * GenericDeviceImpl Tester.
  *
  */
 public class GenericDeviceImplTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -79,11 +78,14 @@ public class GenericDeviceImplTest {
         device = new GenericDeviceImpl() {
         };
 
-        context.checking(new Expectations(){{
-            allowing(dummyService).getName();will(returnValue("serv"));
-            allowing(dummyService).updatePath(with(any(String.class)));
-            allowing(dummyService).setParentDevice(device);
-        }});
+        context.checking(new Expectations() {
+            {
+                allowing(dummyService).getName();
+                will(returnValue("serv"));
+                allowing(dummyService).updatePath(with(any(String.class)));
+                allowing(dummyService).setParentDevice(device);
+            }
+        });
 
         device.setId("devId");
         device.setURN("devUrn");
@@ -101,15 +103,21 @@ public class GenericDeviceImplTest {
     @Test
     public void testEvents() {
 
-        context.checking(new Expectations(){{
-            oneOf(eventManager).notifyGenericDeviceEvent("devId", "DeviceProperties", new Properties(){{
-                put(GenericDeviceEventListener.DEVICE_ONLINE, true);
-            }});
+        context.checking(new Expectations() {
+            {
+                oneOf(eventManager).addEvent("devId", "DeviceProperties", new Properties() {
+                    {
+                        put(GenericDeviceEventListener.DEVICE_ONLINE, true);
+                    }
+                });
 
-            oneOf(eventManager).notifyGenericDeviceEvent("devId", "DeviceProperties", new Properties(){{
-                put(GenericDeviceEventListener.DEVICE_NAME, "banan");
-            }});
-        }});
+                oneOf(eventManager).addEvent("devId", "DeviceProperties", new Properties() {
+                    {
+                        put(GenericDeviceEventListener.DEVICE_NAME, "banan");
+                    }
+                });
+            }
+        });
 
         device.setOnline(true);
         device.setOnline(true);
@@ -121,9 +129,12 @@ public class GenericDeviceImplTest {
 
     @Test
     public void testSerialize() throws GenericDeviceException, JSONException {
-        context.checking(new Expectations(){{
-            oneOf(dummyService).serialize(GenericDevice.FORMAT_JSON);will(returnValue("{\"name\":\"serv\"}"));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(dummyService).serialize(GenericDevice.FORMAT_JSON);
+                will(returnValue("{\"name\":\"serv\"}"));
+            }
+        });
 
         String json = device.serialize(GenericDevice.FORMAT_JSON);
 
@@ -138,9 +149,12 @@ public class GenericDeviceImplTest {
 
     @Test
     public void testSerializeState() throws GenericDeviceException {
-        context.checking(new Expectations(){{
-            oneOf(dummyService).serializeState();will(returnValue("{\"name\":\"serv\"}"));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(dummyService).serializeState();
+                will(returnValue("{\"name\":\"serv\"}"));
+            }
+        });
 
         String json = device.serializeState();
         System.out.println(json);

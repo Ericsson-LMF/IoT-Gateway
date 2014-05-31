@@ -32,7 +32,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.spi;
 
 import com.ericsson.deviceaccess.api.GenericDeviceService;
@@ -41,24 +40,26 @@ import com.ericsson.deviceaccess.api.GenericDeviceService;
  * This is the interface of a generic device to be used by service providers.
  */
 public interface GenericDevice extends com.ericsson.deviceaccess.api.GenericDevice {
-	public static final String ID = "id";
-	public static final String URN = "urn";
-	public static final String NAME = "name";
-	public static final String TYPE = "type";
-	public static final String PROTOCOL = "protocol";
-	public static final String LOCATION = "location";
-	public static final String ONLINE = "online";
-	public static final String ICON = "icon";
-	public static final String PATH = "path";
-	public static final String CONTACT = "contact";
-	public static final String MANUFACTURER = "manufacturer";
-	public static final String MODEL_NAME = "modelName";
-	public static final String DESCRIPTION = "description";
-	public static final String SERIAL_NUMBER = "serialNumber";
-	public static final String PRODUCT_CLASS = "productClass";
+
+    public static final String ID = "id";
+    public static final String URN = "urn";
+    public static final String NAME = "name";
+    public static final String TYPE = "type";
+    public static final String PROTOCOL = "protocol";
+    public static final String LOCATION = "location";
+    public static final String ONLINE = "online";
+    public static final String ICON = "icon";
+    public static final String PATH = "path";
+    public static final String CONTACT = "contact";
+    public static final String MANUFACTURER = "manufacturer";
+    public static final String MODEL_NAME = "modelName";
+    public static final String DESCRIPTION = "description";
+    public static final String SERIAL_NUMBER = "serialNumber";
+    public static final String PRODUCT_CLASS = "productClass";
 
     /**
-     * Method to put an instance that implements GenericDeviceService into the device object.
+     * Method to put an instance that implements GenericDeviceService into the
+     * device object.
      *
      * @param svc An instance that implements the service to be put.
      */
@@ -76,6 +77,7 @@ public interface GenericDevice extends com.ericsson.deviceaccess.api.GenericDevi
      *
      * @param name Friendly name of the device.
      */
+    @Override
     public void setName(String name);
 
     /**
@@ -86,9 +88,9 @@ public interface GenericDevice extends com.ericsson.deviceaccess.api.GenericDevi
     public void setType(String type);
 
     /**
-     * Setter for the name of protocol used for discovery of the device. The value should be chosen from the
-     * constant properties defined in com.ericsson.deviceaccess.api.Constants that
-     * start with prefix "PROTO_".
+     * Setter for the name of protocol used for discovery of the device. The
+     * value should be chosen from the constant properties defined in
+     * com.ericsson.deviceaccess.api.Constants that start with prefix "PROTO_".
      *
      * @param protocol Name of the protocol used for discovery of the device.
      */
@@ -110,8 +112,9 @@ public interface GenericDevice extends com.ericsson.deviceaccess.api.GenericDevi
     public void setOnline(boolean online);
 
     /**
-     * Setter for the icon url field. The value should be URL for an icon image of the device
-     * that is available for the clients to fetch, i.e. image file on an HTTP server.
+     * Setter for the icon url field. The value should be URL for an icon image
+     * of the device that is available for the clients to fetch, i.e. image file
+     * on an HTTP server.
      *
      * @param icon URL for an icon image of the device.
      */
@@ -119,9 +122,10 @@ public interface GenericDevice extends com.ericsson.deviceaccess.api.GenericDevi
 
     /**
      * @param contact Contact URL of the device.
-     * @deprecate Setter for contact URL of the device that is used in Web Device Connectivity. This method
-     * should be removed because each application should have its own way of exposing the device and
-     * thus the contact URL of the device depends.
+     * @deprecate Setter for contact URL of the device that is used in Web
+     * Device Connectivity. This method should be removed because each
+     * application should have its own way of exposing the device and thus the
+     * contact URL of the device depends.
      */
     public void setContact(String contact);
 
