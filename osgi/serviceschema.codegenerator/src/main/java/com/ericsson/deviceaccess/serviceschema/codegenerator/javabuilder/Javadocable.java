@@ -4,15 +4,17 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builder
 
 /**
  * This can be Javadoced
+ *
  * @author delma
  */
 public interface Javadocable {
 
     /**
      * Sets Javadoc for this
+     *
      * @param javadoc Javadoc to be set
      * @return this
      */
     Javadocable setJavadoc(Javadoc javadoc);
-    
+
 }

@@ -9,15 +9,16 @@ import com.ericsson.deviceaccess.service.xmlparser.ResultsDocument.Results;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument.Values;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Constructor;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Javadoc;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Method;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Variable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 
 /**
+ * Adds schema definitions to builder
  *
  * @author delma
  */
@@ -33,7 +34,8 @@ public enum DefinitionsAdder {
     private static final String ACTION_SB = "action";
 
     /**
-     * Adds start of SchemaDefinitions to builder 
+     * Adds start of SchemaDefinitions to builder
+     *
      * @param builder
      * @return block where schema definition happens
      */
@@ -63,6 +65,7 @@ public enum DefinitionsAdder {
 
     /**
      * Adds services schema definition
+     *
      * @param code block to add schema definition
      * @param service service which schema definition to add
      */

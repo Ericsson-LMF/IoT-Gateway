@@ -4,16 +4,18 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 
 /**
- * Constant {@link Variable} of {@link JavaClass}
+ * Constant {@link Variable} for {@link JavaClass}.
+ *
  * @author delma
  */
 public class Constant extends Variable {
 
     /**
      * Creates constant with type, name and value
+     *
      * @param type
      * @param name
-     * @param value 
+     * @param value
      */
     public Constant(String type, String name, String value) {
         super(type, name);

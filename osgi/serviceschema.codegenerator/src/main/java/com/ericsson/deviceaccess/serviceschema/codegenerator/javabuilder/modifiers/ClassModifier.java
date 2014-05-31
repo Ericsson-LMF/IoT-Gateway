@@ -1,11 +1,13 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers;
 
 /**
- * Defines type of class
+ * Defines type of
+ * {@link com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass}
  *
  * @author delma
  */
 public enum ClassModifier {
+
     /**
      * Normal class
      */
@@ -23,8 +25,7 @@ public enum ClassModifier {
      */
     SINGLETON,
     /**
-     * Hybrid between class and interface.
-     * Can have normal and abtract methods
+     * Hybrid between class and interface. Can have normal and abtract methods
      */
     ABSTRACT;
 

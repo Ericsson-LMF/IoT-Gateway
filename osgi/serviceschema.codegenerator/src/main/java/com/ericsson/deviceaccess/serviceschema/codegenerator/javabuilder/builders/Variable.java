@@ -1,16 +1,16 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Component;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.EnumSet;
 
 /**
- * Variable of {@link JavaClass}
+ * Builder of Variable for {@link JavaClass}
  *
  * @author delma
  */

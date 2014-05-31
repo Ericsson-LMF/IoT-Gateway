@@ -1,6 +1,7 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
 /**
+ * Helps with strings.
  *
  * @author delma
  */
@@ -10,9 +11,10 @@ public enum StringHelper {
      * Singleton
      */
     INSTANCE;
-    
+
     /**
      * Makes first char of the string to upper case
+     *
      * @param string String to be capitalized
      * @return capitalized string
      */
@@ -24,6 +26,7 @@ public enum StringHelper {
 
     /**
      * Ensures that there is punctuation at end of string
+     *
      * @param string string to ensure punctuation
      * @return ensured string
      */
@@ -36,6 +39,7 @@ public enum StringHelper {
 
     /**
      * gets type from string
+     *
      * @param string string to get type from
      * @return type as string
      */

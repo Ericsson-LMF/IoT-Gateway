@@ -1,10 +1,8 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
 import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlockImpl;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Component;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.EXTENDS;
@@ -16,6 +14,7 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.emptyLine;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.getGenerationWarning;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
@@ -25,11 +24,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Builder for Java Class
+ * Builder of Class
  *
  * @author delma
  */
-public class JavaClass extends CodeBlockImpl implements Component, Modifierable {
+public class JavaClass extends AbstractCodeBlock implements Modifierable {
 
     private final List<JavaClass> innerClasses;
     private final List<String> imports;
@@ -64,6 +63,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Sets the package this class is in
+     *
      * @param packageString package
      * @return this
      */
@@ -74,6 +74,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Adds import for this class
+     *
      * @param importString import
      * @return this
      */
@@ -90,6 +91,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Sets name of this class
+     *
      * @param name name of this class
      * @return this
      */
@@ -100,6 +102,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Adds inner class to this class
+     *
      * @param consumer Consumer with to edit inner clas
      * @return this
      */
@@ -112,6 +115,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Adds method to this class
+     *
      * @param method method to be added
      * @return this
      */
@@ -123,6 +127,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Adds class variable to this class
+     *
      * @param variable class variable
      * @return this
      */
@@ -263,6 +268,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Adds constructor to this class
+     *
      * @param constructor constructor to be added
      * @return this
      */
@@ -279,6 +285,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Sets what type of class this is
+     *
      * @param type type of class
      * @return this
      */
@@ -289,6 +296,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Sets what this class extends
+     *
      * @param type super class
      * @return this
      */
@@ -299,6 +307,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Gets the type of the class
+     *
      * @return this
      */
     public ClassModifier getClassModifier() {
@@ -313,6 +322,7 @@ public class JavaClass extends CodeBlockImpl implements Component, Modifierable 
 
     /**
      * Adds interface that this class implements
+     *
      * @param interfaceString interface to implement
      * @return this
      */

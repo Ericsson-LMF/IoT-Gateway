@@ -1,10 +1,13 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers;
 
 /**
+ * Defines modifiers for
+ * {@link com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable}
  *
  * @author delma
  */
 public enum OptionalModifier {
+
     /**
      * Class dependand instead of instance dependand.
      */
@@ -14,8 +17,7 @@ public enum OptionalModifier {
      */
     TRANSIENT,
     /**
-     * This variable wont be cached.
-     * Allows use of it in multi threaded system
+     * This variable wont be cached. Allows use of it in multi threaded system
      */
     VOLATILE,
     /**
@@ -23,8 +25,7 @@ public enum OptionalModifier {
      */
     FINAL,
     /**
-     * Methods only in abstract classes.
-     * Will be defined by subclass
+     * Methods only in abstract classes. Will be defined by subclass
      */
     ABSTRACT;
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /**
- * Builder for building Javadoc comments
+ * Builder pf Javadoc
  *
  * @author delma
  */
@@ -161,6 +161,7 @@ public final class Javadoc {
 
     /**
      * Adds return tag to Javadox
+     *
      * @param object description
      * @return this
      */

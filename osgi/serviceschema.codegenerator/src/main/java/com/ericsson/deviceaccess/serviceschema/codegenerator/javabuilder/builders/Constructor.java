@@ -1,17 +1,17 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
 import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlockImpl;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Component;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_PATTERN;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_PATTERN;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import java.util.ArrayList;
@@ -20,10 +20,11 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
- * Constructor of {@link JavaClass}
+ * Builder of Constructor for {@link JavaClass}
+ *
  * @author delma
  */
-public class Constructor extends CodeBlockImpl implements Component, Callable{
+public class Constructor extends AbstractCodeBlock implements Callable {
 
     private AccessModifier accessModifier;
     private final List<Param> parameters;
@@ -41,6 +42,7 @@ public class Constructor extends CodeBlockImpl implements Component, Callable{
 
     /**
      * To be called {@link JavaClass} to set it as owner of this
+     *
      * @param owner
      * @return this
      */
@@ -75,7 +77,7 @@ public class Constructor extends CodeBlockImpl implements Component, Callable{
         }
         return owner.getName();
     }
-    
+
     @Override
     public Constructor addParameter(Param parameter) {
         parameters.add(parameter);
@@ -90,6 +92,7 @@ public class Constructor extends CodeBlockImpl implements Component, Callable{
 
     /**
      * Builds Constructor to string with specified indent
+     *
      * @param indent how much indent there is
      * @return builded string
      */

@@ -1,10 +1,13 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers;
 
 /**
- * Defines how can be accessed
+ * Defines ways of accessing for
+ * {@link com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Accessable}.
+ *
  * @author delma
  */
 public enum AccessModifier {
+
     /**
      * Can be accessed from anywhere.
      */
@@ -20,6 +23,7 @@ public enum AccessModifier {
 
     /**
      * Gets string representation of modifier
+     *
      * @return modifier
      */
     public String get() {

@@ -1,18 +1,18 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlockImpl;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Component;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_PATTERN;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_END;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_PATTERN;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
@@ -23,11 +23,11 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
- * Method of {@link JavaClass}
+ * Builder of Method for {@link JavaClass}
  *
  * @author delma
  */
-public class Method extends CodeBlockImpl implements Component, Callable, Modifierable {
+public class Method extends AbstractCodeBlock implements Callable, Modifierable {
 
     private AccessModifier accessModifier;
     private final String name;
@@ -187,6 +187,7 @@ public class Method extends CodeBlockImpl implements Component, Callable, Modifi
 
     /**
      * Adds throws clause
+     *
      * @param exception exception thrown
      * @return this
      */

@@ -1,7 +1,9 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
 /**
- * Parameter for {@link Callable}
+ * Parameter for
+ * {@link com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable}
+ *
  * @author delma
  */
 public class Param {
@@ -12,16 +14,18 @@ public class Param {
 
     /**
      * Creates new parameter with type and name
+     *
      * @param type
-     * @param name 
+     * @param name
      */
     public Param(String type, String name) {
         this.name = name;
         this.type = type;
     }
-    
+
     /**
      * Gets name
+     *
      * @return name
      */
     public String getName() {
@@ -30,6 +34,7 @@ public class Param {
 
     /**
      * Gets type
+     *
      * @return type
      */
     public String getType() {
@@ -38,6 +43,7 @@ public class Param {
 
     /**
      * Sets description
+     *
      * @param description description
      * @return this
      */
@@ -48,6 +54,7 @@ public class Param {
 
     /**
      * Gets description
+     *
      * @return description
      */
     public String getDescription() {

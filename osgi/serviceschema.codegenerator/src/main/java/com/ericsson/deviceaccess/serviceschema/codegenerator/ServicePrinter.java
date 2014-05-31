@@ -45,15 +45,17 @@ import org.apache.xmlbeans.XmlException;
 
 /**
  * Test class for code generation
+ *
  * @author delma
  */
 public class ServicePrinter {
 
     /**
      * Runs schema XML to java generator for test file
+     *
      * @param args
      * @throws XmlException
-     * @throws IOException 
+     * @throws IOException
      */
     public static void main(String[] args) throws XmlException, IOException {
         ServiceSchemaDocument serviceSchemaDocument = ServiceSchemaDocument.Factory.parse(new File("src/test/resources/services-example.xml"));

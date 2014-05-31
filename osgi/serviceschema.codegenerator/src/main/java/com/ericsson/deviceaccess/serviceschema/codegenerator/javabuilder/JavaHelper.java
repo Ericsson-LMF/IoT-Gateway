@@ -3,7 +3,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 import java.util.regex.Pattern;
 
 /**
- * Helper for code generation
+ * Helps with code generation.
  *
  * @author delma
  */

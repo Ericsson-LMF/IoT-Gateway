@@ -3,17 +3,18 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Constant;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Javadoc;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Method;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Variable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 
 /**
+ * Adds interface of service to builder
  *
  * @author delma
  */
@@ -26,6 +27,7 @@ public enum InterfaceAdder {
 
     /**
      * Adds interface to builder.
+     *
      * @param builder builder to add
      * @param version version of schema
      * @param service service which interface to add

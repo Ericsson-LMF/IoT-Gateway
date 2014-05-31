@@ -53,10 +53,11 @@ public class Main {
 
     /**
      * Runs code generation from schema XML to java code
+     *
      * @param serviceSchemaXml xml file to read from
      * @param outputBaseDir java file to write to
      * @throws XmlException
-     * @throws IOException 
+     * @throws IOException
      */
     public void run(File serviceSchemaXml, File outputBaseDir) throws XmlException, IOException {
         System.out.println("Starting code generation from " + serviceSchemaXml + " to " + outputBaseDir);
@@ -123,10 +124,12 @@ public class Main {
     }
 
     /**
-     * Runs the code generation between xml file in first argument and output file in second argument
+     * Runs the code generation between xml file in first argument and output
+     * file in second argument
+     *
      * @param args
      * @throws XmlException
-     * @throws IOException 
+     * @throws IOException
      */
     public static void main(String[] args) throws XmlException, IOException {
         if (args.length < 2) {
