@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -51,6 +51,13 @@ public class Main {
 
     private ServiceSchemaDocument serviceSchemaDocument;
 
+    /**
+     * Runs code generation from schema XML to java code
+     * @param serviceSchemaXml xml file to read from
+     * @param outputBaseDir java file to write to
+     * @throws XmlException
+     * @throws IOException 
+     */
     public void run(File serviceSchemaXml, File outputBaseDir) throws XmlException, IOException {
         System.out.println("Starting code generation from " + serviceSchemaXml + " to " + outputBaseDir);
 
@@ -77,8 +84,8 @@ public class Main {
                 File spiSourceFile = new File(spiPackageDir, capitalize(service.getName() + "Base") + ".java");
                 try (PrintStream spiPrintStream = new PrintStream(spiSourceFile)) {
                     JavaClass implementationBuilder = new JavaClass();
-                    ImplementationAdder.addServiceImplementation(implementationBuilder, version, service);
-                    spiPrintStream.append(implementationBuilder.build(Main.class));
+                    ImplementationAdder.addServiceImplementation(implementationBuilder, service);
+                    spiPrintStream.append(implementationBuilder.build());
 //                    sp.printServiceImpl(spiPrintStream, version, service);
                 }
 
@@ -90,11 +97,11 @@ public class Main {
                 try (PrintStream apiPrintStream = new PrintStream(apiSourceFile)) {
                     JavaClass interfaceBuilder = new JavaClass();
                     InterfaceAdder.addServiceInterface(interfaceBuilder, version, service);
-                    apiPrintStream.append(interfaceBuilder.build(Main.class));
+                    apiPrintStream.append(interfaceBuilder.build());
                 }
                 System.out.printf("Generated API for '%s' to %s\n", service.getName(), apiSourceFile.getAbsolutePath());
             }
-            schemaDefStream.append(builder.build(Main.class));
+            schemaDefStream.append(builder.build());
         }
 
         System.out.println("Code generation completed!");
@@ -115,6 +122,12 @@ public class Main {
         return sb.toString();
     }
 
+    /**
+     * Runs the code generation between xml file in first argument and output file in second argument
+     * @param args
+     * @throws XmlException
+     * @throws IOException 
+     */
     public static void main(String[] args) throws XmlException, IOException {
         if (args.length < 2) {
             System.out.println("The schema file AND the output base directory must be specified");

@@ -1,10 +1,14 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
 import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlockImpl;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Component;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.PARAMETER_PATTERN;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_PATTERN;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
@@ -16,36 +20,47 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
- *
+ * Constructor of {@link JavaClass}
  * @author delma
  */
-public class Constructor extends AbstractCodeBlock {
+public class Constructor extends CodeBlockImpl implements Component, Callable{
 
     private AccessModifier accessModifier;
     private final List<Param> parameters;
     private Javadoc javadoc;
     private JavaClass owner;
 
+    /**
+     * Creates constructor
+     */
     public Constructor() {
         parameters = new ArrayList<>();
         accessModifier = AccessModifier.PUBLIC;
         javadoc = null;
     }
 
-    public Constructor setOwner(JavaClass owner) {
+    /**
+     * To be called {@link JavaClass} to set it as owner of this
+     * @param owner
+     * @return this
+     */
+    protected Constructor setOwner(JavaClass owner) {
         this.owner = owner;
         return this;
     }
 
+    @Override
     public Constructor setAccessModifier(AccessModifier modifier) {
         accessModifier = modifier;
         return this;
     }
 
+    @Override
     public AccessModifier getAccessModifier() {
         return accessModifier;
     }
 
+    @Override
     public String getName() {
         if (owner == null) {
             return "unknown";
@@ -53,41 +68,50 @@ public class Constructor extends AbstractCodeBlock {
         return owner.getName();
     }
 
+    @Override
     public String getType() {
         if (owner == null) {
             return "unknown";
         }
         return owner.getName();
     }
-
-    public Constructor addParameter(String type, String name, String description) {
-        return addParameter(new Param(type, name).setDescription(description));
-    }
-
+    
+    @Override
     public Constructor addParameter(Param parameter) {
         parameters.add(parameter);
         return this;
     }
 
+    @Override
     public Constructor setJavadoc(Javadoc javadoc) {
         this.javadoc = javadoc;
         return this;
     }
 
+    /**
+     * Builds Constructor to string with specified indent
+     * @param indent how much indent there is
+     * @return builded string
+     */
     public String build(int indent) {
         StringBuilder builder = new StringBuilder();
-        //JAVADOC
-        builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
-        //CONSTRUCTOR DECLARATION
-        String access = accessModifier.get();
-        if (owner.getClassModifier() == ClassModifier.SINGLETON || owner.getClassModifier() == ClassModifier.ENUM) {
-            access = AccessModifier.PRIVATE.get();
+        addJavadoc(builder, indent);
+        addConstructorDeclaration(builder, indent);
+        {
+            addCode(builder, indent + 1);
         }
-        indent(builder, indent).append(access).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
-        //CODE
+        addConstructorEnd(builder, indent);
+        return builder.toString();
+    }
+
+    private void addConstructorEnd(StringBuilder builder, int indent) {
+        indent(builder, indent).append(BLOCK_END).append(LINE_END);
+    }
+
+    private void addCode(StringBuilder builder, int indent) throws NumberFormatException {
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);
-            Matcher matcher = PARAMETER_PATTERN.matcher(line);
+            Matcher matcher = REPLACEMENT_PATTERN.matcher(line);
             while (matcher.find()) {
                 int start = matcher.start();
                 int end = matcher.end();
@@ -103,13 +127,24 @@ public class Constructor extends AbstractCodeBlock {
                     stringBuilder.replace(start, end, methodName);
                 }
             }
-            indent(builder, indent + 1).append(stringBuilder).append(LINE_END);
+            indent(builder, indent).append(stringBuilder).append(LINE_END);
         }
-        indent(builder, indent).append(BLOCK_END).append(LINE_END);
-        return builder.toString();
     }
 
-    public Javadoc parameterJavadocs(Javadoc builder) {
+    private void addConstructorDeclaration(StringBuilder builder, int indent) {
+        AccessModifier access = accessModifier;
+        ClassModifier classModifier = owner.getClassModifier();
+        if (classModifier == ClassModifier.SINGLETON || classModifier == ClassModifier.ENUM) {
+            access = AccessModifier.PRIVATE;
+        }
+        indent(builder, indent).append(access.get()).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
+    }
+
+    private void addJavadoc(StringBuilder builder, int indent) {
+        builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
+    }
+
+    private Javadoc parameterJavadocs(Javadoc builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }
@@ -136,8 +171,8 @@ public class Constructor extends AbstractCodeBlock {
     }
 
     @Override
-    public Constructor addBlock(Object object, Consumer<CodeBlock> block) {
-        super.addBlock(object, block);
+    public Constructor addBlock(String code, Consumer<CodeBlock> block) {
+        super.addBlock(code, block);
         return this;
     }
 }

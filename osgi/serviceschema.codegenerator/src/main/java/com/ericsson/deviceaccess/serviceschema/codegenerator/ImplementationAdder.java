@@ -3,10 +3,11 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constructor;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Constructor;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Javadoc;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Method;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
@@ -17,9 +18,17 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
  */
 public enum ImplementationAdder {
 
+    /**
+     * Singleton
+     */
     INSTANCE;
 
-    public static void addServiceImplementation(JavaClass builder, String version, Service service) {
+    /**
+     * Adds implementation to builder.
+     * @param builder builder to add
+     * @param service service which implementation to add
+     */
+    public static void addServiceImplementation(JavaClass builder, Service service) {
         String name = service.getName();
         String category = service.getCategory();
         builder.setPackage("com.ericsson.deviceaccess.spi.service." + category);
@@ -106,8 +115,8 @@ public enum ImplementationAdder {
                     Method method = new Method("void", "set" + StringHelper.capitalize(name) + "ResultOnContext");
                     method.setJavadoc(new Javadoc("Sets the result from the '").append(name).append("' action on the specified context."));
                     method.setAccessModifier(AccessModifier.PRIVATE);
-                    method.addParameter("GenericDeviceActionContext", "context", "action context to set result in");
-                    method.addParameter(StringHelper.capitalize(name) + "Result", "result", "result to set");
+                    method.addParameter(new Param("GenericDeviceActionContext", "context").setDescription("action context to set result in"));
+                    method.addParameter(new Param(StringHelper.capitalize(name) + "Result", "result").setDescription("result to set"));
 
                     method.add("GenericDeviceProperties value = #0.getResult().getValue();");
                     for (Parameter result : action.getResults().getParameterArray()) {
@@ -135,7 +144,7 @@ public enum ImplementationAdder {
                 method = new Method("void", "update" + StringHelper.capitalize(name));
                 method.setAccessModifier(AccessModifier.PROTECTED).addModifier(OptionalModifier.FINAL);
                 method.setJavadoc(new Javadoc("Update the '").append(name).append("' property. To be used by concrete implementations of the service."));
-                method.addParameter(StringHelper.getType(property.getType()), "value", "value to be set");
+                method.addParameter(new Param(StringHelper.getType(property.getType()), "value").setDescription("value to be set"));
                 method.add("getProperties().set" + StringHelper.capitalize(StringHelper.getType(type)) + "Value(PROP_" + name + ", #0);");
                 builder.addMethod(method);
             }

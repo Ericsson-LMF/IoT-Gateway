@@ -6,25 +6,43 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
  */
 public enum StringHelper {
 
+    /**
+     * Singleton
+     */
     INSTANCE;
-
+    
+    /**
+     * Makes first char of the string to upper case
+     * @param string String to be capitalized
+     * @return capitalized string
+     */
     public static String capitalize(String string) {
         StringBuilder sb = new StringBuilder(string);
         sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         return sb.toString();
     }
 
-    public static String setEndPunctuation(String description) {
-        if (description.endsWith(".")) {
-            return description;
+    /**
+     * Ensures that there is punctuation at end of string
+     * @param string string to ensure punctuation
+     * @return ensured string
+     */
+    public static String setEndPunctuation(String string) {
+        if (string.endsWith(".")) {
+            return string;
         }
-        return description + ".";
+        return string + ".";
     }
 
-    public static String getType(String type) {
-        if (type.toLowerCase().startsWith("int")) {
+    /**
+     * gets type from string
+     * @param string string to get type from
+     * @return type as string
+     */
+    public static String getType(String string) {
+        if (string.toLowerCase().startsWith("int")) {
             return "int";
-        } else if (type.toLowerCase().startsWith("float")) {
+        } else if (string.toLowerCase().startsWith("float")) {
             return "float";
         } else {
             return "String";

@@ -3,14 +3,30 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 import java.util.function.Consumer;
 
 /**
- *
+ * Block of code
  * @author delma
  */
 public interface CodeBlock {
 
+    /**
+     * Adds line of code
+     * @param code code to be added
+     * @return this
+     */
     public CodeBlock add(String code);
-
+    
+    /**
+     * Appends to last line of code
+     * @param code code to be appended
+     * @return this
+     */
     public CodeBlock append(Object code);
 
-    public CodeBlock addBlock(Object object, Consumer<CodeBlock> block);
+    /**
+     * Adds whole block of code
+     * @param code code before block starting
+     * @param block consumer to add block code in
+     * @return this
+     */
+    public CodeBlock addBlock(String code, Consumer<CodeBlock> block);
 }

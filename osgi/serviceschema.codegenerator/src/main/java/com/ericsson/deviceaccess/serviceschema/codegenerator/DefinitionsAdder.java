@@ -1,20 +1,20 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
-import com.ericsson.deviceaccess.service.xmlparser.ActionDocument;
+import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ActionsDocument.Actions;
-import com.ericsson.deviceaccess.service.xmlparser.ArgumentsDocument;
-import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument;
+import com.ericsson.deviceaccess.service.xmlparser.ArgumentsDocument.Arguments;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter;
 import com.ericsson.deviceaccess.service.xmlparser.PropertiesDocument.Properties;
-import com.ericsson.deviceaccess.service.xmlparser.ResultsDocument;
+import com.ericsson.deviceaccess.service.xmlparser.ResultsDocument.Results;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
-import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument;
+import com.ericsson.deviceaccess.service.xmlparser.ValuesDocument.Values;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Constructor;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Javadoc;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Method;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Variable;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Constructor;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Javadoc;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Method;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Param;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Variable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 
 /**
@@ -23,12 +23,20 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
  */
 public enum DefinitionsAdder {
 
+    /**
+     * Singleton
+     */
     INSTANCE;
 
     private static final String SERVICE_SB = "service";
     private static final String PARAMETER_SB = "parameter";
     private static final String ACTION_SB = "action";
 
+    /**
+     * Adds start of SchemaDefinitions to builder 
+     * @param builder
+     * @return block where schema definition happens
+     */
     public static CodeBlock addDefinitionsStart(JavaClass builder) {
         builder.setPackage("com.ericsson.deviceaccess.spi.service");
         builder.addImport("java.util.HashMap");
@@ -46,10 +54,18 @@ public enum DefinitionsAdder {
         code.add("ActionSchema.Builder ").append(ACTION_SB).append(";");
         code.add("ParameterSchema.Builder ").append(PARAMETER_SB).append(";");
         code.add("ServiceSchema.Builder ").append(SERVICE_SB).append(";");
-        builder.addMethod(new Method("ServiceSchema", "getServiceSchema").setJavadoc(new Javadoc("Gets ServiceSchema based on it's name.").result("Service schema")).addParameter("String", "name", "name of schema").add("return serviceSchemas.get(#0);"));
+        builder.addMethod(new Method("ServiceSchema", "getServiceSchema")
+                .setJavadoc(new Javadoc("Gets ServiceSchema based on it's name.").result("Service schema"))
+                .addParameter(new Param("String", "name").setDescription("name of schema"))
+                .add("return serviceSchemas.get(#0);"));
         return code;
     }
 
+    /**
+     * Adds services schema definition
+     * @param code block to add schema definition
+     * @param service service which schema definition to add
+     */
     public static void addService(CodeBlock code, Service service) {
         code.add("");
         String name = service.getName();
@@ -76,7 +92,7 @@ public enum DefinitionsAdder {
         String type = parameter.getType();
         String default0 = parameter.getDefault();
         if ("String".equals(StringHelper.getType(type))) {
-            ValuesDocument.Values values = parameter.getValues();
+            Values values = parameter.getValues();
             if (default0 == null && parameter.isSetValues()) {
                 default0 = values.getValueArray(0);
             }
@@ -103,20 +119,20 @@ public enum DefinitionsAdder {
         if (actions == null) {
             return;
         }
-        for (ActionDocument.Action action : actions.getActionArray()) {
+        for (Action action : actions.getActionArray()) {
             String name = action.getName();
             boolean mandatory = !action.getOptional();
             code.add(ACTION_SB).append(" = new ActionSchema.Builder(\"").append(name).append("\").setMandatory(").append(mandatory).append(");");
-            ArgumentsDocument.Arguments arguments = action.getArguments();
+            Arguments arguments = action.getArguments();
             if (arguments != null) {
-                for (ParameterDocument.Parameter argument : arguments.getParameterArray()) {
+                for (Parameter argument : arguments.getParameterArray()) {
                     addParameter(code, argument);
                     code.add(ACTION_SB).append(".addArgumentSchema(").append(PARAMETER_SB).append(".build());");
                 }
             }
-            ResultsDocument.Results results = action.getResults();
+            Results results = action.getResults();
             if (results != null) {
-                for (ParameterDocument.Parameter result : results.getParameterArray()) {
+                for (Parameter result : results.getParameterArray()) {
                     addParameter(code, result);
                     code.add(ACTION_SB).append(".addResultSchema(").append(PARAMETER_SB).append(".build());");
                 }
@@ -129,7 +145,7 @@ public enum DefinitionsAdder {
         if (properties == null) {
             return;
         }
-        for (ParameterDocument.Parameter property : properties.getParameterArray()) {
+        for (Parameter property : properties.getParameterArray()) {
             addParameter(code, property);
             code.add(SERVICE_SB).append(".addPropertySchema(").append(PARAMETER_SB).append(".build());");
         }

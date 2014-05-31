@@ -1,9 +1,14 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlockImpl;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Component;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.PARAMETER_PATTERN;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_PATTERN;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.REPLACEMENT_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
@@ -12,17 +17,17 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
+ * Method of {@link JavaClass}
  *
  * @author delma
  */
-public class Method extends AbstractCodeBlock {
+public class Method extends CodeBlockImpl implements Component, Callable, Modifierable {
 
     private AccessModifier accessModifier;
     private final String name;
@@ -33,6 +38,12 @@ public class Method extends AbstractCodeBlock {
     private Javadoc javadoc;
     private JavaClass owner;
 
+    /**
+     * Creates new Method with type and name
+     *
+     * @param type
+     * @param name
+     */
     public Method(String type, String name) {
         this.type = type;
         this.name = name;
@@ -43,74 +54,73 @@ public class Method extends AbstractCodeBlock {
         javadoc = null;
     }
 
-    public Method setOwner(JavaClass owner) {
+    /**
+     * To be called {@link JavaClass} to set it as owner of this
+     *
+     * @param owner
+     * @return this
+     */
+    protected Method setOwner(JavaClass owner) {
         this.owner = owner;
         return this;
     }
 
+    @Override
     public Method setAccessModifier(AccessModifier modifier) {
         accessModifier = modifier;
         return this;
     }
 
+    @Override
     public AccessModifier getAccessModifier() {
         return accessModifier;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
-    public Method addParameter(String type, String name, String description) {
-        return addParameter(new Param(type, name).setDescription(description));
-    }
-
+    @Override
     public Method addParameter(Param parameter) {
         parameters.add(parameter);
         return this;
     }
 
-    public List<Param> getParameters() {
-        return Collections.unmodifiableList(parameters);
-    }
-
-    public Iterable<String> getCodeLines() {
-        return lines;
-    }
-
+    @Override
     public Method setJavadoc(Javadoc javadoc) {
         this.javadoc = javadoc;
         return this;
     }
 
+    /**
+     * Builds Method to string with specified indent
+     *
+     * @param indent how much indent there is
+     * @return builded string
+     */
     public String build(int indent) {
         StringBuilder builder = new StringBuilder();
-        //JAVADOC
-        builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
-        //METHOD DECLARATION
-        String access = accessModifier.get();
-        indent(builder, indent).append(access).append(" ");
-        modifiers.forEach(m -> builder.append(m.get()).append(" "));
-        builder.append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
-        if (!throwList.isEmpty()) {
-            builder.append(" throws ");
-            throwList.forEach(t -> builder.append(t).append(", "));
-            builder.setLength(builder.length() - 2);
-        }
-        boolean isAbstract = modifiers.contains(OptionalModifier.ABSTRACT) || (owner != null && owner.getClassModifier() == ClassModifier.INTERFACE);
-        if (isAbstract) {
-            builder.append(STATEMENT_END).append(LINE_END);
+        addJavadoc(builder, indent);
+        if (addMethodDeclaration(builder, indent)) {
             return builder.toString();
         }
-        builder.append(" ").append(BLOCK_START).append(LINE_END);
-        //CODE
+        {
+            addCode(builder, indent + 1);
+        }
+        addMethodEnd(builder, indent);
+        return builder.toString();
+    }
+
+    private void addCode(StringBuilder builder, int indent) throws NumberFormatException {
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);
-            Matcher matcher = PARAMETER_PATTERN.matcher(line);
+            Matcher matcher = REPLACEMENT_PATTERN.matcher(line);
             while (matcher.find()) {
                 int start = matcher.start();
                 int end = matcher.end();
@@ -126,10 +136,39 @@ public class Method extends AbstractCodeBlock {
                     stringBuilder.replace(start, end, methodName);
                 }
             }
-            indent(builder, indent + 1).append(stringBuilder).append(LINE_END);
+            indent(builder, indent).append(stringBuilder).append(LINE_END);
         }
+    }
+
+    private void addMethodEnd(StringBuilder builder, int indent) {
         indent(builder, indent).append(BLOCK_END).append(LINE_END);
-        return builder.toString();
+    }
+
+    private boolean addMethodDeclaration(StringBuilder builder, int indent) {
+        String access = accessModifier.get();
+        indent(builder, indent).append(access).append(" ");
+        modifiers.forEach(m -> builder.append(m.get()).append(" "));
+        builder.append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
+        addThrows(builder);
+        boolean isAbstract = modifiers.contains(OptionalModifier.ABSTRACT) || (owner != null && owner.getClassModifier() == ClassModifier.INTERFACE);
+        if (isAbstract) {
+            builder.append(STATEMENT_END).append(LINE_END);
+            return true;
+        }
+        builder.append(" ").append(BLOCK_START).append(LINE_END);
+        return false;
+    }
+
+    private void addThrows(StringBuilder builder) {
+        if (!throwList.isEmpty()) {
+            builder.append(" throws ");
+            throwList.forEach(t -> builder.append(t).append(", "));
+            builder.setLength(builder.length() - 2);
+        }
+    }
+
+    private void addJavadoc(StringBuilder builder, int indent) {
+        builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
     }
 
     private Javadoc parameterJavadocs(Javadoc builder) {
@@ -146,6 +185,11 @@ public class Method extends AbstractCodeBlock {
         return builder;
     }
 
+    /**
+     * Adds throws clause
+     * @param exception exception thrown
+     * @return this
+     */
     public Method addThrow(String exception) {
         throwList.add(exception);
         return this;
@@ -164,11 +208,12 @@ public class Method extends AbstractCodeBlock {
     }
 
     @Override
-    public Method addBlock(Object object, Consumer<CodeBlock> block) {
-        super.addBlock(object, block);
+    public Method addBlock(String code, Consumer<CodeBlock> block) {
+        super.addBlock(code, block);
         return this;
     }
 
+    @Override
     public Method addModifier(OptionalModifier modifier) {
         modifiers.add(modifier);
         return this;

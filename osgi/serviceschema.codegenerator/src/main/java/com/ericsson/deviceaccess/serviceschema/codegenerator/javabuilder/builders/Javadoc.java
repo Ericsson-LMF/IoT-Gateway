@@ -1,5 +1,6 @@
-package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
+package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,6 +159,11 @@ public final class Javadoc {
         return this;
     }
 
+    /**
+     * Adds return tag to Javadox
+     * @param object description
+     * @return this
+     */
     public Javadoc result(Object object) {
         addTag(TAG_RETURN, object);
         return this;

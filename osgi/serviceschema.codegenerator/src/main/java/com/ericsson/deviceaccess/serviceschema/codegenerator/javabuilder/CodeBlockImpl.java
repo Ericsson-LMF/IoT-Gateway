@@ -1,18 +1,17 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
-import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.STATEMENT_END;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
- *
+ * Implementation of block of code
  * @author delma
  */
-class AbstractCodeBlock implements CodeBlock {
+public class CodeBlockImpl implements CodeBlock {
     protected final List<String> lines;
 
-    public AbstractCodeBlock() {
+    public CodeBlockImpl() {
         lines = new ArrayList<>();
     }
 
@@ -30,11 +29,11 @@ class AbstractCodeBlock implements CodeBlock {
     }
 
     @Override
-    public CodeBlock addBlock(Object object, Consumer<CodeBlock> block) {
-        add(object.toString()).append(" ").append(JavaHelper.BLOCK_START);
-        AbstractCodeBlock code = new AbstractCodeBlock();
-        block.accept(code);
-        code.lines.forEach(s -> add(JavaHelper.INDENT + s));
+    public CodeBlock addBlock(String code, Consumer<CodeBlock> block) {
+        add(code).append(" ").append(JavaHelper.BLOCK_START);
+        CodeBlockImpl codeblock = new CodeBlockImpl();
+        block.accept(codeblock);
+        codeblock.lines.forEach(s -> add(JavaHelper.INDENT + s));
         add(JavaHelper.BLOCK_END);
         return this;
     }

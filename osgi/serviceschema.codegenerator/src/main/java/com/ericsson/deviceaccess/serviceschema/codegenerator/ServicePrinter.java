@@ -38,13 +38,23 @@ import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaClass;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
 import java.io.File;
 import java.io.IOException;
 import org.apache.xmlbeans.XmlException;
 
+/**
+ * Test class for code generation
+ * @author delma
+ */
 public class ServicePrinter {
 
+    /**
+     * Runs schema XML to java generator for test file
+     * @param args
+     * @throws XmlException
+     * @throws IOException 
+     */
     public static void main(String[] args) throws XmlException, IOException {
         ServiceSchemaDocument serviceSchemaDocument = ServiceSchemaDocument.Factory.parse(new File("src/test/resources/services-example.xml"));
         String version = serviceSchemaDocument.getServiceSchema().getVersion();
@@ -57,7 +67,7 @@ public class ServicePrinter {
         for (Service service : serviceArray) {
             DefinitionsAdder.addService(code, service);
         }
-        System.out.print(builder.build(ServicePrinter.class));
+        System.out.print(builder.build());
 
         System.out.println("=============================================");
         System.out.println("=============================================");
@@ -67,11 +77,11 @@ public class ServicePrinter {
         for (Service service : serviceArray) {
             builder = new JavaClass();
             InterfaceAdder.addServiceInterface(builder, version, service);
-            System.out.print(builder.build(ServicePrinter.class));
+            System.out.print(builder.build());
             System.out.println("=============================================");
             builder = new JavaClass();
-            ImplementationAdder.addServiceImplementation(builder, version, service);
-            System.out.print(builder.build(ServicePrinter.class));
+            ImplementationAdder.addServiceImplementation(builder, service);
+            System.out.print(builder.build());
             System.out.println("=============================================");
             System.out.println("=============================================");
         }
