@@ -37,18 +37,21 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 
@@ -72,14 +75,6 @@ public class LDAPExpr {
     private static final String EOS = "Unexpected end of query";
     private static final String MALFORMED = "Malformed query";
     private static final String OPERATOR = "Undefined operator";
-
-    private static Class<?> classBigDecimal;
-    private static Constructor consBigDecimal;
-    private static Method compBigDecimal;
-
-    private static Class<?> classBigInteger;
-    private static Constructor consBigInteger;
-    private static Method compBigInteger;
 
     public int operator;
     public LDAPExpr[] args;
@@ -305,15 +300,13 @@ public class LDAPExpr {
             return true;
         }
         try {
-            if (obj instanceof String) {
-                return compareString((String) obj, op, s);
-            } else if (obj instanceof Character) {
+            if (obj instanceof String || obj instanceof Character) {
                 return compareString(obj.toString(), op, s);
             } else if (obj instanceof Boolean) {
                 if (op == LE || op == GE) {
                     return false;
                 }
-                if (((Boolean) obj).booleanValue()) {
+                if ((Boolean) obj) {
                     return s.equalsIgnoreCase("true");
                 } else {
                     return s.equalsIgnoreCase("false");
@@ -322,66 +315,65 @@ public class LDAPExpr {
                 if (obj instanceof Byte) {
                     switch (op) {
                         case LE:
-                            return ((Byte) obj).byteValue() <= Byte.parseByte(s);
+                            return ((Byte) obj) <= Byte.parseByte(s);
                         case GE:
-                            return ((Byte) obj).byteValue() >= Byte.parseByte(s);
+                            return ((Byte) obj) >= Byte.parseByte(s);
                         default: /* APPROX and EQ */
 
-                            return (new Byte(s)).equals(obj);
+                            return new Byte(s).equals(obj);
                     }
                 } else if (obj instanceof Integer) {
                     switch (op) {
                         case LE:
-                            return ((Integer) obj).intValue() <= Integer.parseInt(s);
+                            return ((Integer) obj) <= Integer.parseInt(s);
                         case GE:
-                            return ((Integer) obj).intValue() >= Integer.parseInt(s);
+                            return ((Integer) obj) >= Integer.parseInt(s);
                         default: /* APPROX and EQ */
 
-                            return (new Integer(s)).equals(obj);
+                            return new Integer(s).equals(obj);
                     }
                 } else if (obj instanceof Short) {
                     switch (op) {
                         case LE:
-                            return ((Short) obj).shortValue() <= Short.parseShort(s);
+                            return ((Short) obj) <= Short.parseShort(s);
                         case GE:
-                            return ((Short) obj).shortValue() >= Short.parseShort(s);
+                            return ((Short) obj) >= Short.parseShort(s);
                         default: /* APPROX and EQ */
 
-                            return (new Short(s)).equals(obj);
+                            return new Short(s).equals(obj);
                     }
                 } else if (obj instanceof Long) {
                     switch (op) {
                         case LE:
-                            return ((Long) obj).longValue() <= Long.parseLong(s);
+                            return ((Long) obj) <= Long.parseLong(s);
                         case GE:
-                            return ((Long) obj).longValue() >= Long.parseLong(s);
+                            return ((Long) obj) >= Long.parseLong(s);
                         default: /* APPROX and EQ */
 
-                            return (new Long(s)).equals(obj);
+                            return new Long(s).equals(obj);
                     }
                 } else if (obj instanceof Float) {
                     switch (op) {
                         case LE:
-                            return ((Float) obj).floatValue() <= (new Float(s)).floatValue();
+                            return ((Float) obj) <= (new Float(s));
                         case GE:
-                            return ((Float) obj).floatValue() >= (new Float(s)).floatValue();
+                            return ((Float) obj) >= (new Float(s));
                         default: /* APPROX and EQ */
 
-                            return (new Float(s)).equals(obj);
+                            return new Float(s).equals(obj);
                     }
                 } else if (obj instanceof Double) {
                     switch (op) {
                         case LE:
-                            return ((Double) obj).doubleValue() <= (new Double(s)).doubleValue();
+                            return ((Double) obj) <= (new Double(s));
                         case GE:
-                            return ((Double) obj).doubleValue() >= (new Double(s)).doubleValue();
+                            return ((Double) obj) >= (new Double(s));
                         default: /* APPROX and EQ */
 
-                            return (new Double(s)).equals(obj);
+                            return new Double(s).equals(obj);
                     }
-                } else if (classBigInteger != null && classBigInteger.isInstance(obj)) {
-                    Object n = consBigInteger.newInstance(new Object[]{s});
-                    int c = ((Integer) compBigInteger.invoke(obj, new Object[]{n})).intValue();
+                } else if (BigInteger.class.isInstance(obj)) {
+                    int c = ((BigInteger) obj).compareTo(new BigInteger(s));
 
                     switch (op) {
                         case LE:
@@ -392,9 +384,8 @@ public class LDAPExpr {
 
                             return c == 0;
                     }
-                } else if (classBigDecimal != null && classBigDecimal.isInstance(obj)) {
-                    Object n = consBigDecimal.newInstance(new Object[]{s});
-                    int c = ((Integer) compBigDecimal.invoke(obj, new Object[]{n})).intValue();
+                } else if (BigDecimal.class.isInstance(obj)) {
+                    int c = ((BigDecimal) obj).compareTo(new BigDecimal(s));
 
                     switch (op) {
                         case LE:
@@ -407,10 +398,8 @@ public class LDAPExpr {
                     }
                 }
             } else if (obj instanceof Collection) {
-                for (Iterator i = ((Collection) obj).iterator(); i.hasNext();) {
-                    if (compare(i.next(), op, s)) {
-                        return true;
-                    }
+                if (((Collection) obj).stream().anyMatch(i -> compare(i, op, s))) {
+                    return true;
                 }
             } else if (obj.getClass().isArray()) {
                 int len = Array.getLength(obj);
@@ -424,11 +413,10 @@ public class LDAPExpr {
                 // Allow simple EQ comparison on all classes having
                 // a string constructor, and use compareTo if they
                 // implement Comparable
-                Class clazz = obj.getClass();
-                Constructor cons = getConstructor(clazz);
+                Constructor cons = getConstructor(obj.getClass());
 
                 if (cons != null) {
-                    Object other = cons.newInstance(new Object[]{s});
+                    Object other = cons.newInstance(s);
                     if (obj instanceof Comparable) {
                         int c = ((Comparable) obj).compareTo(other);
                         switch (op) {
@@ -461,46 +449,24 @@ public class LDAPExpr {
     }
 
     // Clazz -> Constructor(String)
-    private static HashMap constructorMap = new HashMap();
+    private static Map<Class<?>, Constructor<?>> constructorMap = new ConcurrentHashMap<>();
+    private static Constructor<?> DUMMY_CONS = LDAPExpr.class.getConstructors()[0];
 
     /**
      * Get cached String constructor for a class
      */
     private static Constructor getConstructor(Class clazz) {
-        synchronized (constructorMap) {
-
-            // This might be null
-            Constructor cons = (Constructor) constructorMap.get(clazz);
-
-            // ...check if we have tried before. A failed try
-            // is stored as null
-            if (!constructorMap.containsKey(clazz)) {
-                try {
-                    cons = clazz.getConstructor(new Class[]{String.class});
-                } catch (Exception e) {
-                    // remember by storing null in map
-                }
-                constructorMap.put(clazz, cons);
+        Constructor<?> cons = constructorMap.computeIfAbsent(clazz, k -> {
+            try {
+                return clazz.getConstructor(String.class);
+            } catch (NoSuchMethodException | SecurityException ex) {
+                return DUMMY_CONS;
             }
-            return cons;
+        });
+        if (cons == DUMMY_CONS) {
+            return null;
         }
-    }
-
-    static {
-        try {
-            classBigDecimal = Class.forName("java.math.BigDecimal");
-            consBigDecimal = getConstructor(classBigDecimal);
-            compBigDecimal = classBigDecimal.getMethod("compareTo", new Class[]{classBigDecimal});
-        } catch (Exception ignore) {
-            classBigDecimal = null;
-        }
-        try {
-            classBigInteger = Class.forName("java.math.BigInteger");
-            consBigInteger = getConstructor(classBigInteger);
-            compBigInteger = classBigInteger.getMethod("compareTo", new Class[]{classBigInteger});
-        } catch (Exception ignore) {
-            classBigInteger = null;
-        }
+        return cons;
     }
 
     private static boolean compareString(String s1, int op, String s2) {
@@ -519,18 +485,7 @@ public class LDAPExpr {
     }
 
     private static String fixupString(String s) {
-        StringBuilder sb = new StringBuilder();
-        int len = s.length();
-        for (int i = 0; i < len; i++) {
-            char c = s.charAt(i);
-            if (!Character.isWhitespace(c)) {
-                if (Character.isUpperCase(c)) {
-                    c = Character.toLowerCase(c);
-                }
-                sb.append(c);
-            }
-        }
-        return sb.toString();
+        return s.replaceAll("\\s+", "").toLowerCase();
     }
 
     private static boolean patSubstr(String s, String pat) {
