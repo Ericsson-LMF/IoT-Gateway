@@ -67,50 +67,62 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         this.result = new GenericDeviceActionResultImpl(result);
     }
 
+    @Override
     public void setRequester(String requester) {
         this.requester = requester;
     }
 
+    @Override
     public String getRequester() {
         return requester;
     }
 
+    @Override
     public void setDevice(String device) {
         this.device = device;
     }
 
+    @Override
     public String getDevice() {
         return device;
     }
 
+    @Override
     public void setService(String service) {
         this.service = service;
     }
 
+    @Override
     public String getService() {
         return service;
     }
 
+    @Override
     public void setOwner(String owner) {
         this.owner = owner;
     }
 
+    @Override
     public String getOwner() {
         return owner;
     }
 
+    @Override
     public void setAction(String action) {
         this.action = action;
     }
 
+    @Override
     public String getAction() {
         return action;
     }
 
+    @Override
     public void setAuthorized(boolean isAuthorized) {
         this.isAuthorized = isAuthorized;
     }
 
+    @Override
     public boolean isAuthorized() {
         if (getRequester() != null && getRequester().equals(getOwner())) {
             return true;
@@ -119,10 +131,12 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         }
     }
 
+    @Override
     public void setFirstTime(boolean isFirstTime) {
         this.isFirstTime = isFirstTime;
     }
 
+    @Override
     public boolean isFirstTime() {
         return isFirstTime;
     }
@@ -151,18 +165,22 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         return isFailed;
     }
 
+    @Override
     public GenericDeviceActionResult getResult() {
         return result;
     }
 
+    @Override
     public void setRequesterContact(String requesterContact) {
         this.requesterContact = requesterContact;
     }
 
+    @Override
     public String getRequesterContact() {
         return requesterContact;
     }
 
+    @Override
     public GenericDeviceProperties getArguments() {
         return arguments;
     }
@@ -171,11 +189,12 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
         this.result = result;
     }
 
+    @Override
     public String serialize(int format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         if (format == Serializable.FORMAT_JSON
                 || format == Serializable.FORMAT_JSON_WDC) {
-            StringBuffer sb = new StringBuffer("{");
+            StringBuilder sb = new StringBuilder("{");
             sb.append("\"device\":\"").append(getDevice()).append("\",");
             sb.append("\"service\":\"").append(getService()).append("\",");
             sb.append("\"action\":\"").append(getAction()).append("\",");

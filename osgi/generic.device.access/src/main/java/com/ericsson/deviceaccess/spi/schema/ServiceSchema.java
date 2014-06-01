@@ -96,7 +96,6 @@ public class ServiceSchema {
          * Create builder for a service with the specified name.
          *
          * @param serviceName
-         * @return the builder
          */
         public Builder(String serviceName) {
             this.name = serviceName;

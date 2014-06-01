@@ -68,6 +68,7 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putService(GenericDeviceService svc) {
         putService(null, svc);
     }
@@ -75,6 +76,7 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putService(String name, GenericDeviceService svc) {
         if (!(svc instanceof SchemaBasedService)) {
             throw new ServiceSchemaError("Trying to add a service '" + name + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SchemaBasedService.class);
@@ -84,6 +86,7 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
 
     /**
      * Sets the services of this device.
+     * @param services
      */
     public void setService(HashMap services) {
         for (Iterator iterator = services.values().iterator(); iterator.hasNext();) {

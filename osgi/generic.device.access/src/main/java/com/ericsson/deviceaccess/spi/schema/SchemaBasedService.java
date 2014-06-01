@@ -62,7 +62,7 @@ public interface SchemaBasedService extends GenericDeviceService {
     /**
      * Verifies that the schema is valid.
      *
-     * @throws in case the schema is invalid
+     * @throws ServiceSchemaError in case the schema is invalid
      */
     void validateSchema() throws ServiceSchemaError;
 }

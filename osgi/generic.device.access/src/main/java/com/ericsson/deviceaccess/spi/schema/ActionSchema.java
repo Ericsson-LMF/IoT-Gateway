@@ -129,7 +129,7 @@ public class ActionSchema {
         /**
          * Adds an argument to the action schema.
          *
-         * @param ParameterSchema
+         * @param argumentSchema
          * @return the builder
          */
         public Builder addArgumentSchema(ParameterSchema argumentSchema) {
@@ -140,7 +140,7 @@ public class ActionSchema {
         /**
          * Adds a result to the action schema.
          *
-         * @param ParameterSchema
+         * @param resultSchema
          * @return the builder
          */
         public Builder addResultSchema(ParameterSchema resultSchema) {

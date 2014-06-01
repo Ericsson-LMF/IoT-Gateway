@@ -72,14 +72,14 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
         }
 
         if (Float.class.isAssignableFrom(type)) {
-            minValue = new Float(Float.NEGATIVE_INFINITY);
-            maxValue = new Float(Float.POSITIVE_INFINITY);
+            minValue = Float.NEGATIVE_INFINITY;
+            maxValue = Float.POSITIVE_INFINITY;
         } else if (Integer.class.isAssignableFrom(type)) {
-            minValue = new Integer(Integer.MIN_VALUE);
-            maxValue = new Integer(Integer.MAX_VALUE);
+            minValue = Integer.MIN_VALUE;
+            maxValue = Integer.MAX_VALUE;
         } else if (Long.class.isAssignableFrom(type)) {
-            minValue = new Long(Long.MIN_VALUE);
-            maxValue = new Long(Long.MAX_VALUE);
+            minValue = Long.MIN_VALUE;
+            maxValue = Long.MAX_VALUE;
         }
 
         this.name = name;
@@ -90,6 +90,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -97,6 +98,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Class getType() {
         return type;
     }
@@ -104,6 +106,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getTypeName() {
         if (type == String.class) {
             return "String";
@@ -122,6 +125,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Number getMinValue() {
         return minValue;
     }
@@ -129,6 +133,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Number getMaxValue() {
         return maxValue;
     }
@@ -136,6 +141,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Number getDefaultNumberValue() {
         return (Number) defaultValue;
     }
@@ -143,6 +149,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDefaultStringValue() {
         return defaultValue + "";
     }
@@ -150,6 +157,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getValidValues() {
         return validValues;
     }
@@ -157,6 +165,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String serialize(int format) throws GenericDeviceException {
         if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
             return toJsonString(format, 0);
@@ -168,6 +177,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getSerializedNode(String path, int format) throws GenericDeviceException {
         if (path == null) {
             throw new GenericDeviceException(405, "Path cannot be null");
@@ -181,7 +191,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     }
 
     private String toJsonString(int format, int indent) {
-        StringBuffer json = new StringBuffer("{");
+        StringBuilder json = new StringBuilder("{");
         json.append("\"name\":\"").append(Utils.escapeJSON(name)).append("\",");
         json.append("\"type\":\"").append(getTypeName()).append("\",");
         if (minValue != null) {
@@ -214,6 +224,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getPath(boolean isAbsolute) {
         return path + "/parameter/" + this.getName();
     }
@@ -221,6 +232,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getPath() {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         return path + "/parameter/" + this.getName();
@@ -229,6 +241,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updatePath(String path) {
         GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
         this.path = path;

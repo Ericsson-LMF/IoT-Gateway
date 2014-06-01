@@ -53,6 +53,7 @@ public class GenericDeviceActionResultImpl implements GenericDeviceActionResult 
         value = result;
     }
 
+    @Override
     public void setCode(int code) {
         this.code = code;
     }
@@ -60,6 +61,7 @@ public class GenericDeviceActionResultImpl implements GenericDeviceActionResult 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getCode() {
         return code;
     }
@@ -67,6 +69,7 @@ public class GenericDeviceActionResultImpl implements GenericDeviceActionResult 
     /**
      * {@inheritDoc}
      */
+    @Override
     public GenericDeviceProperties getValue() {
         return value;
     }
@@ -74,6 +77,7 @@ public class GenericDeviceActionResultImpl implements GenericDeviceActionResult 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setReason(String reason) {
         this.reason = reason;
     }
@@ -81,16 +85,17 @@ public class GenericDeviceActionResultImpl implements GenericDeviceActionResult 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getReason() {
         return reason;
     }
 
-    //@Override
+    @Override
     public String serialize(int format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         if (format == Serializable.FORMAT_JSON
                 || format == Serializable.FORMAT_JSON_WDC) {
-            StringBuffer sb = new StringBuffer("{");
+            StringBuilder sb = new StringBuilder("{");
             sb.append("\"code\":\"").append(getCode()).append("\",");
             sb.append("\"reason\":\"").append(getReason()).append("\",");
             if (value != null) {

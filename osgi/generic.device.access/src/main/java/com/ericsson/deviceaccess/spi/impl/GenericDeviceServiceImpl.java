@@ -35,23 +35,20 @@
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.*;
-import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
+import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkGetPermission;
+import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkSetPermission;
 import com.ericsson.deviceaccess.spi.GenericDeviceService;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.utility.Utils;
-
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 
 public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
         implements GenericDeviceService {
-
-    private static MetadataUtil metadataUtil = MetadataUtil.getInstance();
     private String name;
     private String path;
     private GenericDeviceImpl parentDevice;
-    private HashMap action = new HashMap();
+    private HashMap<String, GenericDeviceAction> action = new HashMap();
     private GenericDevicePropertiesImpl properties;
     private GenericDevicePropertyMetadata[] propertyMetadata;
 
@@ -75,9 +72,8 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public String[] getActionNames() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-
-        return (String[]) action.keySet().toArray(new String[0]);
+        checkGetPermission(getClass().getName());
+        return action.keySet().toArray(new String[0]);
     }
 
     /**
@@ -85,13 +81,12 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public GenericDeviceAction getAction(String name) {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-
-        return (GenericDeviceAction) action.get(name);
+        checkGetPermission(getClass().getName());
+        return action.get(name);
     }
 
     public void putAction(GenericDeviceAction act) {
-        GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
+        checkSetPermission(getClass().getName());
         action.put(act.getName(), act);
         act.updatePath(getPath(true));
     }
@@ -125,7 +120,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public String getName() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        checkGetPermission(getClass().getName());
         return name;
     }
 
@@ -134,7 +129,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public String getPath(boolean isAbsolute) {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        checkGetPermission(getClass().getName());
         return path + "/service/" + this.getName();
     }
 
@@ -143,7 +138,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public String getPath() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        checkGetPermission(getClass().getName());
         return path + "/service/" + this.getName();
     }
 
@@ -152,12 +147,9 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public void updatePath(String path) {
-        GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
+        checkSetPermission(getClass().getName());
         this.path = path;
-        for (Iterator i = action.values().iterator(); i.hasNext();) {
-            GenericDeviceAction act = (GenericDeviceAction) i.next();
-            act.updatePath(getPath(true));
-        }
+        action.forEach((k, act) -> act.updatePath(getPath(true)));
 
         for (GenericDevicePropertyMetadata md : propertyMetadata) {
             md.updatePath(getPath(true));
@@ -173,7 +165,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public final GenericDeviceProperties getProperties() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        checkGetPermission(getClass().getName());
         return properties;
     }
 
@@ -190,7 +182,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      */
     @Override
     public String serialize(int format) throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        checkGetPermission(getClass().getName());
         if (format == Serializable.FORMAT_JSON
                 || format == Serializable.FORMAT_JSON_WDC) {
             int indent = 0;
@@ -211,7 +203,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
     @Override
     public String getSerializedNode(String path, int format)
             throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        checkGetPermission(getClass().getName());
         if (path == null) {
             throw new GenericDeviceException(405, "Path cannot be null");
         }
@@ -284,20 +276,22 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
 
     private String getActionListJsonString(int format, int indent)
             throws GenericDeviceException {
-        String json = "{";
-        Iterator it = action.keySet().iterator();
-        while (it.hasNext()) {
-            Object key = it.next();
-            GenericDeviceAction act = (GenericDeviceAction) action.get(key);
-            if (act != null) {
-                json += '"' + Utils.escapeJSON(act.getName()) + "\":" + act.serialize(format);
-                if (it.hasNext()) {
-                    json += ",";
+        StringBuilder json = new StringBuilder("{");
+        try {
+            action.forEach((k, act) -> {
+                if (act != null) {
+                    json.append('"').append(Utils.escapeJSON(act.getName())).append('"').append(':');
+                    json.append(LambdaHelper.smugle(() -> act.serialize(format)));
+                    json.append(',');
                 }
-            }
+            });
+        } catch (RuntimeException ex) {
+            throw (GenericDeviceException) ex.getCause();
         }
-        json += "}";
-        return json;
+        if (json.length() > 0) {
+            json.setLength(json.length() - 1);
+        }
+        return json.append("}").toString();
     }
 
     public GenericDevice getParentDevice() {

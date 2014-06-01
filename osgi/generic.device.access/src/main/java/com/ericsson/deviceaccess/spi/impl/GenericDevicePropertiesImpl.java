@@ -48,20 +48,17 @@ import java.util.Properties;
 
 public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         implements GenericDeviceProperties {
-
-    private static MetadataUtil metadataUtil = MetadataUtil.getInstance();
     public static final String LAST_UPDATE_TIME = "lastUpdateTime";
-    private Map map;
-    private Map metadata; // name:String -> GenericDevicePropertyMetadata
+    private Map<String, Object> map;
+    private Map<String, GenericDevicePropertyMetadata> metadata; // name:String -> GenericDevicePropertyMetadata
     private GenericDeviceServiceImpl parentService;
 
     GenericDevicePropertiesImpl(GenericDevicePropertyMetadata[] metadataArray, GenericDeviceServiceImpl parentService) {
         this.parentService = parentService;
-        this.metadata = new HashMap();
-        this.map = new HashMap();
+        this.metadata = new HashMap<>();
+        this.map = new HashMap<>();
         if (metadataArray != null) {
-            for (int i = 0; i < metadataArray.length; i++) {
-                GenericDevicePropertyMetadata metadata = metadataArray[i];
+            for (GenericDevicePropertyMetadata metadata : metadataArray) {
                 this.metadata.put(metadata.getName(), metadata);
                 if (metadata.getType() == String.class) {
                     map.put(metadata.getName(), metadata.getDefaultStringValue());
@@ -76,6 +73,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         this(metadataArray, null);
     }
 
+    @Override
     public boolean hasProperty(String name) {
         return map.containsKey(name);
     }
@@ -83,13 +81,13 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getValue(String name) {
         if (map.containsKey(name)) {
             return map.get(name);
         }
 
-        GenericDevicePropertyMetadata valueMetadata = (GenericDevicePropertyMetadata) metadata
-                .get(name);
+        GenericDevicePropertyMetadata valueMetadata = metadata.get(name);
         if (Number.class.isAssignableFrom(valueMetadata.getType())) {
             return valueMetadata.getDefaultNumberValue();
         } else {
@@ -100,9 +98,9 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getStringValue(String key) {
-        String defaultValue = ((GenericDevicePropertyMetadata) metadata
-                .get(key)).getDefaultStringValue();
+        String defaultValue = metadata.get(key).getDefaultStringValue();
         if (map.containsKey(key)) {
             Object value = map.get(key);
             if (value == null) {
@@ -123,13 +121,13 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
             throw new GenericDeviceError("There is no property: " + key
                     + " specified in the metadata for this property set.");
         }
-        if (((GenericDevicePropertyMetadata) metadata.get(key)).getType() == Float.class) {
+        Class<?> type = metadata.get(key).getType();
+        if (type == Float.class) {
             setFloatValue(key, Float.parseFloat(value));
-        } else if (((GenericDevicePropertyMetadata) metadata.get(key))
-                .getType() == Integer.class) {
+        } else if (type == Integer.class) {
             setIntValue(key, Integer.parseInt(value));
         } else {
-            metadataUtil.verifyPropertyAgainstMetadata(metadata, key, value);
+            MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, value);
             Object oldValue = map.get(key);
             map.put(key, value);
             tryNotifyChange(key, oldValue, value);
@@ -139,9 +137,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setIntValue(String key, int value) {
-        Integer intValue = new Integer(value);
-        metadataUtil.verifyPropertyAgainstMetadata(metadata, key, intValue);
+        Integer intValue = value;
+        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, intValue);
         Object oldValue = map.get(key);
         map.put(key, intValue);
         tryNotifyChange(key, oldValue, intValue);
@@ -150,9 +149,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLongValue(String key, long value) {
-        Long longValue = new Long(value);
-        metadataUtil.verifyPropertyAgainstMetadata(metadata, key, longValue);
+        Long longValue = value;
+        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, longValue);
         Object oldValue = map.get(key);
         map.put(key, longValue);
         tryNotifyChange(key, oldValue, longValue);
@@ -161,9 +161,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFloatValue(String key, float value) {
-        Float floatValue = new Float(value);
-        metadataUtil.verifyPropertyAgainstMetadata(metadata, key, floatValue);
+        Float floatValue = value;
+        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, floatValue);
         Object oldValue = map.get(key);
         map.put(key, floatValue);
         tryNotifyChange(key, oldValue, floatValue);
@@ -172,7 +173,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     private void tryNotifyChange(final String key, Object oldValue,
             final Object value) {
         if (metadata.containsKey(LAST_UPDATE_TIME)) {
-            map.put(LAST_UPDATE_TIME, new Long(System.currentTimeMillis()));
+            map.put(LAST_UPDATE_TIME, System.currentTimeMillis());
         }
         if (parentService != null && parentService.getParentDevice() != null) {
             if ((value == null && oldValue != null) || (value != null && !value.equals(oldValue))) {
@@ -188,10 +189,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getIntValue(String key) {
         Object value = map.get(key);
-        Number defaultValue = ((GenericDevicePropertyMetadata) metadata
-                .get(key)).getDefaultNumberValue();
+        Number defaultValue = metadata.get(key).getDefaultNumberValue();
         if (value instanceof String) {
             try {
                 return Integer.parseInt((String) value);
@@ -207,10 +208,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getLongValue(String key) {
         Object value = map.get(key);
-        Number defaultValue = ((GenericDevicePropertyMetadata) metadata
-                .get(key)).getDefaultNumberValue();
+        Number defaultValue = metadata.get(key).getDefaultNumberValue();
         if (value instanceof String) {
             try {
                 return Long.parseLong((String) value);
@@ -226,10 +227,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFloatValue(String key) {
         Object value = map.get(key);
-        Number defaultValue = ((GenericDevicePropertyMetadata) metadata
-                .get(key)).getDefaultNumberValue();
+        Number defaultValue = metadata.get(key).getDefaultNumberValue();
         if (value instanceof String) {
             try {
                 return Float.parseFloat((String) value);
@@ -245,9 +246,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getValueType(String key) {
         if (map.containsKey(key)) {
-            return ((GenericDevicePropertyMetadata) metadata.get(key)).getTypeName();
+            return metadata.get(key).getTypeName();
         }
         return null;
     }
@@ -255,13 +257,15 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getNames() {
-        return (String[]) map.keySet().toArray(new String[0]);
+        return map.keySet().toArray(new String[0]);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String serialize(int format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         if (format == Serializable.FORMAT_JSON
@@ -273,10 +277,10 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         }
     }
 
+    @Override
     public String serializeState() {
-        StringBuffer sb = new StringBuffer("{");
-        for (int i = 0; i < getNames().length; i++) {
-            String name = getNames()[i];
+        StringBuilder sb = new StringBuilder("{");
+        for (String name : getNames()) {
             sb.append("\"").append(name).append("\":\"").append(Utils.escapeJSON(getStringValue(name))).append("\",");
         }
 
@@ -292,9 +296,9 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addAll(GenericDeviceProperties source) {
-        for (int i = 0; i < source.getNames().length; i++) {
-            String name = source.getNames()[i];
+        for (String name : source.getNames()) {
             if (String.class.getName().equals(source.getValueType(name))) {
                 setStringValue(name, source.getStringValue(name));
             } else if (Integer.class.getName()
@@ -307,15 +311,14 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     }
 
     private String valuesToJson(int format) throws GenericDeviceException {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < getNames().length; i++) {
-            String name = getNames()[i];
+        StringBuilder sb = new StringBuilder();
+        for (String name : getNames()) {
             sb.append("\"").append(name).append("\":{");
             sb.append("\"currentValue\":\"").append(Utils.escapeJSON(getStringValue(name))).append("\",");
             if (metadata.containsKey(name)) {
                 sb.append("\"metadata\":");
-                String serializedMetadata = ((GenericDevicePropertyMetadata) metadata.get(name)).serialize(format);
-                if (serializedMetadata != null && serializedMetadata.indexOf("{") >= 0) {
+                String serializedMetadata = metadata.get(name).serialize(format);
+                if (serializedMetadata != null && serializedMetadata.contains("{")) {
                     sb.append(serializedMetadata);
                 } else {
                     sb.append("null");

@@ -222,7 +222,7 @@ public class EventManager implements ServiceListener, Runnable,
                     Object property = matchingProperties.get(deltaProperty);
                     String id = event.deviceId + event.serviceId + deltaProperty;
                     // Any old values saved to calculate delta from?
-                    if (deltaValues.get(id) != null) {
+                    if (deltaValues.containsKey(id)) {
                         if (property instanceof Integer) {
                             int oldValue = (Integer) deltaValues.get(id);
                             int newValue = (Integer) property;

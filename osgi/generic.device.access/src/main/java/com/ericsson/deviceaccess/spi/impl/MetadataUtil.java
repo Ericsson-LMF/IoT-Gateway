@@ -46,15 +46,13 @@ import java.util.Map;
  * Checker for checking {@link GenericDeviceProperties} against
  * {@link GenericDevicePropertyMetadata}.
  */
-class MetadataUtil {
-
-    private static MetadataUtil instance = new MetadataUtil();
+enum MetadataUtil {
+    /**
+     * Singleton.
+     */
+    INSTANCE;
 
     private MetadataUtil() {
-    }
-
-    static MetadataUtil getInstance() {
-        return instance;
     }
 
     /**
@@ -69,10 +67,7 @@ class MetadataUtil {
         if (metadataMap == null) {
             return;
         }
-
-        String[] names = props.getNames();
-        for (int i = 0; i < names.length; i++) {
-            String name = names[i];
+        for (String name : props.getNames()) {
             verifyPropertyAgainstMetadata(metadataMap, name, props.getValue(name));
         }
     }
@@ -177,10 +172,9 @@ class MetadataUtil {
      * @return the array
      */
     private static String arrayToString(String[] validValues) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append('[');
-        for (int i = 0; i < validValues.length; i++) {
-            String string = validValues[i];
+        for (String string : validValues) {
             sb.append(string).append(',');
         }
         if (sb.length() > 1) {
@@ -207,7 +201,7 @@ class MetadataUtil {
         }
         if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
             if (metadata.size() > 0) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append('"').append(name).append("\": {");
                 for (Iterator iterator = metadata.iterator(); iterator.hasNext();) {
                     GenericDevicePropertyMetadata md = (GenericDevicePropertyMetadata) iterator.next();
