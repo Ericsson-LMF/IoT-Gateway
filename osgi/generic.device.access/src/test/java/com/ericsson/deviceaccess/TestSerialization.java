@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess;
 
@@ -41,19 +41,15 @@ import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceActionImpl;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceServiceImpl;
-import com.ericsson.deviceaccess.spi.schema.ActionSchema;
-import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
+import java.util.Dictionary;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Test;
-
-import java.util.Dictionary;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class TestSerialization {
 
@@ -65,25 +61,27 @@ public class TestSerialization {
 
     // String template = "{\"action\":{\"test\":{\"arguments\":{\"requester\":null},\"name\":\"test\"}},\"name\":\"test\",\"parameter\":{\"math\":{\"name\":\"math\",\"value\":\"100\"}},\"status\":null}";
     String template = "{\"name\":\"test\",\"actions\":[{\"name\":\"action\",\"arguments\": [{\"name\":\"arg\",\"type\":\"java.lang.Integer\",\"minValue\":\"-10\",\"maxValue\":\"10\",\"defaultValue\":\"0\"},{\"name\":\"arg2\",\"type\":\"java.lang.Integer\",\"minValue\":\"-10\",\"maxValue\":\"10\",\"defaultValue\":\"0\"}],\"result\": [{\"name\":\"res1\",\"type\":\"java.lang.Integer\",\"minValue\":\"-2147483648\",\"maxValue\":\"2147483647\",\"defaultValue\":\"0\"}]}],\"properties\":[{\"prop1\":\"100\"}]}";
-    ServiceSchema serviceSchema = new ServiceSchema.Builder("@@TEST@@").
-            addActionSchema(new ActionSchema.Builder("action").
-                    setMandatory(true).
-                    addArgumentSchema(new ParameterSchema.Builder("arg", Integer.class).
-                            setMinValue("-10").
-                            setMaxValue("10").
-                            build()).
-                    addArgumentSchema(new ParameterSchema.Builder("arg2", Integer.class).
-                            setMinValue("-10").
-                            setMaxValue("10").
-                            build()).
-                    addResultSchema(new ParameterSchema.Builder("res1", Integer.class).
-                            build()).
-                    build()).
-            addActionSchema(new ActionSchema.Builder("optionalAction").
-                    build()).
-            addPropertySchema(new ParameterSchema.Builder("prop1", Integer.class).
-                    build()).
-            build();
+    ServiceSchema serviceSchema = new ServiceSchema.Builder("@@TEST@@")
+            .addAction(a -> {
+                a.setName("action");
+                a.setMandatory(true);
+                a.addArgument(p -> {
+                    p.setName("arg");
+                    p.setType(Integer.class);
+                    p.setMinValue("-10");
+                    p.setMaxValue("10");
+                });
+                a.addArgument(p -> {
+                    p.setName("arg2");
+                    p.setType(Integer.class);
+                    p.setMinValue("-10");
+                    p.setMaxValue("10");
+                });
+                a.addResult("res1", Integer.class);
+            })
+            .addAction("optionalAction")
+            .addProperty("prop1", Integer.class)
+            .build();
 
     /*
      * @Test public void serializeTestServiceWithJSONIC(){ TestService test =
@@ -91,7 +89,7 @@ public class TestSerialization {
      * GenericDeviceActionImpl(); act.setName("test"); test.putAction(act);
      * test.getParameter().setIntValue("math", 100); String json =
      * JSON.encode(test); System.out.println(json);
-     * 
+     *
      * TestService test2 = JSON.decode(json, TestService.class);
      * assertEquals(test2.getName(), test.getName());
      * assertEquals(test2.getParameter().getStringValue("math"),
@@ -110,7 +108,7 @@ public class TestSerialization {
      * "testArgValue"); act.setArguments(args); test.putAction(act);
      * test.getParameter().setIntValue("math", 100); String json =
      * JSON.encode(dev); System.out.println(json);
-     * 
+     *
      * GenericDeviceImpl dev2 = JSON.decode(json, GenericDeviceImpl.class);
      * GenericDeviceService test2 = dev2.getService(test.getName());
      * assertEquals(test2.getName(), test.getName());
@@ -197,7 +195,7 @@ public class TestSerialization {
      * test.getParameter().setIntValue("math", 100); String json =
      * test.serialize(com.ericsson.deviceaccess.api.Constants.FORMAT_JSON);
      * System.out.println(json);
-     * 
+     *
      * TestService test2 = JSON.decode(json, TestService.class);
      * assertEquals(test2.getName(), test.getName());
      * assertEquals(test2.getParameter().getStringValue("math"),
@@ -216,7 +214,7 @@ public class TestSerialization {
      * String json =
      * dev.serialize(com.ericsson.deviceaccess.api.Constants.FORMAT_JSON);
      * System.out.println(json);
-     * 
+     *
      * GenericDevice dev2 = JSON.decode(json, GenericDeviceImpl.class);
      * GenericDeviceService test2 = dev2.getService("test");
      * assertEquals(test2.getName(), test.getName());

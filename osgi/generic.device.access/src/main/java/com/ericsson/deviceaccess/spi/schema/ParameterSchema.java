@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,18 +29,17 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.spi.schema;
-
-import java.util.Arrays;
 
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 import com.ericsson.deviceaccess.spi.utility.Utils;
+import java.util.Arrays;
 
 /**
  *
@@ -259,11 +258,23 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
         /**
          * Creates a builder for a parameter with the specified name.
          *
-         * @param parameterName
          */
-        public Builder(String parameterName, Class type) {
-            this.name = parameterName;
+        public Builder() {
+        }
+
+        public Builder(String name, Class<?> type) {
+            this.name = name;
             this.type = type;
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setType(Class type) {
+            this.type = type;
+            return this;
         }
 
         /**
@@ -310,7 +321,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
          * @param defaultValue the defaultValue to set
          * @return the builder
          */
-        public Builder setDefaultValue(String defaultValue) {
+        public Builder setDefault(String defaultValue) {
             try {
                 if (isSuperOf(Float.class, type)) {
                     this.defaultValue = Float.valueOf(defaultValue);
@@ -331,7 +342,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
          * @param validValues the validValues to set
          * @return the builder
          */
-        public Builder setValidValues(String[] validValues) {
+        public Builder setValidValues(String... validValues) {
             this.validValues = validValues;
             return this;
         }

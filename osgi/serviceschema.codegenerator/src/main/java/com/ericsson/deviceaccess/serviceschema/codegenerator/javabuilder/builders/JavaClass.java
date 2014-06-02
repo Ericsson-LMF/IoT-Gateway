@@ -175,6 +175,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
 
     private void addEnums(StringBuilder builder, int classIndent) {
         if (classModifier == ClassModifier.SINGLETON) {
+            builder.append(new Javadoc("Singleton.").build(classIndent));
             indent(builder, classIndent).append("INSTANCE").append(STATEMENT_END).append(LINE_END);
             emptyLine(builder);
         }

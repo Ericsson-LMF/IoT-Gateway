@@ -3,6 +3,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Constructor;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
@@ -78,7 +79,22 @@ public enum ImplementationAdder {
                 constructor.addBlock("defineAction(ACTION_" + name + ", context -> ", b -> {
                     b.add("if(!context.isAuthorized()) return;");
                     b.add("GenericDeviceProperties arguments = context.getArguments();");
-                    b.add(getResultDecl(action) + "execute" + StringHelper.capitalize(name) + "(" + getGetArgumentsFromContext(action) + ");");
+                    b.add(getResultDecl(action) + "execute" + StringHelper.capitalize(name) + "(");
+                    if (action.isSetArguments()) {
+                        boolean first = true;
+                        for (Parameter argument : action.getArguments().getParameterArray()) {
+                            if (!first) {
+                                b.append(", ");
+                            } else {
+                                first = false;
+                            }
+                            b.add(JavaHelper.INDENT)
+                                    .append("arguments.get")
+                                    .append(StringHelper.capitalize(StringHelper.getType(argument.getType())))
+                                    .append("Value(ACTION_").append(action.getName()).append("_ARG_").append(argument.getName()).append(")");
+                        }
+                    }
+                    b.add(");");
                     if (action.isSetResults()) {
                         b.add("set" + StringHelper.capitalize(name) + "ResultOnContext(context, result);");
                     }
@@ -90,21 +106,6 @@ public enum ImplementationAdder {
     private static String getResultDecl(Action action) {
         if (action.isSetResults()) {
             return StringHelper.capitalize(action.getName()) + "Result result = ";
-        }
-        return "";
-    }
-
-    private static String getGetArgumentsFromContext(Action action) {
-        if (action.isSetArguments()) {
-            StringBuilder signature = new StringBuilder();
-            for (Parameter argument : action.getArguments().getParameterArray()) {
-                signature.append("arguments.get")
-                        .append(StringHelper.capitalize(StringHelper.getType(argument.getType())))
-                        .append("Value(ACTION_").append(action.getName())
-                        .append("_ARG_").append(argument.getName()).append("), ");
-            }
-            signature.setLength(signature.length() - 2);
-            return signature.toString();
         }
         return "";
     }
