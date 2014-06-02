@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,19 +29,21 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.spi.schema.*;
+import com.ericsson.deviceaccess.spi.schema.ActionSchema;
+import com.ericsson.deviceaccess.spi.schema.SchemaBasedServiceBase;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 
 /**
  * Example of a custom service which is not defined in the service.xml, and for
  * which there exists no base class.
  */
 public class CustomService extends SchemaBasedServiceBase {
+
     public static final String SERVICE_NAME = "MyCustomService";
 
     /**
@@ -58,20 +60,22 @@ public class CustomService extends SchemaBasedServiceBase {
      * </ul>
      */
     private final static ActionSchema MY_ACTION = new ActionSchema.Builder("MyCustomAction").
-            addArgumentSchema(new ParameterSchema.Builder("arg1", String.class).
-                    build()).
-            addArgumentSchema(new ParameterSchema.Builder("arg2", Integer.class).
-                    setDefaultValue("20").
-                    setMinValue("10").
-                    setMaxValue("45").
-                    build()).
-            addResultSchema(new ParameterSchema.Builder("res1", Float.class).
-                    build()).
-            addResultSchema(new ParameterSchema.Builder("res2", String.class)
-                    .setDefaultValue("On")
-                    .setValidValues(new String[]{"On", "Off"}).
-                            build()).
-            build();
+            addArgument("arg1", String.class).
+            addArgument(p -> {
+                p.setName("arg2");
+                p.setType(Integer.class);
+                p.setDefault("20");
+                p.setMinValue("10");
+                p.setMaxValue("45");
+            })
+            .addResult("res1", Float.class)
+            .addResult(p -> {
+                p.setName("res2");
+                p.setType(String.class);
+                p.setDefault("On");
+                p.setValidValues("On", "Off");
+            })
+            .build();
 
     /**
      * This is the schema for this custom service. Define a schema
@@ -82,13 +86,15 @@ public class CustomService extends SchemaBasedServiceBase {
      * values: "Active" and "Inactive"</li>
      * </ul>
      */
-    private static ServiceSchema SERVICE_SCHEMA = new ServiceSchema.Builder(SERVICE_NAME).
-            addActionSchema(MY_ACTION).
-            addPropertySchema(new ParameterSchema.Builder("prop1", String.class).
-                    setDefaultValue("Active").
-                    setValidValues(new String[]{"Active", "Inactive"}).
-                    build()).
-            build();
+    private static ServiceSchema SERVICE_SCHEMA = new ServiceSchema.Builder(SERVICE_NAME)
+            .addAction(MY_ACTION)
+            .addProperty(p -> {
+                p.setName("prop1");
+                p.setType(String.class);
+                p.setDefault("Active");
+                p.setValidValues("Active", "Inactive");
+            })
+            .build();
 
     /**
      * Create an instance.
@@ -96,7 +102,7 @@ public class CustomService extends SchemaBasedServiceBase {
     public CustomService() {
         super(SERVICE_SCHEMA);
 
-        // Define the action 
+        // Define the action
         defineAction("MyCustomAction", context -> {
             String arg1 = context.getArguments().getStringValue("arg1");
             int arg2 = context.getArguments().getIntValue("arg2");
@@ -106,9 +112,11 @@ public class CustomService extends SchemaBasedServiceBase {
     }
 
     /**
-     * This method is called by the base driver which simulates updates when the active state of the custom device.
+     * This method is called by the base driver which simulates updates when the
+     * active state of the custom device.
      * <p/>
-     * It updates the <i>prop1</i> property using the <i>getProperties().setStringValue(...)</i>
+     * It updates the <i>prop1</i> property using the
+     * <i>getProperties().setStringValue(...)</i>
      * method provided by the base class.
      *
      * @param active
