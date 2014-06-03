@@ -33,7 +33,7 @@
                 <module>basedriver.tutorial</module>
                 <module>adaptor.tutorial</module>
                 <module>rest.servlet</module>
-                <!--module>android.tutorial</module-->
+                <module>android.tutorial</module>
             </modules>
         </profile>
     </profiles>
