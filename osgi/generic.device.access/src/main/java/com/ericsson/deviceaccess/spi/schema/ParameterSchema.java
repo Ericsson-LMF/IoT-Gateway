@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
-import com.ericsson.deviceaccess.spi.utility.Utils;
+import com.ericsson.research.commonutil.StringUtil;
 import java.util.Arrays;
 
 /**
@@ -191,7 +191,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
 
     private String toJsonString(int format, int indent) {
         StringBuilder json = new StringBuilder("{");
-        json.append("\"name\":\"").append(Utils.escapeJSON(name)).append("\",");
+        json.append("\"name\":\"").append(StringUtil.escapeJSON(name)).append("\",");
         json.append("\"type\":\"").append(getTypeName()).append("\",");
         if (minValue != null) {
             json.append("\"minValue\":\"").append(minValue).append("\",");
@@ -201,12 +201,12 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
         }
 
         if (defaultValue != null) {
-            json.append("\"defaultValue\":\"").append(Utils.escapeJSON(defaultValue.toString())).append("\",");
+            json.append("\"defaultValue\":\"").append(StringUtil.escapeJSON(defaultValue.toString())).append("\",");
         }
         if (validValues != null) {
             json.append("\"validValues\":[");
             for (int i = 0; i < validValues.length; i++) {
-                String value = Utils.escapeJSON(validValues[i]);
+                String value = StringUtil.escapeJSON(validValues[i]);
                 json.append('"').append(value).append('"');
                 if (i < validValues.length - 1) {
                     json.append(',');

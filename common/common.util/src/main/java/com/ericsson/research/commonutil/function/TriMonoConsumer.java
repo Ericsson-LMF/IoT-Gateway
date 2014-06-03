@@ -1,10 +1,11 @@
-package com.ericsson.deviceaccess.spi.utility;
+package com.ericsson.research.commonutil.function;
 
 /**
  *
  * @author delma
  * @param <A>
  */
+@FunctionalInterface
 public interface TriMonoConsumer<A> extends TriConsumer<A, A, A> {
-    
+
 }

@@ -34,19 +34,18 @@
  */
 package com.ericsson.research.commonutil;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 /**
- * Various string utilities that are not supported in CDC.
+ * Various string utilities.
  */
-public class StringUtil {
-
-    private StringUtil() {
-    }
+public enum StringUtil {
 
     /**
-     * Escapes all '&' characters with '&amp;' in the specified string.
+     * Singleton
+     */
+    INSTANCE;
+
+    /**
+     * Escapes all '&' characters with '&amp;amp;' in the specified string.
      *
      * @param string the input string
      *
@@ -56,20 +55,65 @@ public class StringUtil {
         return string.replace("&", "&amp;");
     }
 
-    public static String toHexString(byte byteValue) {
-        return Integer.toHexString(((int) byteValue) & 0xFF);
+    /**
+     * Makes first char of the string to upper case
+     *
+     * @param string String to be capitalized
+     * @return capitalized string
+     */
+    public static String capitalize(String string) {
+        StringBuilder sb = new StringBuilder(string);
+        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+        return sb.toString();
     }
 
-    public static String toHexString(byte[] bytes) {
-        return Arrays.asList(bytes).stream()
-                .map(StringUtil::toHexString)
-                .collect(Collectors.toList()).toString();
+    /**
+     * Ensures that there is punctuation at end of string
+     *
+     * @param string string to ensure punctuation
+     * @return ensured string
+     */
+    public static String setEndPunctuation(String string) {
+        if (string.endsWith(".")) {
+            return string;
+        }
+        return string + ".";
     }
 
-    public static String toHexString(int[] ints) {
-        return Arrays.stream(ints)
-                .mapToObj(Integer::toHexString)
-                .collect(Collectors.toList()).toString();
+    /**
+     * gets type from string
+     *
+     * @param string string to get type from
+     * @return type as string
+     */
+    public static String getType(String string) {
+        if (string.toLowerCase().startsWith("int")) {
+            return "int";
+        } else if (string.toLowerCase().startsWith("float")) {
+            return "float";
+        } else {
+            return "String";
+        }
+    }
+
+    public static String escapeJSON(String input) {
+        StringBuilder result = new StringBuilder();
+        int len = input.length();
+        for (int i = 0; i < len; i++) {
+            char c = input.charAt(i);
+            if (c == '\n') {
+                result.append("\\n");
+            } else if (c == '\r') {
+                result.append("\\r");
+            } else if (c == '"') {
+                result.append("\\\"");
+            } else if (c == '\\') {
+                result.append("\\\\");
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
     }
 
 }

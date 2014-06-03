@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
@@ -39,6 +39,7 @@ import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
+import com.ericsson.research.commonutil.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -82,7 +83,7 @@ public class Main {
 
                 File spiPackageDir = new File(spiBaseDir, makePath(service));
                 spiPackageDir.mkdirs();
-                File spiSourceFile = new File(spiPackageDir, capitalize(service.getName() + "Base") + ".java");
+                File spiSourceFile = new File(spiPackageDir, StringUtil.capitalize(service.getName() + "Base") + ".java");
                 try (PrintStream spiPrintStream = new PrintStream(spiSourceFile)) {
                     JavaClass implementationBuilder = new JavaClass();
                     ImplementationAdder.addServiceImplementation(implementationBuilder, service);
@@ -94,7 +95,7 @@ public class Main {
 
                 File apiPackageDir = new File(apiBaseDir, makePath(service));
                 apiPackageDir.mkdirs();
-                File apiSourceFile = new File(apiPackageDir, capitalize(service.getName()) + ".java");
+                File apiSourceFile = new File(apiPackageDir, StringUtil.capitalize(service.getName()) + ".java");
                 try (PrintStream apiPrintStream = new PrintStream(apiSourceFile)) {
                     JavaClass interfaceBuilder = new JavaClass();
                     InterfaceAdder.addServiceInterface(interfaceBuilder, version, service);
@@ -115,12 +116,6 @@ public class Main {
         } else {
             return category.replace('.', '/');
         }
-    }
-
-    private String capitalize(String string) {
-        StringBuilder sb = new StringBuilder(string);
-        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-        return sb.toString();
     }
 
     /**

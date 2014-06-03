@@ -1,6 +1,5 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
-import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
@@ -14,6 +13,7 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.research.commonutil.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -154,7 +154,7 @@ public class Constructor extends AbstractCodeBlock implements Callable {
 
     private StringBuilder buildParameters() {
         StringBuilder builder = new StringBuilder();
-        parameters.forEach(p -> builder.append(StringHelper.capitalize(p.getType())).append(" ").append(p.getName().toLowerCase()).append(", "));
+        parameters.forEach(p -> builder.append(StringUtil.capitalize(p.getType())).append(" ").append(p.getName().toLowerCase()).append(", "));
         if (builder.length() > 0) {
             builder.setLength(builder.length() - 2);
         }

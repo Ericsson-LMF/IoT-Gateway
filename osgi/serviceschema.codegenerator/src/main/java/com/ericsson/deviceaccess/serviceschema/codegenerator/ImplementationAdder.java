@@ -12,6 +12,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builder
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
+import com.ericsson.research.commonutil.StringUtil;
 
 /**
  * Adds implementation of service to builder
@@ -42,12 +43,12 @@ public enum ImplementationAdder {
         builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceActionContext");
         builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ActionDefinition");
-        builder.addImport("com.ericsson.deviceaccess.api.service." + category + "." + StringHelper.capitalize(name));
+        builder.addImport("com.ericsson.deviceaccess.api.service." + category + "." + StringUtil.capitalize(name));
 
-        builder.setJavadoc(new Javadoc(StringHelper.setEndPunctuation(service.getDescription())));
-        builder.setName(StringHelper.capitalize(name) + "Base");
+        builder.setJavadoc(new Javadoc(StringUtil.setEndPunctuation(service.getDescription())));
+        builder.setName(StringUtil.capitalize(name) + "Base");
         builder.setExtends("SchemaBasedServiceBase");
-        builder.addImplements(StringHelper.capitalize(name));
+        builder.addImplements(StringUtil.capitalize(name));
         builder.setClassModifier(ClassModifier.ABSTRACT);
 
         addConstructor(builder, service);
@@ -79,7 +80,7 @@ public enum ImplementationAdder {
                 constructor.addBlock("defineAction(ACTION_" + name + ", context -> ", b -> {
                     b.add("if(!context.isAuthorized()) return;");
                     b.add("GenericDeviceProperties arguments = context.getArguments();");
-                    b.add(getResultDecl(action) + "execute" + StringHelper.capitalize(name) + "(");
+                    b.add(getResultDecl(action) + "execute" + StringUtil.capitalize(name) + "(");
                     if (action.isSetArguments()) {
                         boolean first = true;
                         for (Parameter argument : action.getArguments().getParameterArray()) {
@@ -90,13 +91,13 @@ public enum ImplementationAdder {
                             }
                             b.add(JavaHelper.INDENT)
                                     .append("arguments.get")
-                                    .append(StringHelper.capitalize(StringHelper.getType(argument.getType())))
+                                    .append(StringUtil.capitalize(StringUtil.getType(argument.getType())))
                                     .append("Value(ACTION_").append(action.getName()).append("_ARG_").append(argument.getName()).append(")");
                         }
                     }
                     b.add(");");
                     if (action.isSetResults()) {
-                        b.add("set" + StringHelper.capitalize(name) + "ResultOnContext(context, result);");
+                        b.add("set" + StringUtil.capitalize(name) + "ResultOnContext(context, result);");
                     }
                 }).append(");");
             }
@@ -105,7 +106,7 @@ public enum ImplementationAdder {
 
     private static String getResultDecl(Action action) {
         if (action.isSetResults()) {
-            return StringHelper.capitalize(action.getName()) + "Result result = ";
+            return StringUtil.capitalize(action.getName()) + "Result result = ";
         }
         return "";
     }
@@ -115,15 +116,15 @@ public enum ImplementationAdder {
             for (Action action : service.getActions().getActionArray()) {
                 String name = action.getName();
                 if (action.isSetResults()) {
-                    Method method = new Method("void", "set" + StringHelper.capitalize(name) + "ResultOnContext");
+                    Method method = new Method("void", "set" + StringUtil.capitalize(name) + "ResultOnContext");
                     method.setJavadoc(new Javadoc("Sets the result from the '").append(name).append("' action on the specified context."));
                     method.setAccessModifier(AccessModifier.PRIVATE);
                     method.addParameter(new Param("GenericDeviceActionContext", "context").setDescription("action context to set result in"));
-                    method.addParameter(new Param(StringHelper.capitalize(name) + "Result", "result").setDescription("result to set"));
+                    method.addParameter(new Param(StringUtil.capitalize(name) + "Result", "result").setDescription("result to set"));
 
                     method.add("GenericDeviceProperties value = #0.getResult().getValue();");
                     for (Parameter result : action.getResults().getParameterArray()) {
-                        String type = StringHelper.capitalize(StringHelper.getType(result.getType()));
+                        String type = StringUtil.capitalize(StringUtil.getType(result.getType()));
                         method.add("value.set" + type + "Value(ACTION_" + name + "_RES_" + result.getName() + ", #1." + result.getName() + ");");
                     }
                     builder.addMethod(method);
@@ -138,17 +139,17 @@ public enum ImplementationAdder {
                 String name = property.getName();
                 String type = property.getType();
 
-                Method method = new Method(StringHelper.getType(type), "get" + StringHelper.capitalize(name));
+                Method method = new Method(StringUtil.getType(type), "get" + StringUtil.capitalize(name));
                 method.addModifier(OptionalModifier.FINAL);
                 method.setJavadoc(new Javadoc().inherit());
-                method.add("return getProperties().get" + StringHelper.capitalize(StringHelper.getType(type)) + "Value(PROP_" + name + ");");
+                method.add("return getProperties().get" + StringUtil.capitalize(StringUtil.getType(type)) + "Value(PROP_" + name + ");");
                 builder.addMethod(method);
 
-                method = new Method("void", "update" + StringHelper.capitalize(name));
+                method = new Method("void", "update" + StringUtil.capitalize(name));
                 method.setAccessModifier(AccessModifier.PROTECTED).addModifier(OptionalModifier.FINAL);
                 method.setJavadoc(new Javadoc("Update the '").append(name).append("' property. To be used by concrete implementations of the service."));
-                method.addParameter(new Param(StringHelper.getType(property.getType()), "value").setDescription("value to be set"));
-                method.add("getProperties().set" + StringHelper.capitalize(StringHelper.getType(type)) + "Value(PROP_" + name + ", #0);");
+                method.addParameter(new Param(StringUtil.getType(property.getType()), "value").setDescription("value to be set"));
+                method.add("getProperties().set" + StringUtil.capitalize(StringUtil.getType(type)) + "Value(PROP_" + name + ", #0);");
                 builder.addMethod(method);
             }
         }

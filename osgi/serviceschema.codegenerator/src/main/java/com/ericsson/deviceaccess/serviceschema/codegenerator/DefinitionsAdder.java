@@ -12,6 +12,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builder
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.Variable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import com.ericsson.research.commonutil.StringUtil;
 
 /**
  * Adds schema definitions to builder
@@ -46,9 +47,6 @@ public enum DefinitionsAdder {
         builder.addVariable(new Variable("Map<String, ServiceSchema>", "serviceSchemas").init("new HashMap<>()"));
         Constructor code = new Constructor().setJavadoc(new Javadoc("Constructor which generates schemata."));
         builder.addConstructor(code);
-//        code.add("ActionSchema.Builder ").append(ACTION_SB).append(";");
-//        code.add("ParameterSchema.Builder ").append(PARAMETER_SB).append(";");
-//        code.add("ServiceSchema.Builder ").append(SERVICE_SB).append(";");
         builder.addMethod(new Method("ServiceSchema", "getServiceSchema")
                 .setJavadoc(new Javadoc("Gets ServiceSchema based on it's name.").result("Service schema"))
                 .addParameter(new Param("String", "name").setDescription("name of schema"))
@@ -107,7 +105,7 @@ public enum DefinitionsAdder {
                 if (defaultStr != null) {
                     parameterBlock.add("p.setDefault(\"").append(defaultStr).append("\");");
                 }
-                if ("String".equals(StringHelper.getType(parameter.getType()))) {
+                if ("String".equals(StringUtil.getType(parameter.getType()))) {
                     if (parameter.isSetValues()) {
                         parameterBlock.addBlock("p.setValidValues(new String[]", defaultBlock -> {
                             boolean first = true;

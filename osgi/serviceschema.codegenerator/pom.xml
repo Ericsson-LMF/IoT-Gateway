@@ -62,5 +62,10 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
+import com.ericsson.research.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceAction;
@@ -45,7 +46,7 @@ import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkGet
 import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkSetPermission;
 import com.ericsson.deviceaccess.spi.GenericDeviceService;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.deviceaccess.spi.utility.Utils;
+import com.ericsson.research.commonutil.StringUtil;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -274,7 +275,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
     private String toJsonString(int format, int indent)
             throws GenericDeviceException {
         String json = "{";
-        json += "\"name\":\"" + Utils.escapeJSON(getName()) + "\",";
+        json += "\"name\":\"" + StringUtil.escapeJSON(getName()) + "\",";
         json += "\"actions\":" + getActionListJsonString(format, indent) + ",";
         json += "\"properties\": " + properties.serialize(format);
         json += "}";
@@ -287,8 +288,8 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
         try {
             action.forEach((k, act) -> {
                 if (act != null) {
-                    json.append('"').append(Utils.escapeJSON(act.getName())).append('"').append(':');
-                    json.append(LambdaHelper.smugle(() -> act.serialize(format)));
+                    json.append('"').append(StringUtil.escapeJSON(act.getName())).append('"').append(':');
+                    json.append(FunctionalUtil.smuggle(() -> act.serialize(format)));
                     json.append(',');
                 }
             });

@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.spi.impl;
 
@@ -40,14 +40,14 @@ import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 import com.ericsson.deviceaccess.spi.GenericDeviceError;
-import com.ericsson.deviceaccess.spi.utility.Utils;
-
+import com.ericsson.research.commonutil.StringUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         implements GenericDeviceProperties {
+
     public static final String LAST_UPDATE_TIME = "lastUpdateTime";
     private Map<String, Object> map;
     private Map<String, GenericDevicePropertyMetadata> metadata; // name:String -> GenericDevicePropertyMetadata
@@ -281,7 +281,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     public String serializeState() {
         StringBuilder sb = new StringBuilder("{");
         for (String name : getNames()) {
-            sb.append("\"").append(name).append("\":\"").append(Utils.escapeJSON(getStringValue(name))).append("\",");
+            sb.append("\"").append(name).append("\":\"").append(StringUtil.escapeJSON(getStringValue(name))).append("\",");
         }
 
         // remove last ','
@@ -314,7 +314,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         StringBuilder sb = new StringBuilder();
         for (String name : getNames()) {
             sb.append("\"").append(name).append("\":{");
-            sb.append("\"currentValue\":\"").append(Utils.escapeJSON(getStringValue(name))).append("\",");
+            sb.append("\"currentValue\":\"").append(StringUtil.escapeJSON(getStringValue(name))).append("\",");
             if (metadata.containsKey(name)) {
                 sb.append("\"metadata\":");
                 String serializedMetadata = metadata.get(name).serialize(format);

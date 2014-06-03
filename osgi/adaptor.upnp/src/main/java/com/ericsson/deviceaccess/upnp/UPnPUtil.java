@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,11 +29,19 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.upnp;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import org.apache.regexp.RE;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -45,16 +53,9 @@ import org.osgi.service.upnp.UPnPService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Dictionary;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
 public class UPnPUtil {
-	private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
     public static final String DEVICE_TYPE_MEDIA_RENDERER = "urn:schemas-upnp-org:device:MediaRenderer";
     public static final String DEVICE_TYPE_MEDIA_SERVER = "urn:schemas-upnp-org:device:MediaServer";
     public static final String DEVICE_TYPE_BINARY_LIGHT = "urn:schemas-upnp-org:device:BinaryLight";
@@ -108,7 +109,9 @@ public class UPnPUtil {
         Properties args = new Properties();
         args.put("InstanceID", "0");
         args.put("CurrentURI", url);
-        if (title == null) title = "";
+        if (title == null) {
+            title = "";
+        }
 
         String contentType = getContentType(url);
         args.put("CurrentURIMetaData", getCurrentURIMetadata(url, title, contentType));
@@ -129,24 +132,24 @@ public class UPnPUtil {
         String contentType;
         try {
             contentType = HttpClient.getHeader(url, HEADER_CONTENT_TYPE);
-            if (contentType == null || contentType.indexOf("/") < 0) {
+            if (contentType == null || !contentType.contains("/")) {
                 throw new UPnPUtilException(404, "Could not determine content type");
             }
             debug("Content type is " + contentType);
             if (contentType.indexOf(";") > 0) {
                 /*
-                     * remove optional data such as character encoding.
-                     * e.g. video/mp4;UTF-8
-                     */
+                 * remove optional data such as character encoding.
+                 * e.g. video/mp4;UTF-8
+                 */
                 contentType = contentType.substring(0, contentType.indexOf(";"));
             }
         } catch (IOException e) {
             throw new UPnPUtilException(500, e.getMessage());
         }
         /*
-           * Workaround for ustream mp4 file which returns audio/mp4
-           * 20100917 Kenta
-           */
+         * Workaround for ustream mp4 file which returns audio/mp4
+         * 20100917 Kenta
+         */
         if (url.indexOf("ustream") > 0) {
             contentType = "video/mp4";
         }
@@ -196,13 +199,15 @@ public class UPnPUtil {
 
     public static Dictionary browse(UPnPDevice dev, Properties givenArgs) throws UPnPException {
         UPnPAction action = getUPnPAction(dev, BROWSE_ACTION);
-        if (action == null) throw new UPnPException(404, "No such action supported by " + getFriendlyName(dev));
+        if (action == null) {
+            throw new UPnPException(404, "No such action supported by " + getFriendlyName(dev));
+        }
         Properties args = getDefaultBrowseArguments();
         String[] argNames = action.getInputArgumentNames();
-        for (int i = 0; i < argNames.length; i++) {
-            if (givenArgs.containsKey(argNames[i])) {
-                debug("Setting " + argNames[i] + " to " + givenArgs.get(argNames[i]));
-                args.put(argNames[i], givenArgs.get(argNames[i]).toString());
+        for (String argName : argNames) {
+            if (givenArgs.containsKey(argName)) {
+                debug("Setting " + argName + " to " + givenArgs.get(argName));
+                args.put(argName, givenArgs.get(argName).toString());
             }
         }
         try {
@@ -232,8 +237,8 @@ public class UPnPUtil {
         RE varRE = new RE("<(\\w+)\\s.*val=\"(.*)\".*/");
         String[] tags = new RE(">").split(value);
 
-        for (int i = 0; i < tags.length; i++) {
-            if (varRE.match(tags[i])) {
+        for (String tag : tags) {
+            if (varRE.match(tag)) {
                 result.setProperty(varRE.getParen(1), varRE.getParen(2));
             }
         }
@@ -249,9 +254,9 @@ public class UPnPUtil {
             UPnPAction action = services[i].getAction(actionName);
             if (action != null) {
                 /*
-                     * log.debug("invoking " + action.getName() + " on " +
-                     * device.getDescriptions(null).get( UPnPDevice.FRIENDLY_NAME));
-                     */
+                 * log.debug("invoking " + action.getName() + " on " +
+                 * device.getDescriptions(null).get( UPnPDevice.FRIENDLY_NAME));
+                 */
                 return action;
             }
         }
@@ -270,37 +275,27 @@ public class UPnPUtil {
     public static String getFriendlyName(UPnPDevice dev) {
         return getProperty(dev, UPnPDevice.FRIENDLY_NAME);
     }
-    
+
     public static String getModelName(UPnPDevice dev) {
         return getProperty(dev, UPnPDevice.MODEL_NAME);
     }
 
     public static boolean isMediaRenderer(UPnPDevice dev) {
         String type = getDeviceType(dev);
-        if (type != null && type.startsWith(DEVICE_TYPE_MEDIA_RENDERER)) {
-            return true;
-        }
-        return false;
+        return type != null && type.startsWith(DEVICE_TYPE_MEDIA_RENDERER);
     }
 
     public static boolean isMediaServer(UPnPDevice dev) {
         String type = getDeviceType(dev);
-        if (type != null && type.startsWith(DEVICE_TYPE_MEDIA_SERVER)) {
-            return true;
-        }
-        return false;
+        return type != null && type.startsWith(DEVICE_TYPE_MEDIA_SERVER);
     }
 
     public static boolean isDimmableLight(UPnPDevice dev) {
         String type = getDeviceType(dev);
         String model = getModelName(dev);
-        if (type != null && type.startsWith(DEVICE_TYPE_BINARY_LIGHT) &&
-        	model != null && model.startsWith("Intel")) { // "Intel CLR Emulated Light Bulb
-            return true;
-        }
-        return false;
+        return type != null && type.startsWith(DEVICE_TYPE_BINARY_LIGHT)
+                && model != null && model.startsWith("Intel");
     }
-
 
     private static String getProperty(UPnPDevice dev, String name) {
         if (dev != null) {
@@ -327,8 +322,8 @@ public class UPnPUtil {
             // uuidFilter);
 
             if (refs != null) {
-                for (int i = 0; i < refs.length; i++) {
-                    UPnPDevice dev = (UPnPDevice) context.getService(refs[i]);
+                for (ServiceReference ref : refs) {
+                    UPnPDevice dev = (UPnPDevice) context.getService(ref);
                     if (uuid.equalsIgnoreCase((String) dev
                             .getDescriptions(null).get(UPnPDevice.UDN))) {
                         return dev;
@@ -343,36 +338,39 @@ public class UPnPUtil {
     }
 
     private static void debug(String msg) {
-        if (logger != null)
+        if (logger != null) {
             logger.debug(msg);
+        }
     }
 
     private static void info(String msg) {
-        if (logger != null)
+        if (logger != null) {
             logger.info(msg);
+        }
     }
 
     private static void error(String msg) {
-        if (logger != null)
+        if (logger != null) {
             logger.error(msg);
+        }
     }
-    
+
     static public String[] parseServiceType(String serviceType) {
-    	return UPnPUtil.stringSplit(serviceType, ":");
+        return UPnPUtil.stringSplit(serviceType, ":");
     }
-    
-	static private String[] stringSplit(String str, String delimiter) {
-		StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
-		Vector tokenList = new Vector();
-		
-		while (tokenizer.hasMoreElements()) {
-			String token = tokenizer.nextToken();
-			if (token == null) {
-				continue;
-			}
-			tokenList.add(token);
-		}
-		
-		return (String[])tokenList.toArray(new String[0]);
-	}
+
+    static private String[] stringSplit(String str, String delimiter) {
+        StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
+        List<String> tokenList = new ArrayList<>();
+
+        while (tokenizer.hasMoreElements()) {
+            String token = tokenizer.nextToken();
+            if (token == null) {
+                continue;
+            }
+            tokenList.add(token);
+        }
+
+        return tokenList.toArray(new String[0]);
+    }
 }

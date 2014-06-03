@@ -58,6 +58,11 @@
             <version>2.5.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

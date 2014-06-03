@@ -12,6 +12,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builder
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
+import com.ericsson.research.commonutil.StringUtil;
 
 /**
  * Adds interface of service to builder
@@ -38,7 +39,7 @@ public enum InterfaceAdder {
         builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceService");
         builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
 
-        builder.setJavadoc(new Javadoc(StringHelper.setEndPunctuation(service.getDescription())));
+        builder.setJavadoc(new Javadoc(StringUtil.setEndPunctuation(service.getDescription())));
         builder.setClassModifier(ClassModifier.INTERFACE);
         builder.setName(service.getName());
         builder.setExtends("GenericDeviceService");
@@ -98,9 +99,9 @@ public enum InterfaceAdder {
         if (service.isSetProperties()) {
             for (Parameter property : service.getProperties().getParameterArray()) {
                 String name = property.getName();
-                Method method = new Method(StringHelper.getType(property.getType()), "get" + StringHelper.capitalize(name));
+                Method method = new Method(StringUtil.getType(property.getType()), "get" + StringUtil.capitalize(name));
                 method.setJavadoc(new Javadoc("Gets the property '").append(name).append("'.")
-                        .line("Property description: ").append(StringHelper.setEndPunctuation(property.getDescription()))
+                        .line("Property description: ").append(StringUtil.setEndPunctuation(property.getDescription()))
                         .append(b -> getValidValuesJavadoc(b, property)));
                 builder.addMethod(method);
             }
@@ -108,7 +109,7 @@ public enum InterfaceAdder {
     }
 
     private static Javadoc getValidValuesJavadoc(Javadoc builder, Parameter property) {
-        if ("String".equals(StringHelper.getType(property.getType()))) {
+        if ("String".equals(StringUtil.getType(property.getType()))) {
             if (property.isSetValues()) {
                 builder.line("Valid values:");
                 getValidValuesString(builder, property.getValues().getValueArray());
@@ -135,7 +136,7 @@ public enum InterfaceAdder {
     private static void addActionDefinitions(JavaClass builder, Service service) {
         if (service.isSetActions()) {
             for (Action action : service.getActions().getActionArray()) {
-                String name = StringHelper.capitalize(action.getName());
+                String name = StringUtil.capitalize(action.getName());
                 Javadoc javadoc = new Javadoc();
 
                 String result = "void";
@@ -148,7 +149,7 @@ public enum InterfaceAdder {
                 Method method = new Method(result, "execute" + name);
                 if (action.isSetArguments()) {
                     for (Parameter parameter : action.getArguments().getParameterArray()) {
-                        Param param = new Param(StringHelper.getType(parameter.getType()), parameter.getName());
+                        Param param = new Param(StringUtil.getType(parameter.getType()), parameter.getName());
                         param.setDescription(parameter.getDescription());
                         method.addParameter(param);
                     }
@@ -166,13 +167,13 @@ public enum InterfaceAdder {
                     String name = action.getName();
                     builder.addInnerClass(inner -> {
                         inner.setJavadoc(new Javadoc("Result from action ").append(name));
-                        inner.setName(StringHelper.capitalize(name) + "Result");
+                        inner.setName(StringUtil.capitalize(name) + "Result");
                         inner.addModifier(OptionalModifier.FINAL);
                         inner.addModifier(OptionalModifier.STATIC);
                         for (Parameter result : action.getResults().getParameterArray()) {
-                            Variable variable = new Variable(StringHelper.getType(result.getType()), result.getName());
+                            Variable variable = new Variable(StringUtil.getType(result.getType()), result.getName());
                             variable.setAccessModifier(AccessModifier.PUBLIC);
-                            variable.setJavadoc(new Javadoc(StringHelper.setEndPunctuation(result.getDescription())));
+                            variable.setJavadoc(new Javadoc(StringUtil.setEndPunctuation(result.getDescription())));
                             inner.addVariable(variable);
                         }
                     });

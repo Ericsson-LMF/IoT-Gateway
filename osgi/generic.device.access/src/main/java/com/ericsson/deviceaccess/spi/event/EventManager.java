@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.event;
 
-import com.ericsson.deviceaccess.spi.utility.TriMonoConsumer;
+import com.ericsson.research.commonutil.function.TriMonoConsumer;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
 import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.*;

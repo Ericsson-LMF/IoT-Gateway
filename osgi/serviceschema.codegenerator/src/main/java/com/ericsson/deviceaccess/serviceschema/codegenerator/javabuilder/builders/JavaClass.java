@@ -1,6 +1,5 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
-import com.ericsson.deviceaccess.serviceschema.codegenerator.StringHelper;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
@@ -18,6 +17,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
+import com.ericsson.research.commonutil.StringUtil;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -96,7 +96,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      * @return this
      */
     public JavaClass setName(String name) {
-        this.name = StringHelper.capitalize(name);
+        this.name = StringUtil.capitalize(name);
         return this;
     }
 
