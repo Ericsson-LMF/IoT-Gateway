@@ -16,6 +16,7 @@
         <additionalparam>-Xdoclint:none</additionalparam>
     </properties>
     <modules>
+        <module>common.util</module>
         <module>common.server.util</module>
         <module>common.osgi.log.util</module>
         <module>common.test.util</module>
