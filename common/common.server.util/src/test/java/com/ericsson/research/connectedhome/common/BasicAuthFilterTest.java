@@ -70,7 +70,7 @@ public class BasicAuthFilterTest {
 
         context.checking(new Expectations() {
             {
-                allowing(clientRequest).getMetadata();
+                allowing(clientRequest).getHeaders();
                 will(returnValue(headers));
                 allowing(dummy).handle(with(aNonNull(ClientRequest.class)));
                 will(returnValue(null));
