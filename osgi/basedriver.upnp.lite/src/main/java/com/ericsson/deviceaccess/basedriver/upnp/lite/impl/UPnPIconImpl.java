@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
@@ -40,57 +40,58 @@ import java.net.URL;
 import org.osgi.service.upnp.UPnPIcon;
 
 public class UPnPIconImpl implements UPnPIcon {
-	String mimetype;
-	String url;
-	int width;
-	int height;
-	int depth;
-	
-	protected UPnPIconImpl(String mimetype, int width, int height, int depth, String url) {
-		this.mimetype = mimetype;
-		this.width = width;
-		this.height = height;
-		this.depth = depth;
-		this.url = url;
-	}
-	
-	public String getUrl() {
-		return url;
-	}
-	
-    @Override
-	public String getMimeType() {
-		return mimetype;
-	}
-	
-    @Override
-	public int getWidth() {
-		return width;
-	}
-	
-    @Override
-	public int getHeight() {
-		return height;
-	}
-	
-    @Override
-	public int getDepth() {
-		return depth;
-	}
-	
-    @Override
-	public int getSize() {
-		return 0;
-	}
+
+    String mimetype;
+    String url;
+    int width;
+    int height;
+    int depth;
+
+    protected UPnPIconImpl(String mimetype, int width, int height, int depth, String url) {
+        this.mimetype = mimetype;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.url = url;
+    }
+
+    public String getUrl() {
+        return url;
+    }
 
     @Override
-	public InputStream getInputStream() throws IOException {
-		URL loc = new URL(url);
-		return loc.openConnection().getInputStream();
-	}
-	
+    public String getMimeType() {
+        return mimetype;
+    }
+
     @Override
-	public String toString() {
-		return "UPnP icon: mimetype=" + mimetype + ", width=" + width + ", height=" + height + ", depth=" + depth + ", url=" + url;
-	}
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public int getDepth() {
+        return depth;
+    }
+
+    @Override
+    public int getSize() {
+        return 0;
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        URL loc = new URL(url);
+        return loc.openConnection().getInputStream();
+    }
+
+    @Override
+    public String toString() {
+        return "UPnP icon: mimetype=" + mimetype + ", width=" + width + ", height=" + height + ", depth=" + depth + ", url=" + url;
+    }
 }

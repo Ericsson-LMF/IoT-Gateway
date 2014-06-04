@@ -153,7 +153,7 @@ public class LDAPExpr {
         if (!ps.prefix("(")) {
             ps.error(MALFORMED);
         }
-        
+
         int operator;
         ps.skipWhite();
         switch (ps.peek()) {
@@ -575,7 +575,7 @@ public class LDAPExpr {
                     }
                 }
             }
-        }catch (ArrayIndexOutOfBoundsException |
+        } catch (ArrayIndexOutOfBoundsException |
                 IllegalAccessException |
                 IllegalArgumentException |
                 InstantiationException |
@@ -634,7 +634,6 @@ public class LDAPExpr {
         res.append(")");
         return res.toString();
     }
-
 
     /**
      * Contains the current parser position and parsing utility methods.

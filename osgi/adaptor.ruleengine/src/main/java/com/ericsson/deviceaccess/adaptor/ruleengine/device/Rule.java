@@ -228,7 +228,7 @@ public class Rule {
         Calendar date = Calendar.getInstance();
         int hourOfDay = date.get(Calendar.HOUR_OF_DAY);
         //Removed casting
-        int minute =  date.get(Calendar.MINUTE);
+        int minute = date.get(Calendar.MINUTE);
         float time = hourOfDay + minute / 60;
 
         if (startTimeFloat < stopTimeFloat) {
@@ -336,8 +336,7 @@ public class Rule {
 
         if (startTime != null && !startTime.trim().isEmpty()) {
             callTimer(startTime, "start");
-        }
-        else if (stopTime != null && !stopTime.trim().isEmpty()) {
+        } else if (stopTime != null && !stopTime.trim().isEmpty()) {
             callTimer(stopTime, "stop");
         }
     }

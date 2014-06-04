@@ -87,7 +87,6 @@ public class EventManager implements ServiceListener, Runnable,
     private ServiceTracker deviceTracker;
     private final Map<String, GenericDevice> devices = new ConcurrentHashMap<>();
 
-
     private Thread thread;
     private final GenericDeviceEvent POISON = new GenericDeviceEvent(null, null, null, null);
     private Filter ALLOW_ALL = new Filter() {
@@ -368,7 +367,6 @@ public class EventManager implements ServiceListener, Runnable,
             logger.warn("There was no device registered with deviceID: " + deviceId);
         }
     }
-
 
     @Override
     public Object addingService(ServiceReference<GenericDevice> reference) {

@@ -43,19 +43,19 @@
             <artifactId>json</artifactId>
         </dependency>
         <!-- 
-	    <dependency>
-              <groupId>com.springsource.org.apache.commons</groupId>
-              <artifactId>logging</artifactId>
-	    </dependency>
-	    -->
-	    <dependency>
-              <groupId>org.apache.commons</groupId>
-              <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-	    </dependency>
-            <dependency>
-                <groupId>org.apache.log4j</groupId>
-                <artifactId>com.springsource.org.apache.log4j</artifactId>
-            </dependency>        
+        <dependency>
+          <groupId>com.springsource.org.apache.commons</groupId>
+          <artifactId>logging</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.log4j</groupId>
+            <artifactId>com.springsource.org.apache.log4j</artifactId>
+        </dependency>        
         <dependency>
             <groupId>com.ericsson.deviceaccess</groupId>
             <artifactId>generic.device.access</artifactId>

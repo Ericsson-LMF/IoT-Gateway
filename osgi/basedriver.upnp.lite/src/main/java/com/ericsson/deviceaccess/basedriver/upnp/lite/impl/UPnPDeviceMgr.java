@@ -237,7 +237,7 @@ public class UPnPDeviceMgr {
                             if (device.isAlive()) {
                                 UPnPDeviceImpl oldDevice = getDevice(device.getUuid());
                                 if (oldDevice == null) {
-									// Add this device if it's new
+                                    // Add this device if it's new
                                     // TODO: Can use this since we can figure out which interface it's coming from: addUPnPDeviceInstance(device);
                                 } else {
                                     // Otherwise update it's timestamp

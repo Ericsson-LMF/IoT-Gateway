@@ -144,7 +144,7 @@ public class ReflectionTestUtil {
      *
      * @return the Method object, or <code>null</code> if none found
      */
-    private static  Method findMethod(Class<?> clazz, String name, Class<?>... paramTypes) {
+    private static Method findMethod(Class<?> clazz, String name, Class<?>... paramTypes) {
         Class<?> searchType = clazz;
         while (searchType != null) {
             Method[] methods = (searchType.isInterface() ? searchType.getMethods() : searchType.getDeclaredMethods());

@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UPnPAgentFactory implements BundleActivator, ServiceTrackerCustomizer {
+
     private static final Logger logger = LoggerFactory.getLogger(UPnPAgentFactory.class);
 
     private BundleContext context;

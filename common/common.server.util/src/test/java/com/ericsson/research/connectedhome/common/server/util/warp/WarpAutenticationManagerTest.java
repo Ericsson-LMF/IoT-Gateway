@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,14 +29,20 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.research.connectedhome.common.server.util.warp;
 
 import com.ericsson.research.connectedhome.common.BasicAuthFilter;
+import static com.ericsson.research.connectedhome.common.Matchers.anAuthIdentity;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import java.io.IOException;
+import java.net.URI;
+import javax.ws.rs.core.MediaType;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -44,15 +50,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.net.URI;
-
-import static com.ericsson.research.connectedhome.common.Matchers.*;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
-
 public class WarpAutenticationManagerTest {
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -72,7 +71,6 @@ public class WarpAutenticationManagerTest {
     @After
     public void tearDown() throws Exception {
     }
-
 
 //    public void test1() throws WarpAutenticationManager.CommunicationException {
 //        ReflectionTestUtils.setField(
@@ -99,22 +97,23 @@ public class WarpAutenticationManagerTest {
 //        }
 //
 //    }
-
     @Test
     public void testGetUser() throws Exception {
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).get(AuthIdentity.class);
-                will(returnValue(new AuthIdentity("joe", "joe")));
-            }});
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).get(AuthIdentity.class);
+                        will(returnValue(new AuthIdentity("joe", "joe")));
+                    }
+                });
 
         AuthIdentity user = warpAutenticationManager.getUser("joe");
 
@@ -126,20 +125,21 @@ public class WarpAutenticationManagerTest {
     @Test
     public void testGetUserError() throws Exception {
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).get(AuthIdentity.class);
-                will(
-                    throwException(new IOException("Expected test exception")));
-            }});
-
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).get(AuthIdentity.class);
+                        will(
+                                throwException(new IOException("Expected test exception")));
+                    }
+                });
 
         try {
             warpAutenticationManager.getUser("joe");
@@ -154,12 +154,13 @@ public class WarpAutenticationManagerTest {
     @Test
     public void testGetUserError2() throws Exception {
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-            }});
-
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                    }
+                });
 
         try {
             warpAutenticationManager.getUser(" ");
@@ -174,17 +175,19 @@ public class WarpAutenticationManagerTest {
     @Test
     public void testRemoveUser() throws Exception {
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).delete();
-            }});
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).delete();
+                    }
+                });
 
         warpAutenticationManager.removeUser("joe");
 
@@ -194,19 +197,21 @@ public class WarpAutenticationManagerTest {
     @Test
     public void testRemoveUserError() throws Exception {
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).delete();
-                will(
-                    throwException(new IOException("Expected test exception")));
-            }});
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).delete();
+                        will(
+                                throwException(new IOException("Expected test exception")));
+                    }
+                });
 
         try {
             warpAutenticationManager.removeUser("joe");
@@ -222,17 +227,19 @@ public class WarpAutenticationManagerTest {
     public void testCreateUser() throws Exception {
         final AuthIdentity authIdentity = new AuthIdentity("joe", "joe");
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).put(with(anAuthIdentity(authIdentity)));
-            }});
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).put(with(anAuthIdentity(authIdentity)));
+                    }
+                });
 
         warpAutenticationManager.createUser(authIdentity);
 
@@ -243,19 +250,21 @@ public class WarpAutenticationManagerTest {
     public void testCreateOrUpdateUserError() throws Exception {
         final AuthIdentity authIdentity = new AuthIdentity("joe", "joe");
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).put(with(anAuthIdentity(authIdentity)));
-                will(
-                    throwException(new IOException("Expected test exception")));
-            }});
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).put(with(anAuthIdentity(authIdentity)));
+                        will(
+                                throwException(new IOException("Expected test exception")));
+                    }
+                });
 
         try {
             warpAutenticationManager.createUser(authIdentity);
@@ -271,17 +280,19 @@ public class WarpAutenticationManagerTest {
     public void testUpdateUser() throws Exception {
         final AuthIdentity authIdentity = new AuthIdentity("joe", "banan");
         context.checking(
-            new Expectations() {{
-                oneOf(client).removeAllFilters();
-                oneOf(client).addFilter(
-                    with(equal(new BasicAuthFilter("admin", "lamepass"))));
-                oneOf(client).resource(
-                    new URI(
-                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
-                will(returnValue(resource));
-                oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
-                oneOf(resource).put(with(anAuthIdentity(authIdentity)));
-            }});
+                new Expectations() {
+                    {
+                        oneOf(client).removeAllFilters();
+                        oneOf(client).addFilter(
+                                with(equal(new BasicAuthFilter("admin", "lamepass"))));
+                        oneOf(client).resource(
+                                new URI(
+                                        "http://192.121.150.61:8080/Core-Authentication-View/api/users/joe"));
+                        will(returnValue(resource));
+                        oneOf(resource).accept(MediaType.APPLICATION_JSON_TYPE);
+                        oneOf(resource).put(with(anAuthIdentity(authIdentity)));
+                    }
+                });
 
         warpAutenticationManager.updateUser("joe", authIdentity);
 

@@ -63,7 +63,7 @@ public class Main {
             System.out.println("The schema file AND the output base directory must be specified");
             System.exit(1);
         }
-        
+
         Main main = new Main();
         main.run(new File(args[0]), new File(args[1]));
     }

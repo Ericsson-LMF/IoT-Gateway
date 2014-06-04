@@ -64,6 +64,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, GenericDeviceEventListener, ServiceListener {
+
     private static Log logger = LogFactory.getLog(GenericDeviceServlet.class);
 
     private BundleContext context;

@@ -56,7 +56,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
 
     private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
         UPnPService[] services = device.getServices();
-        
+
         for (int i = 0; i < services.length; ++i) {
             UPnPAction action = services[i].getAction(actionName);
             if (action != null) {
@@ -156,8 +156,8 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
 
     // @Override
     @Override
-public void updateProperty(String name, Object value) {
-    logger.debug("updateProperty(" + name + ")");
+    public void updateProperty(String name, Object value) {
+        logger.debug("updateProperty(" + name + ")");
         GenericDeviceProperties properties = this.getProperties();
         if ("LoadLevelStatus".equalsIgnoreCase(name)) {
             if (value instanceof Integer) {

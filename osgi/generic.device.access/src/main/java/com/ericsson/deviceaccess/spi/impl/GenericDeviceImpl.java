@@ -567,5 +567,4 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return service.keySet().toArray(new String[0]);
     }
 
-
 }

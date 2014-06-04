@@ -62,7 +62,6 @@ public class ConfigurationManager implements ManagedService {
         this.pid = pid;
     }
 
-
     public void start() {
         Dictionary properties = new Properties();
         properties.put(Constants.SERVICE_PID, pid);

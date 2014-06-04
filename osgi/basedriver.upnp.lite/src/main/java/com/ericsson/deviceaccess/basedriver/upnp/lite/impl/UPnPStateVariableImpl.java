@@ -40,7 +40,9 @@ import java.util.Map;
 import org.osgi.service.upnp.UPnPStateVariable;
 
 public class UPnPStateVariableImpl implements UPnPStateVariable {
+
     private static final Map<String, Class<?>> dataTypeMap = new HashMap<>(30);
+
     static {
         mapType(Integer.class, "ui1", "ui2", "i1", "i2", "i4", "int");
         mapType(Long.class, "ui4", "time", "time.tz");
@@ -68,7 +70,6 @@ public class UPnPStateVariableImpl implements UPnPStateVariable {
     Number step;
     private final String defaultValue;
     private String value = null;
-
 
     public UPnPStateVariableImpl(String name, String dataType, boolean sendEvents, String[] allowedValues, Number maximum, Number minimum, Number step, String defaultValue) {
         this.name = name;

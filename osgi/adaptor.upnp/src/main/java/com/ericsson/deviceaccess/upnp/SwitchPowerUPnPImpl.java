@@ -48,7 +48,7 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
 
     private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
         UPnPService[] services = device.getServices();
-        
+
         for (int i = 0; i < services.length; ++i) {
             UPnPAction action = services[i].getAction(actionName);
             if (action != null) {

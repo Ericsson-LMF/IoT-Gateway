@@ -52,8 +52,8 @@ public enum StaticLoggerBinder {
      */
     // to avoid constant folding by the compiler, this field must *not* be final
     public static String REQUESTED_API_VERSION = "1.6.2";  // !final
-    
-    public static StaticLoggerBinder getSingleton(){
+
+    public static StaticLoggerBinder getSingleton() {
         return INSTANCE;
     }
 

@@ -54,7 +54,6 @@ import org.osgi.framework.InvalidSyntaxException;
 
 public class RuleService extends SchemaBasedServiceBase implements ConfigurationManagerListener {
 
-
     // Define schema for this device
     private static final ActionSchema SET_RULE_ACTION = new ActionSchema.Builder().setName("setRule")
             .addArgument("id", String.class)

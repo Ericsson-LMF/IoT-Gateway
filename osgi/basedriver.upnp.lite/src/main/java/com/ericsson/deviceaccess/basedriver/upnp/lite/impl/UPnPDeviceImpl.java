@@ -81,6 +81,7 @@ public class UPnPDeviceImpl implements UPnPDevice {
     private ServiceRegistration sr = null;
     private Dictionary<String, Object> props = new Hashtable<>();
     private Map<String, String> map = new HashMap();
+
     {
         put("friendlyName", FRIENDLY_NAME);
         put("deviceType", TYPE);

@@ -13,10 +13,14 @@
                     <h3>
                         <xsl:value-of select="@name"/>
                     </h3>
-                    <nobr><b>Category:</b>&#160;<xsl:value-of select="category"/>
+                    <nobr>
+                        <b>Category:</b>&#160;
+                        <xsl:value-of select="category"/>
                         <br/>
                     </nobr>
-                    <nobr><b>Description:</b>&#160;<xsl:value-of select="description"/>
+                    <nobr>
+                        <b>Description:</b>&#160;
+                        <xsl:value-of select="description"/>
                         <br/>
                     </nobr>
                     <xsl:if test="count(actions/action) > 0">
@@ -36,7 +40,8 @@
                                         <table border="0" cellspacing="0" cellpadding="0">
                                             <xsl:for-each select="arguments/parameter">
                                                 <tr>
-                                                    <td><xsl:value-of select="@type"/>&#160;:&#160;<xsl:value-of
+                                                    <td>
+                                                        <xsl:value-of select="@type"/>&#160;:&#160;<xsl:value-of
                                                             select="@name"/>
                                                     </td>
                                                 </tr>
@@ -47,7 +52,8 @@
                                         <table border="0" cellspacing="0" cellpadding="0">
                                             <xsl:for-each select="results/parameter">
                                                 <tr>
-                                                    <td><xsl:value-of select="@type"/>&#160;:&#160;<xsl:value-of
+                                                    <td>
+                                                        <xsl:value-of select="@type"/>&#160;:&#160;<xsl:value-of
                                                             select="@name"/>
                                                     </td>
                                                 </tr>

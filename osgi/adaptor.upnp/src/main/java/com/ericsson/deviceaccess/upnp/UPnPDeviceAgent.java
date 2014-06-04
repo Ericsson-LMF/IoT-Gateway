@@ -60,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UPnPDeviceAgent implements UPnPEventListener {
+
     private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
 
     protected static String getMediaTitle(String didl) {
