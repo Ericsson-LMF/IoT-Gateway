@@ -69,8 +69,8 @@ public final class BasicAuthFilter extends ClientFilter {
     public ClientResponse handle(final ClientRequest cr) throws
             ClientHandlerException {
 
-        if (!cr.getMetadata().containsKey(HttpHeaders.AUTHORIZATION)) {
-            cr.getMetadata().add(HttpHeaders.AUTHORIZATION, authentication);
+        if (!cr.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+            cr.getHeaders().add(HttpHeaders.AUTHORIZATION, authentication);
         }
         return getNext().handle(cr);
     }
