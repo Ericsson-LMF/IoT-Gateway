@@ -55,6 +55,32 @@ import java.util.Properties;
 
 public abstract class GenericDeviceImpl extends GenericDevice.Stub implements GenericDevice {
 
+    /**
+     * Static utility method which generates a Properties object from
+     * GenericDevice object. It is for making it easy to register the instance
+     * to OSGi framework as a service.
+     *
+     * @param dev device to generate properties from
+     * @return Properties object that can be used in registerService() method.
+     */
+    public static Dictionary<String, Object> getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
+        checkGetPermission(GenericDevice.class.getName());
+        Dictionary<String, Object> props = new Hashtable<>();
+        if (dev.getURN() != null) {
+            props.put(Constants.PARAM_DEVICE_URN, dev.getURN());
+        }
+        if (dev.getId() != null) {
+            props.put(Constants.PARAM_DEVICE_ID, dev.getId());
+        }
+        if (dev.getType() != null) {
+            props.put(Constants.PARAM_DEVICE_TYPE, dev.getType());
+        }
+        if (dev.getProtocol() != null) {
+            props.put(Constants.PARAM_DEVICE_PROTOCOL, dev.getProtocol());
+        }
+        return props;
+    }
+
     private String id = "undefined";
     private String urn = "undefined";
     private String name = "undefined";
@@ -447,32 +473,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return getDeviceProperties(this);
     }
 
-    /**
-     * Static utility method which generates a Properties object from
-     * GenericDevice object. It is for making it easy to register the instance
-     * to OSGi framework as a service.
-     *
-     * @param dev device to generate properties from
-     * @return Properties object that can be used in registerService() method.
-     */
-    public static Dictionary<String, Object> getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
-        checkGetPermission(GenericDevice.class.getName());
-        Dictionary<String, Object> props = new Hashtable<>();
-        if (dev.getURN() != null) {
-            props.put(Constants.PARAM_DEVICE_URN, dev.getURN());
-        }
-        if (dev.getId() != null) {
-            props.put(Constants.PARAM_DEVICE_ID, dev.getId());
-        }
-        if (dev.getType() != null) {
-            props.put(Constants.PARAM_DEVICE_TYPE, dev.getType());
-        }
-        if (dev.getProtocol() != null) {
-            props.put(Constants.PARAM_DEVICE_PROTOCOL, dev.getProtocol());
-        }
-        return props;
-    }
-
     public void notifyEvent(String serviceId, final Properties parameters) {
         GenericDeviceActivator.getEventManager().addEvent(id, serviceId, parameters);
     }
@@ -566,5 +566,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         checkGetPermission(getClass().getName());
         return service.keySet().toArray(new String[0]);
     }
+
 
 }

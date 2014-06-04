@@ -73,7 +73,7 @@ public class XmlNode {
     }
 
     public XmlNode[] getChildren() {
-        return children.toArray(new XmlNode[0]);
+        return children.toArray(new XmlNode[children.size()]);
     }
 
     public XmlNode[] getChildren(String name) {

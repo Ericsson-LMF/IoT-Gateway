@@ -34,14 +34,16 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.activator;
 
-import org.osgi.framework.*;
 import com.ericsson.deviceaccess.basedriver.upnp.lite.impl.UPnPDeviceMgr;
 import com.ericsson.research.common.slf4jlogger.OSGILogFactory;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 	private BundleContext context;
 	private UPnPDeviceMgr upnpDeviceMgr;
 
+    @Override
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		
@@ -51,6 +53,7 @@ public class Activator implements BundleActivator {
         upnpDeviceMgr.start(context.getProperty("lan.ip"));
 	}
 
+    @Override
 	public void stop(BundleContext context) throws Exception {
 		upnpDeviceMgr.stop();
 	}

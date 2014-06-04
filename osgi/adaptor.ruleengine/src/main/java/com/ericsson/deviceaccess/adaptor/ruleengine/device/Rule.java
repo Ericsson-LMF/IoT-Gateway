@@ -136,7 +136,7 @@ public class Rule {
             return;
         }
 
-        int idx = startTime.indexOf(":");
+        int idx = startTime.indexOf(':');
         if (idx <= 0) {
             throw new IllegalArgumentException("Illegal start time"); // TODO: Allow this if empty
         }
@@ -152,7 +152,7 @@ public class Rule {
             return;
         }
 
-        int idx = stopTime.indexOf(":");
+        int idx = stopTime.indexOf(':');
         if (idx <= 0) {
             throw new IllegalArgumentException("Illegal stop time");
         }
@@ -344,7 +344,7 @@ public class Rule {
 
     private void callTimer(String time, String condition) {
         try {
-            int idx = time.indexOf(":");
+            int idx = time.indexOf(':');
             if (idx <= 0) {
                 throw new Exception("Illegal " + condition + " time");
             }

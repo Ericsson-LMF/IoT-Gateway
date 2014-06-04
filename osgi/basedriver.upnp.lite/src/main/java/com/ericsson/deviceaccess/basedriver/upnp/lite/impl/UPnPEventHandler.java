@@ -95,6 +95,7 @@ public class UPnPEventHandler extends NanoHTTPD implements ServiceTrackerCustomi
         }
     }
 
+    @Override
     public Response serve(String uri, String method, Properties header, Properties parms, BufferedReader in) {
         log.debug("UPnP Event: uri=" + uri + ", method=" + method + ", headers=" + header.toString());
 
@@ -126,6 +127,7 @@ public class UPnPEventHandler extends NanoHTTPD implements ServiceTrackerCustomi
                 Filter filter = (Filter) listeners.get(listener);
                 if (filter.match(service.getProperties())) {
                     (new Thread() {
+                        @Override
                         public void run() {
                             listener.notifyUPnPEvent(service.getDevice().getUuid(), service.getId(), events);
                         }
@@ -169,31 +171,30 @@ public class UPnPEventHandler extends NanoHTTPD implements ServiceTrackerCustomi
 
         log.debug("SUBSCRIBE " + url.getFile() + " HTTP/1.1\nHost: " + host + ":" + port + "\nCallback: " + "<http://" + service.getDevice().getLocalIp() + ":" + getListenPort() + "/" + service.getDevice().getUuid() + "/" + service.getId() + ">\nNT: upnp:event\nTIMEOUT: Second-" + SUBSCRIBE_TIMEOUT + "\nContent-Length: 0\n");
 
-        BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream(), "UTF8"));
-        wr.write("SUBSCRIBE " + url.getFile() + " HTTP/1.1\r\n");
-        wr.write("Host: " + host + ":" + port + "\r\n");
-        wr.write("Callback: " + "<http://" + service.getDevice().getLocalIp() + ":" + getListenPort() + "/" + service.getDevice().getUuid() + "/" + service.getId() + ">\r\n");
-        wr.write("NT: upnp:event\r\n");
-        wr.write("TIMEOUT: Second-" + SUBSCRIBE_TIMEOUT + "\r\n");
-        wr.write("Content-Length: 0\r\n");
-        wr.write("\r\n");
-        wr.flush();
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-        StringBuffer sb = new StringBuffer();
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            sb.append(inputLine + "\n");
-            if (inputLine.trim().length() == 0) {
-                break;
+        try (BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream(), "UTF8"))) {
+            wr.write("SUBSCRIBE " + url.getFile() + " HTTP/1.1\r\n");
+            wr.write("Host: " + host + ":" + port + "\r\n");
+            wr.write("Callback: " + "<http://" + service.getDevice().getLocalIp() + ":" + getListenPort() + "/" + service.getDevice().getUuid() + "/" + service.getId() + ">\r\n");
+            wr.write("NT: upnp:event\r\n");
+            wr.write("TIMEOUT: Second-" + SUBSCRIBE_TIMEOUT + "\r\n");
+            wr.write("Content-Length: 0\r\n");
+            wr.write("\r\n");
+            wr.flush();
+            BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                sb.append(inputLine).append("\n");
+                if (inputLine.trim().length() == 0) {
+                    break;
+                }
             }
+            log.debug("SUBSCRIBE RESPONSE:\n" + sb.toString());
+            in.close();
         }
-        log.debug("SUBSCRIBE RESPONSE:\n" + sb.toString());
-
-        in.close();
-        wr.close();
     }
 
+    @Override
     public Object addingService(ServiceReference sr) {
         UPnPEventListener listener = (UPnPEventListener) context.getService(sr);
         synchronized (listeners) {
@@ -203,9 +204,11 @@ public class UPnPEventHandler extends NanoHTTPD implements ServiceTrackerCustomi
         return listener;
     }
 
+    @Override
     public void modifiedService(ServiceReference reference, Object service) {
     }
 
+    @Override
     public void removedService(ServiceReference reference, Object service) {
         synchronized (listeners) {
             listeners.remove(service);
@@ -214,6 +217,7 @@ public class UPnPEventHandler extends NanoHTTPD implements ServiceTrackerCustomi
 
     private void startSubscriptionThread() {
         subscriptionThread = new Thread() {
+            @Override
             public void run() {
                 while (!shutdown) {
                     try {

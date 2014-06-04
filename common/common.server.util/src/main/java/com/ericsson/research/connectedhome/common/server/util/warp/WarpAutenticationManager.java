@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,24 +29,23 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.research.connectedhome.common.server.util.warp;
 
 import com.ericsson.research.connectedhome.common.BasicAuthFilter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Interface towards the warp authentication manager.
- * 
+ *
  * Uses the web API:
  * <ul>
  * <li>GET /AuthenticationProviderView/api/users
@@ -58,12 +57,13 @@ import java.text.MessageFormat;
  * Auth = Basic<br>
  * User = admin<br>
  * PW (default) = lamepass<br>
- * 
+ *
  * When doing put, Content Type must be "application/json" or "application/xml".
  * For all methods except delete, the Accept header shall be set to
  * "application/json" or "application/xml".
  */
 public class WarpAutenticationManager {
+
     private static final String authRequestFormat = "http://{0}/Core-Authentication-View/api/{1}";
 
     final private Client jerseyClient;
@@ -74,14 +74,16 @@ public class WarpAutenticationManager {
     /**
      * Create a manager.
      *
-     * @param jerseyClient      Jersey client to be used to access the AuthenticationProviderView
-     * @param warpServerAddr    the host name/IP for the warp server
-     * @param warpAdminUser     the admin user for AuthenticationProviderView
-     * @param warpAdminPassword the admin password for AuthenticationProviderView
+     * @param jerseyClient Jersey client to be used to access the
+     * AuthenticationProviderView
+     * @param warpServerAddr the host name/IP for the warp server
+     * @param warpAdminUser the admin user for AuthenticationProviderView
+     * @param warpAdminPassword the admin password for
+     * AuthenticationProviderView
      */
     public WarpAutenticationManager(
-        Client jerseyClient, String warpServerAddr, String warpAdminUser,
-        String warpAdminPassword) {
+            Client jerseyClient, String warpServerAddr, String warpAdminUser,
+            String warpAdminPassword) {
         this.jerseyClient = jerseyClient;
         this.warpServerAddr = warpServerAddr;
         this.warpAdminUser = warpAdminUser;
@@ -94,17 +96,18 @@ public class WarpAutenticationManager {
      * @param userName the warp user name
      *
      * @return the user credentials
-     * @throws com.ericsson.research.connectedhome.common.server.util.warp.WarpAutenticationManager.CommunicationException
+     * @throws
+     * com.ericsson.research.connectedhome.common.server.util.warp.WarpAutenticationManager.CommunicationException
      */
     public AuthIdentity getUser(String userName)
-        throws CommunicationException {
+            throws CommunicationException {
         try {
             WebResource webResource = createRequestResource(
-                "users/" + userName);
+                    "users/" + userName);
             return webResource.get(AuthIdentity.class);
         } catch (Exception t) {
             throw new CommunicationException(
-                "Exception when executing GET user: " + userName, t);
+                    "Exception when executing GET user: " + userName, t);
         }
     }
 
@@ -113,16 +116,17 @@ public class WarpAutenticationManager {
      *
      * @param userName the warp user name
      *
-     * @throws CommunicationException in case communication with the warp authentication manager fails
+     * @throws CommunicationException in case communication with the warp
+     * authentication manager fails
      */
     public void removeUser(String userName) throws CommunicationException {
         try {
             WebResource webResource = createRequestResource(
-                "users/" + userName);
+                    "users/" + userName);
             webResource.delete();
         } catch (Exception t) {
             throw new CommunicationException(
-                "Exception when executing DELETE user: " + userName, t);
+                    "Exception when executing DELETE user: " + userName, t);
         }
     }
 
@@ -131,35 +135,37 @@ public class WarpAutenticationManager {
      *
      * @param warpUserCredentials user credentials
      *
-     * @throws CommunicationException in case communication with the warp authentication manager fails
+     * @throws CommunicationException in case communication with the warp
+     * authentication manager fails
      */
     public void createUser(AuthIdentity warpUserCredentials)
-        throws CommunicationException {
+            throws CommunicationException {
         updateUser(warpUserCredentials.getUser(), warpUserCredentials);
     }
 
     /**
      * Updates the warp user with the specified name
      *
-     * @param currentUserName    the current warp user name
+     * @param currentUserName the current warp user name
      * @param newUserCredentials new user credentials
      *
-     * @throws CommunicationException in case communication with the warp authentication manager fails
+     * @throws CommunicationException in case communication with the warp
+     * authentication manager fails
      */
     public void updateUser(
-        String currentUserName,
-        AuthIdentity newUserCredentials)
-        throws CommunicationException {
+            String currentUserName,
+            AuthIdentity newUserCredentials)
+            throws CommunicationException {
         // make sure user name is not changed
         AuthIdentity userCred = new AuthIdentity(
-            currentUserName, newUserCredentials.getPassword());
+                currentUserName, newUserCredentials.getPassword());
         try {
             WebResource webResource = createRequestResource(
-                "users/" + currentUserName);
+                    "users/" + currentUserName);
             webResource.put(userCred);
         } catch (Exception t) {
             throw new CommunicationException(
-                "Exception when executing PUT user: " + newUserCredentials, t);
+                    "Exception when executing PUT user: " + newUserCredentials, t);
         }
     }
 
@@ -169,7 +175,7 @@ public class WarpAutenticationManager {
         WebResource webResource;
         try {
             jerseyClient.addFilter(
-                new BasicAuthFilter(warpAdminUser, warpAdminPassword));
+                    new BasicAuthFilter(warpAdminUser, warpAdminPassword));
             final URI uri = new URI(url);
             webResource = jerseyClient.resource(uri);
             webResource.accept(MediaType.APPLICATION_JSON_TYPE);
@@ -183,6 +189,7 @@ public class WarpAutenticationManager {
      * Thrown in case communication with the warp authentication manager fails.
      */
     public static class CommunicationException extends IOException {
+
         public CommunicationException(String message, Throwable cause) {
             super(message, cause);
         }

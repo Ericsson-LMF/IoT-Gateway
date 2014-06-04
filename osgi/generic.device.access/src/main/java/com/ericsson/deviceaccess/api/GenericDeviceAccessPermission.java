@@ -143,6 +143,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
      *
      * @return Hash code value for this object.
      */
+    @Override
     public int hashCode() {
         return (getName().hashCode() ^ getActions().hashCode());
     }
@@ -156,7 +157,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
         private Hashtable permissions;
         private boolean allAllowed = false;
 
-        public GenericDeviceAccessPermissionCollection() {
+        GenericDeviceAccessPermissionCollection() {
             permissions = new Hashtable();
         }
 

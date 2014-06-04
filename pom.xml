@@ -13,6 +13,8 @@
         <bootSeparator>:</bootSeparator>
         <osgi.base.version>1.71</osgi.base.version>
         <additionalparam>-Xdoclint:none</additionalparam>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     
     <modules>

@@ -80,6 +80,19 @@ public class UPnPDeviceImpl implements UPnPDevice {
     private BundleContext context;
     private ServiceRegistration sr = null;
     private Dictionary<String, Object> props = new Hashtable<>();
+    private Map<String, String> map = new HashMap();
+    {
+        put("friendlyName", FRIENDLY_NAME);
+        put("deviceType", TYPE);
+        put("modelName", MODEL_NAME);
+        put("modelNumber", MODEL_NUMBER);
+        put("modelDescription", MODEL_DESCRIPTION);
+        put("UPC", UPC);
+        put("serialNumber", SERIAL_NUMBER);
+        put("presentationURL", PRESENTATION_URL);
+        put("manufacturer", MANUFACTURER);
+        put("manufacturerURL", MANUFACTURER_URL);
+    }
 
     protected UPnPDeviceImpl(BundleContext context, String uuid, String location, String ip, int port, String localIp, UPnPEventHandler eventHandler) {
         this.context = context;
@@ -92,24 +105,28 @@ public class UPnPDeviceImpl implements UPnPDevice {
         m_eventHandler = eventHandler;
     }
 
+    @Override
     public UPnPIcon[] getIcons(String locale) {
-        return (UPnPIcon[]) m_icons.toArray(new UPnPIcon[0]);
+        return (UPnPIcon[]) m_icons.toArray(new UPnPIcon[m_icons.size()]);
     }
 
+    @Override
     public Dictionary getDescriptions(String locale) {
         return props;
     }
 
+    @Override
     public UPnPService[] getServices() {
         return (UPnPService[]) m_services.values().toArray(new UPnPService[0]);
     }
 
+    @Override
     public UPnPService getService(String serviceId) {
         return (UPnPService) m_services.get(serviceId);
     }
 
     public UPnPIconImpl[] getIcons() {
-        return (UPnPIconImpl[]) m_icons.toArray(new UPnPIconImpl[0]);
+        return (UPnPIconImpl[]) m_icons.toArray(new UPnPIconImpl[m_icons.size()]);
     }
 
     // Returns false if no response has been received from the device within two minutes
@@ -173,20 +190,6 @@ public class UPnPDeviceImpl implements UPnPDevice {
         for (Iterator i = m_services.values().iterator(); i.hasNext();) {
             ((UPnPServiceImpl) i.next()).stop();
         }
-    }
-    private Map<String, String> map = new HashMap();
-
-    {
-        put("friendlyName", FRIENDLY_NAME);
-        put("deviceType", TYPE);
-        put("modelName", MODEL_NAME);
-        put("modelNumber", MODEL_NUMBER);
-        put("modelDescription", MODEL_DESCRIPTION);
-        put("UPC", UPC);
-        put("serialNumber", SERIAL_NUMBER);
-        put("presentationURL", PRESENTATION_URL);
-        put("manufacturer", MANUFACTURER);
-        put("manufacturerURL", MANUFACTURER_URL);
     }
 
     private void put(String key, String value) {

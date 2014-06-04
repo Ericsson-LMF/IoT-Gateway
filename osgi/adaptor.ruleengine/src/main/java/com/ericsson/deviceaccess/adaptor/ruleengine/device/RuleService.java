@@ -54,11 +54,6 @@ import org.osgi.framework.InvalidSyntaxException;
 
 public class RuleService extends SchemaBasedServiceBase implements ConfigurationManagerListener {
 
-    private BundleContext context;
-    private final HashMap<String, ParameterSchema> ruleProperties = new HashMap<>();
-    private HashMap<String, Rule> rules = new HashMap<>();
-    private final HashMap<String, List<Rule>> ruleMap = new HashMap<>();
-    private ConfigurationManager configManager;
 
     // Define schema for this device
     private static final ActionSchema SET_RULE_ACTION = new ActionSchema.Builder().setName("setRule")
@@ -91,6 +86,11 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
             .addAction(INVOKE_RULE_ACTION_START)
             .addAction(INVOKE_RULE_ACTION_STOP)
             .build();
+    private BundleContext context;
+    private final HashMap<String, ParameterSchema> ruleProperties = new HashMap<>();
+    private HashMap<String, Rule> rules = new HashMap<>();
+    private final HashMap<String, List<Rule>> ruleMap = new HashMap<>();
+    private ConfigurationManager configManager;
 
     public RuleService() {
         super(SERVICE_SCHEMA);

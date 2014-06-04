@@ -38,6 +38,7 @@ package com.ericsson.deviceaccess.tutorial;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.spi.service.util.PowerMeterBase;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
+import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceException;
 
 /**
  * Adaptor specific implementation of the <i>PowerMeter</i> service.
@@ -56,11 +57,12 @@ public class PowerMeterImpl extends PowerMeterBase {
      * <p/>
      * It will be called by the base class when a client invokes the action.
      */
+    @Override
     public GetPowerResult executeGetPower() throws GenericDeviceException {
         GetPowerResult result = new GetPowerResult();
         try {
             result.Power = Float.parseFloat(dev.getConsumedPowerInWatt());
-        } catch (Exception e) {
+        } catch (PseudoDeviceException | NumberFormatException e) {
             throw new GenericDeviceException(500, "Exception", e);
         }
         return result;
@@ -79,6 +81,7 @@ public class PowerMeterImpl extends PowerMeterBase {
         updateCurrentPower(currentPower);
     }
 
+    @Override
     protected void refreshProperties() {
         // NOP
     }

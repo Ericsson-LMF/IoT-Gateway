@@ -50,6 +50,24 @@ import org.apache.xmlbeans.XmlException;
  */
 public class Main {
 
+    /**
+     * Runs the code generation between xml file in first argument and output
+     * file in second argument
+     *
+     * @param args
+     * @throws XmlException
+     * @throws IOException
+     */
+    public static void main(String[] args) throws XmlException, IOException {
+        if (args.length < 2) {
+            System.out.println("The schema file AND the output base directory must be specified");
+            System.exit(1);
+        }
+        
+        Main main = new Main();
+        main.run(new File(args[0]), new File(args[1]));
+    }
+
     private ServiceSchemaDocument serviceSchemaDocument;
 
     /**
@@ -118,21 +136,4 @@ public class Main {
         }
     }
 
-    /**
-     * Runs the code generation between xml file in first argument and output
-     * file in second argument
-     *
-     * @param args
-     * @throws XmlException
-     * @throws IOException
-     */
-    public static void main(String[] args) throws XmlException, IOException {
-        if (args.length < 2) {
-            System.out.println("The schema file AND the output base directory must be specified");
-            System.exit(1);
-        }
-
-        Main main = new Main();
-        main.run(new File(args[0]), new File(args[1]));
-    }
 }

@@ -48,14 +48,17 @@ public class ThermostatSetpointImpl extends ThermostatSetPointBase {
         updateCurrentDesiredHeatingTemperature(20.0f);
     }
 
+    @Override
     protected void refreshProperties() {
     }
 
+    @Override
     public void executeSetDesiredCoolingTemperature(float desiredTemperature) throws GenericDeviceException {
         updateCurrentDesiredCoolingTemperature(desiredTemperature);
         System.out.println("Desired cooling temperature has been set to: " + desiredTemperature);
     }
 
+    @Override
     public void executeSetDesiredHeatingTemperature(float desiredTemp) throws GenericDeviceException {
         updateCurrentDesiredHeatingTemperature(desiredTemp);
         System.out.println("Desired heating temperature has been set to: " + desiredTemp);

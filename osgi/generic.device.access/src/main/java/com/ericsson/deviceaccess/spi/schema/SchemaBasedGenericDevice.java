@@ -35,11 +35,10 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 import com.ericsson.deviceaccess.api.GenericDeviceService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Base class for devices implemented in adaptors.

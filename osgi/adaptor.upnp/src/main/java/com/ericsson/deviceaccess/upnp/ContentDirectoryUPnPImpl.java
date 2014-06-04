@@ -59,21 +59,22 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
      * {@inheritDoc}
      */
     // @Override
+    @Override
     public BrowseResult executeBrowse(String objectId, String browseFlag, int startIndex, int requestedCount, String sortCriteria, String filter) throws GenericDeviceException {
         Properties args = new Properties();
         args.put("ObjectID", objectId);
         args.put("BrowseFlag", browseFlag);
         args.put("Filter", filter);
-        args.put("StartingIndex", (long) startIndex);
-        args.put("RequestedCount", (long) requestedCount);
+        args.put("StartingIndex", startIndex);
+        args.put("RequestedCount", requestedCount);
         args.put("SortCriteria", sortCriteria);
         try {
             Dictionary result = UPnPUtil.browse(dev, args);
             BrowseResult browseResult = new BrowseResult();
             browseResult.DidlDocument = (String) result.get("Result");
-            browseResult.NumberReturned = ((Long) result.get("NumberReturned")).intValue();
-            browseResult.TotalMatches = ((Long) result.get("TotalMatches")).intValue();
-            browseResult.UpdateID = ((Long) result.get("UpdateID")).intValue();
+            browseResult.NumberReturned = ((Number) result.get("NumberReturned")).intValue();
+            browseResult.TotalMatches = ((Number) result.get("TotalMatches")).intValue();
+            browseResult.UpdateID = ((Number) result.get("UpdateID")).intValue();
             return browseResult;
         } catch (UPnPException e) {
             throw new GenericDeviceException("Failed in invoking browse action" + e.getMessage());

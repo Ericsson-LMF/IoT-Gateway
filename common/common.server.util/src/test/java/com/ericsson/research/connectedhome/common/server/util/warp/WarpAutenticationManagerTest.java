@@ -43,7 +43,6 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;

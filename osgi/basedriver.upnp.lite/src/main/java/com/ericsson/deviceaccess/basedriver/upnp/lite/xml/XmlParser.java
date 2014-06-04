@@ -80,4 +80,7 @@ public class XmlParser {
         }
         return node;
     }
+
+    private XmlParser() {
+    }
 }

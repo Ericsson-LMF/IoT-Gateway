@@ -38,9 +38,8 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import org.apache.commons.codec.binary.Base64;
-
 import javax.ws.rs.core.HttpHeaders;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * A filter to be used for basic HTTP authentication since the HTTPBasicAuthFilter
@@ -86,14 +85,20 @@ public final class BasicAuthFilter extends ClientFilter {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BasicAuthFilter that = (BasicAuthFilter) o;
 
         if (authentication != null ?
             !authentication.equals(that.authentication) :
-            that.authentication != null) return false;
+            that.authentication != null) {
+            return false;
+        }
 
         return true;
     }

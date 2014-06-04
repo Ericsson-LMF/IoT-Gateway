@@ -233,7 +233,7 @@ public class TestSerialization {
      */
     class TestService extends GenericDeviceServiceImpl {
 
-        public TestService() {
+        TestService() {
             super("test", serviceSchema.getPropertiesSchemas());
             init();
         }
@@ -244,7 +244,7 @@ public class TestSerialization {
 
         class TestAction extends GenericDeviceActionImpl {
 
-            public TestAction() {
+            TestAction() {
                 super("action", serviceSchema.getActionSchemas()[0].getArgumentsSchemas(), serviceSchema.getActionSchemas()[0].getResultSchema());
             }
         }

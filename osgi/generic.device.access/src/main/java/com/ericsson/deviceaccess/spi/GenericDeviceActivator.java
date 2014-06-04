@@ -54,6 +54,10 @@ public class GenericDeviceActivator implements BundleActivator {
         OSGILogFactory.initOSGI(bundle != null ? bundle.getBundleContext() : null);
     }
 
+    public static EventManager getEventManager() {
+        return eventManager;
+    }
+
     @Override
     public void start(BundleContext context) throws Exception {
         eventManager.setContext(context);
@@ -63,9 +67,5 @@ public class GenericDeviceActivator implements BundleActivator {
     @Override
     public void stop(BundleContext context) throws Exception {
         eventManager.shutdown();
-    }
-
-    public static EventManager getEventManager() {
-        return eventManager;
     }
 }

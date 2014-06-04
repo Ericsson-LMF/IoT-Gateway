@@ -19,24 +19,7 @@
 
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
-/**
- * This class provides encode/decode for RFC 2045 Base64 as
- * defined by RFC 2045, N. Freed and N. Borenstein.
- * RFC 2045: Multipurpose Internet Mail Extensions (MIME)
- * Part One: Format of Internet Message Bodies. Reference
- * 1996 Available at: http://www.ietf.org/rfc/rfc2045.txt
- * This class is used by XML Schema binary format validation
- *
- * This implementation does not encode/decode streaming
- * data. You need the data that you will encode/decode
- * already on a byte arrray.
- *
- * @xerces.internal 
- *
- * @author Jeffrey Rodriguez
- * @author Sandy Gao
- * @version $Id: Base64.java 674879 2008-07-08 16:59:54Z lenzi $
- */
+
 public final class  Base64 {
 
     static private final int  BASELENGTH         = 128;
@@ -71,16 +54,19 @@ public final class  Base64 {
         base64Alphabet['+']  = 62;
         base64Alphabet['/']  = 63;
 
-        for (int i = 0; i<=25; i++)
+        for (int i = 0; i<=25; i++) {
             lookUpBase64Alphabet[i] = (char)('A'+i);
+        }
 
-        for (int i = 26,  j = 0; i<=51; i++, j++)
+        for (int i = 26,  j = 0; i<=51; i++, j++) {
             lookUpBase64Alphabet[i] = (char)('a'+ j);
+        }
 
-        for (int i = 52,  j = 0; i<=61; i++, j++)
+        for (int i = 52,  j = 0; i<=61; i++, j++) {
             lookUpBase64Alphabet[i] = (char)('0' + j);
-        lookUpBase64Alphabet[62] = (char)'+';
-        lookUpBase64Alphabet[63] = (char)'/';
+        }
+        lookUpBase64Alphabet[62] = '+';
+        lookUpBase64Alphabet[63] = '/';
 
     }
 
@@ -108,8 +94,9 @@ public final class  Base64 {
      */
     public static String encode(byte[] binaryData) {
 
-        if (binaryData == null)
+        if (binaryData == null) {
             return null;
+        }
 
         int      lengthDataBits    = binaryData.length*EIGHTBIT;
         if (lengthDataBits == 0) {
@@ -199,8 +186,9 @@ public final class  Base64 {
      */
     public static byte[] decode(String encoded) {
 
-        if (encoded == null)
+        if (encoded == null) {
             return null;
+        }
 
         char[] base64Data = encoded.toCharArray();
         // remove white spaces
@@ -212,8 +200,9 @@ public final class  Base64 {
 
         int      numberQuadruple    = (len/FOURBYTE );
 
-        if (numberQuadruple == 0)
+        if (numberQuadruple == 0) {
             return new byte[0];
+        }
 
         byte     decodedData[]      = null;
         byte     b1=0,b2=0,b3=0,b4=0;
@@ -229,9 +218,9 @@ public final class  Base64 {
             if (!isData( (d1 = base64Data[dataIndex++]) )||
                 !isData( (d2 = base64Data[dataIndex++]) )||
                 !isData( (d3 = base64Data[dataIndex++]) )||
-                !isData( (d4 = base64Data[dataIndex++]) ))
+                !isData( (d4 = base64Data[dataIndex++]) )) {
                 return null;//if found "no data" just return null
-
+            }
             b1 = base64Alphabet[d1];
             b2 = base64Alphabet[d2];
             b3 = base64Alphabet[d3];
@@ -255,16 +244,18 @@ public final class  Base64 {
         if (!isData( (d3 ) ) ||
             !isData( (d4 ) )) {//Check if they are PAD characters
             if (isPad( d3 ) && isPad( d4)) {               //Two PAD e.g. 3c[Pad][Pad]
-                if ((b2 & 0xf) != 0)//last 4 bits should be zero
+                if ((b2 & 0xf) != 0) {//last 4 bits should be zero
                     return null;
+                }
                 byte[] tmp = new byte[ i*3 + 1 ];
                 System.arraycopy( decodedData, 0, tmp, 0, i*3 );
                 tmp[encodedIndex]   = (byte)(  b1 <<2 | b2>>4 ) ;
                 return tmp;
             } else if (!isPad( d3) && isPad(d4)) {               //One PAD  e.g. 3cQ[Pad]
                 b3 = base64Alphabet[ d3 ];
-                if ((b3 & 0x3 ) != 0)//last 2 bits should be zero
+                if ((b3 & 0x3 ) != 0) {//last 2 bits should be zero
                     return null;
+                }
                 byte[] tmp = new byte[ i*3 + 2 ];
                 System.arraycopy( decodedData, 0, tmp, 0, i*3 );
                 tmp[encodedIndex++] = (byte)(  b1 <<2 | b2>>4 );
@@ -292,16 +283,21 @@ public final class  Base64 {
      * @return      the new length
      */
     protected static int removeWhiteSpace(char[] data) {
-        if (data == null)
+        if (data == null) {
             return 0;
+        }
 
         // count characters that's not whitespace
         int newSize = 0;
         int len = data.length;
         for (int i = 0; i < len; i++) {
-            if (!isWhiteSpace(data[i]))
+            if (!isWhiteSpace(data[i])) {
                 data[newSize++] = data[i];
+            }
         }
         return newSize;
+    }
+
+    private Base64() {
     }
 }

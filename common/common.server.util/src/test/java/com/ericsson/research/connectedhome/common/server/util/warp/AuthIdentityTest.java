@@ -36,13 +36,9 @@ package com.ericsson.research.connectedhome.common.server.util.warp;
 
 
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.After;
 import static org.junit.Assert.*;
-import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class AuthIdentityTest {
     private Mockery context = new Mockery() {

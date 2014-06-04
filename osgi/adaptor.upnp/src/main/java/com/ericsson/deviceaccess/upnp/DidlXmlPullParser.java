@@ -161,4 +161,7 @@ public class DidlXmlPullParser {
         }
         return MediaItem.TYPE_UNKNOWN;
     }
+
+    private DidlXmlPullParser() {
+    }
 }

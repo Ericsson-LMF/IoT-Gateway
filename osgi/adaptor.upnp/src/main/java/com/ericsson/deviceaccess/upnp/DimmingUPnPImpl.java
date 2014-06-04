@@ -54,6 +54,19 @@ import org.slf4j.Logger;
  */
 public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.UpdatePropertyInterface {
 
+    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
+        UPnPService[] services = device.getServices();
+        
+        for (int i = 0; i < services.length; ++i) {
+            UPnPAction action = services[i].getAction(actionName);
+            if (action != null) {
+                return action;
+            }
+        }
+        throw new UPnPException(UPnPException.INVALID_ACTION,
+                "No such action supported " + actionName);
+    }
+
     final private UPnPAction switchPower_setTarget;
     final private UPnPAction dimmingService_setLoadLevelTarget;
     final private Logger logger;
@@ -80,6 +93,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     }
 
     //@Override
+    @Override
     public void executeOff() throws GenericDeviceException {
         this.logger.debug("DimmingUPnPImpl::executeOff()");
 
@@ -94,6 +108,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     }
 
     //@Override
+    @Override
     public void executeOn() throws GenericDeviceException {
         this.logger.debug("DimmingUPnPImpl::executeOn()");
 
@@ -108,6 +123,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     }
 
     //@Override
+    @Override
     public void executeSetLoadLevelTarget(int lvl)
             throws GenericDeviceException {
         this.logger.debug("DimmingUPnPImpl::executeSetLoadLevelTarget(" + lvl + ")");
@@ -124,6 +140,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     }
 
     //@Override
+    @Override
     public void executeSetLoadLevelTargetWithRate(int lvl, float rate)
             throws GenericDeviceException {
         this.logger.debug("DimmingUPnPImpl::executeSetLoadLevelTargetWithRate(" + lvl + "," + rate + ")");
@@ -132,36 +149,24 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     }
 
     //@Override
+    @Override
     protected void refreshProperties() {
         this.logger.debug("DimmingUPnPImpl::refreshProperties()");
     }
 
-    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName)
-            throws UPnPException {
-        UPnPService[] services = device.getServices();
-
-        for (int i = 0; i < services.length; ++i) {
-            UPnPAction action = services[i].getAction(actionName);
-            if (action != null) {
-                return action;
-            }
-        }
-        throw new UPnPException(UPnPException.INVALID_ACTION,
-                "No such action supported " + actionName);
-    }
-
     // @Override
-    public void updateProperty(String name, Object value) {
-        logger.debug("updateProperty(" + name + ")");
-
+    @Override
+public void updateProperty(String name, Object value) {
+    logger.debug("updateProperty(" + name + ")");
         GenericDeviceProperties properties = this.getProperties();
         if ("LoadLevelStatus".equalsIgnoreCase(name)) {
             if (value instanceof Integer) {
-                logger.debug("updateCurrentLoadLevel(" + (Integer) value + ")");
+                logger.debug("updateCurrentLoadLevel(" + value + ")");
                 this.updateCurrentLoadLevel((Integer) value);
             }
         } else {
             // NOP
         }
     }
+
 }

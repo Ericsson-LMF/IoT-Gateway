@@ -44,9 +44,6 @@ import java.util.Arrays;
  */
 public class ReflectionTestUtil {
 
-    private ReflectionTestUtil() {
-    }
-
     /**
      * Set the field value of the field with the given name of the specified
      * object. If the object is a class, then it is assumed to be a static
@@ -147,7 +144,7 @@ public class ReflectionTestUtil {
      *
      * @return the Method object, or <code>null</code> if none found
      */
-    private static Method findMethod(Class<?> clazz, String name, Class<?>... paramTypes) {
+    private static  Method findMethod(Class<?> clazz, String name, Class<?>... paramTypes) {
         Class<?> searchType = clazz;
         while (searchType != null) {
             Method[] methods = (searchType.isInterface() ? searchType.getMethods() : searchType.getDeclaredMethods());
@@ -187,5 +184,8 @@ public class ReflectionTestUtil {
             searchType = searchType.getSuperclass();
         }
         return null;
+    }
+
+    private ReflectionTestUtil() {
     }
 }

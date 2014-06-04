@@ -36,14 +36,7 @@ package com.ericsson.deviceaccess.spi;
 
 import com.ericsson.deviceaccess.api.GenericDeviceAccessPermission;
 
-/**
- * In GenericDeviceImpl class, as well as other SPI classes such as
- * GenericDeviceServiceImpl, each method call checks if the caller is authorized
- * to call the method by using this class. A call may have GET, SET, and EXECUTE
- * permissions corresponding to retrieving information from a device, setting
- * information to a device, and executing an action of a service on a device
- * respectively.
- */
+
 public class GenericDeviceAccessSecurity {
 
     public static void checkGetPermission(String clazz) {
@@ -63,6 +56,9 @@ public class GenericDeviceAccessSecurity {
         if (null != sm) {
             sm.checkPermission(new GenericDeviceAccessPermission(clazz, action));
         }
+    }
+
+    private GenericDeviceAccessSecurity() {
     }
 
 }

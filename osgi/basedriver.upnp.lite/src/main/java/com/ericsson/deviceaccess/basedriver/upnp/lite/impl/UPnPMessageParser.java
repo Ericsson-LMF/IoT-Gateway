@@ -54,7 +54,7 @@ public class UPnPMessageParser {
 		if(start == -1) {
 			throw new Exception("No HTTP URL found in LOCATION parameter");
 		}
-		end = location.toUpperCase().indexOf("/", start + 7);
+		end = location.toUpperCase().indexOf('/', start + 7);
 		if(end == -1) {
 			throw new Exception("Invalid HTTP URL found in LOCATION parameter");
 		}
@@ -132,7 +132,7 @@ public class UPnPMessageParser {
 			if(start == -1) {
 				throw new Exception("Invalid URL in message:\n" + message);
 			}
-			end = location.toUpperCase().indexOf("/", start + 7);
+			end = location.toUpperCase().indexOf('/', start + 7);
 			if(end == -1) {
 				throw new Exception("Invalid URL in message:\n" + message);
 			}
@@ -165,9 +165,13 @@ public class UPnPMessageParser {
 		UPnPDeviceImpl device = new UPnPDeviceImpl(context, uuid, location, ip, port, "", null);
 		
 		// Flag the device for removal if it's not an "alive" message (i.e. byebye)
-		if (! NTS.equals("ssdp:alive"))
-			device.setExpired();
+		if (! NTS.equals("ssdp:alive")) {
+                    device.setExpired();
+        }
 
 		return device;
 	}
+
+    private UPnPMessageParser() {
+    }
 }

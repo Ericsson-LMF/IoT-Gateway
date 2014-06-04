@@ -39,9 +39,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-/**
- * Matchers.
- */
+
 public class Matchers {
 
     public static Matcher<AuthIdentity> anAuthIdentity(final AuthIdentity expected) {
@@ -64,5 +62,8 @@ public class Matchers {
                 descr.appendText("Warp user credentials equals ").appendValue(expected);
             }
         };
+    }
+
+    private Matchers() {
     }
 }

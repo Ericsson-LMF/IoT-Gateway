@@ -60,17 +60,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UPnPDeviceAgent implements UPnPEventListener {
+    private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
+
+    protected static String getMediaTitle(String didl) {
+        RE titleRE = new RE("dc:title[>&gt;]+([^&]*)[&<lt;]+/dc:title");
+        if (titleRE.match(didl)) {
+            return titleRE.getParen(1);
+        }
+        return "";
+    }
 
     private final BundleContext context;
     private final SchemaBasedGenericDevice dev;
-    private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
     private ServiceRegistration eventListenerReg;
     private ServiceRegistration devReg;
 
-    public interface UpdatePropertyInterface {
-
-        public void updateProperty(String name, Object value);
-    }
     final private Map idToService = new HashMap();
 
     public UPnPDeviceAgent(BundleContext bc, UPnPDevice upnpdev) {
@@ -281,14 +285,6 @@ public class UPnPDeviceAgent implements UPnPEventListener {
         }
     }
 
-    protected static String getMediaTitle(String didl) {
-        RE titleRE = new RE("dc:title[>&gt;]+([^&]*)[&<lt;]+/dc:title");
-        if (titleRE.match(didl)) {
-            return titleRE.getParen(1);
-        }
-        return "";
-    }
-
     private void notifyUpdate(String path) {
         if (devReg != null) {
             Dictionary<String, Object> props = dev.getDeviceProperties();
@@ -305,6 +301,11 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             return "ContentDirectory";
         }
         return "unsupported";
+    }
+
+    public interface UpdatePropertyInterface {
+
+        public void updateProperty(String name, Object value);
     }
 
 }

@@ -37,17 +37,15 @@ package com.ericsson.research.connectedhome.common;
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.HttpHeaders;
+import static junit.framework.Assert.assertEquals;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import javax.ws.rs.core.HttpHeaders;
-
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class BasicAuthFilterTest {
     private Mockery context = new Mockery() {

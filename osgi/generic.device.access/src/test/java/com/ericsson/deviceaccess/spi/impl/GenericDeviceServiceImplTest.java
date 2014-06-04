@@ -34,11 +34,16 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.*;
+import com.ericsson.deviceaccess.api.GenericDevice;
+import com.ericsson.deviceaccess.api.GenericDeviceAction;
+import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
 import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
+import java.util.Properties;
 import junit.framework.Assert;
+import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -47,10 +52,6 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Properties;
-
-import static junit.framework.Assert.fail;
 
 /**
  * GenericDeviceServiceImpl Tester.
@@ -222,7 +223,7 @@ public class GenericDeviceServiceImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             fail(e.getMessage());
         }
     }
@@ -237,7 +238,7 @@ public class GenericDeviceServiceImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }

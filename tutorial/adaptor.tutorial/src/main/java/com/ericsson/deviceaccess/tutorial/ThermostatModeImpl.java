@@ -47,9 +47,11 @@ public class ThermostatModeImpl extends ThermostatModeBase {
         updateMode(ThermostatMode.VALUE_PROP_mode_Heat);
     }
 
+    @Override
     protected void refreshProperties() {
     }
 
+    @Override
     public void executeSetMode(String s) throws GenericDeviceException {
         updateMode(s);
         System.out.println("Thermostat mode has been set to: " +s);

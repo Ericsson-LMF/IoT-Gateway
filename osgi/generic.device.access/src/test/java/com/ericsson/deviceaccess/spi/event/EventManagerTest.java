@@ -63,6 +63,10 @@ import org.osgi.framework.ServiceReference;
  */
 public class EventManagerTest {
 
+    static ShutdownEventManager shutdown(EventManager eventManager) {
+        return new ShutdownEventManager(eventManager);
+    }
+
     private Mockery context = new Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
@@ -530,8 +534,8 @@ public class EventManagerTest {
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
                     {
-                        put("power", new Float(104.34));
-                        put("power__delta", new Float(4.24));
+                        put("power", (float) 104.34);
+                        put("power__delta", (float) 4.24);
                     }
                 }));
 
@@ -541,13 +545,13 @@ public class EventManagerTest {
 
         eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
             {
-                put("power", new Float(100.10));
+                put("power", (float) 100.10);
             }
         });
 
         eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
             {
-                put("power", new Float(104.34));
+                put("power", (float) 104.34);
             }
         });
 
@@ -661,22 +665,20 @@ public class EventManagerTest {
         }));
     }
 
-    static ShutdownEventManager shutdown(EventManager eventManager) {
-        return new ShutdownEventManager(eventManager);
-    }
-
     static class ShutdownEventManager implements Action {
 
         private EventManager eventManager;
 
-        public ShutdownEventManager(EventManager eventManager) {
+        ShutdownEventManager(EventManager eventManager) {
             this.eventManager = eventManager;
         }
 
+        @Override
         public void describeTo(Description description) {
             description.appendText("Shutdown the event manager");
         }
 
+        @Override
         public Object invoke(Invocation invocation) throws Throwable {
             eventManager.shutdown();
             return null;

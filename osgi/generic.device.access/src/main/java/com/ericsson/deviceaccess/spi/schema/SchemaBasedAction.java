@@ -60,7 +60,7 @@ final class SchemaBasedAction extends
      */
     @Override
     public void execute(GenericDeviceActionContext sac) throws GenericDeviceException {
-        ActionDefinition actionDefinition = (ActionDefinition) schemaBasedServiceBase.getActionDefinitions(getName());
+        ActionDefinition actionDefinition = schemaBasedServiceBase.getActionDefinitions(getName());
         if (actionDefinition == null) {
         } else {
             actionDefinition.invoke(sac);

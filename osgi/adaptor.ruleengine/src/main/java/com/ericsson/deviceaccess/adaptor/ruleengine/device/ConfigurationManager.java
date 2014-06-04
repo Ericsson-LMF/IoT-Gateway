@@ -62,10 +62,6 @@ public class ConfigurationManager implements ManagedService {
         this.pid = pid;
     }
 
-    public interface ConfigurationManagerListener {
-
-        public void updated(Dictionary added, Dictionary removed, Dictionary modified);
-    }
 
     public void start() {
         Dictionary properties = new Properties();
@@ -155,5 +151,10 @@ public class ConfigurationManager implements ManagedService {
         } else {
             System.err.println("ConfigurationAdmin is not found");
         }
+    }
+
+    public interface ConfigurationManagerListener {
+
+        public void updated(Dictionary added, Dictionary removed, Dictionary modified);
     }
 }

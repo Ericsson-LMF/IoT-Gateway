@@ -49,6 +49,7 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
      * {@inheritDoc}
      */
     //@Override
+    @Override
     public void executePlay(String url, String title) throws GenericDeviceException {
         try {
             String type = UPnPUtil.playMedia(dev, url, title);
@@ -74,6 +75,7 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
 //		}
 
     //@Override
+    @Override
     public void executeStop() throws GenericDeviceException {
 
         try {
@@ -84,6 +86,7 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
     }
 
     //@Override
+    @Override
     public void executePause() throws GenericDeviceException {
         try {
             UPnPUtil.pauseMedia(dev);
@@ -93,6 +96,7 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
     }
 
     //@Override
+    @Override
     public void executeResume() throws GenericDeviceException {
         try {
             UPnPUtil.resumeMedia(dev);
@@ -102,6 +106,7 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
     }
 
     //@Override
+    @Override
     public void executeSetVolume(int volume) throws GenericDeviceException {
         try {
             UPnPUtil.setVolume(dev, "" + volume);
@@ -110,6 +115,7 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
         }
     }
 
+    @Override
     protected void refreshProperties() {
         // NOP
     }

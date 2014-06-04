@@ -36,7 +36,6 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.AbstractSet;
@@ -75,6 +74,151 @@ public class LDAPExpr {
     private static final String EOS = "Unexpected end of query";
     private static final String MALFORMED = "Malformed query";
     private static final String OPERATOR = "Undefined operator";
+    // Clazz -> Constructor(String)
+    private static Map<Class<?>, Constructor<?>> constructorMap = new ConcurrentHashMap<>();
+    private static Constructor<?> DUMMY_CONS = LDAPExpr.class.getConstructors()[0];
+
+    public static boolean query(String filter, Dictionary pd) throws InvalidSyntaxException {
+        return new LDAPExpr(filter).evaluate(pd, false);
+    }
+
+    /**
+     * Get cached String constructor for a class
+     */
+    private static Constructor getConstructor(Class clazz) {
+        Constructor<?> cons = constructorMap.computeIfAbsent(clazz, k -> {
+            try {
+                return clazz.getConstructor(String.class);
+            } catch (NoSuchMethodException | SecurityException ex) {
+                return DUMMY_CONS;
+            }
+        });
+        if (cons == DUMMY_CONS) {
+            return null;
+        }
+        return cons;
+    }
+
+    private static boolean compareString(String s1, int op, String s2) {
+        switch (op) {
+            case LE:
+                return s1.compareTo(s2) <= 0;
+            case GE:
+                return s1.compareTo(s2) >= 0;
+            case EQ:
+                return patSubstr(s1, s2);
+            case APPROX:
+                return fixupString(s2).equals(fixupString(s1));
+            default:
+                return false;
+        }
+    }
+
+    private static String fixupString(String s) {
+        return s.replaceAll("\\s+", "").toLowerCase();
+    }
+
+    private static boolean patSubstr(String s, String pat) {
+        return s == null ? false : patSubstr(s.toCharArray(), 0, pat.toCharArray(), 0);
+    }
+
+    private static boolean patSubstr(char[] s, int si, char[] pat, int pi) {
+        if (pat.length - pi == 0) {
+            return s.length - si == 0;
+        }
+        if (pat[pi] == WILDCARD) {
+            pi++;
+            for (;;) {
+                if (patSubstr(s, si, pat, pi)) {
+                    return true;
+                }
+                if (s.length - si == 0) {
+                    return false;
+                }
+                si++;
+            }
+        } else {
+            if (s.length - si == 0) {
+                return false;
+            }
+            if (s[si] != pat[pi]) {
+                return false;
+            }
+            return patSubstr(s, ++si, pat, ++pi);
+        }
+    }
+
+    private static LDAPExpr parseExpr(ParseState ps) throws InvalidSyntaxException {
+        ps.skipWhite();
+        if (!ps.prefix("(")) {
+            ps.error(MALFORMED);
+        }
+        
+        int operator;
+        ps.skipWhite();
+        switch (ps.peek()) {
+            case '&':
+                operator = AND;
+                break;
+            case '|':
+                operator = OR;
+                break;
+            case '!':
+                operator = NOT;
+                break;
+            default:
+                return parseSimple(ps);
+        }
+        ps.skip(1); // Ignore the operator
+        List v = new ArrayList();
+        do {
+            v.add(parseExpr(ps));
+            ps.skipWhite();
+        } while (ps.peek() == '(');
+        int n = v.size();
+        if (!ps.prefix(")") || n == 0 || (operator == NOT && n > 1)) {
+            ps.error(MALFORMED);
+        }
+        LDAPExpr[] args = new LDAPExpr[n];
+        v.toArray(args);
+        return new LDAPExpr(operator, args);
+    }
+
+    private static LDAPExpr parseSimple(ParseState ps) throws InvalidSyntaxException {
+        String attrName = ps.getAttributeName();
+        if (attrName == null) {
+            ps.error(MALFORMED);
+        }
+        int operator = 0;
+        if (ps.prefix("=")) {
+            operator = EQ;
+        } else if (ps.prefix("<=")) {
+            operator = LE;
+        } else if (ps.prefix(">=")) {
+            operator = GE;
+        } else if (ps.prefix("~=")) {
+            operator = APPROX;
+        } else {
+            // System.out.println("undef op='" + ps.peek() + "'");
+            ps.error(OPERATOR); // Does not return
+        }
+        String attrValue = ps.getAttributeValue();
+        if (!ps.prefix(")")) {
+            ps.error(MALFORMED);
+        }
+        return new LDAPExpr(operator, attrName, attrValue);
+    }
+
+    public static void main(String[] args) {
+        try {
+            LDAPExpr l = new LDAPExpr("(prop1&=bpan*)");
+            Properties p = new Properties();
+            p.put("prop1", "apanrap");
+            System.out.println(l.evaluate(p, true));
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     public int operator;
     public LDAPExpr[] args;
@@ -202,10 +346,6 @@ public class LDAPExpr {
         return false;
     }
 
-    public static boolean query(String filter, Dictionary pd) throws InvalidSyntaxException {
-        return new LDAPExpr(filter).evaluate(pd, false);
-    }
-
     /**
      * Evaluate this LDAP filter.
      *
@@ -315,9 +455,9 @@ public class LDAPExpr {
                 if (obj instanceof Byte) {
                     switch (op) {
                         case LE:
-                            return ((Byte) obj) <= Byte.parseByte(s);
+                            return ((int) obj) <= Byte.parseByte(s);
                         case GE:
-                            return ((Byte) obj) >= Byte.parseByte(s);
+                            return ((int) obj) >= Byte.parseByte(s);
                         default: /* APPROX and EQ */
 
                             return new Byte(s).equals(obj);
@@ -335,9 +475,9 @@ public class LDAPExpr {
                 } else if (obj instanceof Short) {
                     switch (op) {
                         case LE:
-                            return ((Short) obj) <= Short.parseShort(s);
+                            return ((int) obj) <= Short.parseShort(s);
                         case GE:
-                            return ((Short) obj) >= Short.parseShort(s);
+                            return ((int) obj) >= Short.parseShort(s);
                         default: /* APPROX and EQ */
 
                             return new Short(s).equals(obj);
@@ -373,8 +513,7 @@ public class LDAPExpr {
                             return new Double(s).equals(obj);
                     }
                 } else if (BigInteger.class.isInstance(obj)) {
-                    int c = ((BigInteger) obj).compareTo(new BigInteger(s));
-
+                    int c = ((Comparable<BigInteger>) obj).compareTo(new BigInteger(s));
                     switch (op) {
                         case LE:
                             return c <= 0;
@@ -385,8 +524,7 @@ public class LDAPExpr {
                             return c == 0;
                     }
                 } else if (BigDecimal.class.isInstance(obj)) {
-                    int c = ((BigDecimal) obj).compareTo(new BigDecimal(s));
-
+                    int c = ((Comparable<BigDecimal>) obj).compareTo(new BigDecimal(s));
                     switch (op) {
                         case LE:
                             return c <= 0;
@@ -437,7 +575,7 @@ public class LDAPExpr {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException |
+        }catch (ArrayIndexOutOfBoundsException |
                 IllegalAccessException |
                 IllegalArgumentException |
                 InstantiationException |
@@ -446,137 +584,6 @@ public class LDAPExpr {
             // Just consider it a false match and ignore the exception
         }
         return false;
-    }
-
-    // Clazz -> Constructor(String)
-    private static Map<Class<?>, Constructor<?>> constructorMap = new ConcurrentHashMap<>();
-    private static Constructor<?> DUMMY_CONS = LDAPExpr.class.getConstructors()[0];
-
-    /**
-     * Get cached String constructor for a class
-     */
-    private static Constructor getConstructor(Class clazz) {
-        Constructor<?> cons = constructorMap.computeIfAbsent(clazz, k -> {
-            try {
-                return clazz.getConstructor(String.class);
-            } catch (NoSuchMethodException | SecurityException ex) {
-                return DUMMY_CONS;
-            }
-        });
-        if (cons == DUMMY_CONS) {
-            return null;
-        }
-        return cons;
-    }
-
-    private static boolean compareString(String s1, int op, String s2) {
-        switch (op) {
-            case LE:
-                return s1.compareTo(s2) <= 0;
-            case GE:
-                return s1.compareTo(s2) >= 0;
-            case EQ:
-                return patSubstr(s1, s2);
-            case APPROX:
-                return fixupString(s2).equals(fixupString(s1));
-            default:
-                return false;
-        }
-    }
-
-    private static String fixupString(String s) {
-        return s.replaceAll("\\s+", "").toLowerCase();
-    }
-
-    private static boolean patSubstr(String s, String pat) {
-        return s == null ? false : patSubstr(s.toCharArray(), 0, pat.toCharArray(), 0);
-    }
-
-    private static boolean patSubstr(char[] s, int si, char[] pat, int pi) {
-        if (pat.length - pi == 0) {
-            return s.length - si == 0;
-        }
-        if (pat[pi] == WILDCARD) {
-            pi++;
-            for (;;) {
-                if (patSubstr(s, si, pat, pi)) {
-                    return true;
-                }
-                if (s.length - si == 0) {
-                    return false;
-                }
-                si++;
-            }
-        } else {
-            if (s.length - si == 0) {
-                return false;
-            }
-            if (s[si] != pat[pi]) {
-                return false;
-            }
-            return patSubstr(s, ++si, pat, ++pi);
-        }
-    }
-
-    private static LDAPExpr parseExpr(ParseState ps) throws InvalidSyntaxException {
-        ps.skipWhite();
-        if (!ps.prefix("(")) {
-            ps.error(MALFORMED);
-        }
-
-        int operator;
-        ps.skipWhite();
-        switch (ps.peek()) {
-            case '&':
-                operator = AND;
-                break;
-            case '|':
-                operator = OR;
-                break;
-            case '!':
-                operator = NOT;
-                break;
-            default:
-                return parseSimple(ps);
-        }
-        ps.skip(1); // Ignore the operator
-        List v = new ArrayList();
-        do {
-            v.add(parseExpr(ps));
-            ps.skipWhite();
-        } while (ps.peek() == '(');
-        int n = v.size();
-        if (!ps.prefix(")") || n == 0 || (operator == NOT && n > 1)) {
-            ps.error(MALFORMED);
-        }
-        LDAPExpr[] args = new LDAPExpr[n];
-        v.toArray(args);
-        return new LDAPExpr(operator, args);
-    }
-
-    private static LDAPExpr parseSimple(ParseState ps) throws InvalidSyntaxException {
-        String attrName = ps.getAttributeName();
-        if (attrName == null) {
-            ps.error(MALFORMED);
-        }
-        int operator = 0;
-        if (ps.prefix("=")) {
-            operator = EQ;
-        } else if (ps.prefix("<=")) {
-            operator = LE;
-        } else if (ps.prefix(">=")) {
-            operator = GE;
-        } else if (ps.prefix("~=")) {
-            operator = APPROX;
-        } else {
-            // System.out.println("undef op='" + ps.peek() + "'");
-            ps.error(OPERATOR); // Does not return
-        }
-        String attrValue = ps.getAttributeValue();
-        if (!ps.prefix(")")) {
-            ps.error(MALFORMED);
-        }
-        return new LDAPExpr(operator, attrName, attrValue);
     }
 
     @Override
@@ -628,6 +635,7 @@ public class LDAPExpr {
         return res.toString();
     }
 
+
     /**
      * Contains the current parser position and parsing utility methods.
      */
@@ -636,7 +644,7 @@ public class LDAPExpr {
         int pos;
         String str;
 
-        public ParseState(String str) throws InvalidSyntaxException {
+        ParseState(String str) throws InvalidSyntaxException {
             this.str = str;
             if (str.length() == 0) {
                 error(NULL);
@@ -760,14 +768,4 @@ public class LDAPExpr {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            LDAPExpr l = new LDAPExpr("(prop1&=bpan*)");
-            Properties p = new Properties();
-            p.put("prop1", "apanrap");
-            System.out.println(l.evaluate(p, true));
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -61,29 +61,18 @@ public class PseudoDevice {
     }
 
     public void setParameterUpdateListener(final PseudoDeviceUpdateListener listener) {
-        new Thread(new Runnable() {
-            /*
-                * Parameter update emulation code.
-                * It emulates a parameter update per 3 seconds
-                */
-            public void run() {
-                while (listener != null) {
-                    try {
-                        Thread.sleep(60*1000);
-                        watt++;
-                        listener.pseudoDeviceUpdated(getConsumedPowerInWatt(), active);
-                        active = !active;
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (PseudoDeviceException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
+        new Thread(() -> {
+            while (listener != null) {
+                try {
+                    Thread.sleep(60*1000);
+                    watt++;
+                    listener.pseudoDeviceUpdated(getConsumedPowerInWatt(), active);
+                    active = !active;
+                } catch (InterruptedException | PseudoDeviceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
-
         }).start();
     }
 

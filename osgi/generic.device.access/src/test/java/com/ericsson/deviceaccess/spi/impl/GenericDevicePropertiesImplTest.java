@@ -41,6 +41,7 @@ import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -106,7 +107,7 @@ public class GenericDevicePropertiesImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -121,7 +122,7 @@ public class GenericDevicePropertiesImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }

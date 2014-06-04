@@ -14,8 +14,6 @@ import java.util.function.UnaryOperator;
  */
 public final class Javadoc {
 
-    private StringBuilder builder;
-    private Map<String, List<String>> tags;
     private static final String JAVADOC_START = "/**";
     private static final String JAVADOC_END = " */";
     private static final String LINE_START = " * ";
@@ -23,6 +21,8 @@ public final class Javadoc {
     private static final String TAG_INHERITED = "{@inheritDoc}";
     private static final String TAG_PARAMETER = "@param";
     private static final String TAG_RETURN = "@return";
+    private StringBuilder builder;
+    private Map<String, List<String>> tags;
 
     /**
      * New builder

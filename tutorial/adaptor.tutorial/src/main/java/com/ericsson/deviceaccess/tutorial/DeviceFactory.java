@@ -64,6 +64,7 @@ public class DeviceFactory implements BundleActivator,
      * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
      * )
      */
+    @Override
     public void start(BundleContext context) {
         this.context = context;
         PseudoDeviceManager.getInstance().setDeviceDiscoveryListener(this);
@@ -76,6 +77,7 @@ public class DeviceFactory implements BundleActivator,
      * com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceDiscoveryListener
      * #deviceDiscovered(com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice)
      */
+    @Override
     public void deviceDiscovered(PseudoDevice dev) {
         if (!devices.containsKey(dev.getId())) {
             System.out.println("A new device is discovered!");
@@ -99,6 +101,7 @@ public class DeviceFactory implements BundleActivator,
      * com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceDiscoveryListener
      * #deviceRemoved(com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice)
      */
+    @Override
     public void deviceRemoved(PseudoDevice dev) {
         if (devices.containsKey(dev.getId())) {
             System.out.println("Device " + dev.getId() + " is removed");
@@ -120,6 +123,7 @@ public class DeviceFactory implements BundleActivator,
      * @see
      * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
+    @Override
     public void stop(BundleContext context) {
         Iterator it = devices.values().iterator();
         while (it.hasNext()) {

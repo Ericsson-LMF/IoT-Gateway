@@ -41,7 +41,9 @@ import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
 import com.ericsson.deviceaccess.spi.GenericDeviceService;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
+import java.util.Properties;
 import junit.framework.Assert;
+import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -50,10 +52,6 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Properties;
-
-import static junit.framework.Assert.fail;
 
 /**
  * GenericDeviceImpl Tester.
@@ -142,7 +140,7 @@ public class GenericDeviceImplTest {
         // Just check that JSON parsing works
         try {
             JSONObject jsonObject = new JSONObject(json);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             fail(e.getMessage());
         }
     }
@@ -164,7 +162,7 @@ public class GenericDeviceImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
     }

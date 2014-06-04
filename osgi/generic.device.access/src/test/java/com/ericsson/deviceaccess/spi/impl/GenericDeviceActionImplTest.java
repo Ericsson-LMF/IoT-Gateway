@@ -36,6 +36,8 @@ package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
+import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -43,10 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-
-import static junit.framework.Assert.fail;
 
 /**
  *
@@ -107,7 +105,7 @@ public class GenericDeviceActionImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             fail(e.getMessage());
         }
     }

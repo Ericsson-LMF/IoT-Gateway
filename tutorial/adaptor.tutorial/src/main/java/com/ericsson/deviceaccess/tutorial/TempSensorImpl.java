@@ -43,6 +43,7 @@ public class TempSensorImpl extends TemperatureSensorBase {
     {
         System.out.println("Created "+this);
     }
+    @Override
     protected void refreshProperties() {
 
     }

@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import org.osgi.service.upnp.UPnPStateVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 public class UPnPServiceImpl implements UPnPService {
 
@@ -77,14 +79,17 @@ public class UPnPServiceImpl implements UPnPService {
         m_properties.put(UPnPService.ID, m_serviceId);
     }
 
+    @Override
     public String getId() {
         return m_serviceId;
     }
 
+    @Override
     public String getType() {
         return m_serviceType;
     }
 
+    @Override
     public String getVersion() {
         int idx = m_serviceType.lastIndexOf(':');
         if (idx > 0) {
@@ -94,18 +99,22 @@ public class UPnPServiceImpl implements UPnPService {
         }
     }
 
+    @Override
     public UPnPAction getAction(String name) {
         return (UPnPAction) m_actions.get(name);
     }
 
+    @Override
     public UPnPAction[] getActions() {
         return (UPnPAction[]) m_actions.values().toArray(new UPnPAction[0]);
     }
 
+    @Override
     public UPnPStateVariable[] getStateVariables() {
         return null;
     }
 
+    @Override
     public UPnPStateVariable getStateVariable(String name) {
         return (UPnPStateVariable) m_variables.get(name);
     }
@@ -171,17 +180,17 @@ public class UPnPServiceImpl implements UPnPService {
                             if (p.getEventType() == XmlPullParser.START_TAG && p.getName().equalsIgnoreCase("minimum")) {
                                 try {
                                     minimum = new Long(p.nextText());
-                                } catch (Exception e) {
+                                } catch (IOException | NumberFormatException | XmlPullParserException e) {
                                 }
                             } else if (p.getEventType() == XmlPullParser.START_TAG && p.getName().equalsIgnoreCase("maximum")) {
                                 try {
                                     maximum = new Long(p.nextText());
-                                } catch (Exception e) {
+                                } catch (IOException | NumberFormatException | XmlPullParserException e) {
                                 }
                             } else if (p.getEventType() == XmlPullParser.START_TAG && p.getName().equalsIgnoreCase("step")) {
                                 try {
                                     step = new Long(p.nextText());
-                                } catch (Exception e) {
+                                } catch (IOException | NumberFormatException | XmlPullParserException e) {
                                 }
                             }
                         }
@@ -189,7 +198,7 @@ public class UPnPServiceImpl implements UPnPService {
                 }
 
                 if (allowedValueList.size() > 0) {
-                    allowedValues = (String[]) allowedValueList.toArray(new String[0]);
+                    allowedValues = (String[]) allowedValueList.toArray(new String[allowedValueList.size()]);
                 }
 
                 m_variables.put(variableName, new UPnPStateVariableImpl(variableName, dataType, sendEvents, allowedValues, maximum, minimum, step, defaultValue));

@@ -77,6 +77,7 @@ public class EventManager implements ServiceListener, Runnable,
         ServiceTrackerCustomizer<GenericDevice, Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
+    private static final String REGEX_DELTA = "/state/([^/]+)$";
     private BundleContext context;
     //TODO: this starts from false due tests not calling start but run
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
@@ -86,7 +87,6 @@ public class EventManager implements ServiceListener, Runnable,
     private ServiceTracker deviceTracker;
     private final Map<String, GenericDevice> devices = new ConcurrentHashMap<>();
 
-    private static final String REGEX_DELTA = "/state/([^/]+)$";
 
     private Thread thread;
     private final GenericDeviceEvent POISON = new GenericDeviceEvent(null, null, null, null);
@@ -258,7 +258,7 @@ public class EventManager implements ServiceListener, Runnable,
     private float substract(float a, float b) {
         // Hack to get around bit errors
         // when doing subtract of floats
-        float delta = (float) (Math.round(a * 1000) - Math.round(b * 1000));
+        float delta = (Math.round(a * 1000) - Math.round(b * 1000));
         return delta / 1000;
     }
 
@@ -369,6 +369,28 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
+
+    @Override
+    public Object addingService(ServiceReference<GenericDevice> reference) {
+        GenericDevice device = context.getService(reference);
+        devices.put(device.getId(), device);
+
+        // Always generate a state event when a new device is registered
+        Dictionary<String, Object> properties = new Hashtable<>();
+        properties.put(DEVICE_STATE, device.getState());
+        addEvent(device.getId(), "DeviceProperties", properties);
+        return device;
+    }
+
+    @Override
+    public void modifiedService(ServiceReference<GenericDevice> reference, Object service) {
+    }
+
+    @Override
+    public void removedService(ServiceReference<GenericDevice> reference, Object service) {
+        devices.remove(context.getService(reference).getId());
+    }
+
     /**
      * Internal class to hold an event
      */
@@ -382,8 +404,7 @@ public class EventManager implements ServiceListener, Runnable,
         public boolean propertyAdded;
         public GenericDevice device;
 
-        public GenericDeviceEvent(GenericDevice device, String deviceId,
-                String serviceId, Dictionary<String, Object> properties) {
+        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, Dictionary<String, Object> properties) {
             propertyEvent = false;
             this.device = device;
             this.deviceId = deviceId;
@@ -391,8 +412,7 @@ public class EventManager implements ServiceListener, Runnable,
             this.properties = properties;
         }
 
-        public GenericDeviceEvent(GenericDevice device, String deviceId,
-                String serviceId, String propertyId, boolean propertyAdded) {
+        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, String propertyId, boolean propertyAdded) {
             propertyEvent = true;
             this.device = device;
             this.deviceId = deviceId;
@@ -413,26 +433,5 @@ public class EventManager implements ServiceListener, Runnable,
                 return deviceId + " " + serviceId + " " + properties;
             }
         }
-    }
-
-    @Override
-    public Object addingService(ServiceReference<GenericDevice> reference) {
-        GenericDevice device = context.getService(reference);
-        devices.put(device.getId(), device);
-
-        // Always generate a state event when a new device is registered
-        Dictionary<String, Object> properties = new Hashtable<String, Object>();
-        properties.put(DEVICE_STATE, device.getState());
-        addEvent(device.getId(), "DeviceProperties", properties);
-        return device;
-    }
-
-    @Override
-    public void modifiedService(ServiceReference<GenericDevice> reference, Object service) {
-    }
-
-    @Override
-    public void removedService(ServiceReference<GenericDevice> reference, Object service) {
-        devices.remove(context.getService(reference).getId());
     }
 }

@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.research.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceAction;
@@ -47,6 +46,7 @@ import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkSet
 import com.ericsson.deviceaccess.spi.GenericDeviceService;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.research.commonutil.function.FunctionalUtil;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -234,7 +234,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
                     actName = path;
                     path = "";
                 }
-                GenericDeviceAction act = (GenericDeviceAction) action
+                GenericDeviceAction act = action
                         .get(actName);
                 if (act != null) {
                     return act.getSerializedNode(path, format);

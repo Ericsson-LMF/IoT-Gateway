@@ -136,12 +136,12 @@ public class UPnPUtil {
                 throw new UPnPUtilException(404, "Could not determine content type");
             }
             debug("Content type is " + contentType);
-            if (contentType.indexOf(";") > 0) {
+            if (contentType.indexOf(';') > 0) {
                 /*
                  * remove optional data such as character encoding.
                  * e.g. video/mp4;UTF-8
                  */
-                contentType = contentType.substring(0, contentType.indexOf(";"));
+                contentType = contentType.substring(0, contentType.indexOf(';'));
             }
         } catch (IOException e) {
             throw new UPnPUtilException(500, e.getMessage());
@@ -157,7 +157,7 @@ public class UPnPUtil {
     }
 
     protected static String getCurrentURIMetadata(String url, String title, String contentType) throws UPnPUtilException {
-        String itemType = contentType.substring(0, contentType.indexOf("/"));
+        String itemType = contentType.substring(0, contentType.indexOf('/'));
         String md = "<DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\">";
         md += "<item>";
         md += "<dc:title>" + title + "</dc:title>";
@@ -183,6 +183,9 @@ public class UPnPUtil {
             String value = urlconn.getHeaderField(header);
             urlconn.disconnect();
             return value;
+        }
+
+        private HttpClient() {
         }
     }
 
@@ -371,6 +374,9 @@ public class UPnPUtil {
             tokenList.add(token);
         }
 
-        return tokenList.toArray(new String[0]);
+        return tokenList.toArray(new String[tokenList.size()]);
+    }
+
+    private UPnPUtil() {
     }
 }

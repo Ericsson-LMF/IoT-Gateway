@@ -64,11 +64,11 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, GenericDeviceEventListener, ServiceListener {
+    private static Log logger = LogFactory.getLog(GenericDeviceServlet.class);
 
     private BundleContext context;
     private boolean shutdown;
 
-    private static Log logger = LogFactory.getLog(GenericDeviceServlet.class);
 //	private LogTracker logger = null;
     private ServiceRegistration sr;
     protected HashMap sockets;
@@ -81,6 +81,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
         super(8090);
     }
 
+    @Override
     public Response serve(String uri, String method, Properties header, Properties parms, Properties files) {
         logger.debug("REST: Get request for " + uri);
         String resource;
@@ -93,7 +94,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                     uri = uri.substring(8);
                     String deviceId;
                     String requestedNode = "";
-                    int pathIndex = uri.indexOf("/", 1);
+                    int pathIndex = uri.indexOf('/', 1);
                     if (pathIndex < 0) {
                         deviceId = uri.substring(1);
                         GenericDevice dev = getDevice(deviceId);
@@ -121,7 +122,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             } else {
                 return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "No servlet registered for " + uri);
             }
-        } catch (Exception e) {
+        } catch (GenericDeviceException | IOException | JSONException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             return new NanoHTTPD.Response(HTTP_INTERNALERROR, "text/plain", "Failed to get resource " + uri + " due to " + sw.toString());
@@ -165,7 +166,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             } else {
                 return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "Could not find device: " + deviceId);
             }
-        } catch (Throwable e) {
+        } catch (GenericDeviceException e) {
             return new NanoHTTPD.Response(HTTP_INTERNALERROR, "text/plain", "Failed to perform action " + request + " due to " + e);
         }
     }
@@ -224,6 +225,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
         return devices.toString(3);
     }
 
+    @Override
     public void start(BundleContext bc) throws Exception {
         context = bc;
 //		logger = new LogTracker(context);
@@ -239,27 +241,32 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
         }
     }
 
+    @Override
     public void stop(BundleContext bc) throws Exception {
         shutdown = true;
         sr.unregister();
         shutdown();
     }
 
+    @Override
     public void notifyGenericDeviceEvent(String deviceId, String serviceName, Dictionary properties) {
 //		logger.log(LogService.LOG_DEBUG, "REST Servlet received event: " + deviceId + ", " + serviceName + ", " + properties);
         logger.debug("REST Servlet received event: " + deviceId + ", " + serviceName + ", " + properties);
     }
 
+    @Override
     public void notifyGenericDevicePropertyRemovedEvent(String deviceId, String serviceName, String propertyId) {
 //		logger.log(LogService.LOG_DEBUG, "Removed property " + propertyId + " from " + deviceId + "." + propertyId);
         logger.debug("Removed property " + propertyId + " from " + deviceId + "." + propertyId);
     }
 
+    @Override
     public void notifyGenericDevicePropertyAddedEvent(String deviceId, String serviceName, String propertyId) {
 //		logger.log(LogService.LOG_DEBUG, "Added property " + propertyId + " to " + deviceId + "." + propertyId);
         logger.debug("Added property " + propertyId + " to " + deviceId + "." + propertyId);
     }
 
+    @Override
     public void serviceChanged(ServiceEvent event) {
         ServiceReference sr = event.getServiceReference();
         switch (event.getType()) {

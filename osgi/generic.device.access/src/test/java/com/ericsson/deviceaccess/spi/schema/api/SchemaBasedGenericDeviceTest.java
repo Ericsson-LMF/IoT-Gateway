@@ -35,15 +35,21 @@
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.spi.schema.*;
+import com.ericsson.deviceaccess.spi.schema.ActionSchema;
+import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
+import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.SchemaBasedService;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  *

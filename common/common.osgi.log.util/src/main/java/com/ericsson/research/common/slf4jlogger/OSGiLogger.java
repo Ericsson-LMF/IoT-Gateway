@@ -48,6 +48,34 @@ import org.slf4j.helpers.MessageFormatter;
 public class OSGiLogger extends MarkerIgnoringBase {
 
     private static final long serialVersionUID = 1L;
+
+    private static String createMessagePart(int logLevel, StackTraceElement stackTraceElement, String message) {
+        if (logLevel == LogService.LOG_INFO) {
+            return message;
+        }
+        if (stackTraceElement != null) {
+            return message + " ;; (" + "{" + Thread.currentThread().getName() + "} " + stackTraceElement.getClassName() + "."
+                    + stackTraceElement.getMethodName() + "#"
+                    + stackTraceElement.getLineNumber() + ") ";
+        } else {
+            return message;
+        }
+    }
+
+    private static String getLogLevelString(int logLevel) {
+        switch (logLevel) {
+            case LogService.LOG_ERROR:
+                return "ERROR";
+            case LogService.LOG_WARNING:
+                return "WARNING";
+            case LogService.LOG_DEBUG:
+                return "DEBUG";
+            case LogService.LOG_INFO:
+                return "INFO";
+            default:
+                return "UNKOWN";
+        }
+    }
     private boolean detailed;
 
     {
@@ -357,31 +385,4 @@ public class OSGiLogger extends MarkerIgnoringBase {
         }
     }
 
-    private static String createMessagePart(int logLevel, StackTraceElement stackTraceElement, String message) {
-        if (logLevel == LogService.LOG_INFO) {
-            return message;
-        }
-        if (stackTraceElement != null) {
-            return message + " ;; (" + "{" + Thread.currentThread().getName() + "} " + stackTraceElement.getClassName() + "."
-                    + stackTraceElement.getMethodName() + "#"
-                    + stackTraceElement.getLineNumber() + ") ";
-        } else {
-            return message;
-        }
-    }
-
-    private static String getLogLevelString(int logLevel) {
-        switch (logLevel) {
-            case LogService.LOG_ERROR:
-                return "ERROR";
-            case LogService.LOG_WARNING:
-                return "WARNING";
-            case LogService.LOG_DEBUG:
-                return "DEBUG";
-            case LogService.LOG_INFO:
-                return "INFO";
-            default:
-                return "UNKOWN";
-        }
-    }
 }

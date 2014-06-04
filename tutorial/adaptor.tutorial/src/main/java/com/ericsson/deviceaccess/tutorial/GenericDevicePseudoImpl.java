@@ -113,6 +113,7 @@ public class GenericDevicePseudoImpl extends SchemaBasedGenericDevice implements
      * com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceUpdateListener#
      * pseudoDeviceUpdated(java.lang.String)
      */
+    @Override
     public void pseudoDeviceUpdated(String data, boolean active) {
         PowerMeterImpl powerMeterService = (PowerMeterImpl) getService(PowerMeter.SERVICE_NAME);
         powerMeterService.setCurrentPower(Float.parseFloat(data));

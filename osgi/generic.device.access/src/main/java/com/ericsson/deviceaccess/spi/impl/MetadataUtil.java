@@ -34,9 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.*;
+import com.ericsson.deviceaccess.api.Constants;
+import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.GenericDeviceProperties;
+import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
+import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceError;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;

@@ -34,25 +34,27 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine;
 
-import org.osgi.framework.*;
-
 import com.ericsson.deviceaccess.adaptor.ruleengine.device.ConfigurationManager;
 import com.ericsson.deviceaccess.adaptor.ruleengine.device.RuleDevice;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 	private static final String PID = "com.ericsson.deviceaccess.adapter.ruleengine";
+    public static BundleContext context;
 	private ConfigurationManager cm;
 	private RuleDevice ruleDevice;
-	public static BundleContext context;
 
+    @Override
 	public void start(BundleContext bc) throws Exception {
-		this.context = bc;
+		Activator.context = bc;
 		cm = new ConfigurationManager(bc, PID);
 		ruleDevice = new RuleDevice(bc, cm);
 		ruleDevice.start();
 		cm.start();
 	}
 
+    @Override
 	public void stop(BundleContext bc) throws Exception {
 		ruleDevice.stop();
 		cm.stop();

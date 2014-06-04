@@ -46,6 +46,19 @@ import org.slf4j.Logger;
 
 public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAgent.UpdatePropertyInterface {
 
+    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
+        UPnPService[] services = device.getServices();
+        
+        for (int i = 0; i < services.length; ++i) {
+            UPnPAction action = services[i].getAction(actionName);
+            if (action != null) {
+                return action;
+            }
+        }
+        throw new UPnPException(UPnPException.INVALID_ACTION,
+                "No such action supported " + actionName);
+    }
+
     final private UPnPDevice upnpDev;
     final private Logger logger;
 
@@ -55,6 +68,7 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
     }
 
     // @Override
+    @Override
     public void executeSetTarget(int target) throws GenericDeviceException {
         // TODO Auto-generated method stub
         UPnPAction action = null;
@@ -75,19 +89,21 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
     }
 
     // @Override
+    @Override
     protected void refreshProperties() {
         // TODO Auto-generated method stub
 
     }
 
     // @Override
+    @Override
     public void updateProperty(String name, Object value) {
         logger.debug("updateProperty(" + name + ")");
 
         GenericDeviceProperties properties = this.getProperties();
         if ("Status".equalsIgnoreCase(name)) {
             if (value instanceof Boolean) {
-                logger.debug("updateCurrentTarget(" + (Boolean) value + ")");
+                logger.debug("updateCurrentTarget(" + value + ")");
                 this.updateCurrentTarget(((Boolean) value) ? 1 : 0);
             }
         } else {
@@ -95,17 +111,4 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
         }
     }
 
-    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName)
-            throws UPnPException {
-        UPnPService[] services = device.getServices();
-
-        for (int i = 0; i < services.length; ++i) {
-            UPnPAction action = services[i].getAction(actionName);
-            if (action != null) {
-                return action;
-            }
-        }
-        throw new UPnPException(UPnPException.INVALID_ACTION,
-                "No such action supported " + actionName);
-    }
 }

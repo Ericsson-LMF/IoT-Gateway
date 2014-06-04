@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -44,7 +45,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -70,27 +70,33 @@ public class UPnPActionImpl implements UPnPAction {
 		this.outputArgumentNames = outputArgumentNames;
 	}
 
+    @Override
 	public String getName() {
 		return name;
 	}
 
+    @Override
 	public String getReturnArgumentName() {
 		return null;
 	}
 
+    @Override
 	public String[] getInputArgumentNames() {
 		return (String[]) inputArgumentNames.keySet().toArray(new String[0]);
 	}
 
+    @Override
 	public String[] getOutputArgumentNames() {
 		return (String[]) outputArgumentNames.keySet().toArray(new String[0]);
 	}
 
+    @Override
 	public UPnPStateVariable getStateVariable(String argumentName) {
 		String stateVarName = (String) outputArgumentNames.get(argumentName);
 		return m_service.getStateVariable(stateVarName);
 	}
 
+    @Override
 	public Dictionary invoke(Dictionary args) throws Exception {
 		Properties ret = new Properties();
 		
@@ -99,15 +105,17 @@ public class UPnPActionImpl implements UPnPAction {
         for (Iterator i = inputArgumentNames.keySet().iterator(); i.hasNext(); ) {
         	String argumentName = (String) i.next();
             String argumentValue = (String)	args.get(argumentName);
-            if (argumentValue!=null)
+            if (argumentValue!=null) {
                 argumentValue = UPnPUtils.escapeXml(argumentValue);
-            else
+            } else {
                 argumentValue="";
+            }
             
-            if (argumentValue.length() == 0)
-            	arguments.append("         <" + argumentName + " />\r\n" );
-            else
-            	arguments.append("         <" + argumentName + ">" + argumentValue + "</" + argumentName + ">\r\n");
+            if (argumentValue.length() == 0) {
+                arguments.append("         <").append(argumentName).append(" />\r\n");
+            } else {
+                arguments.append("         <").append(argumentName).append(">").append(argumentValue).append("</").append(argumentName).append(">\r\n");
+            }
         }
         
         // Insert UPnP request in a SOAP body
@@ -166,10 +174,11 @@ public class UPnPActionImpl implements UPnPAction {
 				"\n" + actionDataTransport);
 			
 			// Remove header fields
-			StringBuffer buf = new StringBuffer("Got response from action " + name + ":\n");
+			StringBuilder buf = new StringBuilder("Got response from action " + name + ":\n");
 			String inputLine;
-			while ((inputLine = in.readLine()).trim().length() != 0)
-				buf.append("\n" + inputLine);
+			while ((inputLine = in.readLine()).trim().length() != 0) {
+                            buf.append("\n").append(inputLine);
+            }
         	
         	// Parse response
         	String responseTag = name + "Response";
@@ -191,7 +200,7 @@ public class UPnPActionImpl implements UPnPAction {
 				} else if (p.getEventType() == XmlPullParser.TEXT) {
 					tagValue = p.getText();
 					if (inResponseTag) {
-						buf.append("\nTag: " + tagName + " = " + tagValue);
+                                            buf.append("\nTag: ").append(tagName).append(" = ").append(tagValue);
 						UPnPStateVariableImpl var = (UPnPStateVariableImpl) getStateVariable(tagName);
 						if (var != null && tagValue != null && tagValue.trim().length() > 0) {
 							Object val = UPnPUtils.parseString(tagValue, var.getUPnPDataType());
@@ -212,7 +221,7 @@ public class UPnPActionImpl implements UPnPAction {
 				in.close();
 	        	//out.close();
 				wr.close();
-			} catch (Throwable t) {}
+			} catch (IOException t) {}
         } catch (Exception e) {
         	log.warn(UPnPServiceImpl.class.getName() + " invokeAction, close failed", e);
         }

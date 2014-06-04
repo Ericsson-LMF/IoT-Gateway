@@ -57,6 +57,7 @@ public class PowerControlImpl extends PowerControlBase {
      * <p/>
      * It will be called by the base class when a client invokes the action.
      */
+    @Override
     public void executeOn() throws GenericDeviceException {
         try {
             dev.powerOn();
@@ -73,6 +74,7 @@ public class PowerControlImpl extends PowerControlBase {
      * <p/>
      * It will be called by the base class when a client invokes the action.
      */
+    @Override
     public void executeOff() throws GenericDeviceException {
         try {
             dev.powerOff();
@@ -82,6 +84,7 @@ public class PowerControlImpl extends PowerControlBase {
         }
     }
 
+    @Override
     protected void refreshProperties() {
         // NOP
     }
