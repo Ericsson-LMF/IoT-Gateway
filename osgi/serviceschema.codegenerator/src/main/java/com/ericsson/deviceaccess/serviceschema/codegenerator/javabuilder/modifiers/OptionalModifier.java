@@ -9,7 +9,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifi
 public enum OptionalModifier {
 
     /**
-     * Class dependand instead of instance dependand.
+     * Class dependant instead of instance dependant.
      */
     STATIC,
     /**

@@ -49,8 +49,8 @@ public enum StringUtil {
     /**
      * Makes first char of the string to upper case
      *
-     * @param string String to be capitalized
-     * @return capitalized string
+     * @param string String to be capitalised
+     * @return capitalised string
      */
     public static String capitalize(String string) {
         StringBuilder sb = new StringBuilder(string);

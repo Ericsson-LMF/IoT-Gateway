@@ -43,21 +43,21 @@ public class Activator implements BundleActivator {
 
     private static final String PID = "com.ericsson.deviceaccess.adapter.ruleengine";
     public static BundleContext context;
-    private ConfigurationManager cm;
-    private RuleDevice ruleDevice;
+	private ConfigurationManager configManager;
+	private RuleDevice ruleDevice;
 
     @Override
-    public void start(BundleContext bc) throws Exception {
-        Activator.context = bc;
-        cm = new ConfigurationManager(bc, PID);
-        ruleDevice = new RuleDevice(bc, cm);
-        ruleDevice.start();
-        cm.start();
-    }
+	public void start(BundleContext context) throws Exception {
+		Activator.context = context;
+		configManager = new ConfigurationManager(context, PID);
+		ruleDevice = new RuleDevice(context, configManager);
+		ruleDevice.start();
+		configManager.start();
+	}
 
     @Override
-    public void stop(BundleContext bc) throws Exception {
-        ruleDevice.stop();
-        cm.stop();
-    }
+	public void stop(BundleContext context) throws Exception {
+		ruleDevice.stop();
+		configManager.stop();
+	}
 }

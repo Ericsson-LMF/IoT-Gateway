@@ -37,7 +37,7 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Properties;
+import java.util.Hashtable;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.osgi.framework.BundleContext;
@@ -53,7 +53,7 @@ public class ConfigurationManager implements ManagedService {
 
     private final BundleContext context;
     private final String pid;
-    private final Dictionary configProperties = new Properties();
+    private final Dictionary<String, Object> configProperties = new Hashtable<>();
     private ServiceRegistration serviceReg;
     private final Queue<ConfigurationManagerListener> listeners = new ConcurrentLinkedQueue<>();
 
@@ -63,7 +63,7 @@ public class ConfigurationManager implements ManagedService {
     }
 
     public void start() {
-        Dictionary properties = new Properties();
+        Dictionary<String, Object> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, pid);
         serviceReg = context.registerService(ManagedService.class.getName(), this, properties);
     }
@@ -93,16 +93,16 @@ public class ConfigurationManager implements ManagedService {
     }
 
     @Override
-    public void updated(Dictionary properties) throws ConfigurationException {
+    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
         if (properties == null) {
             return;
         }
         properties.remove(Constants.SERVICE_PID);
 
         // Check for added configuration parameters
-        Properties added = new Properties();
-        for (Enumeration e = properties.keys(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
+        Dictionary<String, Object> added = new Hashtable<>();
+        for (Enumeration<String> e = properties.keys(); e.hasMoreElements();) {
+            String key = e.nextElement();
             Object value = properties.get(key);
             if (configProperties.get(key) == null) {
                 added.put(key, value);
@@ -111,9 +111,9 @@ public class ConfigurationManager implements ManagedService {
         }
 
         // Check for removed configuration parameters
-        Properties removed = new Properties();
-        for (Enumeration e = configProperties.keys(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
+        Dictionary<String, Object> removed = new Hashtable<>();
+        for (Enumeration<String> e = configProperties.keys(); e.hasMoreElements();) {
+            String key = e.nextElement();
             if (properties.get(key) == null) {
                 removed.put(key, configProperties.get(key));
                 configProperties.remove(key);
@@ -121,9 +121,9 @@ public class ConfigurationManager implements ManagedService {
         }
 
         // Check for modified configuration parameters
-        Properties modified = new Properties();
-        for (Enumeration e = properties.keys(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
+        Dictionary<String, Object> modified = new Hashtable<>();
+        for (Enumeration<String> e = properties.keys(); e.hasMoreElements();) {
+            String key = e.nextElement();
             String newValue = (String) properties.get(key);
             String oldValue = (String) configProperties.get(key);
             if (!newValue.equals(oldValue)) {
@@ -132,7 +132,7 @@ public class ConfigurationManager implements ManagedService {
             }
         }
 
-        if (added.size() > 0 || removed.size() > 0 || modified.size() > 0) {
+        if (!added.isEmpty() || !removed.isEmpty() || !modified.isEmpty()) {
             listeners.forEach(l -> l.updated(added, removed, modified));
         }
     }
