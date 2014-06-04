@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.research.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
@@ -45,9 +44,12 @@ import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkGet
 import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkSetPermission;
 import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
 import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.research.commonutil.function.FunctionalUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
@@ -441,7 +443,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      *
      * @return
      */
-    public Properties getDeviceProperties() {
+    public Dictionary<String, Object> getDeviceProperties() {
         return getDeviceProperties(this);
     }
 
@@ -453,20 +455,20 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      * @param dev device to generate properties from
      * @return Properties object that can be used in registerService() method.
      */
-    public static Properties getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
+    public static Dictionary<String, Object> getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
         checkGetPermission(GenericDevice.class.getName());
-        Properties props = new Properties();
+        Dictionary<String, Object> props = new Hashtable<>();
         if (dev.getURN() != null) {
-            props.setProperty(Constants.PARAM_DEVICE_URN, dev.getURN());
+            props.put(Constants.PARAM_DEVICE_URN, dev.getURN());
         }
         if (dev.getId() != null) {
-            props.setProperty(Constants.PARAM_DEVICE_ID, dev.getId());
+            props.put(Constants.PARAM_DEVICE_ID, dev.getId());
         }
         if (dev.getType() != null) {
-            props.setProperty(Constants.PARAM_DEVICE_TYPE, dev.getType());
+            props.put(Constants.PARAM_DEVICE_TYPE, dev.getType());
         }
         if (dev.getProtocol() != null) {
-            props.setProperty(Constants.PARAM_DEVICE_PROTOCOL, dev.getProtocol());
+            props.put(Constants.PARAM_DEVICE_PROTOCOL, dev.getProtocol());
         }
         return props;
     }

@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,25 +29,31 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.spi.event;
 
-import com.ericsson.research.commonutil.function.TriMonoConsumer;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.*;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_ID;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_NAME;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_PROTOCOL;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_STATE;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_URN;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.GENERICDEVICE_FILTER;
+import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.SERVICE_NAME;
+import com.ericsson.research.commonutil.function.TriMonoConsumer;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -68,7 +74,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class EventManager implements ServiceListener, Runnable,
-        ServiceTrackerCustomizer {
+        ServiceTrackerCustomizer<GenericDevice, Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private BundleContext context;
@@ -76,7 +82,7 @@ public class EventManager implements ServiceListener, Runnable,
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final Map<GenericDeviceEventListener, Filter> listeners = new ConcurrentHashMap<>();
     private final BlockingQueue<GenericDeviceEvent> events = new LinkedBlockingQueue<>();
-    private final HashMap deltaValues = new HashMap();
+    private final Map<String, Object> deltaValues = new HashMap<>();
     private ServiceTracker deviceTracker;
     private final Map<String, GenericDevice> devices = new ConcurrentHashMap<>();
 
@@ -98,6 +104,11 @@ public class EventManager implements ServiceListener, Runnable,
 
         @Override
         public boolean matchCase(Dictionary dictionary) {
+            return true;
+        }
+
+        @Override
+        public boolean matches(Map<String, ?> map) {
             return true;
         }
     };
@@ -132,7 +143,7 @@ public class EventManager implements ServiceListener, Runnable,
             if (isEventInvalid(event)) {
                 continue;
             }
-            Properties matching = new Properties();
+            Dictionary<String, Object> matching = new Hashtable<>();
             addForNoPropertyEvent(event, matching);
             invokeListeners(event, matching);
         }
@@ -152,7 +163,7 @@ public class EventManager implements ServiceListener, Runnable,
         return event.properties == null && !event.propertyEvent;
     }
 
-    private void addForNoPropertyEvent(GenericDeviceEvent event, Properties matching) {
+    private void addForNoPropertyEvent(GenericDeviceEvent event, Dictionary<String, Object> matching) {
         if (!event.propertyEvent) {
             matching.put(DEVICE_ID, event.deviceId);
             matching.put(SERVICE_NAME, event.serviceId);
@@ -166,27 +177,28 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
-    private void invokeListeners(GenericDeviceEvent event, Properties matchingProperties) {
+    private void invokeListeners(GenericDeviceEvent event, Dictionary<String, Object> matchingProperties) {
         String deviceId = event.deviceId;
         String serviceName = event.serviceId;
         listeners.forEach((listener, filter) -> {
             checkForDeltaProperty(filter, event, matchingProperties);
-            try {
-                // TODO: "Prevent this from hanging"? This comment was here... But I changed things around...
-                if (event.propertyEvent) {
-                    TriMonoConsumer<String> consumer;
-                    if (event.propertyAdded) {
-                        consumer = listener::notifyGenericDevicePropertyAddedEvent;
-                    } else {
-                        consumer = listener::notifyGenericDevicePropertyRemovedEvent;
-                    }
-                    consumer.consume(deviceId, serviceName, event.propertyId);
-                } else if (filter.match(matchingProperties)) {
-                    listener.notifyGenericDeviceEvent(deviceId, serviceName, event.properties);
+//            try {
+            // TODO: "Prevent this from hanging"? This comment was here... But I changed things around...
+            if (event.propertyEvent) {
+                TriMonoConsumer<String> consumer;
+                if (event.propertyAdded) {
+                    consumer = listener::notifyGenericDevicePropertyAddedEvent;
+                } else {
+                    consumer = listener::notifyGenericDevicePropertyRemovedEvent;
                 }
-            } catch (Throwable t) {
-                logger.warn("Exception when invoking event listener", t);
+                consumer.consume(deviceId, serviceName, event.propertyId);
+            } else if (filter.match(matchingProperties)) {
+                System.out.println(deviceId + " " + serviceName + " " + event.properties);
+                listener.notifyGenericDeviceEvent(deviceId, serviceName, event.properties);
             }
+//            } catch (Exception ex) {
+//                logger.warn("Exception when invoking event listener", ex);
+//            }
         });
     }
 
@@ -197,18 +209,18 @@ public class EventManager implements ServiceListener, Runnable,
             context.addServiceListener(this, filter);
 
             // Check if there are already registered listeners
-            ServiceReference[] references = context.getServiceReferences(null, filter);
+            ServiceReference[] references = context.getServiceReferences((String) null, filter);
             if (references != null) {
                 for (ServiceReference reference : references) {
                     serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, reference));
                 }
             }
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            logger.warn("Filter format was hardcoded wrong", e);
         }
     }
 
-    private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Properties matchingProperties) {
+    private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Dictionary<String, Object> matchingProperties) {
         if (filter != null) {
             String deltaProperty = filter.toString();
             if (deltaProperty.contains("__delta")) {
@@ -331,30 +343,18 @@ public class EventManager implements ServiceListener, Runnable,
      * @param properties
      */
     public void addEvent(String deviceId, String serviceId, Dictionary properties) {
-        if (shutdown.get()) {
-            logger.warn("Tried to notify event on closed event manager, dropping it!");
-            return;
-        }
-        // Ignore events from devices that are not registered yet
-        GenericDevice device = devices.get(deviceId);
-        if (device != null) {
-            events.add(new GenericDeviceEvent(device, deviceId, serviceId, properties));
-        }
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, properties));
     }
 
     public void addRemoveEvent(String deviceId, String serviceId, String propertyId) {
-        if (shutdown.get()) {
-            logger.warn("Tried to notify event on closed event manager, dropping it!");
-            return;
-        }
-        // Ignore events from devices that are not registered yet
-        GenericDevice device = devices.get(deviceId);
-        if (device != null) {
-            events.add(new GenericDeviceEvent(device, deviceId, serviceId, propertyId, false));
-        }
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, false));
     }
 
     public void addAddEvent(String deviceId, String serviceId, String propertyId) {
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, true));
+    }
+
+    private void addEvent(String deviceId, Function<GenericDevice, GenericDeviceEvent> func) {
         if (shutdown.get()) {
             logger.warn("Tried to notify event on closed event manager, dropping it!");
             return;
@@ -362,7 +362,10 @@ public class EventManager implements ServiceListener, Runnable,
         // Ignore events from devices that are not registered yet
         GenericDevice device = devices.get(deviceId);
         if (device != null) {
-            events.add(new GenericDeviceEvent(device, deviceId, serviceId, propertyId, true));
+            events.add(func.apply(device));
+            System.out.println(events);
+        } else {
+            logger.warn("There was no device registered with deviceID: " + deviceId);
         }
     }
 
@@ -373,14 +376,14 @@ public class EventManager implements ServiceListener, Runnable,
 
         public String deviceId;
         public String serviceId;
-        public Dictionary properties;
+        public Dictionary<String, Object> properties;
         public boolean propertyEvent;
         public String propertyId;
         public boolean propertyAdded;
         public GenericDevice device;
 
         public GenericDeviceEvent(GenericDevice device, String deviceId,
-                String serviceId, Dictionary properties) {
+                String serviceId, Dictionary<String, Object> properties) {
             propertyEvent = false;
             this.device = device;
             this.deviceId = deviceId;
@@ -396,32 +399,40 @@ public class EventManager implements ServiceListener, Runnable,
             this.serviceId = serviceId;
             this.propertyId = propertyId;
             this.propertyAdded = propertyAdded;
-            this.properties = new Hashtable();
+            this.properties = new Hashtable<>();
             properties.put(GenericDeviceEventListener.DEVICE_ID, deviceId);
             properties.put(propertyId, new Object());
             properties.put(GenericDeviceEventListener.SERVICE_NAME, serviceId);
         }
+
+        @Override
+        public String toString() {
+            if (propertyId != null) {
+                return deviceId + " " + serviceId + " " + propertyId + " " + propertyAdded;
+            } else {
+                return deviceId + " " + serviceId + " " + properties;
+            }
+        }
     }
 
     @Override
-    public Object addingService(ServiceReference reference) {
-        GenericDevice device = (GenericDevice) context.getService(reference);
+    public Object addingService(ServiceReference<GenericDevice> reference) {
+        GenericDevice device = context.getService(reference);
         devices.put(device.getId(), device);
 
         // Always generate a state event when a new device is registered
-        Properties properties = new Properties();
+        Dictionary<String, Object> properties = new Hashtable<String, Object>();
         properties.put(DEVICE_STATE, device.getState());
         addEvent(device.getId(), "DeviceProperties", properties);
         return device;
     }
 
     @Override
-    public void modifiedService(ServiceReference reference, Object service) {
+    public void modifiedService(ServiceReference<GenericDevice> reference, Object service) {
     }
 
     @Override
-    public void removedService(ServiceReference reference, Object service) {
-        GenericDevice device = (GenericDevice) context.getService(reference);
-        devices.remove(device.getId());
+    public void removedService(ServiceReference<GenericDevice> reference, Object service) {
+        devices.remove(context.getService(reference).getId());
     }
 }

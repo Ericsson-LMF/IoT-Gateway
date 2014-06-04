@@ -45,6 +45,7 @@ import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.regexp.RE;
@@ -108,7 +109,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     public void start() {
         subscribeToEvents(UPnPFilterRule.deviceID(dev.getId()));
         dev.setState(GenericDevice.STATE_ADDED);
-        devReg = context.registerService(GenericDevice.class.getName(), dev, dev.getDeviceProperties());
+        devReg = context.registerService(GenericDevice.class, dev, dev.getDeviceProperties());
         dev.setState(GenericDevice.STATE_READY);
     }
 
@@ -136,9 +137,9 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             Filter filter;
             try {
                 filter = context.createFilter(rule.toFilterRule());
-                Properties props = new Properties();
+                Dictionary<String, Object> props = new Hashtable<>();
                 props.put(UPnPEventListener.UPNP_FILTER, filter);
-                this.eventListenerReg = context.registerService(UPnPEventListener.class.getName(), this, props);
+                this.eventListenerReg = context.registerService(UPnPEventListener.class, this, props);
             } catch (InvalidSyntaxException e) {
                 logger.error("Parsing failed: " + e);
             }
@@ -290,8 +291,8 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     private void notifyUpdate(String path) {
         if (devReg != null) {
-            Properties props = dev.getDeviceProperties();
-            props.setProperty(Constants.UPDATED_PATH, path);
+            Dictionary<String, Object> props = dev.getDeviceProperties();
+            props.put(Constants.UPDATED_PATH, path);
             devReg.setProperties(props);
         }
 

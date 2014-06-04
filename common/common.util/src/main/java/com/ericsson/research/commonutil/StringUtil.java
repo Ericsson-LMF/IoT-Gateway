@@ -34,6 +34,8 @@
  */
 package com.ericsson.research.commonutil;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
  * Various string utilities.
  */
@@ -43,17 +45,6 @@ public enum StringUtil {
      * Singleton
      */
     INSTANCE;
-
-    /**
-     * Escapes all '&' characters with '&amp;amp;' in the specified string.
-     *
-     * @param string the input string
-     *
-     * @return the string with the escaped values.
-     */
-    public static String escapeAmpersand(String string) {
-        return string.replace("&", "&amp;");
-    }
 
     /**
      * Makes first char of the string to upper case
@@ -114,6 +105,26 @@ public enum StringUtil {
             }
         }
         return result.toString();
+    }
+
+    /**
+     * Encode a byte array to hex string
+     *
+     * @param binaryData array of byte to encode
+     * @return return encoded string
+     */
+    public static String encode(byte[] binaryData) {
+        return DatatypeConverter.printHexBinary(binaryData);
+    }
+
+    /**
+     * Decode hex string to a byte array
+     *
+     * @param encoded encoded string
+     * @return return array of byte to encode
+     */
+    public static byte[] decode(String encoded) {
+        return DatatypeConverter.parseHexBinary(encoded);
     }
 
 }

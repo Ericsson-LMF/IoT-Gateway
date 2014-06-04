@@ -40,6 +40,7 @@ import com.ericsson.deviceaccess.api.GenericDeviceService;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -68,9 +69,9 @@ public enum PropertyManager implements GenericDeviceEventListener, ServiceTracke
         deviceTracker = new ServiceTracker(context, GenericDevice.class.getName(), this);
         deviceTracker.open();
 
-        Properties props = new Properties();
-        props.setProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
-        sr = context.registerService(GenericDeviceEventListener.class.getName(), this, props);
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put(GenericDeviceEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
+        sr = context.registerService(GenericDeviceEventListener.class, this, props);
     }
 
     public void stop() {

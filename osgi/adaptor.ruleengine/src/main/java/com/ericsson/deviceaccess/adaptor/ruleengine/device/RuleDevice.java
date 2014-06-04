@@ -67,7 +67,7 @@ public class RuleDevice extends SchemaBasedGenericDevice {
     public void start() {
         ruleService.start(context, configManager);
         propertyManager.start(context, ruleService);
-        serviceReg = context.registerService(GenericDevice.class.getName(), this, getDeviceProperties());
+        serviceReg = context.registerService(GenericDevice.class, this, getDeviceProperties());
     }
 
     public void stop() {

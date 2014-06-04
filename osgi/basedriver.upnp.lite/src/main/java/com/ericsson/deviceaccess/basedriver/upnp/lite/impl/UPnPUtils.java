@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
+import com.ericsson.research.commonutil.StringUtil;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -210,7 +211,7 @@ public enum UPnPUtils {
             case "bin.base64":
                 return Base64.decode(value);
             case "bin.hex":
-                return HexBin.decode(value);
+                return StringUtil.decode(value);
         }
         throw new IllegalArgumentException("Invalid Binding");
     }
