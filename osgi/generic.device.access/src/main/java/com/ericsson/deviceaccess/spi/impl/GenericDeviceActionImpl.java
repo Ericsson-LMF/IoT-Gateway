@@ -40,7 +40,6 @@ import com.ericsson.deviceaccess.api.GenericDeviceActionResult;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceProperties;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 import com.ericsson.research.commonutil.StringUtil;
 import java.util.HashMap;
@@ -218,10 +217,9 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      * {@inheritDoc}
      */
     @Override
-    public String serialize(int format) throws GenericDeviceException {
+    public String serialize(Format format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-        if (format == Serializable.FORMAT_JSON
-                || format == Serializable.FORMAT_JSON_WDC) {
+        if (format.isJson()) {
             return toJsonString(format, 0);
         } else {
             throw new GenericDeviceException(405, "No such format supported");
@@ -232,7 +230,7 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      * {@inheritDoc}
      */
     @Override
-    public String getSerializedNode(String path, int format)
+    public String getSerializedNode(String path, Format format)
             throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
         if (path == null) {
@@ -252,16 +250,16 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
         }
     }
 
-    private String toJsonString(int format, int indent)
+    private String toJsonString(Format format, int indent)
             throws GenericDeviceException {
         String json = "{";
         json += "\"name\":\"" + StringUtil.escapeJSON(getName()) + "\"";
         StringBuffer sb = new StringBuffer(",");
         if (argumentsMetadata != null && argumentsMetadata.size() > 0) {
-            sb.append(MetadataUtil.INSTANCE.metadataToJson("", Serializable.FORMAT_JSON, "arguments", argumentsMetadata.values())).append(',');
+            sb.append(MetadataUtil.INSTANCE.metadataToJson("", Format.JSON, "arguments", argumentsMetadata.values())).append(',');
         }
         if (resultMetadata != null && resultMetadata.size() > 0) {
-            sb.append(MetadataUtil.INSTANCE.metadataToJson("", Serializable.FORMAT_JSON, "result", resultMetadata.values())).append(',');
+            sb.append(MetadataUtil.INSTANCE.metadataToJson("", Format.JSON, "result", resultMetadata.values())).append(',');
         }
         if (sb.length() > 1) {
             // Remove last ','

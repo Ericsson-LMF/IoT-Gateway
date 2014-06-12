@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
-import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import junit.framework.Assert;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -89,7 +89,7 @@ public class ParameterSchemaTest {
 
     @Test
     public void testSerializeInt() throws GenericDeviceException {
-        String json = intParameterSchema.serialize(GenericDevice.FORMAT_JSON);
+        String json = intParameterSchema.serialize(Format.JSON);
         System.out.println(json);
 
         context.assertIsSatisfied();
@@ -104,7 +104,7 @@ public class ParameterSchemaTest {
 
     @Test
     public void testSerializeFloat() throws GenericDeviceException {
-        String json = floatParameterSchema.serialize(GenericDevice.FORMAT_JSON);
+        String json = floatParameterSchema.serialize(Format.JSON);
         System.out.println(json);
 
         context.assertIsSatisfied();
@@ -119,7 +119,7 @@ public class ParameterSchemaTest {
 
     @Test
     public void testSerializeString() throws GenericDeviceException {
-        String json = stringParameterSchema.serialize(GenericDevice.FORMAT_JSON);
+        String json = stringParameterSchema.serialize(Format.JSON);
         System.out.println(json);
 
         context.assertIsSatisfied();

@@ -41,7 +41,7 @@ import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
 import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceService;
-import com.ericsson.deviceaccess.api.Serializable;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -103,7 +103,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                             return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "Device " + deviceId + " not found");
                         }
 
-                        String json = dev.getSerializedNode(requestedNode, Serializable.FORMAT_JSON);
+                        String json = dev.getSerializedNode(requestedNode, Format.JSON);
                         try {
                             resource = new JSONObject(json).toString(3);
                         } catch (JSONException e) {
@@ -157,7 +157,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                         ac.setAuthorized(true);
                         setArguments(ac, parms);
                         act.execute(ac);
-                        return new NanoHTTPD.Response(HTTP_OK, "application/json", ac.getResult().getValue().serialize(Serializable.FORMAT_JSON));
+                        return new NanoHTTPD.Response(HTTP_OK, "application/json", ac.getResult().getValue().serialize(Format.JSON));
                     } else {
                         return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "Could not find action: " + action);
                     }
@@ -213,7 +213,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                 for (int i = 0; i < refs.length; i++) {
                     GenericDevice dev = (GenericDevice) context.getService(refs[i]);
                     try {
-                        String json = dev.getSerializedNode("", Serializable.FORMAT_JSON);
+                        String json = dev.getSerializedNode("", Format.JSON);
                         devices.put(dev.getId(), new JSONObject(json));
                     } catch (GenericDeviceException e) {
                         e.printStackTrace();

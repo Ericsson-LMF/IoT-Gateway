@@ -35,7 +35,7 @@
 package com.ericsson.deviceaccess;
 
 import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.Serializable;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceActionImpl;
@@ -132,7 +132,7 @@ public class TestSerialization {
         TestService test = new TestService();
         test.getProperties().setIntValue("prop1", 10);
         dev.putService(test);
-        String node = dev.getSerializedNode("service/test/parameter/prop1", Serializable.FORMAT_JSON);
+        String node = dev.getSerializedNode("service/test/parameter/prop1", Format.JSON);
 
         assertEquals("10", node);
     }
@@ -144,21 +144,21 @@ public class TestSerialization {
         TestService test = new TestService();
         test.getProperties().setIntValue("prop1", 100);
         dev.putService(test);
-        String node = dev.getSerializedNode("service/test", Serializable.FORMAT_JSON);
+        String node = dev.getSerializedNode("service/test", Format.JSON);
         System.out.println(node);
 
         assertTrue(node.indexOf("prop1") > 0);
 
-        node = dev.getSerializedNode("service/test/parameter", Serializable.FORMAT_JSON);
+        node = dev.getSerializedNode("service/test/parameter", Format.JSON);
         System.out.println(node);
 
         assertTrue(node.indexOf("prop1") > 0);
 
-        node = dev.getSerializedNode("service/test/action", Serializable.FORMAT_JSON);
+        node = dev.getSerializedNode("service/test/action", Format.JSON);
         System.out.println(node);
         assertTrue(node.indexOf("arg2") > 0);
 
-        node = dev.getSerializedNode("service/test/action/action", Serializable.FORMAT_JSON);
+        node = dev.getSerializedNode("service/test/action/action", Format.JSON);
         System.out.println(node);
 
         assertTrue(node.indexOf("arg2") > 0);
@@ -180,7 +180,7 @@ public class TestSerialization {
         dev.setName("dev");
         Object node = null;
         try {
-            node = dev.getSerializedNode("service/nonexist", Serializable.FORMAT_JSON);
+            node = dev.getSerializedNode("service/nonexist", Format.JSON);
         } catch (GenericDeviceException e) {
 
         }

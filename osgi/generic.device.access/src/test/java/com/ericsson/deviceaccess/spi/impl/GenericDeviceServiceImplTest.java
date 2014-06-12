@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,15 +29,15 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDeviceAction;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
@@ -110,7 +110,7 @@ public class GenericDeviceServiceImplTest {
                 will(returnValue(Float.NEGATIVE_INFINITY));
                 allowing(metadataFloat).getMaxValue();
                 will(returnValue(Float.POSITIVE_INFINITY));
-                allowing(metadataFloat).serialize(GenericDevice.FORMAT_JSON);
+                allowing(metadataFloat).serialize(Format.JSON);
                 will(returnValue("{\"type\":\"float\"}"));
 
                 allowing(metadataInt).getDefaultNumberValue();
@@ -125,7 +125,7 @@ public class GenericDeviceServiceImplTest {
                 will(returnValue(Integer.MIN_VALUE));
                 allowing(metadataInt).getMaxValue();
                 will(returnValue(Integer.MAX_VALUE));
-                allowing(metadataInt).serialize(GenericDevice.FORMAT_JSON);
+                allowing(metadataInt).serialize(Format.JSON);
                 will(returnValue("{\"type\":\"int\"}"));
 
                 allowing(metadataString).getDefaultStringValue();
@@ -136,7 +136,7 @@ public class GenericDeviceServiceImplTest {
                 will(returnValue(String.class));
                 allowing(metadataString).getValidValues();
                 will(returnValue(null));
-                allowing(metadataString).serialize(GenericDevice.FORMAT_JSON);
+                allowing(metadataString).serialize(Format.JSON);
                 will(returnValue("{\"type\":\"string\"}"));
 
                 allowing(action).getName();
@@ -212,11 +212,11 @@ public class GenericDeviceServiceImplTest {
     public void testSerialize() throws GenericDeviceException, JSONException {
         context.checking(new Expectations() {
             {
-                oneOf(action).serialize(GenericDevice.FORMAT_JSON);
+                oneOf(action).serialize(Format.JSON);
                 will(returnValue("{\"name\":\"action1\"}"));
             }
         });
-        String json = service.serialize(GenericDevice.FORMAT_JSON);
+        String json = service.serialize(Format.JSON);
 
         context.assertIsSatisfied();
         // Just check that JSON parsing works

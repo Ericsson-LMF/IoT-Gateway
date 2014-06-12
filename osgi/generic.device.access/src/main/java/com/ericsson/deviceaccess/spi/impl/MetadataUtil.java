@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceProperties;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.spi.GenericDeviceError;
 import java.util.Arrays;
 import java.util.Collection;
@@ -198,12 +198,12 @@ enum MetadataUtil {
      * @return JSON string of the specified metadata
      * @throws GenericDeviceException
      */
-    String metadataToJson(String path, int format, String name, Collection metadata) throws GenericDeviceException {
+    String metadataToJson(String path, Format format, String name, Collection metadata) throws GenericDeviceException {
         String retVal = "";
         if (path == null) {
             path = "";
         }
-        if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
+        if (format.isJson()) {
             if (metadata.size() > 0) {
                 StringBuilder sb = new StringBuilder();
                 sb.append('"').append(name).append("\": {");

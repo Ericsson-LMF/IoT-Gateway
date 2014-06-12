@@ -37,7 +37,6 @@ package com.ericsson.deviceaccess.spi.impl;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceProperties;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 import com.ericsson.deviceaccess.spi.GenericDeviceError;
 import com.ericsson.research.commonutil.StringUtil;
@@ -266,10 +265,9 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      * {@inheritDoc}
      */
     @Override
-    public String serialize(int format) throws GenericDeviceException {
+    public String serialize(Format format) throws GenericDeviceException {
         GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-        if (format == Serializable.FORMAT_JSON
-                || format == Serializable.FORMAT_JSON_WDC) {
+        if (format.isJson()) {
             int indent = 0;
             return "{" + valuesToJson(format) + "}";
         } else {
@@ -310,7 +308,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         }
     }
 
-    private String valuesToJson(int format) throws GenericDeviceException {
+    private String valuesToJson(Format format) throws GenericDeviceException {
         StringBuilder sb = new StringBuilder();
         for (String name : getNames()) {
             sb.append("\"").append(name).append("\":{");

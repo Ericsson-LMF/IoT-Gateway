@@ -40,7 +40,6 @@ import com.ericsson.deviceaccess.api.GenericDeviceAction;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceProperties;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable;
 import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkGetPermission;
 import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkSetPermission;
 import com.ericsson.deviceaccess.spi.GenericDeviceService;
@@ -189,10 +188,9 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      * {@inheritDoc}
      */
     @Override
-    public String serialize(int format) throws GenericDeviceException {
+    public String serialize(Format format) throws GenericDeviceException {
         checkGetPermission(getClass().getName());
-        if (format == Serializable.FORMAT_JSON
-                || format == Serializable.FORMAT_JSON_WDC) {
+        if (format.isJson()) {
             int indent = 0;
             return toJsonString(format, indent);
         } else {
@@ -209,7 +207,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
      * {@inheritDoc}
      */
     @Override
-    public String getSerializedNode(String path, int format)
+    public String getSerializedNode(String path, Format format)
             throws GenericDeviceException {
         checkGetPermission(getClass().getName());
         if (path == null) {
@@ -262,17 +260,16 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
         }
     }
 
-    private String serializeActionList(int format)
+    private String serializeActionList(Format format)
             throws GenericDeviceException {
-        if (format == Serializable.FORMAT_JSON
-                || format == Serializable.FORMAT_JSON_WDC) {
+        if (format.isJson()) {
             return getActionListJsonString(format, 0);
         } else {
             throw new GenericDeviceException(405, "No such format supported");
         }
     }
 
-    private String toJsonString(int format, int indent)
+    private String toJsonString(Format format, int indent)
             throws GenericDeviceException {
         String json = "{";
         json += "\"name\":\"" + StringUtil.escapeJSON(getName()) + "\",";
@@ -282,7 +279,7 @@ public class GenericDeviceServiceImpl extends GenericDeviceService.Stub
         return json;
     }
 
-    private String getActionListJsonString(int format, int indent)
+    private String getActionListJsonString(Format format, int indent)
             throws GenericDeviceException {
         StringBuilder json = new StringBuilder("{");
         try {

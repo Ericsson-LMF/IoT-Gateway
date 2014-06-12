@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,17 +29,22 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.api;
 
+import com.ericsson.research.commonutil.LegacyUtil;
+import com.ericsson.research.commonutil.function.FunctionalUtil;
 import java.security.BasicPermission;
 import java.security.Permission;
 import java.security.PermissionCollection;
+import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class GenericDeviceAccessPermission extends BasicPermission {
 
@@ -47,17 +52,8 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
      *
      */
     private static final long serialVersionUID = 1390917155441371447L;
-    public static final String GET = "get";
-    public static final String SET = "set";
-    public static final String EXECUTE = "execute";
 
-    private static final int ACTION_GET = 0x00000001;
-    private static final int ACTION_SET = 0x00000002;
-    private static final int ACTION_EXECUTE = 0x00000004;
-    private static final int ACTION_ALL = ACTION_GET | ACTION_SET | ACTION_EXECUTE;
-    private static final int ACTION_NONE = 0;
-
-    private int actionMask;
+    private final EnumSet<Type> actionMask;
 
     /**
      * Construct a named GenericDeviceAccessPermission for a set of actions to
@@ -71,66 +67,52 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
         actionMask = getActionMask(actions);
     }
 
-    private GenericDeviceAccessPermission(String name, int mask) {
+    public GenericDeviceAccessPermission(String name, EnumSet<Type> actionMask) {
         super(name);
-        actionMask = mask;
+        this.actionMask = actionMask.clone();
     }
 
-    private int getActionMask(String actStr) {
-        int mask = 0;
+    public GenericDeviceAccessPermission(String name, Type first, Type... rest) {
+        super(name);
+        this.actionMask = EnumSet.of(first, rest);
+    }
+
+    private EnumSet<Type> getActionMask(String actStr) {
+        EnumSet<Type> result = EnumSet.noneOf(Type.class);
         if (actStr == null) {
-            return mask;
+            return result;
         }
-        StringTokenizer st = new StringTokenizer(actStr, ",");
-        while (st.hasMoreElements()) {
+        StringTokenizer tokenizer = new StringTokenizer(actStr, ",");
+        while (tokenizer.hasMoreElements()) {
             // TODO: Check if this works properly
-            String action = st.nextToken().trim();
+            String action = tokenizer.nextToken().trim();
             System.out.println("getActionMask: " + action);
-            if (GET.equalsIgnoreCase(action)) {
-                mask |= ACTION_GET;
-            } else if (SET.equalsIgnoreCase(action)) {
-                mask |= ACTION_SET;
-            } else if (EXECUTE.equalsIgnoreCase(action)) {
-                mask |= ACTION_EXECUTE;
-            }
+            result.add(Type.get(action));
         }
-        return mask;
+        return result;
     }
 
-    private int getMask() {
+    protected EnumSet<Type> getMask() {
         return actionMask;
     }
 
     @Override
-    public boolean implies(Permission p) {
-        if (p instanceof GenericDeviceAccessPermission) {
-            GenericDeviceAccessPermission target = (GenericDeviceAccessPermission) p;
-
-            return (((actionMask & target.actionMask) == target.actionMask) && super
-                    .implies(p));
-        }
-        return (false);
+    public boolean implies(Permission permission) {
+        AtomicBoolean flag = new AtomicBoolean(false);
+        FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, permission, target -> {
+            flag.set(actionMask.containsAll(target.actionMask) && super.implies(target));
+        });
+        return flag.get();
     }
 
     @Override
     public String getActions() {
-        String actions = "";
-        if ((actionMask & ACTION_GET) == ACTION_GET) {
-            actions += GET;
+        StringBuilder builder = new StringBuilder();
+        actionMask.forEach(type -> builder.append(type.get()).append(","));
+        if (!actionMask.isEmpty()) {
+            builder.setLength(builder.length() - 1);
         }
-        if ((actionMask & ACTION_SET) == ACTION_SET) {
-            if (actions.length() > 0) {
-                actions += ",";
-            }
-            actions += SET;
-        }
-        if ((actionMask & ACTION_EXECUTE) == ACTION_EXECUTE) {
-            if (actions.length() > 0) {
-                actions += ",";
-            }
-            actions += EXECUTE;
-        }
-        return actions;
+        return builder.toString();
     }
 
     @Override
@@ -145,7 +127,19 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
      */
     @Override
     public int hashCode() {
-        return (getName().hashCode() ^ getActions().hashCode());
+        return getName().hashCode() ^ getActions().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        AtomicBoolean flag = new AtomicBoolean(false);
+        FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, obj, target -> {
+            flag.set(getName().equals(target.getName()) && getMask().equals(target.getMask()));
+        });
+        return flag.get();
     }
 
     class GenericDeviceAccessPermissionCollection extends PermissionCollection {
@@ -154,91 +148,127 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
          *
          */
         private static final long serialVersionUID = 1102307291093157855L;
-        private Hashtable permissions;
+        private Map<String, GenericDeviceAccessPermission> permissions;
         private boolean allAllowed = false;
 
         GenericDeviceAccessPermissionCollection() {
-            permissions = new Hashtable();
+            permissions = new HashMap<>();
         }
 
         @Override
         public void add(Permission perm) {
-            if (!(perm instanceof GenericDeviceAccessPermission)) {
-                throw new IllegalArgumentException("invalid permission: "
-                        + perm);
-            }
             if (isReadOnly()) {
                 throw new SecurityException("readonly PermissionCollection");
             }
-            String name = perm.getName();
-            GenericDeviceAccessPermission gdaPerm = (GenericDeviceAccessPermission) perm;
-            GenericDeviceAccessPermission existing = (GenericDeviceAccessPermission) permissions.get(name);
-
-            if (existing != null) {
-                int oldMask = existing.getMask();
-                int newMask = gdaPerm.getMask();
-                if (oldMask != newMask) {
-                    permissions.put(name,
-                            new GenericDeviceAccessPermission(name, oldMask | newMask));
-
+            if (!FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, perm, gdaPerm -> {
+                String name = gdaPerm.getName();
+                permissions.compute(name, (key, value) -> {
+                    if (value == null) {
+                        return gdaPerm;
+                    }
+                    EnumSet<Type> oldMask = value.getMask();
+                    EnumSet<Type> newMask = gdaPerm.getMask();
+                    if (oldMask.equals(newMask)) {
+                        return value;
+                    }
+                    EnumSet<Type> mask = EnumSet.copyOf(oldMask);
+                    mask.addAll(newMask);
+                    return new GenericDeviceAccessPermission(key, mask);
+                });
+                if (!allAllowed) {
+                    if (name.equals("*")) {
+                        allAllowed = true;
+                    }
                 }
-            } else {
-                permissions.put(name, perm);
-            }
-
-            if (!allAllowed) {
-                if (name.equals("*")) {
-                    allAllowed = true;
-                }
+            })) {
+                throw new IllegalArgumentException("invalid permission: " + perm);
             }
         }
 
         @Override
         public Enumeration elements() {
-            return permissions.elements();
+            return LegacyUtil.toEnumeration(permissions.values().iterator());
         }
 
         @Override
         public boolean implies(Permission perm) {
-            if (!(perm instanceof GenericDeviceAccessPermission)) {
-                return false;
-            }
-            GenericDeviceAccessPermission gdaPerm = (GenericDeviceAccessPermission) perm;
-            GenericDeviceAccessPermission x;
+            AtomicBoolean flag = new AtomicBoolean(false);
+            FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, perm, gdaPerm -> {
+                EnumSet<Type> desired = gdaPerm.getMask();
+                EnumSet<Type> effective = EnumSet.noneOf(Type.class);
 
-            int desired = gdaPerm.getMask();
-            int effective = 0;
-
-            // Short cut if we have "*"
-            if (allAllowed) {
-                x = (GenericDeviceAccessPermission) permissions.get("*");
-                if (x != null) {
-                    effective |= x.getMask();
-                    if ((effective & desired) == desired) {
-                        return (true);
+                // Shortcut if we have "*"
+                if (allAllowed) {
+                    GenericDeviceAccessPermission temp = permissions.get("*");
+                    if (temp != null) {
+                        effective.addAll(temp.getMask());
+                        if (effective.containsAll(desired)) {
+                            flag.set(true);
+                            return;
+                        }
                     }
                 }
-            }
 
-            x = (GenericDeviceAccessPermission) permissions.get(gdaPerm.getName());
-
-            if (x != null) {
-                // we have a direct hit!
-                effective |= x.getMask();
-                if ((effective & desired) == desired) {
-                    return (true);
-                }
-            }
-            /*
-             * We only care direct match for now since all concerned classes
-             * are under com.ericsson.deviceaccess.api. We may need to
-             * consider to implement handling of package names and wild cards.
-             * See BundlePermision implementation in Knopflerfish, for example.
-             * -- Kenta
-             */
-
-            return false;
+                permissions.computeIfPresent(gdaPerm.getName(), (key, value) -> {
+                    // we have a direct hit!
+                    effective.addAll(value.getMask());
+                    if (effective.containsAll(desired)) {
+                        flag.set(true);
+                    }
+                    return value;
+                });
+                /*
+                 * We only care direct match for now since all concerned classes
+                 * are under com.ericsson.deviceaccess.api. We may need to
+                 * consider to implement handling of package names and wild cards.
+                 * See BundlePermision implementation in Knopflerfish, for example.
+                 * -- Kenta
+                 */
+            });
+            return flag.get();
         }
 
     }
+
+    public enum Type {
+
+        GET("get", 0x00000001),
+        SET("set", 0x00000002),
+        EXECUTE("execute", 0x00000004),
+        UNKNOWN("", 0x00000000);
+
+        private final String string;
+        private final int mask;
+
+        Type(String string, int mask) {
+            this.string = string;
+            this.mask = mask;
+        }
+
+        public String get() {
+            return string;
+        }
+
+        public int mask() {
+            return mask;
+        }
+
+        public static Type get(String string) {
+            string = string.toLowerCase();
+            for (Type type : Type.values()) {
+                if (type.get().equals(string)) {
+                    return type;
+                }
+            }
+            return UNKNOWN;
+        }
+
+        public boolean isContained(int mask) {
+            if (this == UNKNOWN) {
+                return false;
+            }
+            return (mask & mask()) == mask();
+        }
+    }
+
 }

@@ -35,25 +35,26 @@
 package com.ericsson.deviceaccess.spi;
 
 import com.ericsson.deviceaccess.api.GenericDeviceAccessPermission;
+import com.ericsson.deviceaccess.api.GenericDeviceAccessPermission.Type;
 
 public class GenericDeviceAccessSecurity {
 
     public static void checkGetPermission(String clazz) {
-        checkPermission(clazz, GenericDeviceAccessPermission.GET);
+        checkPermission(clazz, Type.GET);
     }
 
     public static void checkSetPermission(String clazz) {
-        checkPermission(clazz, GenericDeviceAccessPermission.SET);
+        checkPermission(clazz, Type.SET);
     }
 
     public static void checkExecutePermission(String clazz) {
-        checkPermission(clazz, GenericDeviceAccessPermission.EXECUTE);
+        checkPermission(clazz, Type.EXECUTE);
     }
 
-    private static void checkPermission(String clazz, String action) {
-        SecurityManager sm = System.getSecurityManager();
-        if (null != sm) {
-            sm.checkPermission(new GenericDeviceAccessPermission(clazz, action));
+    private static void checkPermission(String clazz, Type action) {
+        SecurityManager manager = System.getSecurityManager();
+        if (null != manager) {
+            manager.checkPermission(new GenericDeviceAccessPermission(clazz, action));
         }
     }
 

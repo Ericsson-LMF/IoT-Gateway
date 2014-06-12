@@ -36,7 +36,6 @@ package com.ericsson.deviceaccess.spi.schema;
 
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
 import com.ericsson.research.commonutil.StringUtil;
 import java.util.Arrays;
@@ -165,8 +164,8 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      * {@inheritDoc}
      */
     @Override
-    public String serialize(int format) throws GenericDeviceException {
-        if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
+    public String serialize(Format format) throws GenericDeviceException {
+        if (format.isJson()) {
             return toJsonString(format, 0);
         } else {
             throw new GenericDeviceException(405, "No such format supported");
@@ -177,7 +176,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      * {@inheritDoc}
      */
     @Override
-    public String getSerializedNode(String path, int format) throws GenericDeviceException {
+    public String getSerializedNode(String path, Format format) throws GenericDeviceException {
         if (path == null) {
             throw new GenericDeviceException(405, "Path cannot be null");
         }
@@ -189,7 +188,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
         }
     }
 
-    private String toJsonString(int format, int indent) {
+    private String toJsonString(Format format, int indent) {
         StringBuilder json = new StringBuilder("{");
         json.append("\"name\":\"").append(StringUtil.escapeJSON(name)).append("\",");
         json.append("\"type\":\"").append(getTypeName()).append("\",");

@@ -79,8 +79,7 @@ public class EventManager implements ServiceListener, Runnable,
     private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
     private static final String REGEX_DELTA = "/state/([^/]+)$";
     private BundleContext context;
-    //TODO: this starts from false due tests not calling start but run
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean running = new AtomicBoolean(false);
     private final Map<GenericDeviceEventListener, Filter> listeners = new ConcurrentHashMap<>();
     private final BlockingQueue<GenericDeviceEvent> events = new LinkedBlockingQueue<>();
     private final Map<String, Object> deltaValues = new HashMap<>();
@@ -129,7 +128,7 @@ public class EventManager implements ServiceListener, Runnable,
         createTracker();
 
         // Wait for a GenericDeviceEvent to be received and forward this to all listeners
-        while (!shutdown.get()) {
+        while (running.get()) {
             GenericDeviceEvent event;
             try {
                 event = events.take();
@@ -301,17 +300,17 @@ public class EventManager implements ServiceListener, Runnable,
      * Starts the event manager
      */
     public void start() {
-        synchronized (shutdown) {
-            if (!shutdown.get()) {
+        synchronized (running) {
+            if (running.get()) {
                 throw new IllegalStateException("There is thread already running.");
             }
             thread = new Thread(this);
-            shutdown.set(false);
+            running.set(true);
             try {
                 thread.start();
             } catch (Throwable e) {
                 logger.warn("Failed to start Event Manager.");
-                shutdown.set(true);
+                running.set(true);
             }
         }
     }
@@ -320,12 +319,12 @@ public class EventManager implements ServiceListener, Runnable,
      * Shuts down the event manager.
      */
     public void shutdown() {
-        synchronized (shutdown) {
+        synchronized (running) {
 //TODO: This cannot be done due tests... Functionality should stay same even if testa are fixed to allow this.
-//            if (shutdown.get()) {
-//                throw new IllegalStateException("There wasn't thread running to shutdown.");
-//            }
-            shutdown.set(true);
+            if (!running.get()) {
+                throw new IllegalStateException("There wasn't thread running to shutdown.");
+            }
+            running.set(false);
             events.add(POISON);
             thread = null;
             if (deviceTracker != null) {
@@ -354,7 +353,7 @@ public class EventManager implements ServiceListener, Runnable,
     }
 
     private void addEvent(String deviceId, Function<GenericDevice, GenericDeviceEvent> func) {
-        if (shutdown.get()) {
+        if (running.get()) {
             logger.warn("Tried to notify event on closed event manager, dropping it!");
             return;
         }

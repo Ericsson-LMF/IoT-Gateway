@@ -1,8 +1,10 @@
 package com.ericsson.research.commonutil.function;
 
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 /**
+ * Utility class to help with functional interfaces.
  *
  * @author delma
  */
@@ -38,5 +40,36 @@ public enum FunctionalUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Executes code if target object is certain type.
+     *
+     * Simplifies code
+     * <blockquote><pre>
+     * if(object instanceof TypeThatWeWantItToBe) {
+     *   TypeThatWeWantItToBe temp = (TypeThatWeWantItToBe) object;
+     *   temp.doSomething();
+     * }
+     * </pre></blockquote>
+     * to
+     * <blockquote><pre>
+     * FunctionalUtil.doIfCan(TypeThatWeWantItToBe.class, object, temp -> {
+     *   temp.doSomething();
+     * });
+     * </pre></blockquote>
+     *
+     * @param <T> Type we want it to be
+     * @param type Needed because Type erasure
+     * @param object Object we want to do something on
+     * @param code code that needs to be executed
+     * @return did the code get executed?
+     */
+    public static <T> boolean doIfCan(Class<T> type, Object object, Consumer<T> code) {
+        if (type.isAssignableFrom(object.getClass())) {
+            code.accept((T) object);
+            return true;
+        }
+        return false;
     }
 }

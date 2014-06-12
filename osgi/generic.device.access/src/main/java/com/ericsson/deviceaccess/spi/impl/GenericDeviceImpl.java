@@ -38,7 +38,6 @@ import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
 import com.ericsson.deviceaccess.api.GenericDeviceException;
 import com.ericsson.deviceaccess.api.GenericDeviceService;
-import com.ericsson.deviceaccess.api.Serializable;
 import com.ericsson.deviceaccess.spi.GenericDevice;
 import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkGetPermission;
 import static com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity.checkSetPermission;
@@ -412,9 +411,9 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     }
 
     @Override
-    public String serialize(int format) throws GenericDeviceException {
+    public String serialize(Format format) throws GenericDeviceException {
         checkGetPermission(getClass().getName());
-        if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
+        if (format.isJson()) {
             int indent = 0;
             return toJsonString(format, indent, false);
         } else {
@@ -424,11 +423,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public String serializeState() throws GenericDeviceException {
-        return toJsonString(Serializable.FORMAT_JSON, 0, true);
+        return toJsonString(Format.JSON, 0, true);
     }
 
     @Override
-    public String getSerializedNode(String path, int format) throws GenericDeviceException {
+    public String getSerializedNode(String path, Format format) throws GenericDeviceException {
         checkGetPermission(getClass().getName());
         if (path == null) {
             throw new GenericDeviceException(405, "Path cannot be null");
@@ -485,10 +484,10 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         GenericDeviceActivator.getEventManager().addAddEvent(id, serviceId, propertyId);
     }
 
-    private String serializeServiceList(int format) throws GenericDeviceException {
-        if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
+    private String serializeServiceList(Format format) throws GenericDeviceException {
+        if (format.isJson()) {
             int indent = 0;
-            if (format == Serializable.FORMAT_JSON_WDC) {
+            if (format == Format.JSON_WDC) {
                 indent = 3;
             }
             return getServiceListJsonString(format, indent, false);
@@ -497,7 +496,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         }
     }
 
-    private String toJsonString(int format, int indent, boolean stateOnly) throws GenericDeviceException {
+    private String toJsonString(Format format, int indent, boolean stateOnly) throws GenericDeviceException {
         String json = "{";
         json += "\"id\":\"" + getId() + "\"";
         json += ",";
@@ -520,7 +519,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return json;
     }
 
-    private String getServiceListJsonString(int format, int indent, boolean stateOnly) throws GenericDeviceException {
+    private String getServiceListJsonString(Format format, int indent, boolean stateOnly) throws GenericDeviceException {
         StringBuilder json = new StringBuilder();
         try {
             service.forEach((k, srv) -> {

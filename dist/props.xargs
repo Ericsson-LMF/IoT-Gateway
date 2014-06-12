@@ -27,7 +27,7 @@
 #-Forg.knopflerfish.framework.validator.jks.ca_certs_password=
 
 # URL to bundle repository
-#-Foscar.repository.url=http://www.knopflerfish.org/releases/current/repository.xml
+-Foscar.repository.url=http://www.knopflerfish.org/releases/5.0.0/repository.xml
 
 # Various debug flags
 #-Forg.knopflerfish.framework.debug.packages=true
