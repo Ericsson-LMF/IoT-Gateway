@@ -35,14 +35,14 @@
 package com.ericsson.deviceaccess.spi.event;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_ID;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_NAME;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_PROTOCOL;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_STATE;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.DEVICE_URN;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.GENERICDEVICE_FILTER;
-import static com.ericsson.deviceaccess.api.GenericDeviceEventListener.SERVICE_NAME;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_ID;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_NAME;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_PROTOCOL;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_STATE;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_URN;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.GENERICDEVICE_FILTER;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.SERVICE_NAME;
 import com.ericsson.research.commonutil.function.TriMonoConsumer;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Event manager that handles issuing if events at changes in properties.
  * Matches events against listeners filter (see
- * {@link GenericDeviceEventListener} for details).
+ * {@link GDEventListener} for details).
  *
  */
 public class EventManager implements ServiceListener, Runnable,
@@ -80,7 +80,7 @@ public class EventManager implements ServiceListener, Runnable,
     private static final String REGEX_DELTA = "/state/([^/]+)$";
     private BundleContext context;
     private final AtomicBoolean running = new AtomicBoolean(false);
-    private final Map<GenericDeviceEventListener, Filter> listeners = new ConcurrentHashMap<>();
+    private final Map<GDEventListener, Filter> listeners = new ConcurrentHashMap<>();
     private final BlockingQueue<GenericDeviceEvent> events = new LinkedBlockingQueue<>();
     private final Map<String, Object> deltaValues = new HashMap<>();
     private ServiceTracker deviceTracker;
@@ -202,7 +202,7 @@ public class EventManager implements ServiceListener, Runnable,
 
     private void startListenGenericDeviceEvents() {
         try {
-            String filter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class
+            String filter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class
                     .getName() + ")";
             context.addServiceListener(this, filter);
 
@@ -268,7 +268,7 @@ public class EventManager implements ServiceListener, Runnable,
     @Override
     public void serviceChanged(ServiceEvent event) {
         ServiceReference reference = event.getServiceReference();
-        GenericDeviceEventListener listener = (GenericDeviceEventListener) context.getService(reference);
+        GDEventListener listener = (GDEventListener) context.getService(reference);
         Object filterObj = reference.getProperty(GENERICDEVICE_FILTER);
         Filter filter;
         if (filterObj instanceof String) {
@@ -417,9 +417,9 @@ public class EventManager implements ServiceListener, Runnable,
             this.propertyId = propertyId;
             this.propertyAdded = propertyAdded;
             this.properties = new Hashtable<>();
-            properties.put(GenericDeviceEventListener.DEVICE_ID, deviceId);
+            properties.put(GDEventListener.DEVICE_ID, deviceId);
             properties.put(propertyId, new Object());
-            properties.put(GenericDeviceEventListener.SERVICE_NAME, serviceId);
+            properties.put(GDEventListener.SERVICE_NAME, serviceId);
         }
 
         @Override

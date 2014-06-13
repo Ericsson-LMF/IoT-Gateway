@@ -34,10 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
+import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
+
 /**
  * Implementation of the device management service.
  */
-public class DeviceManagementService extends SchemaBasedServiceBase {
+public class DeviceManagementService extends SBServiceBase {
 
     public static final String SET_NAME = "setName";
     public static final String DEVICE_MANAGEMENT = "DeviceManagement";

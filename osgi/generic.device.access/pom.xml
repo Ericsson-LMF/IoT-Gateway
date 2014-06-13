@@ -112,7 +112,7 @@
                             com.ericsson.deviceaccess.*
                         </Export-Package>
                         <Bundle-Activator>
-                            com.ericsson.deviceaccess.spi.GenericDeviceActivator
+                            com.ericsson.deviceaccess.spi.genericdevice.GDActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

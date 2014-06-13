@@ -32,12 +32,14 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
+
+import com.ericsson.deviceaccess.api.Serializable;
 
 /**
  * The context for an action invocation.
  */
-public interface GenericDeviceActionContext extends Serializable {
+public interface GDActionContext extends Serializable {
 
     /**
      * Placeholder for Android to replace with the stub implementation for this
@@ -45,7 +47,7 @@ public interface GenericDeviceActionContext extends Serializable {
      *
      * @author knt
      */
-    public static abstract class Stub implements GenericDeviceActionContext {
+    public static abstract class Stub implements GDActionContext {
     }
 
     /**
@@ -151,7 +153,7 @@ public interface GenericDeviceActionContext extends Serializable {
      *
      * @return
      */
-    public GenericDeviceActionResult getResult();
+    public GDActionResult getResult();
 
     /**
      * ??
@@ -172,5 +174,5 @@ public interface GenericDeviceActionContext extends Serializable {
      *
      * @return
      */
-    public GenericDeviceProperties getArguments();
+    public GDProperties getArguments();
 }

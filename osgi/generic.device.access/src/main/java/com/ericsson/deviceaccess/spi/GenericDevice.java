@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi;
 
-import com.ericsson.deviceaccess.api.GenericDeviceService;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
 
 /**
  * This is the interface of a generic device to be used by service providers.
@@ -63,7 +63,7 @@ public interface GenericDevice extends com.ericsson.deviceaccess.api.GenericDevi
      *
      * @param svc An instance that implements the service to be put.
      */
-    public void putService(GenericDeviceService svc);
+    public void putService(GDService svc);
 
     /**
      * Setter for the device ID field. Non-null value must be set.

@@ -37,9 +37,9 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 import com.ericsson.deviceaccess.adaptor.ruleengine.Activator;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceAction;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDAction;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -254,17 +254,17 @@ public class Rule {
         actions.stream().forEach(ruleAction -> {
             GenericDevice device = getDevice(ruleAction.getDeviceId());
             if (device != null) {
-                GenericDeviceAction action = device
+                GDAction action = device
                         .getService(ruleAction.getServiceName())
                         .getAction(ruleAction.getActionName());
-                GenericDeviceProperties args = action.createArguments();
+                GDProperties args = action.createArguments();
                 ruleAction.getArguments().forEach((argName, value) -> {
                     args.setStringValue(argName, value);
                 });
 
                 try {
                     action.execute(args);
-                } catch (GenericDeviceException e) {
+                } catch (GDException e) {
                 }
             }
         });

@@ -34,9 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable.Format;
+import java.util.ArrayList;
+import java.util.List;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -57,24 +60,24 @@ public class GenericDeviceActionImplTest {
         }
     };
 
-    private GenericDevicePropertyMetadata floatPropMetadata;
-    private GenericDevicePropertyMetadata stringPropMetadata;
-    private GenericDevicePropertyMetadata intPropMetadata;
-    private GenericDeviceActionImpl action;
+    private GDPropertyMetadata floatPropMetadata;
+    private GDPropertyMetadata stringPropMetadata;
+    private GDPropertyMetadata intPropMetadata;
+    private GDActionImpl action;
 
     @Before
-    public void setup() throws GenericDeviceException {
-        floatPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "floatPropMetadata");
-        intPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "intPropMetadata");
-        stringPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "stringPropMetadata");
-        GenericDevicePropertyMetadata[] resultMetadata = new GenericDevicePropertyMetadata[]{
-            floatPropMetadata,
-            intPropMetadata,
-            stringPropMetadata,};
-        GenericDevicePropertyMetadata[] argumentsMetadata = new GenericDevicePropertyMetadata[]{
-            floatPropMetadata,
-            intPropMetadata,
-            stringPropMetadata,};
+    public void setup() throws GDException {
+        floatPropMetadata = context.mock(GDPropertyMetadata.class, "floatPropMetadata");
+        intPropMetadata = context.mock(GDPropertyMetadata.class, "intPropMetadata");
+        stringPropMetadata = context.mock(GDPropertyMetadata.class, "stringPropMetadata");
+        List<GDPropertyMetadata> resultMetadata = new ArrayList<>();
+        resultMetadata.add(floatPropMetadata);
+        resultMetadata.add(intPropMetadata);
+        resultMetadata.add(stringPropMetadata);
+        List<GDPropertyMetadata> argumentsMetadata = new ArrayList<>();
+        argumentsMetadata.add(floatPropMetadata);
+        argumentsMetadata.add(intPropMetadata);
+        argumentsMetadata.add(stringPropMetadata);
         context.checking(new Expectations() {
             {
                 allowing(intPropMetadata).getName();
@@ -93,11 +96,11 @@ public class GenericDeviceActionImplTest {
             }
         });
 
-        action = new GenericDeviceActionImpl("action", argumentsMetadata, resultMetadata);
+        action = new GDActionImpl("action", argumentsMetadata, resultMetadata);
     }
 
     @Test
-    public void testSerialize() throws GenericDeviceException, JSONException {
+    public void testSerialize() throws GDException, JSONException {
         String json = action.serialize(Format.JSON);
 
         context.assertIsSatisfied();

@@ -32,29 +32,37 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.spi.schema;
+package com.ericsson.deviceaccess.spi.schema.based;
 
-import com.ericsson.deviceaccess.spi.impl.GenericDeviceActionImpl;
-import com.ericsson.deviceaccess.spi.impl.GenericDeviceServiceImpl;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
+import com.ericsson.deviceaccess.spi.schema.ActionDefinition;
+import com.ericsson.deviceaccess.spi.schema.ActionSchema;
+import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * A service implementation based on a schema.
  */
-public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements SchemaBasedService {
+public class SBServiceBase extends GDServiceImpl implements SBService {
 
     public static final String REFRESH_PROPERTIES = "refreshProperties";
-    private ServiceSchema serviceSchema;
-    private Map actionDefinitions = new HashMap();
+    private final ServiceSchema serviceSchema;
+    private final Map<String, ActionDefinition> actionDefinitions = new HashMap<>();
 
     /**
      * Creates instance based on specified schema.
      *
      * @param serviceSchema the schema
      */
-    public SchemaBasedServiceBase(ServiceSchema serviceSchema) {
-        super(serviceSchema.getName(), serviceSchema.getPropertiesSchemas());
+    public SBServiceBase(ServiceSchema serviceSchema) {
+        super(serviceSchema.getName(), Arrays.asList(serviceSchema.getPropertiesSchemas()));
         this.serviceSchema = serviceSchema;
         init(serviceSchema);
     }
@@ -63,7 +71,7 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
      * {@inheritDoc}
      */
     @Override
-    public final SchemaBasedService defineAction(String name, ActionDefinition actionDefinition) {
+    public final SBService defineAction(String name, ActionDefinition actionDefinition) {
         if (getAction(name) == null) {
             throw new ServiceSchemaError("The action: '" + name + "' is not specified in the service schema");
         }
@@ -80,7 +88,7 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
      * {@inheritDoc}
      */
     @Override
-    public final SchemaBasedService defineCustomAction(final ActionSchema actionSchema, ActionDefinition actionDefinition) {
+    public final SBService defineCustomAction(final ActionSchema actionSchema, ActionDefinition actionDefinition) {
         String name = actionSchema.getName();
         if (getAction(name) != null) {
             throw new ServiceSchemaError("The action: '" + name + "' is already defined in the service schema");
@@ -129,13 +137,13 @@ public class SchemaBasedServiceBase extends GenericDeviceServiceImpl implements 
      */
     private void createAction(final ActionSchema actionSchema) {
         String name = actionSchema.getName();
-        final ParameterSchema[] argumentsSchemas = actionSchema.getArgumentsSchemas();
-        final ParameterSchema[] resultParametersSchemas = actionSchema.getResultSchema();
-        GenericDeviceActionImpl genericDeviceActionImpl = new SchemaBasedAction(name, this, argumentsSchemas, resultParametersSchemas);
+        List<GDPropertyMetadata> argumentsSchemas = Arrays.asList(actionSchema.getArgumentsSchemas());
+        List<GDPropertyMetadata> resultParametersSchemas = Arrays.asList(actionSchema.getResultSchema());
+        GDActionImpl genericDeviceActionImpl = new SBAction(name, this, argumentsSchemas, resultParametersSchemas);
         putAction(genericDeviceActionImpl);
     }
 
     ActionDefinition getActionDefinitions(String name) {
-        return (ActionDefinition) actionDefinitions.get(name);
+        return actionDefinitions.get(name);
     }
 }

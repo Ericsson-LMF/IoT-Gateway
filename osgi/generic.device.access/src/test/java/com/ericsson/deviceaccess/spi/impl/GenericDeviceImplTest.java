@@ -34,11 +34,11 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.Serializable.Format;
-import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
-import com.ericsson.deviceaccess.spi.GenericDeviceService;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.Properties;
@@ -66,13 +66,13 @@ public class GenericDeviceImplTest {
     };
     private EventManager eventManager;
     private GenericDeviceImpl device;
-    private GenericDeviceService dummyService;
+    private GDService dummyService;
 
     @Before
     public void setUp() throws Exception {
-        dummyService = context.mock(GenericDeviceService.class);
+        dummyService = context.mock(GDService.class);
         eventManager = context.mock(EventManager.class);
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         device = new GenericDeviceImpl() {
         };
 
@@ -95,7 +95,7 @@ public class GenericDeviceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", null);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", null);
     }
 
     @Test
@@ -105,13 +105,13 @@ public class GenericDeviceImplTest {
             {
                 oneOf(eventManager).addEvent("devId", "DeviceProperties", new Properties() {
                     {
-                        put(GenericDeviceEventListener.DEVICE_ONLINE, true);
+                        put(GDEventListener.DEVICE_ONLINE, true);
                     }
                 });
 
                 oneOf(eventManager).addEvent("devId", "DeviceProperties", new Properties() {
                     {
-                        put(GenericDeviceEventListener.DEVICE_NAME, "banan");
+                        put(GDEventListener.DEVICE_NAME, "banan");
                     }
                 });
             }
@@ -126,7 +126,7 @@ public class GenericDeviceImplTest {
     }
 
     @Test
-    public void testSerialize() throws GenericDeviceException, JSONException {
+    public void testSerialize() throws GDException, JSONException {
         context.checking(new Expectations() {
             {
                 oneOf(dummyService).serialize(Format.JSON);
@@ -146,7 +146,7 @@ public class GenericDeviceImplTest {
     }
 
     @Test
-    public void testSerializeState() throws GenericDeviceException {
+    public void testSerializeState() throws GDException {
         context.checking(new Expectations() {
             {
                 oneOf(dummyService).serializeState();

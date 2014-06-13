@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,57 +29,84 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-/**
- * A result from an action.
- */
-public interface GenericDeviceActionResult extends Serializable {
+import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
+
+public class GDActionResultImpl implements GDActionResult {
+
+    private int code;
+    private String reason;
+    private final GDProperties value;
 
     /**
-     * Placeholder for Android to replace with the stub implementation for this
-     * interface
-     *
-     * @author knt
+     * @param result
      */
-    public static abstract class Stub implements GenericDeviceActionResult {
+    public GDActionResultImpl(GDProperties result) {
+        value = result;
+    }
+
+    @Override
+    public void setCode(int code) {
+        this.code = code;
     }
 
     /**
-     * Gets the status code.
-     *
-     * @return
+     * {@inheritDoc}
      */
-    public int getCode();
+    @Override
+    public int getCode() {
+        return code;
+    }
 
     /**
-     * Sets the status code.
-     *
-     * @param code
+     * {@inheritDoc}
      */
-    public void setCode(int code);
+    @Override
+    public GDProperties getValue() {
+        return value;
+    }
 
     /**
-     * Gets the reason (associated with code).
-     *
-     * @return
+     * {@inheritDoc}
      */
-    public String getReason();
+    @Override
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
     /**
-     * Sets the reason (associated with code).
-     *
-     * @param reason
+     * {@inheritDoc}
      */
-    public void setReason(String reason);
+    @Override
+    public String getReason() {
+        return reason;
+    }
 
-    /**
-     * Gets the result value.
-     *
-     * @return
-     */
-    public GenericDeviceProperties getValue();
+    @Override
+    public String serialize(Format format) throws GDException {
+        GDAccessSecurity.checkGetPermission(getClass().getName());
+        if (format.isJson()) {
+            StringBuilder sb = new StringBuilder("{");
+            sb.append("\"code\":\"").append(getCode()).append("\",");
+            sb.append("\"reason\":\"").append(getReason()).append("\",");
+            if (value != null) {
+                sb.append("\"value\":").append(getValue().serialize(format));
+            } else {
+                sb.append("\"value\":null");
+            }
+            sb.append("}");
+
+            return sb.toString();
+        } else {
+            throw new GDException(405, "No such format supported");
+        }
+    }
+
 }

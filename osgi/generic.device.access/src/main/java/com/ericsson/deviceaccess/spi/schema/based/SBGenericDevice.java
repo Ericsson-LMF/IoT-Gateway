@@ -33,19 +33,22 @@
  DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.spi.schema;
+package com.ericsson.deviceaccess.spi.schema.based;
 
-import com.ericsson.deviceaccess.api.GenericDeviceService;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
+import com.ericsson.deviceaccess.spi.schema.DeviceManagementService;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
+import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 import java.util.HashMap;
 import java.util.Iterator;
 
 /**
  * Base class for devices implemented in adaptors.
  */
-public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
+public abstract class SBGenericDevice extends GenericDeviceImpl {
 
-    protected SchemaBasedGenericDevice() {
+    protected SBGenericDevice() {
         addSchemaBasedService(new DeviceManagementService());
     }
 
@@ -54,7 +57,7 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
      *
      * @param service
      */
-    protected void addSchemaBasedService(SchemaBasedService service) {
+    protected void addSchemaBasedService(SBService service) {
         String name = service.getName();
         if (getService(name) != null) {
             throw new ServiceSchemaError("Service: '" + name + "' is already defined on the device: '" + getName() + "'(id=" + getId() + ")");
@@ -68,7 +71,7 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
      * {@inheritDoc}
      */
     @Override
-    public void putService(GenericDeviceService svc) {
+    public void putService(GDService svc) {
         putService(null, svc);
     }
 
@@ -76,11 +79,11 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
      * {@inheritDoc}
      */
     @Override
-    public void putService(String name, GenericDeviceService svc) {
-        if (!(svc instanceof SchemaBasedService)) {
-            throw new ServiceSchemaError("Trying to add a service '" + name + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SchemaBasedService.class);
+    public void putService(String name, GDService svc) {
+        if (!(svc instanceof SBService)) {
+            throw new ServiceSchemaError("Trying to add a service '" + name + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SBService.class);
         }
-        addSchemaBasedService((SchemaBasedService) svc);
+        addSchemaBasedService((SBService) svc);
     }
 
     /**
@@ -90,7 +93,7 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
      */
     public void setService(HashMap services) {
         for (Iterator iterator = services.values().iterator(); iterator.hasNext();) {
-            GenericDeviceService service = (GenericDeviceService) iterator.next();
+            GDService service = (GDService) iterator.next();
             putService(service);
         }
     }
@@ -101,9 +104,9 @@ public abstract class SchemaBasedGenericDevice extends GenericDeviceImpl {
      * @param schema the service schema
      * @return the service
      */
-    public SchemaBasedService createService(ServiceSchema schema) {
+    public SBService createService(ServiceSchema schema) {
         String name = schema.getName();
-        SchemaBasedServiceBase service = new SchemaBasedServiceBase(schema);
+        SBServiceBase service = new SBServiceBase(schema);
         return service;
     }
 }

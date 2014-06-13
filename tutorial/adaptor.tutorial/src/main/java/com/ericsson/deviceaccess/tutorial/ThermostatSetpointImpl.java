@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.homeautomation.hvac.thermostat.ThermostatSetPointBase;
 
 /**
@@ -53,13 +53,13 @@ public class ThermostatSetpointImpl extends ThermostatSetPointBase {
     }
 
     @Override
-    public void executeSetDesiredCoolingTemperature(float desiredTemperature) throws GenericDeviceException {
+    public void executeSetDesiredCoolingTemperature(float desiredTemperature) throws GDException {
         updateCurrentDesiredCoolingTemperature(desiredTemperature);
         System.out.println("Desired cooling temperature has been set to: " + desiredTemperature);
     }
 
     @Override
-    public void executeSetDesiredHeatingTemperature(float desiredTemp) throws GenericDeviceException {
+    public void executeSetDesiredHeatingTemperature(float desiredTemp) throws GDException {
         updateCurrentDesiredHeatingTemperature(desiredTemp);
         System.out.println("Desired heating temperature has been set to: " + desiredTemp);
     }

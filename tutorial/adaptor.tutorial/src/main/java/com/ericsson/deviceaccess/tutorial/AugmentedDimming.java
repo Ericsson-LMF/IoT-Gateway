@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.service.homeautomation.lighting.DimmingBase;
 
@@ -81,24 +81,24 @@ public class AugmentedDimming extends DimmingBase {
      * It will be called by the base class when a client invokes the action.
      */
     @Override
-    public void executeSetLoadLevelTarget(int loadLevelTarget) throws GenericDeviceException {
+    public void executeSetLoadLevelTarget(int loadLevelTarget) throws GDException {
         currentLoadLevel = loadLevelTarget;
         System.out.println("Set load level target: " + loadLevelTarget);
     }
 
     @Override
-    public void executeSetLoadLevelTargetWithRate(int loadLevelTarget, float rate) throws GenericDeviceException {
+    public void executeSetLoadLevelTargetWithRate(int loadLevelTarget, float rate) throws GDException {
         currentLoadLevel = loadLevelTarget;
         System.out.println("Set load level target: " + loadLevelTarget + " with rate: " + rate);
     }
 
     @Override
-    public void executeOn() throws GenericDeviceException {
+    public void executeOn() throws GDException {
         System.out.println("Execute ON");
     }
 
     @Override
-    public void executeOff() throws GenericDeviceException {
+    public void executeOff() throws GDException {
         System.out.println("Execute OFF");
     }
 }

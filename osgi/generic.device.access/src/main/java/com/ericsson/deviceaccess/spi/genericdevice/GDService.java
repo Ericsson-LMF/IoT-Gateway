@@ -32,14 +32,14 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.spi;
+package com.ericsson.deviceaccess.spi.genericdevice;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
 
 /**
  * Base interface for service implementations.
  */
-public interface GenericDeviceService extends com.ericsson.deviceaccess.api.GenericDeviceService {
+public interface GDService extends com.ericsson.deviceaccess.api.genericdevice.GDService {
 
     /**
      * Sets the parent of this service.

@@ -36,12 +36,12 @@ package com.ericsson.deviceaccess.tutorial.rest;
 
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceAction;
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceService;
 import com.ericsson.deviceaccess.api.Serializable.Format;
+import com.ericsson.deviceaccess.api.genericdevice.GDAction;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -63,7 +63,7 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, GenericDeviceEventListener, ServiceListener {
+public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, GDEventListener, ServiceListener {
 
     private static Log logger = LogFactory.getLog(GenericDeviceServlet.class);
 
@@ -123,7 +123,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             } else {
                 return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "No servlet registered for " + uri);
             }
-        } catch (GenericDeviceException | IOException | JSONException e) {
+        } catch (GDException | IOException | JSONException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             return new NanoHTTPD.Response(HTTP_INTERNALERROR, "text/plain", "Failed to get resource " + uri + " due to " + sw.toString());
@@ -146,11 +146,11 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             String action = st.nextToken();
             GenericDevice dev = getDevice(deviceId);
             if (dev != null) {
-                GenericDeviceService svc = dev.getService(service);
+                GDService svc = dev.getService(service);
                 if (svc != null) {
-                    GenericDeviceAction act = svc.getAction(action);
+                    GDAction act = svc.getAction(action);
                     if (act != null) {
-                        GenericDeviceActionContext ac = act.createActionContext();
+                        GDActionContext ac = act.createActionContext();
                         ac.setDevice(deviceId);
                         ac.setService(service);
                         ac.setAction(action);
@@ -167,7 +167,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             } else {
                 return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "Could not find device: " + deviceId);
             }
-        } catch (GenericDeviceException e) {
+        } catch (GDException e) {
             return new NanoHTTPD.Response(HTTP_INTERNALERROR, "text/plain", "Failed to perform action " + request + " due to " + e);
         }
     }
@@ -175,7 +175,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
     /**
      * @param ac
      */
-    private void setArguments(GenericDeviceActionContext ac, Properties parms) {
+    private void setArguments(GDActionContext ac, Properties parms) {
         Enumeration parameterNames = parms.keys();
         while (parameterNames.hasMoreElements()) {
             String paramName = (String) parameterNames.nextElement();
@@ -215,7 +215,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                     try {
                         String json = dev.getSerializedNode("", Format.JSON);
                         devices.put(dev.getId(), new JSONObject(json));
-                    } catch (GenericDeviceException e) {
+                    } catch (GDException e) {
                         e.printStackTrace();
                     }
                 }
@@ -232,8 +232,8 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
 //		logger = new LogTracker(context);
 //		logger.open();
         Dictionary<String, Object> props = new Hashtable<>();
-        props.put(GenericDeviceEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
-        sr = bc.registerService(GenericDeviceEventListener.class, this, props);
+        props.put(GDEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
+        sr = bc.registerService(GDEventListener.class, this, props);
 
         try {
             bc.addServiceListener(this, "(" + org.osgi.framework.Constants.OBJECTCLASS + "=" + GenericDevice.class.getName() + ")");

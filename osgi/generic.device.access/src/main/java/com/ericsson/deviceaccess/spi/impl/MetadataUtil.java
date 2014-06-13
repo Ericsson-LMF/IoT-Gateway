@@ -35,39 +35,34 @@
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.deviceaccess.api.Constants;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable.Format;
-import com.ericsson.deviceaccess.spi.GenericDeviceError;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Checker for checking {@link GenericDeviceProperties} against
- * {@link GenericDevicePropertyMetadata}.
+ * Checker for checking {@link GDProperties} against {@link GDPropertyMetadata}.
  */
-enum MetadataUtil {
+public enum MetadataUtil {
 
     /**
      * Singleton.
      */
     INSTANCE;
 
-    private MetadataUtil() {
-    }
-
     /**
      * Verifies all the specified properties against the specified metadata.
      *
      * @param props
-     * @param metadataMap name:String -> {@link GenericDevicePropertyMetadata}
-     * @throws GenericDeviceError thrown if value does not adhere to the
-     * metadata
+     * @param metadataMap name:String -> {@link GDPropertyMetadata}
+     * @throws GDError thrown if value does not adhere to the metadata
      */
-    void verifyPropertiesAgainstMetadata(GenericDeviceProperties props, Map metadataMap) throws GenericDeviceError {
+    public void verifyPropertiesAgainstMetadata(GDProperties props, Map metadataMap) throws GDError {
         if (metadataMap == null) {
             return;
         }
@@ -80,14 +75,13 @@ enum MetadataUtil {
      * Verifies the specified property, with the specified name, against the
      * specified metadata.
      *
-     * @param metadataMap name:String -> {@link GenericDevicePropertyMetadata}
+     * @param metadataMap name:String -> {@link GDPropertyMetadata}
      * @param propertyName
      * @param propertyValue
-     * @throws GenericDeviceError thrown if value does not adhere to the
-     * metadata
+     * @throws GDError thrown if value does not adhere to the metadata
      */
-    void verifyPropertyAgainstMetadata(Map metadataMap, String propertyName, Object propertyValue) throws GenericDeviceError {
-        GenericDevicePropertyMetadata metadata = (GenericDevicePropertyMetadata) metadataMap.get(propertyName);
+    public void verifyPropertyAgainstMetadata(Map metadataMap, String propertyName, Object propertyValue) throws GDError {
+        GDPropertyMetadata metadata = (GDPropertyMetadata) metadataMap.get(propertyName);
 
         if (metadata == null) {
             return;
@@ -98,25 +92,25 @@ enum MetadataUtil {
                 try {
                     Float.parseFloat((String) propertyValue);
                 } catch (NumberFormatException e) {
-                    throw new GenericDeviceError(
+                    throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
                             + "' which not parsable to '" + metadata.getType() + "'");
                 }
             } else if (Float.class.isAssignableFrom(metadata.getType())) {
                 if (!(propertyValue instanceof Float)) {
-                    throw new GenericDeviceError(
+                    throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
                             + "' which not assignable to '" + metadata.getType() + "'");
                 }
             } else if (Long.class.isAssignableFrom(metadata.getType())) {
                 if (!(propertyValue instanceof Long)) {
-                    throw new GenericDeviceError(
+                    throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
                             + "' which not assignable to '" + metadata.getType() + "'");
                 }
             } else {
                 if (!(propertyValue instanceof Integer || propertyValue instanceof Short || propertyValue instanceof Byte)) {
-                    throw new GenericDeviceError(
+                    throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
                             + "' which not assignable to '" + metadata.getType() + "'");
                 }
@@ -136,7 +130,7 @@ enum MetadataUtil {
             if (validValues != null) {
                 Arrays.sort(validValues);
                 if (Arrays.binarySearch(validValues, value) < 0) {
-                    throw new GenericDeviceError(
+                    throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " with the value '" + value
                             + "' is not among the allowed values '" + arrayToString(validValues) + "'");
                 }
@@ -152,18 +146,17 @@ enum MetadataUtil {
      * @param propertyName
      * @param propertyValue
      * @param valueToBeChecked
-     * @throws GenericDeviceError thrown if value does not adhere to the
-     * metadata
+     * @throws GDError thrown if value does not adhere to the metadata
      */
-    private static void checkRange(GenericDevicePropertyMetadata metadata, String propertyName, Object propertyValue, double valueToBeChecked) throws GenericDeviceError {
+    private static void checkRange(GDPropertyMetadata metadata, String propertyName, Object propertyValue, double valueToBeChecked) throws GDError {
         if (valueToBeChecked > metadata.getMaxValue().doubleValue()) {
-            throw new GenericDeviceError(
+            throw new GDError(
                     "The property: '" + propertyName + "'=" + propertyValue
                     + " is above the max value '" + metadata.getMaxValue() + "'");
         }
 
         if (valueToBeChecked < metadata.getMinValue().doubleValue()) {
-            throw new GenericDeviceError(
+            throw new GDError(
                     "The property: '" + propertyName + "'=" + propertyValue
                     + " is below the min value '" + metadata.getMinValue() + "'");
         }
@@ -196,9 +189,9 @@ enum MetadataUtil {
      * @param name
      * @param metadata
      * @return JSON string of the specified metadata
-     * @throws GenericDeviceException
+     * @throws GDException
      */
-    String metadataToJson(String path, Format format, String name, Collection metadata) throws GenericDeviceException {
+    public String metadataToJson(String path, Format format, String name, Collection metadata) throws GDException {
         String retVal = "";
         if (path == null) {
             path = "";
@@ -208,7 +201,7 @@ enum MetadataUtil {
                 StringBuilder sb = new StringBuilder();
                 sb.append('"').append(name).append("\": {");
                 for (Iterator iterator = metadata.iterator(); iterator.hasNext();) {
-                    GenericDevicePropertyMetadata md = (GenericDevicePropertyMetadata) iterator.next();
+                    GDPropertyMetadata md = (GDPropertyMetadata) iterator.next();
                     if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
                         sb.append('"').append(md.getName()).append("\":").append(md.getSerializedNode(path.substring(path.indexOf(Constants.PATH_DELIMITER)), format));
                     } else {
@@ -221,7 +214,7 @@ enum MetadataUtil {
                 retVal = sb.toString();
             }
         } else {
-            throw new GenericDeviceException(405, "No such format supported");
+            throw new GDException(405, "No such format supported");
         }
 
         return retVal;

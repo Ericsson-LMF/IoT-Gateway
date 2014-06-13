@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.service.homeautomation.hvac.thermostat.ThermostatMode;
 import com.ericsson.deviceaccess.spi.service.homeautomation.hvac.thermostat.ThermostatModeBase;
 
@@ -53,7 +53,7 @@ public class ThermostatModeImpl extends ThermostatModeBase {
     }
 
     @Override
-    public void executeSetMode(String s) throws GenericDeviceException {
+    public void executeSetMode(String s) throws GDException {
         updateMode(s);
         System.out.println("Thermostat mode has been set to: " + s);
     }

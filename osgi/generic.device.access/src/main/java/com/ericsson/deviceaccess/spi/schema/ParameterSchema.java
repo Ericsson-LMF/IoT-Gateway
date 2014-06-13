@@ -34,16 +34,16 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.research.commonutil.StringUtil;
 import java.util.Arrays;
 
 /**
  *
  */
-public class ParameterSchema implements GenericDevicePropertyMetadata {
+public class ParameterSchema implements GDPropertyMetadata {
 
     private String name;
     private Number minValue;
@@ -164,11 +164,11 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      * {@inheritDoc}
      */
     @Override
-    public String serialize(Format format) throws GenericDeviceException {
+    public String serialize(Format format) throws GDException {
         if (format.isJson()) {
             return toJsonString(format, 0);
         } else {
-            throw new GenericDeviceException(405, "No such format supported");
+            throw new GDException(405, "No such format supported");
         }
     }
 
@@ -176,9 +176,9 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      * {@inheritDoc}
      */
     @Override
-    public String getSerializedNode(String path, Format format) throws GenericDeviceException {
+    public String getSerializedNode(String path, Format format) throws GDException {
         if (path == null) {
-            throw new GenericDeviceException(405, "Path cannot be null");
+            throw new GDException(405, "Path cannot be null");
         }
 
         if (path.length() == 0) {
@@ -232,7 +232,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      */
     @Override
     public String getPath() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         return path + "/parameter/" + this.getName();
     }
 
@@ -241,7 +241,7 @@ public class ParameterSchema implements GenericDevicePropertyMetadata {
      */
     @Override
     public void updatePath(String path) {
-        GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
+        GDAccessSecurity.checkSetPermission(getClass().getName());
         this.path = path;
     }
 

@@ -34,13 +34,13 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 
 /**
  * An action implementation.
  */
 public interface ActionDefinition {
 
-    void invoke(GenericDeviceActionContext context) throws GenericDeviceException;
+    void invoke(GDActionContext context) throws GDException;
 }

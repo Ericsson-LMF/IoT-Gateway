@@ -35,8 +35,8 @@
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-import com.ericsson.deviceaccess.api.GenericDeviceService;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-public enum PropertyManager implements GenericDeviceEventListener, ServiceTrackerCustomizer {
+public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer {
 
     INSTANCE;
 
@@ -70,8 +70,8 @@ public enum PropertyManager implements GenericDeviceEventListener, ServiceTracke
         deviceTracker.open();
 
         Dictionary<String, Object> props = new Hashtable<>();
-        props.put(GenericDeviceEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
-        sr = context.registerService(GenericDeviceEventListener.class, this, props);
+        props.put(GDEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
+        sr = context.registerService(GDEventListener.class, this, props);
     }
 
     public void stop() {
@@ -96,7 +96,7 @@ public enum PropertyManager implements GenericDeviceEventListener, ServiceTracke
         }
 
         synchronized (mutex) {
-            if ("DeviceProperties".equals(serviceName) && properties.get(GenericDeviceEventListener.DEVICE_STATE) != null && properties.get(GenericDeviceEventListener.DEVICE_STATE).equals("Ready")) {
+            if ("DeviceProperties".equals(serviceName) && properties.get(GDEventListener.DEVICE_STATE) != null && properties.get(GDEventListener.DEVICE_STATE).equals("Ready")) {
                 GenericDevice device = (GenericDevice) devices.get(deviceId);
                 if (device != null) {
                     updateDevice(device);
@@ -150,7 +150,7 @@ public enum PropertyManager implements GenericDeviceEventListener, ServiceTracke
             // Remove all service properties
             String[] serviceNames = device.getServiceNames();
             for (String serviceName : serviceNames) {
-                GenericDeviceService srv = device.getService(serviceName);
+                GDService srv = device.getService(serviceName);
                 String[] propertyIds = srv.getProperties().getNames();
                 for (String propertyId : propertyIds) {
                     Object value = srv.getProperties().getValue(propertyId);
@@ -177,7 +177,7 @@ public enum PropertyManager implements GenericDeviceEventListener, ServiceTracke
             // Add or update all service properties
             String[] serviceNames = device.getServiceNames();
             for (String serviceName : serviceNames) {
-                GenericDeviceService service = device.getService(serviceName);
+                GDService service = device.getService(serviceName);
                 String[] propertyIds = service.getProperties().getNames();
                 for (String propertyId : propertyIds) {
                     if ("lastUpdateTime".equals(propertyId)) {

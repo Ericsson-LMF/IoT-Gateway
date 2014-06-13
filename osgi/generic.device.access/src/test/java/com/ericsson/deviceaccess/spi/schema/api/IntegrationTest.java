@@ -34,12 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.schema.api;
 
-import com.ericsson.deviceaccess.api.GenericDeviceAction;
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDAction;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
@@ -81,7 +81,7 @@ public class IntegrationTest {
     }
 
     @Test
-    public void testCreateDevice_sucessfulInlineCustomDefinition() throws GenericDeviceException {
+    public void testCreateDevice_sucessfulInlineCustomDefinition() throws GDException {
         final ServiceSchema serviceSchema = new ServiceSchema.Builder("CustomService").build();
         final ActionSchema actionSchema = new ActionSchema.Builder("CustomAction")
                 .setMandatory(true)
@@ -93,7 +93,7 @@ public class IntegrationTest {
                     p.setValidValues(new String[]{"apa", "result=47"});
                 })
                 .build();
-        SchemaBasedGenericDevice myGenericDevice = new SchemaBasedGenericDevice() {
+        SBGenericDevice myGenericDevice = new SBGenericDevice() {
             {
                 addSchemaBasedService(createService(serviceSchema).
                         defineCustomAction(actionSchema, context -> {
@@ -105,7 +105,7 @@ public class IntegrationTest {
         };
 
         // Call action via GDA
-        GenericDeviceActionContext ac = invokeAction(myGenericDevice, "CustomService", "CustomAction", "CustomArgument", 47);
+        GDActionContext ac = invokeAction(myGenericDevice, "CustomService", "CustomAction", "CustomArgument", 47);
 
         assertEquals("result=47", ac.getResult().getValue().getStringValue("CustomResult"));
     }
@@ -116,16 +116,16 @@ public class IntegrationTest {
      * @param actionName
      * @param parameterName
      * @return
-     * @throws GenericDeviceException
+     * @throws GDException
      */
-    private GenericDeviceActionContext invokeAction(SchemaBasedGenericDevice device, final String serviceName, final String actionName, final String parameterName, int arg) throws GenericDeviceException {
-        GenericDeviceAction action = device.getService(serviceName).getAction(actionName);
-        GenericDeviceActionContext ac = action.createActionContext();
+    private GDActionContext invokeAction(SBGenericDevice device, final String serviceName, final String actionName, final String parameterName, int arg) throws GDException {
+        GDAction action = device.getService(serviceName).getAction(actionName);
+        GDActionContext ac = action.createActionContext();
         ac.setDevice(device.getName());
         ac.setService(serviceName);
         ac.setAction(actionName);
 
-        GenericDeviceProperties args = ac.getArguments();
+        GDProperties args = ac.getArguments();
         args.setIntValue(parameterName, arg);
 
         action.execute(ac);

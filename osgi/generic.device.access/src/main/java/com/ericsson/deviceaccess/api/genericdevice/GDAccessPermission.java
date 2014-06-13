@@ -32,7 +32,7 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
 
 import com.ericsson.research.commonutil.LegacyUtil;
 import com.ericsson.research.commonutil.function.FunctionalUtil;
@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class GenericDeviceAccessPermission extends BasicPermission {
+public final class GDAccessPermission extends BasicPermission {
 
     /**
      *
@@ -62,17 +62,17 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
      * @param name
      * @param actions A comma separated string of actions: GET, SET and EXECUTE.
      */
-    public GenericDeviceAccessPermission(String name, String actions) {
+    public GDAccessPermission(String name, String actions) {
         super(name);
         actionMask = getActionMask(actions);
     }
 
-    public GenericDeviceAccessPermission(String name, EnumSet<Type> actionMask) {
+    public GDAccessPermission(String name, EnumSet<Type> actionMask) {
         super(name);
         this.actionMask = actionMask.clone();
     }
 
-    public GenericDeviceAccessPermission(String name, Type first, Type... rest) {
+    public GDAccessPermission(String name, Type first, Type... rest) {
         super(name);
         this.actionMask = EnumSet.of(first, rest);
     }
@@ -99,7 +99,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
     @Override
     public boolean implies(Permission permission) {
         AtomicBoolean flag = new AtomicBoolean(false);
-        FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, permission, target -> {
+        FunctionalUtil.doIfCan(GDAccessPermission.class, permission, target -> {
             flag.set(actionMask.containsAll(target.actionMask) && super.implies(target));
         });
         return flag.get();
@@ -136,7 +136,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
             return false;
         }
         AtomicBoolean flag = new AtomicBoolean(false);
-        FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, obj, target -> {
+        FunctionalUtil.doIfCan(GDAccessPermission.class, obj, target -> {
             flag.set(getName().equals(target.getName()) && getMask().equals(target.getMask()));
         });
         return flag.get();
@@ -148,7 +148,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
          *
          */
         private static final long serialVersionUID = 1102307291093157855L;
-        private Map<String, GenericDeviceAccessPermission> permissions;
+        private Map<String, GDAccessPermission> permissions;
         private boolean allAllowed = false;
 
         GenericDeviceAccessPermissionCollection() {
@@ -160,7 +160,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
             if (isReadOnly()) {
                 throw new SecurityException("readonly PermissionCollection");
             }
-            if (!FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, perm, gdaPerm -> {
+            if (!FunctionalUtil.doIfCan(GDAccessPermission.class, perm, gdaPerm -> {
                 String name = gdaPerm.getName();
                 permissions.compute(name, (key, value) -> {
                     if (value == null) {
@@ -173,7 +173,7 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
                     }
                     EnumSet<Type> mask = EnumSet.copyOf(oldMask);
                     mask.addAll(newMask);
-                    return new GenericDeviceAccessPermission(key, mask);
+                    return new GDAccessPermission(key, mask);
                 });
                 if (!allAllowed) {
                     if (name.equals("*")) {
@@ -193,13 +193,13 @@ public final class GenericDeviceAccessPermission extends BasicPermission {
         @Override
         public boolean implies(Permission perm) {
             AtomicBoolean flag = new AtomicBoolean(false);
-            FunctionalUtil.doIfCan(GenericDeviceAccessPermission.class, perm, gdaPerm -> {
+            FunctionalUtil.doIfCan(GDAccessPermission.class, perm, gdaPerm -> {
                 EnumSet<Type> desired = gdaPerm.getMask();
                 EnumSet<Type> effective = EnumSet.noneOf(Type.class);
 
                 // Shortcut if we have "*"
                 if (allAllowed) {
-                    GenericDeviceAccessPermission temp = permissions.get("*");
+                    GDAccessPermission temp = permissions.get("*");
                     if (temp != null) {
                         effective.addAll(temp.getMask());
                         if (effective.containsAll(desired)) {

@@ -32,69 +32,86 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
 
 /**
- * A GenericDeviceService represents a service provided by a generic device. A
- * GenericDeviceService can have zero or more properties and actions.
- *
+ * Metadata about a property.
  */
-public interface GenericDeviceService extends GenericDeviceContextNode {
+public interface GDPropertyMetadata extends GDContextNode {
+
+    static final String NAME = "name";
+    static final String TYPE = "type";
+    static final String MIN_VALUE = "minValue";
+    static final String MAX_VALUE = "maxValue";
+    static final String DEFAULT_VALUE = "defaultValue";
 
     /**
-     * Placeholder for Android to replace with the stub implementation for this
-     * interface
+     * Gets the name of the property.
      *
-     * @author knt
+     * @return the name of the property
      */
-    public static abstract class Stub implements GenericDeviceService {
-    }
+    String getName();
 
     /**
-     * Method to query an action that is available in the service by its name.
+     * Gets the type of the associated property.
      *
-     * @param name Name of the action in question.
-     * @return An instance of an action that has the name. Null if not found.
+     * @return String.class, Integer.class or Float.class
      */
-    public GenericDeviceAction getAction(String name);
+    Class getType();
 
     /**
-     * Getter for the name of the service.
+     * Gets the type of the associated property.
      *
-     * @return Name of the service.
+     * @return String.class, Integer.class or Float.class
      */
-    public String getName();
+    String getTypeName();
 
     /**
-     * Getter for the GenericDeviceProperties object that represents the list of
-     * properties of the service.
+     * Gets default value for this property.
+     * <p/>
+     * Use when it describes a string property.
      *
-     * @return List of properties of the service.
+     * @return default value for this property when it describes a string
+     * property
      */
-    public GenericDeviceProperties getProperties();
+    String getDefaultStringValue();
 
     /**
-     * Gets the metadata for the properties of this service.
+     * Gets the valid values for the associated property.
+     * <p/>
+     * Use when it describes a string property.
      *
-     * @return the metadata for the properties of this service.
+     * @return the valid values for the associated property, or null if all
+     * values are OK
      */
-    public GenericDevicePropertyMetadata[] getPropertiesMetadata();
+    String[] getValidValues();
 
     /**
-     * Method to return an array of action names to iterate actions supported in
-     * the service.
+     * Gets default value for this property.
+     * <p/>
+     * Use when it describes a number property.
      *
-     * @return array of action names
+     * @return default value for this property when it describes a string
+     * property
      */
-    public String[] getActionNames();
+    Number getDefaultNumberValue();
 
     /**
-     * Serializes the state (i.e. values of all properties in the service) to
-     * JSON
+     * Gets the min value for this property.
+     * <p/>
+     * Use when it describes a number property.
      *
-     * @return JSON of the state. Example:
-     * <code>{"property1" : "99","property2" : "99"}</code>
-     *
+     * @return the min value for this property
      */
-    public String serializeState();
+    Number getMinValue();
+
+    /**
+     * Gets the max value for this property.
+     * <p/>
+     * Use when it describes a number property.
+     *
+     * @return the max value for this property
+     */
+    Number getMaxValue();
+
 }

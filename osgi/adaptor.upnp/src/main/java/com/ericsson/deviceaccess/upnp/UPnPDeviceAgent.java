@@ -36,12 +36,13 @@ package com.ericsson.deviceaccess.upnp;
 
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceService;
+import com.ericsson.deviceaccess.api.GenericDevice.State;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.ericsson.deviceaccess.api.service.homeautomation.lighting.Dimming;
 import com.ericsson.deviceaccess.api.service.homeautomation.power.SwitchPower;
 import com.ericsson.deviceaccess.api.service.media.ContentDirectory;
 import com.ericsson.deviceaccess.api.service.media.RenderingControl;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,39 +73,39 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     }
 
     private final BundleContext context;
-    private final SchemaBasedGenericDevice dev;
+    private final SBGenericDevice device;
     private ServiceRegistration eventListenerReg;
     private ServiceRegistration devReg;
 
-    final private Map idToService = new HashMap();
+    final private Map<String, GDService> idToService = new HashMap<>();
 
     public UPnPDeviceAgent(BundleContext bc, UPnPDevice upnpdev) {
         this.context = bc;
 
-        dev = new SchemaBasedGenericDevice() {
+        device = new SBGenericDevice() {
         };
-        dev.setId(UPnPUtil.getUDN(upnpdev));
-        dev.setOnline(true);
-        dev.setName(UPnPUtil.getFriendlyName(upnpdev));
-        dev.setProtocol("upnp");
-        dev.setType(UPnPUtil.getDeviceType(upnpdev));
-        dev.setURN((String) upnpdev.getDescriptions(null).get(UPnPDevice.UDN));
+        device.setId(UPnPUtil.getUDN(upnpdev));
+        device.setOnline(true);
+        device.setName(UPnPUtil.getFriendlyName(upnpdev));
+        device.setProtocol("upnp");
+        device.setType(UPnPUtil.getDeviceType(upnpdev));
+        device.setURN((String) upnpdev.getDescriptions(null).get(UPnPDevice.UDN));
 
-        dev.setManufacturer((String) upnpdev.getDescriptions(null).get(UPnPDevice.MANUFACTURER));
-        dev.setSerialNumber((String) upnpdev.getDescriptions(null).get(UPnPDevice.SERIAL_NUMBER));
-        dev.setModelName((String) upnpdev.getDescriptions(null).get(UPnPDevice.MODEL_NAME));
+        device.setManufacturer((String) upnpdev.getDescriptions(null).get(UPnPDevice.MANUFACTURER));
+        device.setSerialNumber((String) upnpdev.getDescriptions(null).get(UPnPDevice.SERIAL_NUMBER));
+        device.setModelName((String) upnpdev.getDescriptions(null).get(UPnPDevice.MODEL_NAME));
         String productClass = (String) upnpdev.getDescriptions(null).get(UPnPDevice.UPC);
         if (productClass == null) {
             productClass = "";
         } else {
             productClass = productClass.trim();
         }
-        dev.setProductClass(productClass);
+        device.setProductClass(productClass);
 
-        dev.setService(getServices(upnpdev));
+        device.setService(getServices(upnpdev));
 
         String iconUrl = (String) upnpdev.getDescriptions(null).get("GDA_ICON");
-        dev.setIcon(iconUrl);
+        device.setIcon(iconUrl);
     }
 
     public void update() {
@@ -112,16 +113,16 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     }
 
     public void start() {
-        subscribeToEvents(UPnPFilterRule.deviceID(dev.getId()));
-        dev.setState(GenericDevice.STATE_ADDED);
-        devReg = context.registerService(GenericDevice.class, dev, dev.getDeviceProperties());
-        dev.setState(GenericDevice.STATE_READY);
+        subscribeToEvents(UPnPFilterRule.deviceID(device.getId()));
+        device.setState(State.ADDED);
+        devReg = context.registerService(GenericDevice.class, device, device.getDeviceProperties());
+        device.setState(State.READY);
     }
 
     public void stop() {
         unsubscribeFromEvents();
-        dev.setOnline(false);
-        dev.setState(GenericDevice.STATE_REMOVED);
+        device.setOnline(false);
+        device.setState(State.REMOVED);
         if (devReg != null) {
             devReg.unregister();
             devReg = null;
@@ -152,11 +153,11 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     }
 
-    // private HashMap<String, GenericDeviceService> getSWoTServices(UPnPDevice
+    // private HashMap<String, GDService> getSWoTServices(UPnPDevice
     // dev) {
     private HashMap getServices(UPnPDevice dev) {
-        // HashMap<String, GenericDeviceService> services = new HashMap<String,
-        // GenericDeviceService>();
+        // HashMap<String, GDService> services = new HashMap<String,
+        // GDService>();
         HashMap services = new HashMap();
         if (UPnPUtil.isMediaRenderer(dev)) {
             logger.debug("Media Renderer is found");
@@ -204,8 +205,8 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     @Override
     public void notifyUPnPEvent(String deviceId, String serviceId, Dictionary eventTable) {
         logger.debug("UPnP event received for " + deviceId + "#" + serviceId);
-        if (deviceId.equals(dev.getId())) {
-            GenericDeviceService svc = dev.getService(getSWoTServiceNameFromUPnPServiceId(serviceId));
+        if (deviceId.equals(device.getId())) {
+            GDService svc = device.getService(getSWoTServiceNameFromUPnPServiceId(serviceId));
             if (svc != null) {
                 Dictionary lastChangeVariables = null;
                 for (Enumeration events = eventTable.keys(); events.hasMoreElements();) {
@@ -264,7 +265,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             Object service = this.idToService.get(serviceId);
             if ((service != null)
                     && (service instanceof UpdatePropertyInterface)
-                    && (service instanceof GenericDeviceService)) {
+                    && (service instanceof GDService)) {
                 logger.debug("Found UpdatePropertyInterface instance");
                 for (Enumeration events = eventTable.keys(); events.hasMoreElements();) {
                     String name = (String) events.nextElement();
@@ -288,7 +289,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     private void notifyUpdate(String path) {
         if (devReg != null) {
-            Dictionary<String, Object> props = dev.getDeviceProperties();
+            Dictionary<String, Object> props = device.getDeviceProperties();
             props.put(Constants.UPDATED_PATH, path);
             devReg.setProperties(props);
         }

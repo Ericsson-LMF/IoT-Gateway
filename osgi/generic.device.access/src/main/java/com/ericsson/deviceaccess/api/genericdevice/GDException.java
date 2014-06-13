@@ -32,37 +32,35 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.spi;
+package com.ericsson.deviceaccess.api.genericdevice;
 
-/**
- * An error (typically programming error).
- */
-public class GenericDeviceError extends Error {
-
-    private static final long serialVersionUID = 1L;
-
-    public GenericDeviceError() {
-    }
+public class GDException extends Exception {
 
     /**
-     * @param message
-     * @param cause
+     *
      */
-    public GenericDeviceError(String message, Throwable cause) {
-        super(message, cause);
+    private static final long serialVersionUID = -1611830596441206137L;
+    private int code;
+
+    public GDException(int code, String msg, Exception e) {
+        super(msg, e);
+        this.code = code;
     }
 
-    /**
-     * @param message
-     */
-    public GenericDeviceError(String message) {
-        super(message);
+    public GDException(int code, String msg) {
+        super(msg);
+        this.code = code;
     }
 
-    /**
-     * @param cause
-     */
-    public GenericDeviceError(Throwable cause) {
-        super(cause);
+    public GDException(String msg, Exception e) {
+        this(500, msg, e);
+    }
+
+    public GDException(String msg) {
+        this(500, msg);
+    }
+
+    public int getCode() {
+        return code;
     }
 }

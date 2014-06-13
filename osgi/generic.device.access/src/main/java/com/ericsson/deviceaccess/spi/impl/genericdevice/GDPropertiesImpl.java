@@ -32,43 +32,46 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.spi.impl;
+package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
-import com.ericsson.deviceaccess.spi.GenericDeviceError;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
+import com.ericsson.deviceaccess.spi.genericdevice.GDError;
+import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
 import com.ericsson.research.commonutil.StringUtil;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
-        implements GenericDeviceProperties {
+public class GDPropertiesImpl extends GDProperties.Stub
+        implements GDProperties {
 
     public static final String LAST_UPDATE_TIME = "lastUpdateTime";
     private Map<String, Object> map;
-    private Map<String, GenericDevicePropertyMetadata> metadata; // name:String -> GenericDevicePropertyMetadata
-    private GenericDeviceServiceImpl parentService;
+    private Map<String, GDPropertyMetadata> metadata;
+    private GDServiceImpl parentService;
 
-    GenericDevicePropertiesImpl(GenericDevicePropertyMetadata[] metadataArray, GenericDeviceServiceImpl parentService) {
+    public GDPropertiesImpl(Iterable<GDPropertyMetadata> metadataArray, GDServiceImpl parentService) {
         this.parentService = parentService;
         this.metadata = new HashMap<>();
         this.map = new HashMap<>();
         if (metadataArray != null) {
-            for (GenericDevicePropertyMetadata metadata : metadataArray) {
-                this.metadata.put(metadata.getName(), metadata);
-                if (metadata.getType() == String.class) {
-                    map.put(metadata.getName(), metadata.getDefaultStringValue());
+            metadataArray.forEach(meta -> {
+                String name = meta.getName();
+                metadata.put(name, meta);
+                if (String.class.equals(meta.getType())) {
+                    map.put(name, meta.getDefaultStringValue());
                 } else {
-                    map.put(metadata.getName(), metadata.getDefaultNumberValue());
+                    map.put(name, meta.getDefaultNumberValue());
                 }
-            }
+            });
         }
     }
 
-    public GenericDevicePropertiesImpl(GenericDevicePropertyMetadata[] metadataArray) {
+    public GDPropertiesImpl(Collection<GDPropertyMetadata> metadataArray) {
         this(metadataArray, null);
     }
 
@@ -82,16 +85,13 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      */
     @Override
     public Object getValue(String name) {
-        if (map.containsKey(name)) {
-            return map.get(name);
-        }
-
-        GenericDevicePropertyMetadata valueMetadata = metadata.get(name);
-        if (Number.class.isAssignableFrom(valueMetadata.getType())) {
-            return valueMetadata.getDefaultNumberValue();
-        } else {
-            return valueMetadata.getDefaultStringValue();
-        }
+        return map.computeIfAbsent(name, key -> {
+            GDPropertyMetadata meta = metadata.get(key);
+            if (String.class.equals(meta.getType())) {
+                return meta.getDefaultStringValue();
+            }
+            return meta.getDefaultNumberValue();
+        });
     }
 
     /**
@@ -102,9 +102,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         String defaultValue = metadata.get(key).getDefaultStringValue();
         if (map.containsKey(key)) {
             Object value = map.get(key);
-            if (value == null) {
-                return defaultValue;
-            } else {
+            if (value != null) {
                 return String.valueOf(value);
             }
         }
@@ -117,19 +115,16 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
     @Override
     public void setStringValue(String key, String value) {
         if (metadata.get(key) == null) {
-            throw new GenericDeviceError("There is no property: " + key
+            throw new GDError("There is no property: " + key
                     + " specified in the metadata for this property set.");
         }
         Class<?> type = metadata.get(key).getType();
-        if (type == Float.class) {
+        if (Float.class.equals(type)) {
             setFloatValue(key, Float.parseFloat(value));
-        } else if (type == Integer.class) {
+        } else if (Integer.class.equals(type)) {
             setIntValue(key, Integer.parseInt(value));
         } else {
-            MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, value);
-            Object oldValue = map.get(key);
-            map.put(key, value);
-            tryNotifyChange(key, oldValue, value);
+            setValue(key, value);
         }
     }
 
@@ -138,11 +133,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      */
     @Override
     public void setIntValue(String key, int value) {
-        Integer intValue = value;
-        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, intValue);
-        Object oldValue = map.get(key);
-        map.put(key, intValue);
-        tryNotifyChange(key, oldValue, intValue);
+        setValue(key, value);
     }
 
     /**
@@ -150,11 +141,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      */
     @Override
     public void setLongValue(String key, long value) {
-        Long longValue = value;
-        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, longValue);
-        Object oldValue = map.get(key);
-        map.put(key, longValue);
-        tryNotifyChange(key, oldValue, longValue);
+        setValue(key, value);
     }
 
     /**
@@ -162,11 +149,15 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      */
     @Override
     public void setFloatValue(String key, float value) {
-        Float floatValue = value;
-        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, floatValue);
-        Object oldValue = map.get(key);
-        map.put(key, floatValue);
-        tryNotifyChange(key, oldValue, floatValue);
+        setValue(key, value);
+    }
+
+    private void setValue(String key, Object value) {
+        MetadataUtil.INSTANCE.verifyPropertyAgainstMetadata(metadata, key, value);
+        map.compute(key, (k, oldValue) -> {
+            tryNotifyChange(k, oldValue, value);
+            return value;
+        });
     }
 
     private void tryNotifyChange(final String key, Object oldValue,
@@ -265,13 +256,13 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      * {@inheritDoc}
      */
     @Override
-    public String serialize(Format format) throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+    public String serialize(Format format) throws GDException {
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         if (format.isJson()) {
             int indent = 0;
             return "{" + valuesToJson(format) + "}";
         } else {
-            throw new GenericDeviceException(405, "No such format supported");
+            throw new GDException(405, "No such format supported");
         }
     }
 
@@ -295,7 +286,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
      * {@inheritDoc}
      */
     @Override
-    public void addAll(GenericDeviceProperties source) {
+    public void addAll(GDProperties source) {
         for (String name : source.getNames()) {
             if (String.class.getName().equals(source.getValueType(name))) {
                 setStringValue(name, source.getStringValue(name));
@@ -308,7 +299,7 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         }
     }
 
-    private String valuesToJson(Format format) throws GenericDeviceException {
+    private String valuesToJson(Format format) throws GDException {
         StringBuilder sb = new StringBuilder();
         for (String name : getNames()) {
             sb.append("\"").append(name).append("\":{");
@@ -335,17 +326,17 @@ public class GenericDevicePropertiesImpl extends GenericDeviceProperties.Stub
         return sb.toString();
     }
 
-    public void addDynamicProperty(GenericDevicePropertyMetadata propertyMetadata) {
+    public void addDynamicProperty(GDPropertyMetadata propertyMetadata) {
         this.metadata.put(propertyMetadata.getName(), propertyMetadata);
-        if (propertyMetadata.getType() == String.class) {
+        if (String.class.equals(propertyMetadata.getType())) {
             map.put(propertyMetadata.getName(), propertyMetadata.getDefaultStringValue());
-        } else if (propertyMetadata.getType() == Number.class) {
+        } else if (Number.class.isAssignableFrom(propertyMetadata.getType())) {
             map.put(propertyMetadata.getName(), propertyMetadata.getDefaultNumberValue());
         }
         parentService.notifyEventAdded(propertyMetadata.getName());
     }
 
-    public void removeDynamicProperty(GenericDevicePropertyMetadata propertyMetadata) {
+    public void removeDynamicProperty(GDPropertyMetadata propertyMetadata) {
         this.metadata.remove(propertyMetadata.getName());
         this.map.remove(propertyMetadata.getName());
         parentService.notifyEventRemoved(propertyMetadata.getName());

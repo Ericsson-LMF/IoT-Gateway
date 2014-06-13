@@ -32,38 +32,37 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.spi.schema;
+package com.ericsson.deviceaccess.spi.genericdevice;
 
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.spi.impl.GenericDeviceActionImpl;
+/**
+ * An error (typically programming error).
+ */
+public class GDError extends Error {
 
-final class SchemaBasedAction extends
-        GenericDeviceActionImpl {
+    private static final long serialVersionUID = 1L;
 
-    private SchemaBasedServiceBase schemaBasedServiceBase;
-
-    SchemaBasedAction(String name,
-            SchemaBasedServiceBase schemaBasedServiceBase,
-            GenericDevicePropertyMetadata[] argumentsMetadata,
-            GenericDevicePropertyMetadata[] resultMetadata) {
-        super(name, argumentsMetadata, resultMetadata);
-        this.schemaBasedServiceBase = schemaBasedServiceBase;
+    public GDError() {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Executes the action definition (added with
-     * {@link SchemaBasedServiceBase#defineAction(String, ActionDefinition)} ).
+     * @param message
+     * @param cause
      */
-    @Override
-    public void execute(GenericDeviceActionContext sac) throws GenericDeviceException {
-        ActionDefinition actionDefinition = schemaBasedServiceBase.getActionDefinitions(getName());
-        if (actionDefinition == null) {
-        } else {
-            actionDefinition.invoke(sac);
-        }
+    public GDError(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * @param message
+     */
+    public GDError(String message) {
+        super(message);
+    }
+
+    /**
+     * @param cause
+     */
+    public GDError(Throwable cause) {
+        super(cause);
     }
 }

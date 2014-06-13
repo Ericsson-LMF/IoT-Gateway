@@ -35,11 +35,11 @@
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-public class RuleDevice extends SchemaBasedGenericDevice {
+public class RuleDevice extends SBGenericDevice {
 
     private final BundleContext context;
     private ServiceRegistration serviceReg;

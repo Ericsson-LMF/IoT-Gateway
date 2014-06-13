@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.service.homeautomation.lighting.DimmingBase;
 import java.util.Properties;
 import org.osgi.service.upnp.UPnPAction;
@@ -94,7 +94,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
 
     //@Override
     @Override
-    public void executeOff() throws GenericDeviceException {
+    public void executeOff() throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeOff()");
 
         Properties args = new Properties();
@@ -109,7 +109,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
 
     //@Override
     @Override
-    public void executeOn() throws GenericDeviceException {
+    public void executeOn() throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeOn()");
 
         Properties args = new Properties();
@@ -125,7 +125,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     //@Override
     @Override
     public void executeSetLoadLevelTarget(int lvl)
-            throws GenericDeviceException {
+            throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeSetLoadLevelTarget(" + lvl + ")");
 
         Properties args = new Properties();
@@ -142,7 +142,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     //@Override
     @Override
     public void executeSetLoadLevelTargetWithRate(int lvl, float rate)
-            throws GenericDeviceException {
+            throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeSetLoadLevelTargetWithRate(" + lvl + "," + rate + ")");
 
         this.executeSetLoadLevelTarget(lvl);
@@ -158,7 +158,7 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
     @Override
     public void updateProperty(String name, Object value) {
         logger.debug("updateProperty(" + name + ")");
-        GenericDeviceProperties properties = this.getProperties();
+        GDProperties properties = this.getProperties();
         if ("LoadLevelStatus".equalsIgnoreCase(name)) {
             if (value instanceof Integer) {
                 logger.debug("updateCurrentLoadLevel(" + value + ")");

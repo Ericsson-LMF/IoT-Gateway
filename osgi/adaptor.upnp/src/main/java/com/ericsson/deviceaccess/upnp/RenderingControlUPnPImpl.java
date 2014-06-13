@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.media.RenderingControlBase;
 import org.osgi.service.upnp.UPnPDevice;
 
@@ -51,16 +51,16 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
      */
     //@Override
     @Override
-    public void executePlay(String url, String title) throws GenericDeviceException {
+    public void executePlay(String url, String title) throws GDException {
         try {
             String type = UPnPUtil.playMedia(dev, url, title);
         } catch (Exception e) {
-            throw new GenericDeviceException(e.getMessage() + " (" + dev + ", " + url + ", " + title + ")", e);
+            throw new GDException(e.getMessage() + " (" + dev + ", " + url + ", " + title + ")", e);
         }
     }
 
     //@Override
-//		public void executePlay(GenericDeviceActionContext sac) throws GenericDeviceException {
+//		public void executePlay(GenericDeviceActionContext sac) throws GDException {
 //			try {
 //				PlayArgs arg = PlayArgs.wrap(sac.getArguments());
 //				if(sac.isAuthorized()){
@@ -70,47 +70,47 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
 //					sac.getResult().setValue(result);
 //				}
 //			} catch (Exception e) {
-//				throw new GenericDeviceException(e.getMessage(), e);
+//				throw new GDException(e.getMessage(), e);
 //			}
 //		}
     //@Override
     @Override
-    public void executeStop() throws GenericDeviceException {
+    public void executeStop() throws GDException {
 
         try {
             UPnPUtil.stopMedia(dev);
         } catch (Exception e) {
-            throw new GenericDeviceException(e.getMessage() + " (" + dev + ")", e);
+            throw new GDException(e.getMessage() + " (" + dev + ")", e);
         }
     }
 
     //@Override
     @Override
-    public void executePause() throws GenericDeviceException {
+    public void executePause() throws GDException {
         try {
             UPnPUtil.pauseMedia(dev);
         } catch (Exception e) {
-            throw new GenericDeviceException(e.getMessage() + " (" + dev + ")", e);
+            throw new GDException(e.getMessage() + " (" + dev + ")", e);
         }
     }
 
     //@Override
     @Override
-    public void executeResume() throws GenericDeviceException {
+    public void executeResume() throws GDException {
         try {
             UPnPUtil.resumeMedia(dev);
         } catch (Exception e) {
-            throw new GenericDeviceException(e.getMessage() + " (" + dev + ")", e);
+            throw new GDException(e.getMessage() + " (" + dev + ")", e);
         }
     }
 
     //@Override
     @Override
-    public void executeSetVolume(int volume) throws GenericDeviceException {
+    public void executeSetVolume(int volume) throws GDException {
         try {
             UPnPUtil.setVolume(dev, "" + volume);
         } catch (Exception e) {
-            throw new GenericDeviceException(e.getMessage() + " (" + dev + ", " + volume + ")", e);
+            throw new GDException(e.getMessage() + " (" + dev + ", " + volume + ")", e);
         }
     }
 

@@ -35,12 +35,12 @@
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
 import com.ericsson.deviceaccess.adaptor.ruleengine.device.ConfigurationManager.ConfigurationManagerListener;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedServiceBase;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
+import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -52,7 +52,7 @@ import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 
-public class RuleService extends SchemaBasedServiceBase implements ConfigurationManagerListener {
+public class RuleService extends SBServiceBase implements ConfigurationManagerListener {
 
     // Define schema for this device
     private static final ActionSchema SET_RULE_ACTION = new ActionSchema.Builder().setName("setRule")
@@ -96,7 +96,7 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
 
         // Define the actions
         defineAction("setRule", actionContext -> {
-            GenericDeviceProperties args = actionContext.getArguments();
+            GDProperties args = actionContext.getArguments();
             String id = args.getStringValue("id");
             String name = args.getStringValue("name");
             String conditions = args.getStringValue("conditions");
@@ -112,7 +112,7 @@ public class RuleService extends SchemaBasedServiceBase implements Configuration
             try {
                 setRule(id, name, conditions, startTime, stopTime, weekDays, actionsThen, actionsElse, actionsStart, actionsStop);
             } catch (Exception e) {
-                throw new GenericDeviceException("Invalid rule: " + e.getMessage(), e);
+                throw new GDException("Invalid rule: " + e.getMessage(), e);
             }
         });
         defineAction("unsetRule", actionContext -> {

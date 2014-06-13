@@ -34,9 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable.Format;
+import java.util.ArrayList;
+import java.util.List;
 import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -58,14 +61,15 @@ public class GenericDevicePropertiesImplTest {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
     };
-    private GenericDevicePropertyMetadata metadataFloat;
-    private GenericDevicePropertyMetadata[] metadataArr;
-    private GenericDevicePropertiesImpl props;
+    private GDPropertyMetadata metadataFloat;
+    private List<GDPropertyMetadata> metadataArr;
+    private GDPropertiesImpl props;
 
     @Before
     public void setUp() throws Exception {
-        metadataFloat = context.mock(GenericDevicePropertyMetadata.class, "metadataFloat");
-        metadataArr = new GenericDevicePropertyMetadata[]{metadataFloat};
+        metadataFloat = context.mock(GDPropertyMetadata.class, "metadataFloat");
+        metadataArr = new ArrayList<>();
+        metadataArr.add(metadataFloat);
 
         context.checking(new Expectations() {
             {
@@ -86,7 +90,7 @@ public class GenericDevicePropertiesImplTest {
             }
         });
 
-        props = new GenericDevicePropertiesImpl(metadataArr, null);
+        props = new GDPropertiesImpl(metadataArr, null);
     }
 
     @After
@@ -94,7 +98,7 @@ public class GenericDevicePropertiesImplTest {
     }
 
     @Test
-    public void testSerialize() throws GenericDeviceException {
+    public void testSerialize() throws GDException {
         context.checking(new Expectations() {
             {
             }

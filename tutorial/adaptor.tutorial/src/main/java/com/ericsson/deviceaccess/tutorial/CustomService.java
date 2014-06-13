@@ -35,14 +35,14 @@
 package com.ericsson.deviceaccess.tutorial;
 
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedServiceBase;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
+import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 
 /**
  * Example of a custom service which is not defined in the service.xml, and for
  * which there exists no base class.
  */
-public class CustomService extends SchemaBasedServiceBase {
+public class CustomService extends SBServiceBase {
 
     public static final String SERVICE_NAME = "MyCustomService";
 

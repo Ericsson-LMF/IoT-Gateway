@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.service.homeautomation.power.SwitchPowerBase;
 import java.util.Properties;
 import org.osgi.service.upnp.UPnPAction;
@@ -69,7 +69,7 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
 
     // @Override
     @Override
-    public void executeSetTarget(int target) throws GenericDeviceException {
+    public void executeSetTarget(int target) throws GDException {
         // TODO Auto-generated method stub
         UPnPAction action = null;
         try {
@@ -100,7 +100,7 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
     public void updateProperty(String name, Object value) {
         logger.debug("updateProperty(" + name + ")");
 
-        GenericDeviceProperties properties = this.getProperties();
+        GDProperties properties = this.getProperties();
         if ("Status".equalsIgnoreCase(name)) {
             if (value instanceof Boolean) {
                 logger.debug("updateCurrentTarget(" + value + ")");

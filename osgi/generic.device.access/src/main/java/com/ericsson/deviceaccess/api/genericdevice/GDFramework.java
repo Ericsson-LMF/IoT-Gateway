@@ -32,8 +32,9 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
 
+import com.ericsson.deviceaccess.api.GenericDevice;
 import java.util.List;
 
 /**
@@ -43,16 +44,16 @@ import java.util.List;
  *
  * @author ekenyas
  */
-public interface GenericDeviceFramework {
+public interface GDFramework {
 
     /**
      * This method should be called when a new device is discovered and to be
      * registered. It corresonds to
      *
      * @param dev The device to be registered
-     * @throws GenericDeviceException
+     * @throws GDException
      */
-    public void register(GenericDevice dev) throws GenericDeviceException;
+    public void register(GenericDevice dev) throws GDException;
 
     /**
      * This method should be called when an update occurs on the concerning
@@ -61,18 +62,18 @@ public interface GenericDeviceFramework {
      * @param dev The concerned device
      * @param updatedPaths Comma separated list of paths that the event
      * concerns.
-     * @throws GenericDeviceException
+     * @throws GDException
      */
-    public void update(GenericDevice dev, String updatedPaths) throws GenericDeviceException;
+    public void update(GenericDevice dev, String updatedPaths) throws GDException;
 
     /**
      * Method to be called when the concerned device gets unavailable and should
      * be removed from the framework
      *
      * @param dev the device to be unregistered.
-     * @throws GenericDeviceException
+     * @throws GDException
      */
-    public void unregister(GenericDevice dev) throws GenericDeviceException;
+    public void unregister(GenericDevice dev) throws GDException;
 
     /**
      * Method to get the list of all the devices registered to the framework
@@ -95,13 +96,13 @@ public interface GenericDeviceFramework {
      *
      * @param listener
      */
-    public void addListener(GenericDeviceFrameworkListener listener);
+    public void addListener(GDFrameworkListener listener);
 
     /**
      * Method to be called when removing a listener for device discovery events.
      *
      * @param listener
      */
-    public void removeListener(GenericDeviceFrameworkListener listener);
+    public void removeListener(GDFrameworkListener listener);
 
 }

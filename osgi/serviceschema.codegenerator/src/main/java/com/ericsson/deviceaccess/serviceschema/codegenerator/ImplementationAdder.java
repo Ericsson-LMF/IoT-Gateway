@@ -37,17 +37,15 @@ public enum ImplementationAdder {
         String category = service.getCategory();
         builder.setPackage("com.ericsson.deviceaccess.spi.service." + category);
 
-        builder.addImport("com.ericsson.deviceaccess.spi.schema.SchemaBasedServiceBase");
+        builder.addImport("com.ericsson.deviceaccess.spi.schema.based.*");
+        builder.addImport("com.ericsson.deviceaccess.api.genericdevice.*");
         builder.addImport("com.ericsson.deviceaccess.spi.service.SchemaDefinitions");
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceProperties");
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceActionContext");
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
         builder.addImport("com.ericsson.deviceaccess.spi.schema.ActionDefinition");
         builder.addImport("com.ericsson.deviceaccess.api.service." + category + "." + StringUtil.capitalize(name));
 
         builder.setJavadoc(new Javadoc(StringUtil.setEndPunctuation(service.getDescription())));
         builder.setName(StringUtil.capitalize(name) + "Base");
-        builder.setExtends("SchemaBasedServiceBase");
+        builder.setExtends("SBServiceBase");
         builder.addImplements(StringUtil.capitalize(name));
         builder.setClassModifier(ClassModifier.ABSTRACT);
 
@@ -79,7 +77,7 @@ public enum ImplementationAdder {
                 String name = action.getName();
                 constructor.addBlock("defineAction(ACTION_" + name + ", context -> ", b -> {
                     b.add("if(!context.isAuthorized()) return;");
-                    b.add("GenericDeviceProperties arguments = context.getArguments();");
+                    b.add("GDProperties arguments = context.getArguments();");
                     b.add(getResultDecl(action) + "execute" + StringUtil.capitalize(name) + "(");
                     if (action.isSetArguments()) {
                         boolean first = true;
@@ -119,10 +117,10 @@ public enum ImplementationAdder {
                     Method method = new Method("void", "set" + StringUtil.capitalize(name) + "ResultOnContext");
                     method.setJavadoc(new Javadoc("Sets the result from the '").append(name).append("' action on the specified context."));
                     method.setAccessModifier(AccessModifier.PRIVATE);
-                    method.addParameter(new Param("GenericDeviceActionContext", "context").setDescription("action context to set result in"));
+                    method.addParameter(new Param("GDActionContext", "context").setDescription("action context to set result in"));
                     method.addParameter(new Param(StringUtil.capitalize(name) + "Result", "result").setDescription("result to set"));
 
-                    method.add("GenericDeviceProperties value = #0.getResult().getValue();");
+                    method.add("GDProperties value = #0.getResult().getValue();");
                     for (Parameter result : action.getResults().getParameterArray()) {
                         String type = StringUtil.capitalize(StringUtil.getType(result.getType()));
                         method.add("value.set" + type + "Value(ACTION_" + name + "_RES_" + result.getName() + ", #1." + result.getName() + ");");

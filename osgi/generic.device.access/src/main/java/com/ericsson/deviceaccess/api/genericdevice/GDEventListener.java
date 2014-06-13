@@ -32,7 +32,7 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
 
 import java.util.Dictionary;
 
@@ -127,7 +127,7 @@ import java.util.Dictionary;
  * in any service, in devices that are online.</li>
  * </ul>
  */
-public interface GenericDeviceEventListener {
+public interface GDEventListener {
 
     public static final String GENERICDEVICE_FILTER = "genericdevice.filter";
     public static final String DEVICE_ID = "device.id";

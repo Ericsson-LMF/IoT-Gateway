@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.util.PowerControlBase;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceException;
@@ -58,12 +58,12 @@ public class PowerControlImpl extends PowerControlBase {
      * It will be called by the base class when a client invokes the action.
      */
     @Override
-    public void executeOn() throws GenericDeviceException {
+    public void executeOn() throws GDException {
         try {
             dev.powerOn();
             updateCurrentState(VALUE_PROP_CurrentState_On);
         } catch (PseudoDeviceException e) {
-            throw new GenericDeviceException(500, "Failed to execute: " + e.getMessage());
+            throw new GDException(500, "Failed to execute: " + e.getMessage());
         }
     }
 
@@ -75,12 +75,12 @@ public class PowerControlImpl extends PowerControlBase {
      * It will be called by the base class when a client invokes the action.
      */
     @Override
-    public void executeOff() throws GenericDeviceException {
+    public void executeOff() throws GDException {
         try {
             dev.powerOff();
             updateCurrentState(VALUE_PROP_CurrentState_Off);
         } catch (PseudoDeviceException e) {
-            throw new GenericDeviceException(500, "Failed to execute: " + e.getMessage());
+            throw new GDException(500, "Failed to execute: " + e.getMessage());
         }
     }
 

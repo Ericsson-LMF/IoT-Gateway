@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- *
+ * 
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
+ * 
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
-
+ 
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,42 +29,59 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
- *
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+ * 
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
+
+import com.ericsson.deviceaccess.api.Serializable;
 
 /**
- * GenericDeviceContextNode represents a node in a tree built by Generic devices
- * and their services and actions. This class provides operations to identify a
- * generic device, a service, or an action in the tree.
- *
+ * A result from an action.
  */
-public interface GenericDeviceContextNode extends Serializable {
+public interface GDActionResult extends Serializable {
 
     /**
-     * @param isAbsolute true if it is supposed to return absolute path from the
-     * root. false if relative path from the device node is wanted.
-     * @return path to the node with "/" as delimiter.
-     * @deprecate Method to get path to this node. This method is used in Web
-     * Device Connectivity, but is deprecated. getPath() without an argument
-     * should be used instead.
-     */
-    public String getPath(boolean isAbsolute);
-
-    /**
-     * @param pathToParent
-     * @deprecate Method to update path until the node's parent by the specified
-     * value. This method is used in Web Device Connectivity, but is deprecated.
-     */
-    public void updatePath(String pathToParent);
-
-    /**
-     * Method to get path from device node to this node.
+     * Placeholder for Android to replace with the stub implementation for this
+     * interface
      *
-     * @return path from the device node to the node with "/" as delimiter.
+     * @author knt
      */
-    public String getPath();
+    public static abstract class Stub implements GDActionResult {
+    }
 
-    String getSerializedNode(String path, Format format) throws GenericDeviceException;
+    /**
+     * Gets the status code.
+     *
+     * @return
+     */
+    public int getCode();
+
+    /**
+     * Sets the status code.
+     *
+     * @param code
+     */
+    public void setCode(int code);
+
+    /**
+     * Gets the reason (associated with code).
+     *
+     * @return
+     */
+    public String getReason();
+
+    /**
+     * Sets the reason (associated with code).
+     *
+     * @param reason
+     */
+    public void setReason(String reason);
+
+    /**
+     * Gets the result value.
+     *
+     * @return
+     */
+    public GDProperties getValue();
 }

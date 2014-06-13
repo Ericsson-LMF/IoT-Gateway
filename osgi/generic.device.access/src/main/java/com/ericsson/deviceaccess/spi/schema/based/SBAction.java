@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,38 +29,43 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.spi.schema.based;
 
-public class GenericDeviceException extends Exception {
+import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
+import com.ericsson.deviceaccess.spi.schema.ActionDefinition;
+import java.util.Collection;
+
+final class SBAction extends
+        GDActionImpl {
+
+    private final SBServiceBase schemaBasedServiceBase;
+
+    SBAction(String name,
+            SBServiceBase schemaBasedServiceBase,
+            Collection<GDPropertyMetadata> argumentsMetadata,
+            Collection<GDPropertyMetadata> resultMetadata) {
+        super(name, argumentsMetadata, resultMetadata);
+        this.schemaBasedServiceBase = schemaBasedServiceBase;
+    }
 
     /**
-     *
+     * {@inheritDoc}
+     * <p>
+     * Executes the action definition (added with
+     * {@link SchemaBasedServiceBase#defineAction(String, ActionDefinition)} ).
      */
-    private static final long serialVersionUID = -1611830596441206137L;
-    private int code;
-
-    public GenericDeviceException(int code, String msg, Exception e) {
-        super(msg, e);
-        this.code = code;
-    }
-
-    public GenericDeviceException(int code, String msg) {
-        super(msg);
-        this.code = code;
-    }
-
-    public GenericDeviceException(String msg, Exception e) {
-        this(500, msg, e);
-    }
-
-    public GenericDeviceException(String msg) {
-        this(500, msg);
-    }
-
-    public int getCode() {
-        return code;
+    @Override
+    public void execute(GDActionContext sac) throws GDException {
+        ActionDefinition actionDefinition = schemaBasedServiceBase.getActionDefinitions(getName());
+        if (actionDefinition == null) {
+        } else {
+            actionDefinition.invoke(sac);
+        }
     }
 }

@@ -34,13 +34,17 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDeviceAction;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
+import com.ericsson.deviceaccess.api.genericdevice.GDAction;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.api.Serializable.Format;
-import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import junit.framework.Assert;
 import static junit.framework.Assert.fail;
@@ -66,24 +70,27 @@ public class GenericDeviceServiceImplTest {
     };
     private EventManager eventManager;
     private GenericDeviceImpl device;
-    private GenericDeviceServiceImpl service;
-    private GenericDevicePropertyMetadata[] metadataArr;
-    private GenericDevicePropertiesImpl props;
-    private GenericDevicePropertyMetadata metadataString;
-    private GenericDevicePropertyMetadata metadataInt;
-    private GenericDevicePropertyMetadata metadataFloat;
-    private GenericDeviceAction action;
+    private GDServiceImpl service;
+    private List<GDPropertyMetadata> metadataArr;
+    private GDPropertiesImpl props;
+    private GDPropertyMetadata metadataString;
+    private GDPropertyMetadata metadataInt;
+    private GDPropertyMetadata metadataFloat;
+    private GDAction action;
 
     @Before
     public void setUp() throws Exception {
-        action = context.mock(GenericDeviceAction.class);
+        action = context.mock(GDAction.class);
         eventManager = context.mock(EventManager.class);
         device = context.mock(GenericDeviceImpl.class);
-        metadataFloat = context.mock(GenericDevicePropertyMetadata.class, "metadataFloat");
-        metadataInt = context.mock(GenericDevicePropertyMetadata.class, "metadataInt");
-        metadataString = context.mock(GenericDevicePropertyMetadata.class, "metadataString");
-        metadataArr = new GenericDevicePropertyMetadata[]{metadataFloat, metadataInt, metadataString};
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        metadataFloat = context.mock(GDPropertyMetadata.class, "metadataFloat");
+        metadataInt = context.mock(GDPropertyMetadata.class, "metadataInt");
+        metadataString = context.mock(GDPropertyMetadata.class, "metadataString");
+        metadataArr = new ArrayList<>();
+        metadataArr.add(metadataFloat);
+        metadataArr.add(metadataInt);
+        metadataArr.add(metadataString);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
 
         context.checking(new Expectations() {
             {
@@ -145,16 +152,16 @@ public class GenericDeviceServiceImplTest {
             }
         });
 
-        service = new GenericDeviceServiceImpl("srv", metadataArr);
+        service = new GDServiceImpl("srv", metadataArr);
         service.setParentDevice(device);
         service.putAction(action);
 
-        props = new GenericDevicePropertiesImpl(metadataArr, service);
+        props = new GDPropertiesImpl(metadataArr, service);
     }
 
     @After
     public void tearDown() throws Exception {
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", null);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", null);
     }
 
     @Test
@@ -209,7 +216,7 @@ public class GenericDeviceServiceImplTest {
     }
 
     @Test
-    public void testSerialize() throws GenericDeviceException, JSONException {
+    public void testSerialize() throws GDException, JSONException {
         context.checking(new Expectations() {
             {
                 oneOf(action).serialize(Format.JSON);

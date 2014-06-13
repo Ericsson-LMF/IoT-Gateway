@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.media.ContentDirectoryBase;
 import java.io.IOException;
 import java.util.Dictionary;
@@ -60,7 +60,7 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
      */
     // @Override
     @Override
-    public BrowseResult executeBrowse(String objectId, String browseFlag, int startIndex, int requestedCount, String sortCriteria, String filter) throws GenericDeviceException {
+    public BrowseResult executeBrowse(String objectId, String browseFlag, int startIndex, int requestedCount, String sortCriteria, String filter) throws GDException {
         Properties args = new Properties();
         args.put("ObjectID", objectId);
         args.put("BrowseFlag", browseFlag);
@@ -77,13 +77,13 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
             browseResult.UpdateID = ((Number) result.get("UpdateID")).intValue();
             return browseResult;
         } catch (UPnPException e) {
-            throw new GenericDeviceException("Failed in invoking browse action" + e.getMessage());
+            throw new GDException("Failed in invoking browse action" + e.getMessage());
         }
     }
 
     @Override
     public SimpleBrowseResult executeSimpleBrowse(String id, int startingIndex,
-            int requestedCount, String sortCriteria) throws GenericDeviceException {
+            int requestedCount, String sortCriteria) throws GDException {
         Dictionary result;
         SimpleBrowseResult actionResult = new SimpleBrowseResult();
         try {
@@ -91,9 +91,9 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
             Vector objects = DidlXmlPullParser.parseDidl((String) result.get("Result"));
             actionResult.Result = new JSONArray(objects).toString();
         } catch (UPnPException e) {
-            throw new GenericDeviceException("Failed in invoking browse action" + e.getMessage());
+            throw new GDException("Failed in invoking browse action" + e.getMessage());
         } catch (XmlPullParserException | IOException e) {
-            throw new GenericDeviceException("Failed to parse DIDL document " + e.getMessage());
+            throw new GDException("Failed to parse DIDL document " + e.getMessage());
         }
         return actionResult;
     }

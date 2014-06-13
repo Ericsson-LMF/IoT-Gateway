@@ -36,13 +36,12 @@ public enum InterfaceAdder {
     public static void addServiceInterface(JavaClass builder, String version, Service service) {
         builder.setPackage("com.ericsson.deviceaccess.api.service." + service.getCategory());
 
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceService");
-        builder.addImport("com.ericsson.deviceaccess.api.GenericDeviceException");
+        builder.addImport("com.ericsson.deviceaccess.api.genericdevice.*");
 
         builder.setJavadoc(new Javadoc(StringUtil.setEndPunctuation(service.getDescription())));
         builder.setClassModifier(ClassModifier.INTERFACE);
         builder.setName(service.getName());
-        builder.setExtends("GenericDeviceService");
+        builder.setExtends("GDService");
 
         builder.addVariable(new Constant("String", "SCHEMA_VERSION", "\"" + version + "\""));
         addConstants(builder, service);
@@ -154,7 +153,7 @@ public enum InterfaceAdder {
                         method.addParameter(param);
                     }
                 }
-                method.addThrow("GenericDeviceException");
+                method.addThrow("GDException");
                 builder.addMethod(method.setJavadoc(javadoc));
             }
         }

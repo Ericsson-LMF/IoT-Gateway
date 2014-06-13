@@ -32,81 +32,41 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.spi.impl;
+package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.deviceaccess.api.GenericDeviceActionResult;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
+import com.ericsson.deviceaccess.api.Serializable;
 
-public class GenericDeviceActionResultImpl implements GenericDeviceActionResult {
-
-    private int code;
-    private String reason;
-    private GenericDeviceProperties value;
-
-    /**
-     * @param result
-     */
-    public GenericDeviceActionResultImpl(GenericDeviceProperties result) {
-        value = result;
-    }
-
-    @Override
-    public void setCode(int code) {
-        this.code = code;
-    }
+/**
+ * GenericDeviceContextNode represents a node in a tree built by Generic devices
+ * and their services and actions. This class provides operations to identify a
+ * generic device, a service, or an action in the tree.
+ *
+ */
+public interface GDContextNode extends Serializable {
 
     /**
-     * {@inheritDoc}
+     * @param isAbsolute true if it is supposed to return absolute path from the
+     * root. false if relative path from the device node is wanted.
+     * @return path to the node with "/" as delimiter.
+     * @deprecate Method to get path to this node. This method is used in Web
+     * Device Connectivity, but is deprecated. getPath() without an argument
+     * should be used instead.
      */
-    @Override
-    public int getCode() {
-        return code;
-    }
+    public String getPath(boolean isAbsolute);
 
     /**
-     * {@inheritDoc}
+     * @param pathToParent
+     * @deprecate Method to update path until the node's parent by the specified
+     * value. This method is used in Web Device Connectivity, but is deprecated.
      */
-    @Override
-    public GenericDeviceProperties getValue() {
-        return value;
-    }
+    public void updatePath(String pathToParent);
 
     /**
-     * {@inheritDoc}
+     * Method to get path from device node to this node.
+     *
+     * @return path from the device node to the node with "/" as delimiter.
      */
-    @Override
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+    public String getPath();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getReason() {
-        return reason;
-    }
-
-    @Override
-    public String serialize(Format format) throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
-        if (format.isJson()) {
-            StringBuilder sb = new StringBuilder("{");
-            sb.append("\"code\":\"").append(getCode()).append("\",");
-            sb.append("\"reason\":\"").append(getReason()).append("\",");
-            if (value != null) {
-                sb.append("\"value\":").append(getValue().serialize(format));
-            } else {
-                sb.append("\"value\":null");
-            }
-            sb.append("}");
-
-            return sb.toString();
-        } else {
-            throw new GenericDeviceException(405, "No such format supported");
-        }
-    }
-
+    String getSerializedNode(String path, Format format) throws GDException;
 }

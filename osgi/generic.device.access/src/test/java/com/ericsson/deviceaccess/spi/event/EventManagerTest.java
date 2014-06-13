@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.event;
 
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import java.util.Hashtable;
 import java.util.Timer;
@@ -73,7 +73,7 @@ public class EventManagerTest {
     };
     private EventManager eventManager;
     private BundleContext bundleContext;
-    private GenericDeviceEventListener listener;
+    private GDEventListener listener;
     private ServiceReference serviceReference;
     private Timer timer;
 
@@ -100,7 +100,7 @@ public class EventManagerTest {
     public void setUp() throws Exception {
         serviceReference = context.mock(ServiceReference.class, "serviceReference");
         bundleContext = context.mock(BundleContext.class);
-        listener = context.mock(GenericDeviceEventListener.class);
+        listener = context.mock(GDEventListener.class);
         eventManager = new EventManager();
         eventManager.setContext(bundleContext);
         timer = new Timer();
@@ -130,7 +130,7 @@ public class EventManagerTest {
 
 //    @Test
     public void testNullFilter() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = null;
 
         context.checking(new Expectations() {
@@ -139,7 +139,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("dev"), with("srv"), with(new Hashtable<String, Object>() {
@@ -153,7 +153,7 @@ public class EventManagerTest {
 
         eventManager.addEvent("dev", "srv", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_ONLINE, true);
+                put(GDEventListener.DEVICE_ONLINE, true);
             }
         });
 
@@ -164,7 +164,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_specific_device() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(|(temp >= 30)(power <= 100)))";
 
         context.checking(new Expectations() {
@@ -173,7 +173,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
@@ -223,7 +223,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_all_devices_and_services() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(|(temp >= 30)(power <= 100))";
 
         context.checking(new Expectations() {
@@ -232,7 +232,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv1"), with(new Hashtable<String, Object>() {
@@ -277,7 +277,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_specific_service() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(service.name=srv)(|(temp >= 30)(power <= 100)))";
 
         context.checking(new Expectations() {
@@ -286,7 +286,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
@@ -336,7 +336,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_specific_device_and_service() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(service.name=srv)(|(temp >= 30)(power <= 100)))";
 
         context.checking(new Expectations() {
@@ -345,7 +345,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
@@ -391,7 +391,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_online_device() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.online=true)(temp =*))";
 
         context.checking(new Expectations() {
@@ -400,12 +400,12 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new Hashtable<String, Object>() {
                     {
-                        put(GenericDeviceEventListener.DEVICE_ONLINE, true);
+                        put(GDEventListener.DEVICE_ONLINE, true);
                         put("temp", 30);
                     }
                 }));
@@ -415,19 +415,19 @@ public class EventManagerTest {
 
         eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_ONLINE, true);
+                put(GDEventListener.DEVICE_ONLINE, true);
                 put("power", 100);
             }
         });
         eventManager.addEvent("zwave32", "srv2", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_ONLINE, true);
+                put(GDEventListener.DEVICE_ONLINE, true);
                 put("temp", 30);
             }
         });
         eventManager.addEvent("zwave33", "srv5", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_ONLINE, false);
+                put(GDEventListener.DEVICE_ONLINE, false);
                 put("temp", 30);
             }
         });
@@ -439,7 +439,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_protocol_device() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.protocol=banan)(temp =*))";
 
         context.checking(new Expectations() {
@@ -448,12 +448,12 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new Hashtable<String, Object>() {
                     {
-                        put(GenericDeviceEventListener.DEVICE_PROTOCOL, "banan");
+                        put(GDEventListener.DEVICE_PROTOCOL, "banan");
                         put("temp", 30);
                     }
                 }));
@@ -463,19 +463,19 @@ public class EventManagerTest {
 
         eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_PROTOCOL, "banan");
+                put(GDEventListener.DEVICE_PROTOCOL, "banan");
                 put("power", 100);
             }
         });
         eventManager.addEvent("zwave32", "srv2", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_PROTOCOL, "banan");
+                put(GDEventListener.DEVICE_PROTOCOL, "banan");
                 put("temp", 30);
             }
         });
         eventManager.addEvent("zwave33", "srv5", new Hashtable<String, Object>() {
             {
-                put(GenericDeviceEventListener.DEVICE_PROTOCOL, "apa");
+                put(GDEventListener.DEVICE_PROTOCOL, "apa");
                 put("temp", 30);
             }
         });
@@ -491,7 +491,7 @@ public class EventManagerTest {
         timer = new Timer();
         timer.schedule(new ShutdownTask(), 1000);
 
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(|(temp >= 30)(power <= 100)))";
 
         context.checking(new Expectations() {
@@ -500,7 +500,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
             }
         });
@@ -519,7 +519,7 @@ public class EventManagerTest {
     //Test that the delta filtering works using various datatypes
 //    @Test
     public void test_Filter_property_delta_float() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(service.name=srv)(power__delta>=2))";
 
         context.checking(new Expectations() {
@@ -528,7 +528,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
@@ -562,7 +562,7 @@ public class EventManagerTest {
 
 //    @Test
     public void test_Filter_property_delta_int() throws InvalidSyntaxException {
-        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GenericDeviceEventListener.class.getName() + ")";
+        final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(service.name=srv)(power__delta>=2))";
 
         context.checking(new Expectations() {
@@ -571,7 +571,7 @@ public class EventManagerTest {
                 will(returnValue(new ServiceReference[]{serviceReference}));
                 oneOf(bundleContext).getService(serviceReference);
                 will(returnValue(listener));
-                oneOf(serviceReference).getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
+                oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
                 oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {

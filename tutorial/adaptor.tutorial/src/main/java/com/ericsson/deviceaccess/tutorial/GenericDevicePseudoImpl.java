@@ -40,7 +40,7 @@ import com.ericsson.deviceaccess.api.service.homeautomation.hvac.thermostat.Ther
 import com.ericsson.deviceaccess.api.service.homeautomation.hvac.thermostat.ThermostatSetPoint;
 import com.ericsson.deviceaccess.api.service.util.PowerControl;
 import com.ericsson.deviceaccess.api.service.util.PowerMeter;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceUpdateListener;
 import java.util.Dictionary;
@@ -53,7 +53,7 @@ import org.osgi.framework.ServiceRegistration;
  * messages upon requests. This class is instantiated when a PseudoDevice is
  * discovered by the tutorial basedriver and registered with the DeviceFactory.
  */
-public class GenericDevicePseudoImpl extends SchemaBasedGenericDevice implements
+public class GenericDevicePseudoImpl extends SBGenericDevice implements
         PseudoDeviceUpdateListener {
 
     private ServiceRegistration devReg;

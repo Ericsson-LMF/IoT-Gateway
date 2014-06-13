@@ -39,7 +39,7 @@ import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceDiscoveryListener;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceManager;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -55,7 +55,7 @@ public class DeviceFactory implements BundleActivator,
         PseudoDeviceDiscoveryListener {
 
     private BundleContext context;
-    private HashMap devices = new HashMap();
+    private final Map<String, GenericDevicePseudoImpl> devices = new HashMap<>();
 
     /*
      * (non-Javadoc)
@@ -105,8 +105,7 @@ public class DeviceFactory implements BundleActivator,
     public void deviceRemoved(PseudoDevice dev) {
         if (devices.containsKey(dev.getId())) {
             System.out.println("Device " + dev.getId() + " is removed");
-            GenericDevicePseudoImpl gdev = (GenericDevicePseudoImpl) devices
-                    .remove(dev.getId());
+            GenericDevicePseudoImpl gdev = devices.remove(dev.getId());
             ServiceRegistration reg = gdev.getServiceRegistration();
             if (reg != null) {
                 gdev.setServiceRegistration(null);
@@ -125,16 +124,14 @@ public class DeviceFactory implements BundleActivator,
      */
     @Override
     public void stop(BundleContext context) {
-        Iterator it = devices.values().iterator();
-        while (it.hasNext()) {
-            GenericDevicePseudoImpl gdev = (GenericDevicePseudoImpl) it.next();
+        devices.values().forEach((gdev) -> {
             ServiceRegistration reg = gdev.getServiceRegistration();
             if (reg != null) {
                 gdev.setServiceRegistration(null);
                 reg.unregister();
             }
             gdev.destroy();
-        }
+        });
     }
 
 }

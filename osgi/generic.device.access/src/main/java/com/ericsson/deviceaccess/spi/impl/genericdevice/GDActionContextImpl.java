@@ -32,15 +32,15 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.spi.impl;
+package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceActionResult;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 
-public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.Stub implements GenericDeviceActionContext {
+public class GDActionContextImpl extends GDActionContext.Stub implements GDActionContext {
 
     private String requester;
     private String requesterContact;
@@ -53,17 +53,17 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
     private boolean isExecuted = false;
     private boolean isFailed = false;
     private long messageThreadId = this.hashCode();
-    private GenericDeviceProperties arguments;
-    private GenericDeviceActionResult result;
+    private final GDProperties arguments;
+    private GDActionResult result;
 
     /**
      * @param arguments
      * @param result
      */
-    public GenericDeviceActionContextImpl(GenericDeviceProperties arguments, GenericDeviceProperties result) {
+    public GDActionContextImpl(GDProperties arguments, GDProperties result) {
         super();
         this.arguments = arguments;
-        this.result = new GenericDeviceActionResultImpl(result);
+        this.result = new GDActionResultImpl(result);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
     }
 
     @Override
-    public GenericDeviceActionResult getResult() {
+    public GDActionResult getResult() {
         return result;
     }
 
@@ -180,17 +180,17 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
     }
 
     @Override
-    public GenericDeviceProperties getArguments() {
+    public GDProperties getArguments() {
         return arguments;
     }
 
-    public void setResult(GenericDeviceActionResult result) {
+    public void setResult(GDActionResult result) {
         this.result = result;
     }
 
     @Override
-    public String serialize(Format format) throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+    public String serialize(Format format) throws GDException {
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         if (format.isJson()) {
             StringBuilder sb = new StringBuilder("{");
             sb.append("\"device\":\"").append(getDevice()).append("\",");
@@ -215,7 +215,7 @@ public class GenericDeviceActionContextImpl extends GenericDeviceActionContext.S
 
             return sb.toString();
         }
-        throw new GenericDeviceException(405, "No such format supported");
+        throw new GDException(405, "No such format supported");
     }
 
 }

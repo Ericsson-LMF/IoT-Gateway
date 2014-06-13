@@ -34,15 +34,15 @@
  */
 package com.ericsson.deviceaccess.spi.schema.api;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedService;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedServiceBase;
+import com.ericsson.deviceaccess.spi.schema.based.SBService;
+import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
@@ -72,7 +72,7 @@ public class SchemaBasedServiceBaseTest {
     private ParameterSchema ParameterSchemaImpl1;
     private ParameterSchema ParameterSchemaImpl2;
     private GenericDeviceImpl device;
-    private SchemaBasedServiceBase service;
+    private SBServiceBase service;
 
     @Before
     public void setup() {
@@ -108,7 +108,7 @@ public class SchemaBasedServiceBaseTest {
         actionSchema = context.mock(ActionSchema.class);
         ParameterSchemaImpl1 = context.mock(ParameterSchema.class, "ParameterSchemaImpl1");
         ParameterSchemaImpl2 = context.mock(ParameterSchema.class, "ParameterSchemaImpl2");
-        service = new SchemaBasedServiceBase(serviceSchema);
+        service = new SBServiceBase(serviceSchema);
         ReflectionTestUtil.setField(service, "parentDevice", device);
     }
 
@@ -117,18 +117,18 @@ public class SchemaBasedServiceBaseTest {
     }
 
     @Test
-    public void testServiceWithProperty() throws GenericDeviceException {
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema);
+    public void testServiceWithProperty() throws GDException {
+        SBService service = new SBServiceBase(serviceSchema);
         assertEquals("prop1", service.getProperties().getNames()[0]);
     }
 
     @Test
-    public void testDefineAction() throws GenericDeviceException {
+    public void testDefineAction() throws GDException {
 
         final int[] ctr = new int[1];
         service.defineAction("action", context1 -> ctr[0]++);
 
-        service.getAction("action").execute((GenericDeviceProperties) null);
+        service.getAction("action").execute((GDProperties) null);
         assertEquals(1, ctr[0]);
     }
 
@@ -157,7 +157,7 @@ public class SchemaBasedServiceBaseTest {
     }
 
     @Test
-    public void testDefineCustomAction() throws GenericDeviceException {
+    public void testDefineCustomAction() throws GDException {
         context.checking(new Expectations() {
             {
                 // define custom action
@@ -172,19 +172,19 @@ public class SchemaBasedServiceBaseTest {
             }
         });
 
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema);
+        SBService service = new SBServiceBase(serviceSchema);
         ReflectionTestUtil.setField(service, "parentDevice", device);
         final int[] ctr = new int[1];
         service.defineCustomAction(actionSchema, context1 -> ctr[0]++);
 
-        service.getAction("customAction").execute((GenericDeviceProperties) null);
+        service.getAction("customAction").execute((GDProperties) null);
 
         context.assertIsSatisfied();
         assertEquals(1, ctr[0]);
     }
 
     @Test
-    public void testDefineCustomAction_alreadyInServiceSchemaImpl() throws GenericDeviceException {
+    public void testDefineCustomAction_alreadyInServiceSchemaImpl() throws GDException {
         context.checking(new Expectations() {
             {
                 // define custom action
@@ -193,7 +193,7 @@ public class SchemaBasedServiceBaseTest {
             }
         });
 
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema);
+        SBService service = new SBServiceBase(serviceSchema);
         ReflectionTestUtil.setField(service, "parentDevice", device);
         try {
             service.defineCustomAction(actionSchema, context1 -> {
@@ -234,9 +234,9 @@ public class SchemaBasedServiceBaseTest {
     }
 
     @Test
-    public void testDefineDynamicProperty() throws GenericDeviceException {
+    public void testDefineDynamicProperty() throws GDException {
         final EventManager eventManager = context.mock(EventManager.class);
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
                 oneOf(device).notifyEvent("@@TEST@@", new Properties() {
@@ -247,7 +247,7 @@ public class SchemaBasedServiceBaseTest {
             }
         });
 
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema) {
+        SBService service = new SBServiceBase(serviceSchema) {
             {
                 addDynamicProperty(new ParameterSchema.Builder().setName("dyn").setType(Integer.class).build());
             }
@@ -260,9 +260,9 @@ public class SchemaBasedServiceBaseTest {
     }
 
     @Test
-    public void testRefreshProperties() throws GenericDeviceException {
+    public void testRefreshProperties() throws GDException {
         final EventManager eventManager = context.mock(EventManager.class);
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
                 allowing(eventManager).addEvent(with(any(String.class)), with(any(String.class)), with(any(Dictionary.class)));
@@ -288,7 +288,7 @@ public class SchemaBasedServiceBaseTest {
         ReflectionTestUtil.setField(service, "parentDevice", device);
 
         final boolean[] actionDone = new boolean[1];
-        SchemaBasedService service = new SchemaBasedServiceBase(serviceSchema) {
+        SBService service = new SBServiceBase(serviceSchema) {
             {
                 defineAction(REFRESH_PROPERTIES, context1 -> actionDone[0] = true);
                 defineAction("action", context -> {
@@ -296,7 +296,7 @@ public class SchemaBasedServiceBaseTest {
             }
         };
         service.validateSchema();
-        service.getAction(SchemaBasedServiceBase.REFRESH_PROPERTIES).execute((GenericDeviceProperties) null);
+        service.getAction(SBServiceBase.REFRESH_PROPERTIES).execute((GDProperties) null);
 
         context.assertIsSatisfied();
         assertEquals(true, actionDone[0]);

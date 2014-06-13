@@ -32,12 +32,14 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
+
+import com.ericsson.deviceaccess.api.Serializable;
 
 /**
  * A set of named properties.
  */
-public interface GenericDeviceProperties extends Serializable {
+public interface GDProperties extends Serializable {
 
     /**
      * Placeholder for Android to replace with the stub implementation for this
@@ -45,7 +47,7 @@ public interface GenericDeviceProperties extends Serializable {
      *
      * @author knt
      */
-    public static abstract class Stub implements GenericDeviceProperties {
+    public static abstract class Stub implements GDProperties {
     }
 
     static final String CURRENT_VALUE = "currentValue";
@@ -163,7 +165,7 @@ public interface GenericDeviceProperties extends Serializable {
      *
      * @param source
      */
-    public void addAll(GenericDeviceProperties source);
+    public void addAll(GDProperties source);
 
     /**
      * Serializes the state (i.e. values of all properties) to JSON

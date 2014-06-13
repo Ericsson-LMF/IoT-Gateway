@@ -1,3 +1,4 @@
+
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
  *
@@ -32,50 +33,47 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.spi.impl;
+package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import com.ericsson.deviceaccess.api.GenericDeviceAction;
-import com.ericsson.deviceaccess.api.GenericDeviceActionContext;
-import com.ericsson.deviceaccess.api.GenericDeviceActionResult;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-import com.ericsson.deviceaccess.spi.GenericDeviceAccessSecurity;
+import com.ericsson.deviceaccess.api.genericdevice.GDAction;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
+import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
 import com.ericsson.research.commonutil.StringUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements GenericDeviceAction {
+public class GDActionImpl extends GDAction.Stub implements GDAction {
 
     private String path;
     protected String name;
-    private Map argumentsMetadata;
-    private Map resultMetadata;
+    private final Map<String, GDPropertyMetadata> argumentsMetadata;
+    private final Map<String, GDPropertyMetadata> resultMetadata;
 
     /**
      * Creates action with metadata for arguments and result.
      *
      * @param name
      * @param argumentsMetadata a Map name:String ->
-     * metadata:{@link GenericDevicePropertyMetadata}
+     * metadata:{@link GDPropertyMetadata}
      * @param resultMetadata a Map name:String ->
-     * metadata:{@link GenericDevicePropertyMetadata}
+     * metadata:{@link GDPropertyMetadata}
      */
-    protected GenericDeviceActionImpl(String name, GenericDevicePropertyMetadata[] argumentsMetadata, GenericDevicePropertyMetadata[] resultMetadata) {
+    public GDActionImpl(String name, Iterable<GDPropertyMetadata> argumentsMetadata, Iterable<GDPropertyMetadata> resultMetadata) {
         this.name = name;
 
-        this.resultMetadata = new HashMap();
+        this.resultMetadata = new HashMap<>();
         if (resultMetadata != null) {
-            for (GenericDevicePropertyMetadata metadata : resultMetadata) {
-                this.resultMetadata.put(metadata.getName(), metadata);
-            }
+            resultMetadata.forEach(metadata -> this.resultMetadata.put(metadata.getName(), metadata));
         }
 
-        this.argumentsMetadata = new HashMap();
+        this.argumentsMetadata = new HashMap<>();
         if (argumentsMetadata != null) {
-            for (GenericDevicePropertyMetadata metadata : argumentsMetadata) {
-                this.argumentsMetadata.put(metadata.getName(), metadata);
-            }
+            argumentsMetadata.forEach(metadata -> this.argumentsMetadata.put(metadata.getName(), metadata));
         }
     }
 
@@ -84,7 +82,7 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      */
     @Override
     public String getName() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         return name;
     }
 
@@ -92,28 +90,28 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      * {@inheritDoc}
      */
     @Override
-    public void execute(GenericDeviceActionContext sac)
-            throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkExecutePermission(getClass().getName());
+    public void execute(GDActionContext sac)
+            throws GDException {
+        GDAccessSecurity.checkExecutePermission(getClass().getName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final GenericDeviceActionResult execute(GenericDeviceProperties arguments)
-            throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkExecutePermission(getClass().getName());
+    public final GDActionResult execute(GDProperties arguments)
+            throws GDException {
+        GDAccessSecurity.checkExecutePermission(getClass().getName());
 
-        GenericDeviceActionContextImpl context = new GenericDeviceActionContextImpl(getVerifiedArguments(arguments), createResult());
+        GDActionContextImpl context = new GDActionContextImpl(getVerifiedArguments(arguments), createResult());
         execute(context);
         return context.getResult();
     }
 
-    private GenericDeviceProperties getVerifiedArguments(
-            GenericDeviceProperties input) {
+    private GDProperties getVerifiedArguments(
+            GDProperties input) {
 
-        GenericDeviceProperties output = createArguments();
+        GDProperties output = createArguments();
         if (input == null) {
             return output;
         }
@@ -144,28 +142,26 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      * {@inheritDoc}
      */
     @Override
-    public GenericDevicePropertyMetadata[] getResultMetadata() {
-        return (GenericDevicePropertyMetadata[]) resultMetadata.values().toArray(
-                new GenericDevicePropertyMetadata[resultMetadata.size()]);
+    public GDPropertyMetadata[] getResultMetadata() {
+        return resultMetadata.values().toArray(
+                new GDPropertyMetadata[resultMetadata.size()]);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GenericDevicePropertyMetadata[] getArgumentsMetadata() {
-        return (GenericDevicePropertyMetadata[]) argumentsMetadata.values().toArray(
-                new GenericDevicePropertyMetadata[argumentsMetadata.size()]);
+    public GDPropertyMetadata[] getArgumentsMetadata() {
+        return argumentsMetadata.values().toArray(
+                new GDPropertyMetadata[argumentsMetadata.size()]);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GenericDeviceProperties createArguments() {
-        return new GenericDevicePropertiesImpl(
-                (GenericDevicePropertyMetadata[]) argumentsMetadata.values().toArray(
-                        new GenericDevicePropertyMetadata[argumentsMetadata.size()]));
+    public GDProperties createArguments() {
+        return new GDPropertiesImpl(argumentsMetadata.values());
     }
 
     /**
@@ -173,18 +169,16 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      *
      * @return
      */
-    public GenericDeviceProperties createResult() {
-        return new GenericDevicePropertiesImpl(
-                (GenericDevicePropertyMetadata[]) resultMetadata.values().toArray(
-                        new GenericDevicePropertyMetadata[resultMetadata.size()]));
+    public GDProperties createResult() {
+        return new GDPropertiesImpl(resultMetadata.values());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GenericDeviceActionContext createActionContext() {
-        return new GenericDeviceActionContextImpl(createArguments(), createResult());
+    public GDActionContext createActionContext() {
+        return new GDActionContextImpl(createArguments(), createResult());
     }
 
     /**
@@ -200,7 +194,7 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      */
     @Override
     public String getPath() {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         return path + "/action/" + this.getName();
     }
 
@@ -209,7 +203,7 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      */
     @Override
     public void updatePath(String path) {
-        GenericDeviceAccessSecurity.checkSetPermission(getClass().getName());
+        GDAccessSecurity.checkSetPermission(getClass().getName());
         this.path = path;
     }
 
@@ -217,12 +211,12 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      * {@inheritDoc}
      */
     @Override
-    public String serialize(Format format) throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+    public String serialize(Format format) throws GDException {
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         if (format.isJson()) {
             return toJsonString(format, 0);
         } else {
-            throw new GenericDeviceException(405, "No such format supported");
+            throw new GDException(405, "No such format supported");
         }
     }
 
@@ -231,10 +225,10 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
      */
     @Override
     public String getSerializedNode(String path, Format format)
-            throws GenericDeviceException {
-        GenericDeviceAccessSecurity.checkGetPermission(getClass().getName());
+            throws GDException {
+        GDAccessSecurity.checkGetPermission(getClass().getName());
         if (path == null) {
-            throw new GenericDeviceException(405, "Path cannot be null");
+            throw new GDException(405, "Path cannot be null");
         }
 
         if (path.length() == 0) {
@@ -246,12 +240,12 @@ public class GenericDeviceActionImpl extends GenericDeviceAction.Stub implements
         } else if (path.startsWith("result") && resultMetadata.size() > 0) {
             return MetadataUtil.INSTANCE.metadataToJson(path, format, "result", resultMetadata.values());
         } else {
-            throw new GenericDeviceException(404, "No such node found");
+            throw new GDException(404, "No such node found");
         }
     }
 
     private String toJsonString(Format format, int indent)
-            throws GenericDeviceException {
+            throws GDException {
         String json = "{";
         json += "\"name\":\"" + StringUtil.escapeJSON(getName()) + "\"";
         StringBuffer sb = new StringBuffer(",");

@@ -37,8 +37,8 @@ package com.ericsson.deviceaccess.spi.schema.api;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedGenericDevice;
-import com.ericsson.deviceaccess.spi.schema.SchemaBasedService;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.based.SBService;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 import org.jmock.Expectations;
@@ -72,7 +72,7 @@ public class SchemaBasedGenericDeviceTest {
 
     @Test
     public void testAddSchemaBasedService() {
-        final SchemaBasedService service = context.mock(SchemaBasedService.class);
+        final SBService service = context.mock(SBService.class);
 
         context.checking(new Expectations() {
             {
@@ -84,7 +84,7 @@ public class SchemaBasedGenericDeviceTest {
             }
         });
 
-        SchemaBasedGenericDevice device = new SchemaBasedGenericDevice() {
+        SBGenericDevice device = new SBGenericDevice() {
             {
                 addSchemaBasedService(service);
             }
@@ -97,7 +97,7 @@ public class SchemaBasedGenericDeviceTest {
 
     @Test
     public void testErrors_addAlreadyExisting() {
-        final SchemaBasedService service = context.mock(SchemaBasedService.class);
+        final SBService service = context.mock(SBService.class);
 
         context.checking(new Expectations() {
             {
@@ -112,7 +112,7 @@ public class SchemaBasedGenericDeviceTest {
         });
 
         try {
-            SchemaBasedGenericDevice device = new SchemaBasedGenericDevice() {
+            SBGenericDevice device = new SBGenericDevice() {
                 {
                     addSchemaBasedService(service);
                     addSchemaBasedService(service);
@@ -148,7 +148,7 @@ public class SchemaBasedGenericDeviceTest {
             }
         });
 
-        SchemaBasedGenericDevice device = new SchemaBasedGenericDevice() {
+        SBGenericDevice device = new SBGenericDevice() {
             {
                 addSchemaBasedService(createService(serviceSchema));
             }

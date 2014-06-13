@@ -34,15 +34,16 @@
  */
 package com.ericsson.deviceaccess;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.Serializable.Format;
-import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
-import com.ericsson.deviceaccess.spi.impl.GenericDeviceActionImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
-import com.ericsson.deviceaccess.spi.impl.GenericDeviceServiceImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
+import java.util.Arrays;
 import java.util.Dictionary;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -170,7 +171,7 @@ public class TestSerialization {
         GenericDeviceImpl dev = new GenericDeviceImpl() {
         };
         final EventManager eventManager = context.mock(EventManager.class);
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
                 oneOf(eventManager).addEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Dictionary.class)));
@@ -181,7 +182,7 @@ public class TestSerialization {
         Object node = null;
         try {
             node = dev.getSerializedNode("service/nonexist", Format.JSON);
-        } catch (GenericDeviceException e) {
+        } catch (GDException e) {
 
         }
 
@@ -231,10 +232,10 @@ public class TestSerialization {
      * ; GenericDeviceActionContextImpl cont = JSON.decode(encoded,
      * GenericDeviceActionContextImpl.class); }
      */
-    class TestService extends GenericDeviceServiceImpl {
+    class TestService extends GDServiceImpl {
 
         TestService() {
-            super("test", serviceSchema.getPropertiesSchemas());
+            super("test", Arrays.asList(serviceSchema.getPropertiesSchemas()));
             init();
         }
 
@@ -242,10 +243,12 @@ public class TestSerialization {
             putAction(new TestAction());
         }
 
-        class TestAction extends GenericDeviceActionImpl {
+        class TestAction extends GDActionImpl {
 
             TestAction() {
-                super("action", serviceSchema.getActionSchemas()[0].getArgumentsSchemas(), serviceSchema.getActionSchemas()[0].getResultSchema());
+                super("action",
+                        Arrays.asList(serviceSchema.getActionSchemas()[0].getArgumentsSchemas()),
+                        Arrays.asList(serviceSchema.getActionSchemas()[0].getResultSchema()));
             }
         }
     }

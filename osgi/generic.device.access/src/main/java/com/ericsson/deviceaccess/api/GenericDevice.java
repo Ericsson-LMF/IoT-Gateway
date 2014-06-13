@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,41 +29,16 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.api;
 
-public interface GenericDevice extends GenericDeviceContextNode {
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDContextNode;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
 
-    /**
-     * Non-mandatory transient state to signal that the device has been
-     * added/paired
-     */
-    public static final String STATE_ADDED = "Added";
-
-    /**
-     * Non-mandatory state to indicate that the device is being initialized
-     * (typically after a pairing)
-     */
-    public static final String STATE_STARTING = "Starting";
-
-    /**
-     * Default and mandatory value to indicate that the device is ready to be
-     * used
-     */
-    public static final String STATE_READY = "Ready";
-
-    /**
-     * State to indicate that the device has failed to initialize
-     */
-    public static final String STATE_FAILED = "Failed";
-
-    /**
-     * Non-mandatory transient state to signal that the device has been
-     * permanently removed/unpaired
-     */
-    public static final String STATE_REMOVED = "Removed";
+public interface GenericDevice extends GDContextNode {
 
     /**
      * Placeholder for Android to replace with the stub implementation for this
@@ -89,7 +64,7 @@ public interface GenericDevice extends GenericDeviceContextNode {
      * @return GenericDeviceService object if the device offers the queried
      * service. Null otherwise.
      */
-    public GenericDeviceService getService(String name);
+    public GDService getService(String name);
 
     /**
      * Method to return an array of service names to iterate services offered by
@@ -159,13 +134,11 @@ public interface GenericDevice extends GenericDeviceContextNode {
     public boolean isOnline();
 
     /**
-     * Gets the running state of the device:
-     * {@link STATE_ADDED}, {@link STATE_REMOVED}, {@link #STATE_READY} or
-     * {@link #STATE_STARTING}.
+     * Gets the running {@link State} of the device.
      *
      * @return
      */
-    public String getState();
+    public State getState();
 
     /**
      * Getter for the icon url field. The value should be URL for an icon image
@@ -228,5 +201,43 @@ public interface GenericDevice extends GenericDeviceContextNode {
      * <code>{"Service1" : {"property1" : "99","property2" : "99"},"Service2" : {"property3" : "99","property4" : "99"}}</code>
      * @throws com.ericsson.deviceaccess.api.GenericDeviceException
      */
-    public String serializeState() throws GenericDeviceException;
+    public String serializeState() throws GDException;
+
+    public enum State {
+
+        /**
+         * Non-mandatory transient state to signal that the device has been
+         * added/paired
+         */
+        ADDED("Added"),
+        /**
+         * Non-mandatory state to indicate that the device is being initialized
+         * (typically after a pairing)
+         */
+        STARTING("Starting"),
+        /**
+         * Default and mandatory value to indicate that the device is ready to
+         * be used
+         */
+        READY("Ready"),
+        /**
+         * State to indicate that the device has failed to initialize
+         */
+        FAILED("Failed"),
+        /**
+         * Non-mandatory transient state to signal that the device has been
+         * permanently removed/unpaired
+         */
+        REMOVED("Removed");
+
+        private final String string;
+
+        State(String string) {
+            this.string = string;
+        }
+
+        public String get() {
+            return string;
+        }
+    }
 }

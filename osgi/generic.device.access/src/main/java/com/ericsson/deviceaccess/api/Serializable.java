@@ -34,6 +34,8 @@
  */
 package com.ericsson.deviceaccess.api;
 
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+
 /**
  * Interface of something that shall be possible to serialize.
  */
@@ -48,5 +50,5 @@ public interface Serializable {
         }
     }
 
-    String serialize(Format format) throws GenericDeviceException;
+    String serialize(Format format) throws GDException;
 }

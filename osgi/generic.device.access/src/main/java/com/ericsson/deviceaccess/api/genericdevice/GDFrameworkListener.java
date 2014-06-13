@@ -32,37 +32,47 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.spi.schema;
+package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.deviceaccess.spi.GenericDeviceService;
+import com.ericsson.deviceaccess.api.GenericDevice;
 
 /**
+ * This interface is intended to be used when using GDA on non-OSGi platform,
+ * e.g. Android. It mimics OSGi service tracker interface without dependency to
+ * OSGi specific API.
  *
+ * @author ekenyas
  */
-public interface SchemaBasedService extends GenericDeviceService {
+public interface GDFrameworkListener {
 
     /**
-     * Add action implementation to the service.
+     * Invoked when a new device is discovered.
      *
-     * @param name action name
-     * @param actionDefinition the action implementation
-     * @return the service
+     * @param dev a newly discovered device.
+     * @return true if the listener wants to be posted on the events occured on
+     * the device, e.g. update, unregister.
+     * @throws GDFrameworkException
+     *
      */
-    SchemaBasedService defineAction(String name, ActionDefinition actionDefinition);
+    public boolean addingDevice(GenericDevice dev) throws GDFrameworkException;
 
     /**
-     * Defines a custom action that is not included in the service schema.
+     * Invoked when a parameter update occurs on the device.
      *
-     * @param actionSchema
-     * @param actionDefinition
-     * @return
+     * @param dev the concerned device.
+     * @param updatedPaths comma-separated list of paths that the event
+     * concerns.
+     * @throws GDFrameworkException
+     *
      */
-    SchemaBasedService defineCustomAction(ActionSchema actionSchema, ActionDefinition actionDefinition);
+    public void modifiedDevice(GenericDevice dev, String updatedPaths) throws GDFrameworkException;
 
     /**
-     * Verifies that the schema is valid.
+     * Invoked when a device is removed.
      *
-     * @throws ServiceSchemaError in case the schema is invalid
+     * @param dev A device removed from the framework.
+     * @throws GDFrameworkException
+     *
      */
-    void validateSchema() throws ServiceSchemaError;
+    public void removedDevice(GenericDevice dev) throws GDFrameworkException;
 }

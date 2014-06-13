@@ -32,7 +32,7 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-package com.ericsson.deviceaccess.api;
+package com.ericsson.deviceaccess.api.genericdevice;
 
 /**
  * GenericDeviceAction represents an action of a service provided by a device.
@@ -40,7 +40,7 @@ package com.ericsson.deviceaccess.api;
  * execution time, or the action can be executed without any action context.
  *
  */
-public interface GenericDeviceAction extends GenericDeviceContextNode {
+public interface GDAction extends GDContextNode {
 
     /**
      * Placeholder for Android to replace with the stub implementation for this
@@ -48,7 +48,7 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      *
      * @author knt
      */
-    public static abstract class Stub implements GenericDeviceAction {
+    public static abstract class Stub implements GDAction {
     }
 
     /**
@@ -67,21 +67,21 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      *
      * @param sac An instance of GenericDeviceActionContext which cannot be
      * null. The object is used for propagting action result or error message.
-     * @throws GenericDeviceException Thrown on failure of the action.
+     * @throws GDException Thrown on failure of the action.
      * @deprecated use {@link #execute(GenericDeviceProperties)} instead.
      */
-    public void execute(GenericDeviceActionContext sac)
-            throws GenericDeviceException;
+    public void execute(GDActionContext sac)
+            throws GDException;
 
     /**
      * Alternative method to execute the action without context.
      *
      * @param arguments
      * @return the result
-     * @throws GenericDeviceException Thrown on failure of the action.
+     * @throws GDException Thrown on failure of the action.
      */
-    public GenericDeviceActionResult execute(GenericDeviceProperties arguments)
-            throws GenericDeviceException;
+    public GDActionResult execute(GDProperties arguments)
+            throws GDException;
 
     /**
      * Creates arguments to be used in an invocation of this action. It is
@@ -91,7 +91,7 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      * @return a fresh properties pre-populated with default values according to
      * the schema.
      */
-    public GenericDeviceProperties createArguments();
+    public GDProperties createArguments();
 
     /**
      * Creates a context to be used in an invocation of this action.
@@ -100,19 +100,19 @@ public interface GenericDeviceAction extends GenericDeviceContextNode {
      * @deprecated use {@link #execute(GenericDeviceProperties)} instead, then
      * no context is needed.
      */
-    public GenericDeviceActionContext createActionContext();
+    public GDActionContext createActionContext();
 
     /**
      * Gets metadata describing the result.
      *
      * @return metadata describing the result
      */
-    public GenericDevicePropertyMetadata[] getResultMetadata();
+    public GDPropertyMetadata[] getResultMetadata();
 
     /**
      * Gets metadata describing the arguments.
      *
      * @return metadata describing the arguments
      */
-    public GenericDevicePropertyMetadata[] getArgumentsMetadata();
+    public GDPropertyMetadata[] getArgumentsMetadata();
 }
