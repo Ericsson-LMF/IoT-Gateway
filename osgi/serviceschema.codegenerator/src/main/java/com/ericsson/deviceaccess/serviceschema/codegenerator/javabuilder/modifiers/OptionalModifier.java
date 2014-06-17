@@ -13,7 +13,7 @@ public enum OptionalModifier {
      */
     STATIC,
     /**
-     * Javas standard serialization doesn't touch this variable
+     * Javas standard serialization doesn't touch this variable.
      */
     TRANSIENT,
     /**
@@ -21,11 +21,11 @@ public enum OptionalModifier {
      */
     VOLATILE,
     /**
-     * Can be defined only once.
+     * Can and has to be defined only once.
      */
     FINAL,
     /**
-     * Methods only in abstract classes. Will be defined by subclass
+     * Methods only for abstract classes. Will be defined by subclass
      */
     ABSTRACT;
 

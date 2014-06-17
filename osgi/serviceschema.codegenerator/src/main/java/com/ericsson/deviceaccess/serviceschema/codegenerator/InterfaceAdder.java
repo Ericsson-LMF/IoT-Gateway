@@ -15,7 +15,9 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import com.ericsson.research.commonutil.StringUtil;
 
 /**
- * Adds interface of service to builder
+ * This generates interfaces in
+ * {@link com.ericsson.deviceaccess.api.service.*}.It does it by adding
+ * necessary code to builder that it is given.
  *
  * @author delma
  */
@@ -27,13 +29,13 @@ public enum InterfaceAdder {
     INSTANCE;
 
     /**
-     * Adds interface to builder.
+     * Adds necessary code to builder to generate interface for service.
      *
      * @param builder builder to add
      * @param version version of schema
-     * @param service service which interface to add
+     * @param service service which to add interface to
      */
-    public static void addServiceInterface(JavaClass builder, String version, Service service) {
+    public static void addServiceInterface(JavaClass builder, Service service, String version) {
         builder.setPackage("com.ericsson.deviceaccess.api.service." + service.getCategory());
 
         builder.addImport("com.ericsson.deviceaccess.api.genericdevice.*");
@@ -43,14 +45,22 @@ public enum InterfaceAdder {
         builder.setName(service.getName());
         builder.setExtends("GDService");
 
-        builder.addVariable(new Constant("String", "SCHEMA_VERSION", "\"" + version + "\""));
-        addConstants(builder, service);
+        addConstants(builder, version, service);
         addPropertyGetters(builder, service);
         addActionDefinitions(builder, service);
         addActionsResultTypes(builder, service);
     }
 
-    private static void addConstants(JavaClass builder, Service service) {
+    /**
+     * Adds needed constants to the builder.
+     *
+     * @param builder builder to add constants to
+     * @param version version of schema
+     * @param service service which constants are added
+     */
+    private static void addConstants(JavaClass builder, String version, Service service) {
+        builder.addVariable(new Constant("String", "SCHEMA_VERSION", "\"" + version + "\""));
+
         builder.addVariable(new Constant("String", "SERVICE_NAME", "\"" + service.getName() + "\""));
 
         // Mandatory refresh properties action
@@ -82,6 +92,13 @@ public enum InterfaceAdder {
         }
     }
 
+    /**
+     * Adds constants for parameters.
+     *
+     * @param builder builder to add constants to
+     * @param parameterArray parameters which constants are added
+     * @param prefix prefix of constants
+     */
     private static void addParameterConstants(JavaClass builder, Parameter[] parameterArray, String prefix) {
         for (Parameter parameter : parameterArray) {
             String name = parameter.getName();
@@ -94,6 +111,12 @@ public enum InterfaceAdder {
         }
     }
 
+    /**
+     * Adds methods for getters of properties.
+     *
+     * @param builder builder to add methods to
+     * @param service service which getters are added
+     */
     private static void addPropertyGetters(JavaClass builder, Service service) {
         if (service.isSetProperties()) {
             for (Parameter property : service.getProperties().getParameterArray()) {
@@ -107,6 +130,13 @@ public enum InterfaceAdder {
         }
     }
 
+    /**
+     * Adds Javadoc for parameter that tells what are allowed values for it.
+     *
+     * @param builder javadoc builder to add javadoc to
+     * @param property property which Javadoc is added
+     * @return builder
+     */
     private static Javadoc getValidValuesJavadoc(Javadoc builder, Parameter property) {
         if ("String".equals(StringUtil.getType(property.getType()))) {
             if (property.isSetValues()) {
@@ -124,6 +154,13 @@ public enum InterfaceAdder {
         return builder;
     }
 
+    /**
+     * Adds list of allowed strings in html syntax to Javadoc.
+     *
+     * @param builder Javadoc builder to add Javadoc to
+     * @param valueArray Allowed values for String
+     * @return builder
+     */
     private static Javadoc getValidValuesString(Javadoc builder, String[] valueArray) {
         builder.line("<ul>");
         for (String value : valueArray) {
@@ -132,6 +169,12 @@ public enum InterfaceAdder {
         return builder.line("</ul>");
     }
 
+    /**
+     * Adds methods for actions of service to builder.
+     *
+     * @param builder builder to add methods to
+     * @param service service which action methods are added
+     */
     private static void addActionDefinitions(JavaClass builder, Service service) {
         if (service.isSetActions()) {
             for (Action action : service.getActions().getActionArray()) {
@@ -159,6 +202,12 @@ public enum InterfaceAdder {
         }
     }
 
+    /**
+     * Adds result types of service as inner classes to builder.
+     *
+     * @param builder builder to add inner classes to
+     * @param service service which actions result POJOs are added
+     */
     private static void addActionsResultTypes(JavaClass builder, Service service) {
         if (service.isSetActions()) {
             for (Action action : service.getActions().getActionArray()) {

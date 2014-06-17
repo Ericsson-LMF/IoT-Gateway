@@ -9,11 +9,11 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifi
 public enum ClassModifier {
 
     /**
-     * Normal class
+     * Normal class.
      */
     CLASS,
     /**
-     * Interface
+     * Interface.
      */
     INTERFACE,
     /**
@@ -25,7 +25,8 @@ public enum ClassModifier {
      */
     SINGLETON,
     /**
-     * Hybrid between class and interface. Can have normal and abtract methods
+     * Hybrid between class and interface. Can have both normal and abstract
+     * methods.
      */
     ABSTRACT;
 

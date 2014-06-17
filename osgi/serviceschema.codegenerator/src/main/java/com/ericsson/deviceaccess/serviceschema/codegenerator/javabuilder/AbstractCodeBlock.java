@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Implementation of block of code
+ * Common implementation of block of code. This is extended to create more
+ * specific ones
  *
  * @author delma
  */

@@ -1,7 +1,7 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
 /**
- * Implementer is a code component.
+ * Implementer generates code component.
  *
  * @author delma
  */
@@ -15,7 +15,7 @@ public interface Component extends Javadocable, Accessable {
     String getName();
 
     /**
-     * Gets type of the componen
+     * Gets type of the component
      *
      * @return type
      */

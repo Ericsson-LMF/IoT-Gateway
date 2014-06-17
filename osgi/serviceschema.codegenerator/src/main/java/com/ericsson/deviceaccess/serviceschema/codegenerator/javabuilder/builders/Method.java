@@ -117,6 +117,13 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
         return builder.toString();
     }
 
+    /**
+     * Adds code to method
+     *
+     * @param builder builder to add code to
+     * @param indent indent
+     * @throws NumberFormatException
+     */
     private void addCode(StringBuilder builder, int indent) throws NumberFormatException {
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);
@@ -140,10 +147,23 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
         }
     }
 
+    /**
+     * Adds methods end to builder
+     *
+     * @param builder builder to add methods end
+     * @param indent indent
+     */
     private void addMethodEnd(StringBuilder builder, int indent) {
         indent(builder, indent).append(BLOCK_END).append(LINE_END);
     }
 
+    /**
+     * Adds methods declaration to builder
+     *
+     * @param builder builder to add declaration to
+     * @param indent indent
+     * @return is there code or not
+     */
     private boolean addMethodDeclaration(StringBuilder builder, int indent) {
         String access = accessModifier.get();
         indent(builder, indent).append(access).append(" ");
@@ -159,6 +179,11 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
         return false;
     }
 
+    /**
+     * Adds thrown exceptions to declaration
+     *
+     * @param builder builder to add throw clauses to
+     */
     private void addThrows(StringBuilder builder) {
         if (!throwList.isEmpty()) {
             builder.append(" throws ");
@@ -167,6 +192,12 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
         }
     }
 
+    /**
+     * Adds Javadoc for method
+     *
+     * @param builder builder to add Javadoc to
+     * @param indent indent
+     */
     private void addJavadoc(StringBuilder builder, int indent) {
         builder.append(new Javadoc(javadoc)
                 .append(this::parameterJavadocs)
@@ -174,16 +205,33 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
                 .build(indent));
     }
 
+    /**
+     * Adds parameters Javadoc to builder
+     *
+     * @param builder Javadoc builder to add Javadoc to
+     * @return builder
+     */
     private Javadoc parameterJavadocs(Javadoc builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }
-    
+
+    /**
+     * Adds throws Javadoc to builder
+     *
+     * @param builder Javadoc builder to add Javadoc to
+     * @return builder
+     */
     private Javadoc throwJavadocs(Javadoc builder) {
         throwList.forEach(t -> builder.exception(t, ""));
         return builder;
     }
 
+    /**
+     * Builds parameters for method declaration
+     *
+     * @return parameters
+     */
     private StringBuilder buildParameters() {
         StringBuilder builder = new StringBuilder();
         parameters.forEach(p -> builder.append(p.getType()).append(" ").append(p.getName()).append(", "));

@@ -3,7 +3,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 
 /**
- * Implementer can have {@link OptionalModifier}s.
+ * Implementers code can have {@link OptionalModifier}s.
  *
  * @author delma
  */

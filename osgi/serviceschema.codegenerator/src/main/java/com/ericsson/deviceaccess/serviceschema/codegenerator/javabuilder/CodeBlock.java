@@ -3,7 +3,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 import java.util.function.Consumer;
 
 /**
- * Implementer is a block of code.
+ * Implementer generates block of code.
  *
  * @author delma
  */

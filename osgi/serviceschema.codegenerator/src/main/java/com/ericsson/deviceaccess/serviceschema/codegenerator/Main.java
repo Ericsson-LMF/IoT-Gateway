@@ -40,21 +40,22 @@ import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
 import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.research.commonutil.function.TriConsumer;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import org.apache.xmlbeans.XmlException;
 
 /**
- * Main class of this application.
+ * Main class that is used to generate Java code from schema XML file.
  */
 public class Main {
 
     /**
      * Runs the code generation between xml file in first argument and output
-     * file in second argument
+     * directory in second argument
      *
-     * @param args
+     * @param args xmlFile outputDirectory
      * @throws XmlException
      * @throws IOException
      */
@@ -82,44 +83,23 @@ public class Main {
         System.out.println("Starting code generation from " + serviceSchemaXml + " to " + outputBaseDir);
 
         serviceSchemaDocument = ServiceSchemaDocument.Factory.parse(serviceSchemaXml);
-        File spiBaseDir = new File(outputBaseDir, "/com/ericsson/deviceaccess/spi/service");
-        spiBaseDir.mkdirs();
-        File apiBaseDir = new File(outputBaseDir, "/com/ericsson/deviceaccess/api/service");
-        apiBaseDir.mkdirs();
+        File spiDirBase = new File(outputBaseDir, "/com/ericsson/deviceaccess/spi/service");
+        spiDirBase.mkdirs();
+        File apiDirBase = new File(outputBaseDir, "/com/ericsson/deviceaccess/api/service");
+        apiDirBase.mkdirs();
 
         String version = serviceSchemaDocument.getServiceSchema().getVersion();
         Services services = serviceSchemaDocument.getServiceSchema().getServices();
-        ServicePrinter sp = new ServicePrinter();
-        Service[] serviceArray = services.getServiceArray();
         // Generate schema definition
-        File schemaDefSourceFile = new File(spiBaseDir, "SchemaDefinitions.java");
-        try (PrintStream schemaDefStream = new PrintStream(schemaDefSourceFile)) {
+        try (PrintStream schemaDefStream = new PrintStream(new File(spiDirBase, "SchemaDefinitions.java"))) {
             JavaClass builder = new JavaClass();
             CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
-            for (Service service : serviceArray) {
+            for (Service service : services.getServiceArray()) {
                 DefinitionsAdder.addService(code, service);
-
-                File spiPackageDir = new File(spiBaseDir, makePath(service));
-                spiPackageDir.mkdirs();
-                File spiSourceFile = new File(spiPackageDir, StringUtil.capitalize(service.getName() + "Base") + ".java");
-                try (PrintStream spiPrintStream = new PrintStream(spiSourceFile)) {
-                    JavaClass implementationBuilder = new JavaClass();
-                    ImplementationAdder.addServiceImplementation(implementationBuilder, service);
-                    spiPrintStream.append(implementationBuilder.build());
-//                    sp.printServiceImpl(spiPrintStream, version, service);
-                }
-
-                System.out.printf("Generated SPI base for '%s' to %s\n", service.getName(), spiSourceFile.getAbsolutePath());
-
-                File apiPackageDir = new File(apiBaseDir, makePath(service));
-                apiPackageDir.mkdirs();
-                File apiSourceFile = new File(apiPackageDir, StringUtil.capitalize(service.getName()) + ".java");
-                try (PrintStream apiPrintStream = new PrintStream(apiSourceFile)) {
-                    JavaClass interfaceBuilder = new JavaClass();
-                    InterfaceAdder.addServiceInterface(interfaceBuilder, version, service);
-                    apiPrintStream.append(interfaceBuilder.build());
-                }
-                System.out.printf("Generated API for '%s' to %s\n", service.getName(), apiSourceFile.getAbsolutePath());
+                //Generate SPI file
+                createFile(spiDirBase, "Base", service, version, ImplementationAdder::addServiceImplementation, "SPI base");
+                //Generate API file
+                createFile(apiDirBase, "", service, version, InterfaceAdder::addServiceInterface, "API");
             }
             schemaDefStream.append(builder.build());
         }
@@ -127,6 +107,35 @@ public class Main {
         System.out.println("Code generation completed!");
     }
 
+    /**
+     * Creates file for API/SPI.
+     *
+     * @param baseDir Base directory under which files are contained
+     * @param postfix postfix for file names
+     * @param service service which file is added
+     * @param version version of schema
+     * @param generator generator which generates the code
+     * @param what description what is generated
+     * @throws IOException
+     */
+    private void createFile(File baseDir, String postfix, Service service, String version, TriConsumer<JavaClass, Service, String> generator, String what) throws IOException {
+        File packageDir = new File(baseDir, makePath(service));
+        packageDir.mkdirs();
+        File sourceFile = new File(packageDir, StringUtil.capitalize(service.getName() + postfix) + ".java");
+        try (PrintStream stream = new PrintStream(sourceFile)) {
+            JavaClass builder = new JavaClass();
+            generator.consume(builder, service, version);
+            stream.append(builder.build());
+        }
+        System.out.println("Generated SPI base for '" + service.getName() + "' to " + sourceFile.getAbsolutePath() + "\n");
+    }
+
+    /**
+     * Creates path for specified service
+     *
+     * @param service service to create path to
+     * @return path
+     */
     private String makePath(Service service) {
         String category = service.getCategory();
         if (category == null || category.length() == 0) {

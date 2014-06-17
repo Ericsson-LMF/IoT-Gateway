@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 
 /**
- * Builder of Constructor for {@link JavaClass}
+ * Builder of Constructor for {@link JavaClass}.
  *
  * @author delma
  */
@@ -32,7 +32,7 @@ public class Constructor extends AbstractCodeBlock implements Callable {
     private JavaClass owner;
 
     /**
-     * Creates constructor
+     * Creates constructor.
      */
     public Constructor() {
         parameters = new ArrayList<>();
@@ -41,7 +41,7 @@ public class Constructor extends AbstractCodeBlock implements Callable {
     }
 
     /**
-     * To be called {@link JavaClass} to set it as owner of this
+     * To be called {@link JavaClass} to set it as owner of this.
      *
      * @param owner
      * @return this
@@ -107,10 +107,23 @@ public class Constructor extends AbstractCodeBlock implements Callable {
         return builder.toString();
     }
 
+    /**
+     * Adds end of constructor to builder
+     *
+     * @param builder builder to add constructors ending
+     * @param indent indent
+     */
     private void addConstructorEnd(StringBuilder builder, int indent) {
         indent(builder, indent).append(BLOCK_END).append(LINE_END);
     }
 
+    /**
+     * Adds code that is in constructor
+     *
+     * @param builder builder to add code
+     * @param indent indent
+     * @throws NumberFormatException
+     */
     private void addCode(StringBuilder builder, int indent) throws NumberFormatException {
         for (String line : lines) {
             StringBuilder stringBuilder = new StringBuilder(line);
@@ -134,6 +147,12 @@ public class Constructor extends AbstractCodeBlock implements Callable {
         }
     }
 
+    /**
+     * Adds declaration of constructor
+     *
+     * @param builder builder to add constructors declaration
+     * @param indent indent
+     */
     private void addConstructorDeclaration(StringBuilder builder, int indent) {
         AccessModifier access = accessModifier;
         ClassModifier classModifier = owner.getClassModifier();
@@ -143,15 +162,32 @@ public class Constructor extends AbstractCodeBlock implements Callable {
         indent(builder, indent).append(access.get()).append(" ").append(getName()).append("(").append(buildParameters()).append(")").append(" ").append(BLOCK_START).append(LINE_END);
     }
 
+    /**
+     * Adds Javadoc of constructor
+     *
+     * @param builder builder to add javadoc to
+     * @param indent indent
+     */
     private void addJavadoc(StringBuilder builder, int indent) {
         builder.append(new Javadoc(javadoc).append(this::parameterJavadocs).build(indent));
     }
 
+    /**
+     * Adds Javadoc of parameters
+     *
+     * @param builder javadoc builder to add parameters javadoc to
+     * @return builder
+     */
     private Javadoc parameterJavadocs(Javadoc builder) {
         parameters.forEach(p -> builder.parameter(p.getName(), p.getDescription()));
         return builder;
     }
 
+    /**
+     * Builds parameters for constructors declaration
+     *
+     * @return parameters
+     */
     private StringBuilder buildParameters() {
         StringBuilder builder = new StringBuilder();
         parameters.forEach(p -> builder.append(StringUtil.capitalize(p.getType())).append(" ").append(p.getName().toLowerCase()).append(", "));

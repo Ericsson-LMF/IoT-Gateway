@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Builder of Class
+ * Builder of Java Class
  *
  * @author delma
  */
@@ -143,14 +143,20 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
     }
 
     /**
-     * Builds Constructor to string
+     * Builds Class to string
      *
-     * @return builded string
+     * @return class
      */
     public String build() {
         return build(0);
     }
 
+    /**
+     * Builds Class with specified indent
+     *
+     * @param indent indent
+     * @return class
+     */
     private String build(int indent) {
         StringBuilder builder = new StringBuilder();
         addPackage(builder, indent);
@@ -164,6 +170,12 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         return builder.toString();
     }
 
+    /**
+     * Adds content of class to builder
+     *
+     * @param builder builder to add content to
+     * @param indent indent
+     */
     private void addClassContent(StringBuilder builder, int indent) {
         addEnums(builder, indent);
         addVariables(builder, indent);
@@ -173,51 +185,93 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         addInnerClasses(builder, indent);
     }
 
-    private void addEnums(StringBuilder builder, int classIndent) {
+    /**
+     * Adds enum instances to class if it's enum
+     *
+     * @param builder builder to add enums
+     * @param indent indent
+     */
+    private void addEnums(StringBuilder builder, int indent) {
         if (classModifier == ClassModifier.SINGLETON) {
-            builder.append(new Javadoc("Singleton.").build(classIndent));
-            indent(builder, classIndent).append("INSTANCE").append(STATEMENT_END).append(LINE_END);
+            builder.append(new Javadoc("Singleton.").build(indent));
+            indent(builder, indent).append("INSTANCE").append(STATEMENT_END).append(LINE_END);
             emptyLine(builder);
         }
     }
 
-    private void addInnerClasses(StringBuilder builder, int classIndent) {
+    /**
+     * Adds inner classes to class
+     *
+     * @param builder builder to add inner classes to
+     * @param indent indent
+     */
+    private void addInnerClasses(StringBuilder builder, int indent) {
         if (!innerClasses.isEmpty()) {
-            innerClasses.forEach(c -> builder.append(c.build(classIndent)).append(LINE_END));
+            innerClasses.forEach(c -> builder.append(c.build(indent)).append(LINE_END));
             emptyLine(builder);
         }
     }
 
-    private void addMethods(StringBuilder builder, int classIndent) {
+    /**
+     * Adds methods to class
+     *
+     * @param builder builder to add methods to
+     * @param indent indent
+     */
+    private void addMethods(StringBuilder builder, int indent) {
         if (!methods.isEmpty()) {
-            methods.forEach(m -> builder.append(m.build(classIndent)).append(LINE_END));
+            methods.forEach(m -> builder.append(m.build(indent)).append(LINE_END));
             emptyLine(builder);
         }
     }
 
-    private void addConstructors(StringBuilder builder, int classIndent) {
+    /**
+     * Adds constructors to class
+     *
+     * @param builder builder to add constructors to
+     * @param indent indent
+     */
+    private void addConstructors(StringBuilder builder, int indent) {
         if (!constructors.isEmpty()) {
-            constructors.forEach(c -> builder.append(c.build(classIndent)).append(LINE_END));
+            constructors.forEach(c -> builder.append(c.build(indent)).append(LINE_END));
             emptyLine(builder);
         }
     }
 
-    private void addStaticBlock(StringBuilder builder, int classIndent) {
+    /**
+     * Adds static block to class
+     *
+     * @param builder builder to add static block to
+     * @param indent indent
+     */
+    private void addStaticBlock(StringBuilder builder, int indent) {
         if (!lines.isEmpty()) {
-            indent(builder, classIndent).append("static").append(BLOCK_START).append(LINE_END);
-            lines.forEach(l -> indent(builder, classIndent + 1).append(l).append(LINE_END));
-            indent(builder, classIndent).append(BLOCK_END).append(LINE_END);
+            indent(builder, indent).append("static").append(BLOCK_START).append(LINE_END);
+            lines.forEach(l -> indent(builder, indent + 1).append(l).append(LINE_END));
+            indent(builder, indent).append(BLOCK_END).append(LINE_END);
             emptyLine(builder);
         }
     }
 
-    private void addVariables(StringBuilder builder, int classIndent) {
+    /**
+     * Adds class variables to class
+     *
+     * @param builder builder to add variables to
+     * @param indent indent
+     */
+    private void addVariables(StringBuilder builder, int indent) {
         if (!variables.isEmpty()) {
-            variables.forEach(v -> builder.append(v.build(classIndent)));
+            variables.forEach(v -> builder.append(v.build(indent)));
             emptyLine(builder);
         }
     }
 
+    /**
+     * Adds class declaration
+     *
+     * @param builder builder to add class declaration to
+     * @param indent indent
+     */
     private void addClassDeclaration(StringBuilder builder, int indent) {
         String access = accessModifier.get();
         indent(builder, indent).append(access).append(" ");
@@ -229,6 +283,11 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         emptyLine(builder);
     }
 
+    /**
+     * Adds interfaces that class implements to class declaration
+     *
+     * @param builder builder to add implements to
+     */
     private void addImplements(StringBuilder builder) {
         if (!interfaces.isEmpty()) {
             builder.append(IMPLEMENTS).append(" ");
@@ -238,21 +297,44 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         }
     }
 
+    /**
+     * Adds super class to extend to class declaration
+     *
+     * @param builder builder to add extends to
+     */
     private void addSuperType(StringBuilder builder) {
         if (superType != null) {
             builder.append(EXTENDS).append(" ").append(superType).append(" ");
         }
     }
 
+    /**
+     * Adds class ending to builder
+     *
+     * @param builder builder to add class ending to
+     * @param indent indent
+     */
     private void addClassEnd(StringBuilder builder, int indent) {
         indent(builder, indent).append(BLOCK_END).append(LINE_END);
     }
 
+    /**
+     * Adds Javadoc for class
+     *
+     * @param builder builder to add Javadoc to
+     * @param indent indent
+     */
     private void addJavadoc(StringBuilder builder, int indent) {
         String warning = getGenerationWarning(this.getClass());
         builder.append(new Javadoc(warning).append(javadoc).build(indent));
     }
 
+    /**
+     * Adds imports for class
+     *
+     * @param builder builder to add imports to
+     * @param indent indent
+     */
     private void addImports(StringBuilder builder, int indent) {
         if (!imports.isEmpty()) {
             imports.forEach(i -> indent(builder, indent).append(IMPORT).append(" ").append(i).append(STATEMENT_END).append(LINE_END));
@@ -260,6 +342,12 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         }
     }
 
+    /**
+     * Adds package for class
+     *
+     * @param builder builder to add package to
+     * @param indent indent
+     */
     private void addPackage(StringBuilder builder, int indent) {
         if (packageString != null) {
             indent(builder, indent).append(PACKAGE).append(" ").append(packageString).append(STATEMENT_END).append(LINE_END);
@@ -360,6 +448,9 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         return getName();
     }
 
+    /**
+     * Builder for inner classes
+     */
     private class InnerJavaBuilder extends JavaClass {
 
         @Override

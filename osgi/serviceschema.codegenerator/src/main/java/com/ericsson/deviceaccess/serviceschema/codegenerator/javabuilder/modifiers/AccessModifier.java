@@ -13,7 +13,7 @@ public enum AccessModifier {
      */
     PUBLIC,
     /**
-     * Can be accessed from same package or subclass.
+     * Can be accessed from same package or by subclass.
      */
     PROTECTED,
     /**

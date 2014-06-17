@@ -15,7 +15,8 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import com.ericsson.research.commonutil.StringUtil;
 
 /**
- * Adds implementation of service to builder
+ * This generates classes in {@link com.ericsson.deviceaccess.spi.service.*}. It
+ * does it by adding necessary code to builder that it is given.
  *
  * @author delma
  */
@@ -27,12 +28,14 @@ public enum ImplementationAdder {
     INSTANCE;
 
     /**
-     * Adds implementation to builder.
+     * Adds necessary code to builder to generate implementation class for
+     * service.
      *
-     * @param builder builder to add
+     * @param builder builder to add implementation to
      * @param service service which implementation to add
+     * @param version version of schema
      */
-    public static void addServiceImplementation(JavaClass builder, Service service) {
+    public static void addServiceImplementation(JavaClass builder, Service service, String version) {
         String name = service.getName();
         String category = service.getCategory();
         builder.setPackage("com.ericsson.deviceaccess.spi.service." + category);
@@ -59,6 +62,12 @@ public enum ImplementationAdder {
         builder.addMethod(method);
     }
 
+    /**
+     * Adds constructor of services implementation class
+     *
+     * @param builder builder to add constructor to
+     * @param service service which constructor is added
+     */
     private static void addConstructor(JavaClass builder, Service service) {
         Constructor constructor = new Constructor();
         builder.addConstructor(constructor);
@@ -78,7 +87,7 @@ public enum ImplementationAdder {
                 constructor.addBlock("defineAction(ACTION_" + name + ", context -> ", b -> {
                     b.add("if(!context.isAuthorized()) return;");
                     b.add("GDProperties arguments = context.getArguments();");
-                    b.add(getResultDecl(action) + "execute" + StringUtil.capitalize(name) + "(");
+                    b.add(getResultDeclaration(action) + "execute" + StringUtil.capitalize(name) + "(");
                     if (action.isSetArguments()) {
                         boolean first = true;
                         for (Parameter argument : action.getArguments().getParameterArray()) {
@@ -102,13 +111,27 @@ public enum ImplementationAdder {
         }
     }
 
-    private static String getResultDecl(Action action) {
+    /**
+     * Returns code to be added before method call to keep information returned
+     * by the method (If there is any).
+     *
+     * @param action action which is called
+     * @return code
+     */
+    private static String getResultDeclaration(Action action) {
         if (action.isSetResults()) {
             return StringUtil.capitalize(action.getName()) + "Result result = ";
         }
         return "";
     }
 
+    /**
+     * Adds setters for action results of service to builder. These are called
+     * only by actions defined in constructor.
+     *
+     * @param builder builder to add methods to
+     * @param service service which action result setter methods are added
+     */
     private static void addSetActionsResultsOnContextMethods(JavaClass builder, Service service) {
         if (service.isSetActions()) {
             for (Action action : service.getActions().getActionArray()) {
@@ -131,6 +154,15 @@ public enum ImplementationAdder {
         }
     }
 
+    /**
+     * Adds getters and updaters for properties of service to builder. Getters
+     * can be called by anyone and updaters are called by extender of
+     * implementation class.
+     *
+     * @param builder builder to add methods to
+     * @param service service which properties getters and setters methods are
+     * added
+     */
     private static void addPropertyGettersAndUpdaters(JavaClass builder, Service service) {
         if (service.isSetProperties()) {
             for (Parameter property : service.getProperties().getParameterArray()) {

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /**
- * Builder pf Javadoc
+ * Builder of Javadoc
  *
  * @author delma
  */
@@ -18,27 +18,12 @@ public final class Javadoc {
     private static final String JAVADOC_END = " */";
     private static final String LINE_START = " * ";
     private static final String LINE_END = "\n";
-    
-    private enum Tag{
-        INHERITED("{@inheritDoc}"),
-        PARAMETER("@param"),
-        RETURN("@return"),
-        THROW("@throws");
-        private String string;
-        
-        Tag(String string){
-            this.string = string;
-        }
-        
-        public String get(){
-            return string;
-        }
-    }
+
     private StringBuilder builder;
     private Map<Tag, List<String>> tags;
 
     /**
-     * New builder
+     * New Javadoc builder
      */
     public Javadoc() {
         builder = new StringBuilder();
@@ -46,7 +31,7 @@ public final class Javadoc {
     }
 
     /**
-     * New builder with object in it
+     * New Javadoc builder with object in it
      *
      * @param object
      */
@@ -56,7 +41,7 @@ public final class Javadoc {
     }
 
     /**
-     * New builder with existing builder in it
+     * New Javadoc builder with existing Javadoc builder in it
      *
      * @param builder
      */
@@ -66,7 +51,7 @@ public final class Javadoc {
     }
 
     /**
-     * Appends new line
+     * Adds new line
      *
      * @param object to be appended
      * @return this
@@ -83,7 +68,7 @@ public final class Javadoc {
     }
 
     /**
-     * Appends new line
+     * Adds Javadoc to new line
      *
      * @param javadoc to be appended
      * @return this
@@ -97,7 +82,7 @@ public final class Javadoc {
     }
 
     /**
-     * Appends new empty line
+     * Adds new empty line
      *
      * @return this
      */
@@ -124,7 +109,7 @@ public final class Javadoc {
     }
 
     /**
-     * Appends to the last line
+     * Appends Javadoc to the last line
      *
      * @param javadoc to be appended
      * @return this
@@ -140,7 +125,7 @@ public final class Javadoc {
     /**
      * Executes operator on this builder
      *
-     * @param function in which editing current builder happends.
+     * @param function in which editing current builder happens.
      * @return this
      */
     public Javadoc append(UnaryOperator<Javadoc> function) {
@@ -172,13 +157,20 @@ public final class Javadoc {
         return this;
     }
 
+    /**
+     * Adds exception tag to Javadoc
+     *
+     * @param name
+     * @param description
+     * @return this
+     */
     public Javadoc exception(Object name, Object description) {
         addTag(Tag.THROW, name + " " + description);
         return this;
     }
 
     /**
-     * Adds return tag to Javadox
+     * Adds return tag to Javadoc
      *
      * @param object description
      * @return this
@@ -188,9 +180,17 @@ public final class Javadoc {
         return this;
     }
 
-    private void addTag(Tag tag, Object value) {
+    /**
+     * Adds tag to Javadoc
+     *
+     * @param tag
+     * @param value
+     * @return this
+     */
+    private Javadoc addTag(Tag tag, Object value) {
         tags.putIfAbsent(tag, new ArrayList<>());
         tags.get(tag).add(value.toString());
+        return this;
     }
 
     /**
@@ -200,7 +200,7 @@ public final class Javadoc {
      * @return Javadoc comment in string form
      */
     public String build() {
-        return JAVADOC_START + inBuild() + LINE_END + JAVADOC_END + LINE_END;
+        return JAVADOC_START + innerBuild() + LINE_END + JAVADOC_END + LINE_END;
     }
 
     @Override
@@ -214,7 +214,7 @@ public final class Javadoc {
      * @param indent
      * @return Javadoc comment in string form
      */
-    String build(int indent) {
+    protected String build(int indent) {
         StringBuilder result = new StringBuilder();
         for (String line : build().split(LINE_END)) {
             JavaHelper.indent(result, indent).append(line).append(LINE_END);
@@ -222,7 +222,7 @@ public final class Javadoc {
         return result.toString();
     }
 
-    private String inBuild() {
+    private String innerBuild() {
         StringBuilder result = new StringBuilder(builder);
         if (!tags.isEmpty()) {
             emptyLine(result);
@@ -231,5 +231,22 @@ public final class Javadoc {
             v.forEach(s -> line(result, k.get()).append(" ").append(s));
         });
         return result.toString();
+    }
+
+    private enum Tag {
+
+        INHERITED("{@inheritDoc}"),
+        PARAMETER("@param"),
+        RETURN("@return"),
+        THROW("@throws");
+        private final String string;
+
+        Tag(String string) {
+            this.string = string;
+        }
+
+        public String get() {
+            return string;
+        }
     }
 }

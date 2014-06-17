@@ -15,7 +15,9 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifie
 import com.ericsson.research.commonutil.StringUtil;
 
 /**
- * Adds schema definitions to builder
+ * This generates
+ * {@link com.ericsson.deviceaccess.spi.service.SchemaDefinitions}. It does it
+ * by adding necessary code to builder that it is given.
  *
  * @author delma
  */
@@ -27,10 +29,14 @@ public enum DefinitionsAdder {
     INSTANCE;
 
     /**
-     * Adds start of SchemaDefinitions to builder
+     * Adds minimal required information to generate
+     * {@link com.ericsson.deviceaccess.spi.service.SchemaDefinitions}.
+     * CodeBlock returned by this method is used by {@link addService} to add
+     * schema definitions.
      *
-     * @param builder
-     * @return block where schema definition happens
+     * @param builder builder that is added to
+     * @return Constructor of
+     * {@link com.ericsson.deviceaccess.spi.service.SchemaDefinitions}
      */
     public static CodeBlock addDefinitionsStart(JavaClass builder) {
         builder.setPackage("com.ericsson.deviceaccess.spi.service");
@@ -62,9 +68,10 @@ public enum DefinitionsAdder {
     }
 
     /**
-     * Adds services schema definition
+     * Adds services schema definition to
+     * {@link com.ericsson.deviceaccess.spi.service.SchemaDefinitions}.
      *
-     * @param code block to add schema definition
+     * @param code block to add schema definition to
      * @param service service which schema definition to add
      */
     public static void addService(CodeBlock code, Service service) {
@@ -93,6 +100,16 @@ public enum DefinitionsAdder {
         }).append(");");
     }
 
+    /**
+     * Adds parameters schema definitions to given block. Used internally by
+     * {@link addService} for schema definitions of arguments, results and
+     * properties
+     *
+     * @param block Block to add parameter definitions
+     * @param parameters Parameters which schemas are defined
+     * @param method Method call that is used to define parameters (Changes
+     * depending what type of parameters are defined)
+     */
     private static void addParameters(CodeBlock block, Parameter[] parameters, String method) {
         for (Parameter parameter : parameters) {
             block.addBlock(method + "(p ->", parameterBlock -> {
