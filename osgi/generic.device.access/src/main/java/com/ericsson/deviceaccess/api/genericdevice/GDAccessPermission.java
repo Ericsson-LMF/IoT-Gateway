@@ -43,7 +43,6 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class GDAccessPermission extends BasicPermission {
@@ -82,10 +81,8 @@ public final class GDAccessPermission extends BasicPermission {
         if (actStr == null) {
             return result;
         }
-        StringTokenizer tokenizer = new StringTokenizer(actStr, ",");
-        while (tokenizer.hasMoreElements()) {
-            // TODO: Check if this works properly
-            String action = tokenizer.nextToken().trim();
+        for (String action : actStr.split(",")) {
+            action = action.trim();
             System.out.println("getActionMask: " + action);
             result.add(Type.get(action));
         }
@@ -137,7 +134,9 @@ public final class GDAccessPermission extends BasicPermission {
         }
         AtomicBoolean flag = new AtomicBoolean(false);
         FunctionalUtil.doIfCan(GDAccessPermission.class, obj, target -> {
-            flag.set(getName().equals(target.getName()) && getMask().equals(target.getMask()));
+            if (getName().equals(target.getName())) {
+                flag.set(getMask().equals(target.getMask()));
+            }
         });
         return flag.get();
     }
@@ -148,7 +147,7 @@ public final class GDAccessPermission extends BasicPermission {
          *
          */
         private static final long serialVersionUID = 1102307291093157855L;
-        private Map<String, GDAccessPermission> permissions;
+        private final Map<String, GDAccessPermission> permissions;
         private boolean allAllowed = false;
 
         GenericDeviceAccessPermissionCollection() {
@@ -166,14 +165,8 @@ public final class GDAccessPermission extends BasicPermission {
                     if (value == null) {
                         return gdaPerm;
                     }
-                    EnumSet<Type> oldMask = value.getMask();
-                    EnumSet<Type> newMask = gdaPerm.getMask();
-                    if (oldMask.equals(newMask)) {
-                        return value;
-                    }
-                    EnumSet<Type> mask = EnumSet.copyOf(oldMask);
-                    mask.addAll(newMask);
-                    return new GDAccessPermission(key, mask);
+                    value.getMask().addAll(gdaPerm.getMask());
+                    return value;
                 });
                 if (!allAllowed) {
                     if (name.equals("*")) {

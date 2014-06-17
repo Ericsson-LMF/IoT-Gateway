@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
@@ -41,10 +42,8 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
 import com.ericsson.research.commonutil.StringUtil;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 public class GDPropertiesImpl extends GDProperties.Stub
         implements GDProperties {
@@ -71,7 +70,7 @@ public class GDPropertiesImpl extends GDProperties.Stub
         }
     }
 
-    public GDPropertiesImpl(Collection<GDPropertyMetadata> metadataArray) {
+    public GDPropertiesImpl(Iterable<GDPropertyMetadata> metadataArray) {
         this(metadataArray, null);
     }
 
@@ -252,12 +251,9 @@ public class GDPropertiesImpl extends GDProperties.Stub
         return map.keySet().toArray(new String[0]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String serialize(Format format) throws GDException {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         if (format.isJson()) {
             int indent = 0;
             return "{" + valuesToJson(format) + "}";

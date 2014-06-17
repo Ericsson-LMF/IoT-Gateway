@@ -36,12 +36,12 @@ package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
+import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
-import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkGetPermission;
-import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkSetPermission;
+import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkPermission;
 import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class GDServiceImpl extends GDService.Stub
         implements GDService {
@@ -64,7 +63,7 @@ public class GDServiceImpl extends GDService.Stub
     private final List<GDPropertyMetadata> propertyMetadata;
 
     public GDServiceImpl(String name,
-            List<GDPropertyMetadata> propertyMetadata) {
+            List<? extends GDPropertyMetadata> propertyMetadata) {
         this.propertyMetadata = new ArrayList(propertyMetadata);
         this.propertyMetadata.add(new ParameterSchema.Builder(GDPropertiesImpl.LAST_UPDATE_TIME, Long.class).build());
         properties = new GDPropertiesImpl(this.propertyMetadata, this);
@@ -81,7 +80,7 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public String[] getActionNames() {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         return action.keySet().toArray(new String[0]);
     }
 
@@ -90,12 +89,12 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public GDAction getAction(String name) {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         return action.get(name);
     }
 
     public void putAction(GDAction act) {
-        checkSetPermission(getClass().getName());
+        checkPermission(getClass(), Type.SET);
         action.put(act.getName(), act);
         act.updatePath(getPath(true));
     }
@@ -129,7 +128,7 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public String getName() {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         return name;
     }
 
@@ -138,7 +137,7 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public String getPath(boolean isAbsolute) {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         return path + "/service/" + this.getName();
     }
 
@@ -147,7 +146,7 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public String getPath() {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         return path + "/service/" + this.getName();
     }
 
@@ -156,13 +155,11 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public void updatePath(String path) {
-        checkSetPermission(getClass().getName());
+        checkPermission(getClass(), Type.SET);
         this.path = path;
-        action.forEach((k, act) -> act.updatePath(getPath(true)));
-
-        for (GDPropertyMetadata md : propertyMetadata) {
-            md.updatePath(getPath(true));
-        }
+        String getPath = getPath(true);
+        action.values().forEach(act -> act.updatePath(getPath));
+        propertyMetadata.forEach(md -> md.updatePath(getPath));
     }
 
     public final boolean hasProperty(String name) {
@@ -174,7 +171,7 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public final GDProperties getProperties() {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         return properties;
     }
 
@@ -191,7 +188,7 @@ public class GDServiceImpl extends GDService.Stub
      */
     @Override
     public String serialize(Format format) throws GDException {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         if (format.isJson()) {
             int indent = 0;
             return toJsonString(format, indent);
@@ -211,7 +208,7 @@ public class GDServiceImpl extends GDService.Stub
     @Override
     public String getSerializedNode(String path, Format format)
             throws GDException {
-        checkGetPermission(getClass().getName());
+        checkPermission(getClass(), Type.GET);
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }

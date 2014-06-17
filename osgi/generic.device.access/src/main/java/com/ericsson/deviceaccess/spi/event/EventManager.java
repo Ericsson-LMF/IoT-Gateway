@@ -45,9 +45,7 @@ import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.GENERI
 import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.SERVICE_NAME;
 import com.ericsson.research.commonutil.function.TriMonoConsumer;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,15 +67,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Event manager that handles issuing if events at changes in properties.
- * Matches events against listeners filter (see
- * {@link GDEventListener} for details).
+ * Matches events against listeners filter (see {@link GDEventListener} for
+ * details).
  *
  */
 public class EventManager implements ServiceListener, Runnable,
         ServiceTrackerCustomizer<GenericDevice, Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
-    private static final String REGEX_DELTA = "/state/([^/]+)$";
+//    private static final String REGEX_DELTA = "/state/([^/]+)$";
     private BundleContext context;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final Map<GDEventListener, Filter> listeners = new ConcurrentHashMap<>();
@@ -168,7 +166,7 @@ public class EventManager implements ServiceListener, Runnable,
             matching.put(DEVICE_PROTOCOL, event.device.getProtocol());
             matching.put(DEVICE_URN, event.device.getURN());
             matching.put(DEVICE_NAME, event.device.getName());
-            event.properties.forEach((key, value) -> matching.put(key, value));
+            event.properties.forEach(matching::put);
         }
     }
 
@@ -177,8 +175,6 @@ public class EventManager implements ServiceListener, Runnable,
         String serviceName = event.serviceId;
         listeners.forEach((listener, filter) -> {
             checkForDeltaProperty(filter, event, matchingProperties);
-//            try {
-            // TODO: "Prevent this from hanging"? This comment was here... But I changed things around...
             if (event.propertyEvent) {
                 TriMonoConsumer<String> consumer;
                 if (event.propertyAdded) {
@@ -191,25 +187,18 @@ public class EventManager implements ServiceListener, Runnable,
                 System.out.println(deviceId + " " + serviceName + " " + event.properties);
                 listener.notifyGenericDeviceEvent(deviceId, serviceName, event.properties);
             }
-//            } catch (Exception ex) {
-//                logger.warn("Exception when invoking event listener", ex);
-//            }
         });
     }
 
+    private static final String LISTENER_FILTER = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
+
     private void startListenGenericDeviceEvents() {
         try {
-            String filter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class
-                    .getName() + ")";
-            context.addServiceListener(this, filter);
+            context.addServiceListener(this, LISTENER_FILTER);
 
             // Check if there are already registered listeners
-            ServiceReference[] references = context.getServiceReferences((String) null, filter);
-            if (references != null) {
-                for (ServiceReference reference : references) {
-                    serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, reference));
-                }
-            }
+            context.getServiceReferences(GDEventListener.class, null)
+                    .forEach(reference -> serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, reference)));
         } catch (InvalidSyntaxException e) {
             logger.warn("Filter format was hardcoded wrong", e);
         }
@@ -317,7 +306,6 @@ public class EventManager implements ServiceListener, Runnable,
      */
     public void shutdown() {
         synchronized (running) {
-//TODO: This cannot be done due tests... Functionality should stay same even if testa are fixed to allow this.
             if (!running.get()) {
                 throw new IllegalStateException("There wasn't thread running to shutdown.");
             }

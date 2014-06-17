@@ -41,7 +41,6 @@ import com.ericsson.deviceaccess.spi.schema.DeviceManagementService;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * Base class for devices implemented in adaptors.
@@ -57,14 +56,13 @@ public abstract class SBGenericDevice extends GenericDeviceImpl {
      *
      * @param service
      */
-    protected void addSchemaBasedService(SBService service) {
+    protected final void addSchemaBasedService(SBService service) {
         String name = service.getName();
         if (getService(name) != null) {
             throw new ServiceSchemaError("Service: '" + name + "' is already defined on the device: '" + getName() + "'(id=" + getId() + ")");
         }
-
         service.validateSchema();
-        super.putService(name, service);
+        super.putService(service);
     }
 
     /**
@@ -72,16 +70,8 @@ public abstract class SBGenericDevice extends GenericDeviceImpl {
      */
     @Override
     public void putService(GDService svc) {
-        putService(null, svc);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void putService(String name, GDService svc) {
         if (!(svc instanceof SBService)) {
-            throw new ServiceSchemaError("Trying to add a service '" + name + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SBService.class);
+            throw new ServiceSchemaError("Trying to add a service '" + svc.getName() + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SBService.class);
         }
         addSchemaBasedService((SBService) svc);
     }
@@ -91,11 +81,8 @@ public abstract class SBGenericDevice extends GenericDeviceImpl {
      *
      * @param services
      */
-    public void setService(HashMap services) {
-        for (Iterator iterator = services.values().iterator(); iterator.hasNext();) {
-            GDService service = (GDService) iterator.next();
-            putService(service);
-        }
+    public void setService(HashMap<Object, GDService> services) {
+        services.values().forEach(this::putService);
     }
 
     /**
@@ -105,8 +92,6 @@ public abstract class SBGenericDevice extends GenericDeviceImpl {
      * @return the service
      */
     public SBService createService(ServiceSchema schema) {
-        String name = schema.getName();
-        SBServiceBase service = new SBServiceBase(schema);
-        return service;
+        return new SBServiceBase(schema);
     }
 }

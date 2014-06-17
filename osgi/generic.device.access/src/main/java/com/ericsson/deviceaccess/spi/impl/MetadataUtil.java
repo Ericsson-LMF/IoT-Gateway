@@ -62,7 +62,7 @@ public enum MetadataUtil {
      * @param metadataMap name:String -> {@link GDPropertyMetadata}
      * @throws GDError thrown if value does not adhere to the metadata
      */
-    public void verifyPropertiesAgainstMetadata(GDProperties props, Map metadataMap) throws GDError {
+    public void verifyPropertiesAgainstMetadata(GDProperties props, Map<String, GDPropertyMetadata> metadataMap) throws GDError {
         if (metadataMap == null) {
             return;
         }
@@ -80,39 +80,40 @@ public enum MetadataUtil {
      * @param propertyValue
      * @throws GDError thrown if value does not adhere to the metadata
      */
-    public void verifyPropertyAgainstMetadata(Map metadataMap, String propertyName, Object propertyValue) throws GDError {
-        GDPropertyMetadata metadata = (GDPropertyMetadata) metadataMap.get(propertyName);
+    public void verifyPropertyAgainstMetadata(Map<String, GDPropertyMetadata> metadataMap, String propertyName, Object propertyValue) throws GDError {
+        GDPropertyMetadata metadata = metadataMap.get(propertyName);
 
         if (metadata == null) {
             return;
         }
 
-        if (Number.class.isAssignableFrom(metadata.getType())) {
+        Class<?> type = metadata.getType();
+        if (Number.class.isAssignableFrom(type)) {
             if (propertyValue instanceof String) {
                 try {
                     Float.parseFloat((String) propertyValue);
                 } catch (NumberFormatException e) {
                     throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not parsable to '" + metadata.getType() + "'");
+                            + "' which not parsable to '" + type + "'");
                 }
-            } else if (Float.class.isAssignableFrom(metadata.getType())) {
+            } else if (Float.class.isAssignableFrom(type)) {
                 if (!(propertyValue instanceof Float)) {
                     throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not assignable to '" + metadata.getType() + "'");
+                            + "' which not assignable to '" + type + "'");
                 }
-            } else if (Long.class.isAssignableFrom(metadata.getType())) {
+            } else if (Long.class.isAssignableFrom(type)) {
                 if (!(propertyValue instanceof Long)) {
                     throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not assignable to '" + metadata.getType() + "'");
+                            + "' which not assignable to '" + type + "'");
                 }
             } else {
                 if (!(propertyValue instanceof Integer || propertyValue instanceof Short || propertyValue instanceof Byte)) {
                     throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not assignable to '" + metadata.getType() + "'");
+                            + "' which not assignable to '" + type + "'");
                 }
             }
 

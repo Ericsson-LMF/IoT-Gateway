@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.spi.schema.based;
 
-import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.deviceaccess.spi.schema.ActionDefinition;
@@ -42,7 +41,6 @@ import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +60,7 @@ public class SBServiceBase extends GDServiceImpl implements SBService {
      * @param serviceSchema the schema
      */
     public SBServiceBase(ServiceSchema serviceSchema) {
-        super(serviceSchema.getName(), Arrays.asList(serviceSchema.getPropertiesSchemas()));
+        super(serviceSchema.getName(), serviceSchema.getPropertiesSchemas());
         this.serviceSchema = serviceSchema;
         init(serviceSchema);
     }
@@ -107,12 +105,12 @@ public class SBServiceBase extends GDServiceImpl implements SBService {
      */
     @Override
     public final void validateSchema() {
-        for (ActionSchema action : serviceSchema.getActionSchemas()) {
+        serviceSchema.getActionSchemas().forEach(action -> {
             String name = action.getName();
             if (action.isMandatory() && !actionDefinitions.containsKey(name)) {
                 throw new ServiceSchemaError("The action: '" + name + "' in service: '" + getName() + "' is mandatory, but lacks definition.");
             }
-        }
+        });
     }
 
     /**
@@ -121,15 +119,13 @@ public class SBServiceBase extends GDServiceImpl implements SBService {
      * @param serviceSchema
      */
     private void init(ServiceSchema serviceSchema) {
-        for (ActionSchema actionSchema : serviceSchema.getActionSchemas()) {
-            createAction(actionSchema);
-        }
+        serviceSchema.getActionSchemas().forEach(this::createAction);
 
         createAction(new ActionSchema.Builder().setName(REFRESH_PROPERTIES).setMandatory(true).build());
 
-        for (ParameterSchema schema : serviceSchema.getPropertiesSchemas()) {
+        serviceSchema.getPropertiesSchemas().forEach(schema -> {
             getProperties().setStringValue(schema.getName(), schema.getDefaultStringValue());
-        }
+        });
     }
 
     /**
@@ -137,8 +133,8 @@ public class SBServiceBase extends GDServiceImpl implements SBService {
      */
     private void createAction(final ActionSchema actionSchema) {
         String name = actionSchema.getName();
-        List<GDPropertyMetadata> argumentsSchemas = Arrays.asList(actionSchema.getArgumentsSchemas());
-        List<GDPropertyMetadata> resultParametersSchemas = Arrays.asList(actionSchema.getResultSchema());
+        List<ParameterSchema> argumentsSchemas = actionSchema.getArgumentsSchemas();
+        List<ParameterSchema> resultParametersSchemas = actionSchema.getResultSchema();
         GDActionImpl genericDeviceActionImpl = new SBAction(name, this, argumentsSchemas, resultParametersSchemas);
         putAction(genericDeviceActionImpl);
     }

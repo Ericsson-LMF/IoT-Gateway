@@ -44,8 +44,8 @@ import java.util.function.Consumer;
 public class ServiceSchema {
 
     private String name;
-    private List actionSchemas = new ArrayList();
-    private List propertySchemas = new ArrayList();
+    private List<ActionSchema> actionSchemas = new ArrayList<>();
+    private List<ParameterSchema> propertySchemas = new ArrayList<>();
 
     /**
      * Creates schema with specified name.
@@ -70,8 +70,8 @@ public class ServiceSchema {
      *
      * @return the actions defined for this schema
      */
-    public ActionSchema[] getActionSchemas() {
-        return (ActionSchema[]) actionSchemas.toArray(new ActionSchema[actionSchemas.size()]);
+    public List<ActionSchema> getActionSchemas() {
+        return actionSchemas;
     }
 
     /**
@@ -79,8 +79,8 @@ public class ServiceSchema {
      *
      * @return
      */
-    public ParameterSchema[] getPropertiesSchemas() {
-        return (ParameterSchema[]) propertySchemas.toArray(new ParameterSchema[propertySchemas.size()]);
+    public List<ParameterSchema> getPropertiesSchemas() {
+        return propertySchemas;
     }
 
     /**
@@ -164,8 +164,8 @@ public class ServiceSchema {
                 throw new ServiceSchemaError("Name must be specified");
             }
             ServiceSchema serviceSchema = new ServiceSchema(name);
-            actionSchemas.forEach(a -> serviceSchema.actionSchemas.add(a));
-            propertieSchemas.forEach(p -> serviceSchema.propertySchemas.add(p));
+            actionSchemas.forEach(serviceSchema.actionSchemas::add);
+            propertieSchemas.forEach(serviceSchema.propertySchemas::add);
             return serviceSchema;
         }
     }

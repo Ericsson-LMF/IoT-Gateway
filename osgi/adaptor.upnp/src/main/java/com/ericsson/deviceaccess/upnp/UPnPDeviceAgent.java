@@ -37,11 +37,8 @@ package com.ericsson.deviceaccess.upnp;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDevice.State;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
-import com.ericsson.deviceaccess.api.service.homeautomation.lighting.Dimming;
-import com.ericsson.deviceaccess.api.service.homeautomation.power.SwitchPower;
-import com.ericsson.deviceaccess.api.service.media.ContentDirectory;
-import com.ericsson.deviceaccess.api.service.media.RenderingControl;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.research.commonutil.LegacyUtil;
 import com.ericsson.research.commonutil.function.FunctionalUtil;
@@ -139,9 +136,8 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     private void subscribeToEvents(UPnPFilterRule rule) {
         logger.debug("Subscribing to UPnP events");
         if (rule != null) {
-            Filter filter;
             try {
-                filter = context.createFilter(rule.toFilterRule());
+                Filter filter = context.createFilter(rule.toFilterRule());
                 Map<String, Object> props = new HashMap<>();
                 props.put(UPnPEventListener.UPNP_FILTER, filter);
                 this.eventListenerReg = context.registerService(UPnPEventListener.class, this, LegacyUtil.toDictionary(props));
@@ -152,51 +148,47 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     }
 
-    // private HashMap<String, GDService> getSWoTServices(UPnPDevice
-    // dev) {
-    private HashMap getServices(UPnPDevice dev) {
-        // HashMap<String, GDService> services = new HashMap<String,
-        // GDService>();
-        HashMap services = new HashMap();
+    private Map<String, GDService> getServices(UPnPDevice dev) {
+        HashMap<String, GDService> services = new HashMap<>();
+        GDService service = null;
         if (UPnPUtil.isMediaRenderer(dev)) {
             logger.debug("Media Renderer is found");
-            RenderingControl rc = new RenderingControlUPnPImpl(dev);
-            services.put(rc.getName(), rc);
-
+            service = new RenderingControlUPnPImpl(dev);
         } else if (UPnPUtil.isMediaServer(dev)) {
             logger.debug("Media Server is found");
-            ContentDirectory cds = new ContentDirectoryUPnPImpl(dev);
-            services.put(cds.getName(), cds);
+            service = new ContentDirectoryUPnPImpl(dev);
         } else if (UPnPUtil.isDimmableLight(dev)) {
             UPnPService[] upnpServices = dev.getServices();
             logger.debug("Dimmable Light is found");
-            for (int i = 0; i < upnpServices.length; ++i) {
-                String serviceType = upnpServices[i].getType();
+            for (UPnPService upnpService : upnpServices) {
+                String serviceType = upnpService.getType();
                 String[] serviceTypeParts = UPnPUtil.parseServiceType(serviceType);
-                if ((serviceTypeParts == null) || (serviceTypeParts.length < 4)) {
+                if (serviceTypeParts == null || serviceTypeParts.length < 4) {
                     logger.debug("Unformatted service type: " + serviceType);
                     continue;
                 }
                 String type = serviceTypeParts[3];
                 logger.debug("Serivce Type " + type);
-                if (null != type) {
+                if (type != null) {
                     switch (type) {
                         case "DimmingService":
-                            Dimming dim = new DimmingUPnPImpl(dev, upnpServices[i], logger);
-                            services.put(dim.getName(), dim);
-                            this.idToService.put(upnpServices[i].getId(), dim);
+                            service = new DimmingUPnPImpl(dev, upnpService, logger);
                             break;
                         case "SwitchPower":
-                            SwitchPower switchPower = new SwitchPowerUPnPImpl(dev, upnpServices[i], logger);
-                            services.put(switchPower.getName(), switchPower);
-                            this.idToService.put(upnpServices[i].getId(), switchPower);
+                            service = new SwitchPowerUPnPImpl(dev, upnpService, logger);
                             break;
                         default:
                             logger.debug("Unexpected service type: " + serviceType);
                             break;
                     }
+                    if (service != null) {
+                        idToService.put(upnpService.getId(), service);
+                    }
                 }
             }
+        }
+        if (service != null) {
+            services.put(service.getName(), service);
         }
         return services;
     }
@@ -208,42 +200,42 @@ public class UPnPDeviceAgent implements UPnPEventListener {
         if (deviceId.equals(device.getId())) {
             GDService svc = device.getService(getSWoTServiceNameFromUPnPServiceId(serviceId));
             if (svc != null) {
+                GDProperties properties = svc.getProperties();
                 events.forEach((event, data) -> {
                     if (event.equals("LastChange")) {
                         logger.debug("Received LastChange variables event");
-                        Map<String, String> changedVars = UPnPUtil.parseLastChangeEvent(data);
-                        changedVars.forEach((name, value) -> {
+                        UPnPUtil.parseLastChangeEvent(data).forEach((name, value) -> {
                             if (null != name) {
                                 switch (name) {
                                     case "Volume":
                                         try {
-                                            svc.getProperties().setStringValue("CurrentVolume", value);
+                                            properties.setStringValue("CurrentVolume", value);
                                         } catch (Exception e) {
                                             // TODO: Parsing error, it seems the string contains channel as well
                                         }
                                         break;
                                     case "AVTransportURI":
                                         // TODO: This does not work with the Noxon. It uses a different variable for this information
-                                        svc.getProperties().setStringValue("CurrentUrl", value);
+                                        properties.setStringValue("CurrentUrl", value);
                                         break;
                                     case "CurrentTrackMetaData":
                                         // TODO: This does not work with the Noxon. It uses a different variable for this information
                                         String title = getMediaTitle(value);
                                         logger.debug("Media title is " + title);
-                                        svc.getProperties().setStringValue("CurrentTitle", title);
+                                        properties.setStringValue("CurrentTitle", title);
                                         break;
                                     case "TransportState":
                                         String state = value.toLowerCase();
                                         if (null != state) {
                                             switch (state) {
                                                 case "playing":
-                                                    svc.getProperties().setStringValue("Status", "Playing");
+                                                    properties.setStringValue("Status", "Playing");
                                                     break;
                                                 case "stopped":
-                                                    svc.getProperties().setStringValue("Status", "Stopped");
+                                                    properties.setStringValue("Status", "Stopped");
                                                     break;
                                                 case "paused":
-                                                    svc.getProperties().setStringValue("Status", "Paused");
+                                                    properties.setStringValue("Status", "Paused");
                                                     break;
                                             }
                                         }
@@ -293,9 +285,9 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     }
 
     private String getSWoTServiceNameFromUPnPServiceId(String id) {
-        if (id.indexOf(UPnPUtil.SRV_RENDERING_CONTROL) > 0 || id.indexOf(UPnPUtil.SRV_AV_TRANSPORT) > 0) {
+        if (id.contains(UPnPUtil.SRV_RENDERING_CONTROL) || id.contains(UPnPUtil.SRV_AV_TRANSPORT)) {
             return "RenderingControl";
-        } else if (id.indexOf(UPnPUtil.SRV_CONTENT_DIRECTORY) > 0) {
+        } else if (id.contains(UPnPUtil.SRV_CONTENT_DIRECTORY)) {
             return "ContentDirectory";
         }
         return "unsupported";

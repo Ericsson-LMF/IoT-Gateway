@@ -44,8 +44,8 @@ import java.util.function.Consumer;
 public class ActionSchema {
 
     private String name;
-    private List argumentSchemas = new ArrayList();
-    private List resultSchemas = new ArrayList();
+    private List<ParameterSchema> argumentSchemas = new ArrayList<>();
+    private List<ParameterSchema> resultSchemas = new ArrayList<>();
     private boolean isMandatory;
 
     /**
@@ -73,8 +73,8 @@ public class ActionSchema {
      *
      * @return the arguments of this action
      */
-    public ParameterSchema[] getArgumentsSchemas() {
-        return (ParameterSchema[]) argumentSchemas.toArray(new ParameterSchema[argumentSchemas.size()]);
+    public List<ParameterSchema> getArgumentsSchemas() {
+        return argumentSchemas;
     }
 
     /**
@@ -82,8 +82,8 @@ public class ActionSchema {
      *
      * @return the arguments of this action
      */
-    public ParameterSchema[] getResultSchema() {
-        return (ParameterSchema[]) resultSchemas.toArray(new ParameterSchema[resultSchemas.size()]);
+    public List<ParameterSchema> getResultSchema() {
+        return resultSchemas;
     }
 
     /**
@@ -189,8 +189,8 @@ public class ActionSchema {
                 throw new ServiceSchemaError("Name must be specified");
             }
             ActionSchema actionSchema = new ActionSchema(name, isMandatory);
-            argumentSchemas.forEach(a -> actionSchema.argumentSchemas.add(a));
-            resultSchemas.forEach(r -> actionSchema.resultSchemas.add(r));
+            argumentSchemas.forEach(actionSchema.argumentSchemas::add);
+            resultSchemas.forEach(actionSchema.resultSchemas::add);
             return actionSchema;
         }
     }

@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,18 +29,17 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.spi.schema.api;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.spi.schema.ActionSchema;
-import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
-import com.ericsson.deviceaccess.spi.schema.based.SBService;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
+import com.ericsson.deviceaccess.spi.schema.based.SBService;
+import java.util.ArrayList;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -80,6 +79,8 @@ public class SchemaBasedGenericDeviceTest {
                 oneOf(service).getName();
                 will(returnValue("myService"));
                 oneOf(service).validateSchema();
+                oneOf(service).getName();
+                will(returnValue("myService"));
                 oneOf(service).updatePath("undefined/undefined");
             }
         });
@@ -89,7 +90,6 @@ public class SchemaBasedGenericDeviceTest {
                 addSchemaBasedService(service);
             }
         };
-
         context.assertIsSatisfied();
 
         assertSame(service, device.getService("myService"));
@@ -105,6 +105,8 @@ public class SchemaBasedGenericDeviceTest {
                 oneOf(service).getName();
                 will(returnValue("alreadyExistingService"));
                 oneOf(service).validateSchema();
+                oneOf(service).getName();
+                will(returnValue("alreadyExistingService"));
                 oneOf(service).updatePath("undefined/undefined");
                 oneOf(service).getName();
                 will(returnValue("alreadyExistingService"));
@@ -135,16 +137,14 @@ public class SchemaBasedGenericDeviceTest {
             {
                 oneOf(serviceSchema).getName();
                 will(returnValue("myService"));
-                oneOf(serviceSchema).getName();
-                will(returnValue("myService"));
                 oneOf(serviceSchema).getPropertiesSchemas();
-                will(returnValue(new ParameterSchema[0]));
+                will(returnValue(new ArrayList<>()));
                 oneOf(serviceSchema).getActionSchemas();
-                will(returnValue(new ActionSchema[0]));
+                will(returnValue(new ArrayList<>()));
                 oneOf(serviceSchema).getPropertiesSchemas();
-                will(returnValue(new ParameterSchema[0]));
+                will(returnValue(new ArrayList<>()));
                 oneOf(serviceSchema).getActionSchemas();
-                will(returnValue(new ActionSchema[0]));
+                will(returnValue(new ArrayList<>()));
             }
         });
 
@@ -153,7 +153,6 @@ public class SchemaBasedGenericDeviceTest {
                 addSchemaBasedService(createService(serviceSchema));
             }
         };
-
         context.assertIsSatisfied();
 
         assertEquals("myService", device.getService("myService").getName());

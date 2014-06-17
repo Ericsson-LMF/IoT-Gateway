@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
+import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
@@ -49,7 +50,7 @@ public class ParameterSchema implements GDPropertyMetadata {
     private Number minValue;
     private Number maxValue;
     private Object defaultValue;
-    private Class type;
+    private Class<?> type;
     private String[] validValues;
     private String path;
 
@@ -60,11 +61,7 @@ public class ParameterSchema implements GDPropertyMetadata {
      * {@link Float.class}
      * @param defaultValue
      */
-    private ParameterSchema(String name, Class type, Object defaultValue) {
-        if (!(Long.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type) || String.class.isAssignableFrom(type))) {
-            throw new ServiceSchemaError("Parameter must be of type Long, Integer, Float or String");
-        }
-
+    private ParameterSchema(String name, Class<?> type, Object defaultValue) {
         if (defaultValue != null && !type.isAssignableFrom(defaultValue.getClass())) {
             throw new ServiceSchemaError("Default value is not of type: " + type);
         }
@@ -78,6 +75,8 @@ public class ParameterSchema implements GDPropertyMetadata {
         } else if (Long.class.isAssignableFrom(type)) {
             minValue = Long.MIN_VALUE;
             maxValue = Long.MAX_VALUE;
+        } else if (!String.class.isAssignableFrom(type)) {
+            throw new ServiceSchemaError("Parameter must be of type Long, Integer, Float or String");
         }
 
         this.name = name;
@@ -232,7 +231,7 @@ public class ParameterSchema implements GDPropertyMetadata {
      */
     @Override
     public String getPath() {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         return path + "/parameter/" + this.getName();
     }
 
@@ -241,7 +240,7 @@ public class ParameterSchema implements GDPropertyMetadata {
      */
     @Override
     public void updatePath(String path) {
-        GDAccessSecurity.checkSetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.SET);
         this.path = path;
     }
 
@@ -251,7 +250,7 @@ public class ParameterSchema implements GDPropertyMetadata {
         private Number minValue;
         private Number maxValue;
         private Object defaultValue;
-        private Class type;
+        private Class<?> type;
         private String[] validValues;
 
         /**

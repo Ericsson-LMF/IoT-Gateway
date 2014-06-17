@@ -68,8 +68,8 @@ public class ServiceSchemaTest {
                 .addProperty(property2).
                 build();
 
-        assertArrayEquals(new ActionSchema[]{action1, action2}, serviceSchema.getActionSchemas());
-        assertArrayEquals(new ParameterSchema[]{property1, property2}, serviceSchema.getPropertiesSchemas());
+        assertArrayEquals(new ActionSchema[]{action1, action2}, serviceSchema.getActionSchemas().toArray());
+        assertArrayEquals(new ParameterSchema[]{property1, property2}, serviceSchema.getPropertiesSchemas().toArray());
         assertEquals("service", serviceSchema.getName());
     }
 

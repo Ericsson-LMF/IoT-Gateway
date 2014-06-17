@@ -39,22 +39,10 @@ import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 
 public class GDAccessSecurity {
 
-    public static void checkGetPermission(String clazz) {
-        checkPermission(clazz, Type.GET);
-    }
-
-    public static void checkSetPermission(String clazz) {
-        checkPermission(clazz, Type.SET);
-    }
-
-    public static void checkExecutePermission(String clazz) {
-        checkPermission(clazz, Type.EXECUTE);
-    }
-
-    private static void checkPermission(String clazz, Type action) {
+    public static void checkPermission(Class<?> clazz, Type action) {
         SecurityManager manager = System.getSecurityManager();
         if (null != manager) {
-            manager.checkPermission(new GDAccessPermission(clazz, action));
+            manager.checkPermission(new GDAccessPermission(clazz.getName(), action));
         }
     }
 

@@ -34,24 +34,21 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.deviceaccess.api.Constants;
+import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.GenericDevice;
-import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkGetPermission;
-import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkSetPermission;
+import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkPermission;
 import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.research.commonutil.StringUtil;
 import com.ericsson.research.commonutil.function.FunctionalUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 
 public abstract class GenericDeviceImpl extends GenericDevice.Stub implements GenericDevice {
 
@@ -64,7 +61,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      * @return Properties object that can be used in registerService() method.
      */
     public static Map<String, Object> getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
-        checkGetPermission(GenericDevice.class.getName());
+        checkPermission(GenericDevice.class, Type.GET);
         Map<String, Object> props = new HashMap<>();
         if (dev.getURN() != null) {
             props.put(Constants.PARAM_DEVICE_URN, dev.getURN());
@@ -116,12 +113,12 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      */
     @Override
     public GDService getService(String name) {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return service.get(name);
     }
 
     public GDServiceImpl getServiceImpl(String svcName) {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return (GDServiceImpl) service.get(name);
     }
 
@@ -131,7 +128,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      * @return Map of service instances with their names as key.
      */
     public Map<String, GDService> getService() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return new HashMap<>(service);
     }
 
@@ -143,21 +140,8 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      */
     @Override
     public void putService(GDService svc) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         service.put(svc.getName(), svc);
-        svc.updatePath(getPath(true));
-        ((com.ericsson.deviceaccess.spi.genericdevice.GDService) svc).setParentDevice(this);
-        isReady = true;
-    }
-
-    /**
-     * @param name
-     * @param svc
-     * @deprecate
-     */
-    public void putService(String name, GDService svc) {
-        checkSetPermission(getClass().getName());
-        service.put(name, svc);
         svc.updatePath(getPath(true));
         ((com.ericsson.deviceaccess.spi.genericdevice.GDService) svc).setParentDevice(this);
         isReady = true;
@@ -165,25 +149,25 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public void setId(String id) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.id = id;
     }
 
     @Override
     public String getId() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return id;
     }
 
     @Override
     public String getURN() {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         return urn;
     }
 
     @Override
     public void setURN(String urn) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         if (urn == null) {
             throw new IllegalArgumentException("URN may not be null");
         }
@@ -200,7 +184,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public void setName(String name) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         if (name == null) {
             throw new IllegalArgumentException("Name may not be null");
         }
@@ -217,49 +201,49 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public String getName() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return name;
     }
 
     @Override
     public void setType(String type) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.type = type;
     }
 
     @Override
     public String getType() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return type;
     }
 
     @Override
     public void setProtocol(String protocol) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.protocol = protocol;
     }
 
     @Override
     public String getProtocol() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return protocol;
     }
 
     @Override
     public void setLocation(String location) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.location = location;
     }
 
     @Override
     public String getLocation() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return location;
     }
 
     @Override
     public void setOnline(boolean online) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         boolean oldOnline = this.online;
         this.online = online;
         if (isReady && online != oldOnline) {
@@ -273,30 +257,30 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public boolean isOnline() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return online;
     }
 
     @Override
     public void setIcon(String icon) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.icon = icon;
     }
 
     @Override
     public String getIcon() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return icon;
     }
 
     @Override
     public State getState() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return state;
     }
 
     public void setState(State state) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         State oldState = this.state;
         this.state = state;
         if (isReady && ((state == null && oldState != null) || (state != null && !state.equals(oldState)))) {
@@ -310,32 +294,32 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public String getPath(boolean isAbsolute) {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return path + "/" + this.getId();
     }
 
     @Override
     public String getPath() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return path + "/" + this.getId();
     }
 
     @Override
     public void updatePath(String path) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.path = path;
         service.forEach((k, svc) -> svc.updatePath(getPath(true)));
     }
 
     @Override
     public void setContact(String contact) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.contact = contact;
     }
 
     @Override
     public String getContact() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return contact;
     }
 
@@ -346,74 +330,74 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      * @param service map of service instances with their names as key.
      */
     public void setService(Map service) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.service = service;
     }
 
     @Override
     public void setManufacturer(String manufacturer) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.manufacturer = manufacturer;
 
     }
 
     @Override
     public String getManufacturer() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return manufacturer;
     }
 
     @Override
     public void setModelName(String modelName) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.modelName = modelName;
     }
 
     @Override
     public String getModelName() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return modelName;
     }
 
     @Override
     public void setDescription(String description) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.description = description;
     }
 
     @Override
     public String getDescription() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return description;
     }
 
     @Override
     public void setSerialNumber(String serialNumber) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.serialNumber = serialNumber;
     }
 
     @Override
     public String getSerialNumber() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return serialNumber;
     }
 
     @Override
     public void setProductClass(String productClass) {
-        checkSetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.SET);
         this.productClass = productClass;
     }
 
     @Override
     public String getProductClass() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return productClass;
     }
 
     @Override
     public String serialize(Format format) throws GDException {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         if (format.isJson()) {
             int indent = 0;
             return toJsonString(format, indent, false);
@@ -429,7 +413,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public String getSerializedNode(String path, Format format) throws GDException {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }
@@ -563,7 +547,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     @Override
     public String[] getServiceNames() {
-        checkGetPermission(getClass().getName());
+        checkPermission(GenericDevice.class, Type.GET);
         return service.keySet().toArray(new String[0]);
     }
 

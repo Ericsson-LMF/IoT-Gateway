@@ -37,13 +37,10 @@ package com.ericsson.deviceaccess.upnp;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import org.apache.regexp.RE;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -361,23 +358,24 @@ public class UPnPUtil {
     }
 
     static public String[] parseServiceType(String serviceType) {
-        return UPnPUtil.stringSplit(serviceType, ":");
+        return serviceType.split(":");
+        //UPnPUtil.stringSplit(serviceType, ":");
     }
-
-    static private String[] stringSplit(String str, String delimiter) {
-        StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
-        List<String> tokenList = new ArrayList<>();
-
-        while (tokenizer.hasMoreElements()) {
-            String token = tokenizer.nextToken();
-            if (token == null) {
-                continue;
-            }
-            tokenList.add(token);
-        }
-
-        return tokenList.toArray(new String[tokenList.size()]);
-    }
+//
+//    static private String[] stringSplit(String str, String delimiter) {
+//        StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
+//        List<String> tokenList = new ArrayList<>();
+//
+//        while (tokenizer.hasMoreElements()) {
+//            String token = tokenizer.nextToken();
+//            if (token == null) {
+//                continue;
+//            }
+//            tokenList.add(token);
+//        }
+//
+//        return tokenList.toArray(new String[tokenList.size()]);
+//    }
 
     private UPnPUtil() {
     }

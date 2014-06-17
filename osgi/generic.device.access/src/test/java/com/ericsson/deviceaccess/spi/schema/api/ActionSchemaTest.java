@@ -71,7 +71,7 @@ public class ActionSchemaTest {
 
         assertEquals("act1", actionSchema.getName());
         assertTrue(actionSchema.isMandatory());
-        assertArrayEquals(new ParameterSchema[]{a1, a2}, actionSchema.getArgumentsSchemas());
-        assertArrayEquals(new ParameterSchema[]{r1, r2}, actionSchema.getResultSchema());
+        assertArrayEquals(new ParameterSchema[]{a1, a2}, actionSchema.getArgumentsSchemas().toArray());
+        assertArrayEquals(new ParameterSchema[]{r1, r2}, actionSchema.getResultSchema().toArray());
     }
 }

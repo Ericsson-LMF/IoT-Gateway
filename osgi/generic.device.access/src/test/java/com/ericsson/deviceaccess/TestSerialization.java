@@ -43,15 +43,11 @@ import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
-import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.Map;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -238,7 +234,8 @@ public class TestSerialization {
     class TestService extends GDServiceImpl {
 
         TestService() {
-            super("test", Arrays.asList(serviceSchema.getPropertiesSchemas()));
+            super("test",
+                    serviceSchema.getPropertiesSchemas());
             init();
         }
 
@@ -250,8 +247,8 @@ public class TestSerialization {
 
             TestAction() {
                 super("action",
-                        Arrays.asList(serviceSchema.getActionSchemas()[0].getArgumentsSchemas()),
-                        Arrays.asList(serviceSchema.getActionSchemas()[0].getResultSchema()));
+                        serviceSchema.getActionSchemas().get(0).getArgumentsSchemas(),
+                        serviceSchema.getActionSchemas().get(0).getResultSchema());
             }
         }
     }

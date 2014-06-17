@@ -46,15 +46,13 @@ import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
 import com.ericsson.deviceaccess.spi.schema.based.SBService;
 import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
-import java.util.Dictionary;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -169,9 +167,9 @@ public class SchemaBasedServiceBaseTest {
                 oneOf(actionSchema).getName();
                 will(returnValue("customAction"));
                 oneOf(actionSchema).getResultSchema();
-                will(returnValue(new ParameterSchema[0]));
+                will(returnValue(new ArrayList<>()));
                 oneOf(actionSchema).getArgumentsSchemas();
-                will(returnValue(new ParameterSchema[0]));
+                will(returnValue(new ArrayList<>()));
             }
         });
 

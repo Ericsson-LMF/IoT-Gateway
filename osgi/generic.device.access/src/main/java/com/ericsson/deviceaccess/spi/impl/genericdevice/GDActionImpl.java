@@ -35,6 +35,7 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
@@ -63,7 +64,7 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
      * @param resultMetadata a Map name:String ->
      * metadata:{@link GDPropertyMetadata}
      */
-    public GDActionImpl(String name, Iterable<GDPropertyMetadata> argumentsMetadata, Iterable<GDPropertyMetadata> resultMetadata) {
+    public GDActionImpl(String name, Iterable<? extends GDPropertyMetadata> argumentsMetadata, Iterable<? extends GDPropertyMetadata> resultMetadata) {
         this.name = name;
 
         this.resultMetadata = new HashMap<>();
@@ -82,7 +83,7 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
      */
     @Override
     public String getName() {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         return name;
     }
 
@@ -92,7 +93,7 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
     @Override
     public void execute(GDActionContext sac)
             throws GDException {
-        GDAccessSecurity.checkExecutePermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.EXECUTE);
     }
 
     /**
@@ -101,16 +102,14 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
     @Override
     public final GDActionResult execute(GDProperties arguments)
             throws GDException {
-        GDAccessSecurity.checkExecutePermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.EXECUTE);
 
         GDActionContextImpl context = new GDActionContextImpl(getVerifiedArguments(arguments), createResult());
         execute(context);
         return context.getResult();
     }
 
-    private GDProperties getVerifiedArguments(
-            GDProperties input) {
-
+    private GDProperties getVerifiedArguments(GDProperties input) {
         GDProperties output = createArguments();
         if (input == null) {
             return output;
@@ -194,25 +193,19 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
      */
     @Override
     public String getPath() {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         return path + "/action/" + this.getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updatePath(String path) {
-        GDAccessSecurity.checkSetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.SET);
         this.path = path;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String serialize(Format format) throws GDException {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         if (format.isJson()) {
             return toJsonString(format, 0);
         } else {
@@ -220,13 +213,9 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String getSerializedNode(String path, Format format)
-            throws GDException {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+    public String getSerializedNode(String path, Format format) throws GDException {
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }

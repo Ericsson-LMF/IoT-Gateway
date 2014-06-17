@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
@@ -190,7 +191,7 @@ public class GDActionContextImpl extends GDActionContext.Stub implements GDActio
 
     @Override
     public String serialize(Format format) throws GDException {
-        GDAccessSecurity.checkGetPermission(getClass().getName());
+        GDAccessSecurity.checkPermission(getClass(), Type.GET);
         if (format.isJson()) {
             StringBuilder sb = new StringBuilder("{");
             sb.append("\"device\":\"").append(getDevice()).append("\",");

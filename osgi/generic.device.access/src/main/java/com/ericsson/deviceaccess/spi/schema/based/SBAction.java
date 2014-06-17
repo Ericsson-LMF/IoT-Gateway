@@ -39,17 +39,15 @@ import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import com.ericsson.deviceaccess.spi.schema.ActionDefinition;
-import java.util.Collection;
 
-final class SBAction extends
-        GDActionImpl {
+final class SBAction extends GDActionImpl {
 
     private final SBServiceBase schemaBasedServiceBase;
 
     SBAction(String name,
             SBServiceBase schemaBasedServiceBase,
-            Collection<GDPropertyMetadata> argumentsMetadata,
-            Collection<GDPropertyMetadata> resultMetadata) {
+            Iterable<? extends GDPropertyMetadata> argumentsMetadata,
+            Iterable<? extends GDPropertyMetadata> resultMetadata) {
         super(name, argumentsMetadata, resultMetadata);
         this.schemaBasedServiceBase = schemaBasedServiceBase;
     }
@@ -63,8 +61,7 @@ final class SBAction extends
     @Override
     public void execute(GDActionContext sac) throws GDException {
         ActionDefinition actionDefinition = schemaBasedServiceBase.getActionDefinitions(getName());
-        if (actionDefinition == null) {
-        } else {
+        if (actionDefinition != null) {
             actionDefinition.invoke(sac);
         }
     }
