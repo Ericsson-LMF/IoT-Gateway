@@ -35,6 +35,7 @@
 package com.ericsson.deviceaccess.api.genericdevice;
 
 import java.util.Dictionary;
+import java.util.Map;
 
 /**
  * GDA Property Events are mapped and delivered to applications according to the
@@ -149,7 +150,7 @@ public interface GDEventListener {
      * @param serviceName the name of the service that the change affect
      * @param properties the properties that was changed
      */
-    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Dictionary properties);
+    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Map<String, Object> properties);
 
     public void notifyGenericDevicePropertyRemovedEvent(String deviceId, String serviceName, String propertyId);
 

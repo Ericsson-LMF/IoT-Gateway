@@ -47,6 +47,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
@@ -230,7 +231,7 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
         configManager.unsetParameter(id);
     }
 
-    public void handlePropertyUpdate(Dictionary properties, String deviceId, String serviceName, String propertyName) {
+    public void handlePropertyUpdate(Map<String, Object> properties, String deviceId, String serviceName, String propertyName) {
         // Only call rules that have an attribute with the same deviceId.serviceName.propertyName
         String ruleName = deviceId + "." + serviceName + "." + propertyName;
         List<Rule> ruleList = ruleMap.getOrDefault(ruleName, Collections.emptyList());

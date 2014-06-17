@@ -34,6 +34,7 @@
  */
 package com.ericsson.research.commonutil;
 
+import java.util.function.UnaryOperator;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -53,8 +54,16 @@ public enum StringUtil {
      * @return capitalised string
      */
     public static String capitalize(String string) {
+        return editCharacter(string, 0, Character::toUpperCase);
+    }
+
+    public static String decapitalize(String string) {
+        return editCharacter(string, 0, Character::toLowerCase);
+    }
+
+    private static String editCharacter(String string, int index, UnaryOperator<Character> editor) {
         StringBuilder sb = new StringBuilder(string);
-        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+        sb.setCharAt(index, editor.apply(sb.charAt(index)));
         return sb.toString();
     }
 

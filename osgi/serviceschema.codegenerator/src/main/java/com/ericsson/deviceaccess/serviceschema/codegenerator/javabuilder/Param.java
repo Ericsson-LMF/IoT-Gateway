@@ -1,5 +1,7 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
+import com.ericsson.research.commonutil.StringUtil;
+
 /**
  * Parameter for
  * {@link com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable}
@@ -19,7 +21,7 @@ public class Param {
      * @param name
      */
     public Param(String type, String name) {
-        this.name = name;
+        this.name = StringUtil.decapitalize(name);
         this.type = type;
     }
 

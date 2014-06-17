@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
+import com.ericsson.research.commonutil.LegacyUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
@@ -67,7 +68,7 @@ public class RuleDevice extends SBGenericDevice {
     public void start() {
         ruleService.start(context, configManager);
         propertyManager.start(context, ruleService);
-        serviceReg = context.registerService(GenericDevice.class, this, getDeviceProperties());
+        serviceReg = context.registerService(GenericDevice.class, this, LegacyUtil.toDictionary(getDeviceProperties()));
     }
 
     public void stop() {

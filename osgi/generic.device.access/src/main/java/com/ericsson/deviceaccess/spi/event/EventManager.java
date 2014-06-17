@@ -141,7 +141,7 @@ public class EventManager implements ServiceListener, Runnable,
             if (isEventInvalid(event)) {
                 continue;
             }
-            Dictionary<String, Object> matching = new Hashtable<>();
+            Map<String, Object> matching = new HashMap<>();
             addForNoPropertyEvent(event, matching);
             invokeListeners(event, matching);
         }
@@ -161,21 +161,18 @@ public class EventManager implements ServiceListener, Runnable,
         return event.properties == null && !event.propertyEvent;
     }
 
-    private void addForNoPropertyEvent(GenericDeviceEvent event, Dictionary<String, Object> matching) {
+    private void addForNoPropertyEvent(GenericDeviceEvent event, Map<String, Object> matching) {
         if (!event.propertyEvent) {
             matching.put(DEVICE_ID, event.deviceId);
             matching.put(SERVICE_NAME, event.serviceId);
             matching.put(DEVICE_PROTOCOL, event.device.getProtocol());
             matching.put(DEVICE_URN, event.device.getURN());
             matching.put(DEVICE_NAME, event.device.getName());
-            for (Enumeration e = event.properties.keys(); e.hasMoreElements();) {
-                String key = (String) e.nextElement();
-                matching.put(key, event.properties.get(key));
-            }
+            event.properties.forEach((key, value) -> matching.put(key, value));
         }
     }
 
-    private void invokeListeners(GenericDeviceEvent event, Dictionary<String, Object> matchingProperties) {
+    private void invokeListeners(GenericDeviceEvent event, Map<String, Object> matchingProperties) {
         String deviceId = event.deviceId;
         String serviceName = event.serviceId;
         listeners.forEach((listener, filter) -> {
@@ -190,7 +187,7 @@ public class EventManager implements ServiceListener, Runnable,
                     consumer = listener::notifyGenericDevicePropertyRemovedEvent;
                 }
                 consumer.consume(deviceId, serviceName, event.propertyId);
-            } else if (filter.match(matchingProperties)) {
+            } else if (filter.matches(matchingProperties)) {
                 System.out.println(deviceId + " " + serviceName + " " + event.properties);
                 listener.notifyGenericDeviceEvent(deviceId, serviceName, event.properties);
             }
@@ -218,7 +215,7 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
-    private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Dictionary<String, Object> matchingProperties) {
+    private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Map<String, Object> matchingProperties) {
         if (filter != null) {
             String deltaProperty = filter.toString();
             if (deltaProperty.contains("__delta")) {
@@ -226,7 +223,7 @@ public class EventManager implements ServiceListener, Runnable,
                 deltaProperty = deltaProperty.replaceAll(".*\\(", "");
                 String deltaString = deltaProperty + "__delta";
 
-                Dictionary properties = event.properties;
+                Map<String, Object> properties = event.properties;
                 // Is this an event update for the delta property?
                 if (properties.get(deltaProperty) != null) {
                     Object property = matchingProperties.get(deltaProperty);
@@ -340,7 +337,7 @@ public class EventManager implements ServiceListener, Runnable,
      * @param serviceId
      * @param properties
      */
-    public void addEvent(String deviceId, String serviceId, Dictionary properties) {
+    public void addEvent(String deviceId, String serviceId, Map<String, Object> properties) {
         addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, properties));
     }
 
@@ -373,7 +370,7 @@ public class EventManager implements ServiceListener, Runnable,
         devices.put(device.getId(), device);
 
         // Always generate a state event when a new device is registered
-        Dictionary<String, Object> properties = new Hashtable<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(DEVICE_STATE, device.getState());
         addEvent(device.getId(), "DeviceProperties", properties);
         return device;
@@ -395,13 +392,13 @@ public class EventManager implements ServiceListener, Runnable,
 
         public String deviceId;
         public String serviceId;
-        public Dictionary<String, Object> properties;
+        public Map<String, Object> properties;
         public boolean propertyEvent;
         public String propertyId;
         public boolean propertyAdded;
         public GenericDevice device;
 
-        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, Dictionary<String, Object> properties) {
+        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, Map<String, Object> properties) {
             propertyEvent = false;
             this.device = device;
             this.deviceId = deviceId;
@@ -416,7 +413,7 @@ public class EventManager implements ServiceListener, Runnable,
             this.serviceId = serviceId;
             this.propertyId = propertyId;
             this.propertyAdded = propertyAdded;
-            this.properties = new Hashtable<>();
+            this.properties = new HashMap<>();
             properties.put(GDEventListener.DEVICE_ID, deviceId);
             properties.put(propertyId, new Object());
             properties.put(GDEventListener.SERVICE_NAME, serviceId);

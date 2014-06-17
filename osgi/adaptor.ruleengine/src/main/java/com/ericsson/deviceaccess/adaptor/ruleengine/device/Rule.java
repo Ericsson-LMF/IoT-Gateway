@@ -46,6 +46,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,7 +58,7 @@ import org.osgi.framework.ServiceReference;
 
 public class Rule {
 
-    final static HashMap<String, Integer> WEEKDAYS = new HashMap<String, Integer>() {
+    final static Map<String, Integer> WEEKDAYS = new HashMap<String, Integer>() {
         {
             put("sun", 0);
             put("mon", 1);
@@ -386,7 +387,7 @@ public class Rule {
         }
     }
 
-    public boolean match(Dictionary properties) {
+    public boolean match(Map<String, Object> properties) {
         return ldapFilter.evaluate(properties, true);
     }
 

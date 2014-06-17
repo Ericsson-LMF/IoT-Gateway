@@ -41,13 +41,12 @@ import java.math.BigInteger;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,7 +77,7 @@ public class LDAPExpr {
     private static Map<Class<?>, Constructor<?>> constructorMap = new ConcurrentHashMap<>();
     private static Constructor<?> DUMMY_CONS = LDAPExpr.class.getConstructors()[0];
 
-    public static boolean query(String filter, Dictionary pd) throws InvalidSyntaxException {
+    public static boolean query(String filter, Map<String, Object> pd) throws InvalidSyntaxException {
         return new LDAPExpr(filter).evaluate(pd, false);
     }
 
@@ -212,7 +211,7 @@ public class LDAPExpr {
     public static void main(String[] args) {
         try {
             LDAPExpr l = new LDAPExpr("(prop1&=bpan*)");
-            Properties p = new Properties();
+            Map<String, Object> p = new HashMap<>();
             p.put("prop1", "apanrap");
             System.out.println(l.evaluate(p, true));
         } catch (InvalidSyntaxException e) {
@@ -353,7 +352,7 @@ public class LDAPExpr {
      * @param matchCase
      * @return
      */
-    public boolean evaluate(Dictionary p, boolean matchCase) {
+    public boolean evaluate(Map<String, Object> p, boolean matchCase) {
         if ((operator & SIMPLE) != 0) {
             return compare(p.get(matchCase ? attrName : attrName.toLowerCase()), operator, attrValue);
         } else { // (operator & COMPLEX) != 0

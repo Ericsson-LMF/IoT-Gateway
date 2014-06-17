@@ -36,7 +36,8 @@ package com.ericsson.deviceaccess.spi.event;
 
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.hamcrest.Description;
@@ -47,6 +48,8 @@ import org.jmock.api.Invocation;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.osgi.framework.BundleContext;
@@ -86,7 +89,7 @@ public class EventManagerTest {
             {
                 oneOf(bundleContext).getService(deviceReference);
                 will(returnValue(device));
-                allowing(listener).notifyGenericDeviceEvent(with(aNonNull(String.class)), with(any(String.class)), with(new Hashtable<String, Object>() {
+                allowing(listener).notifyGenericDeviceEvent(with(aNonNull(String.class)), with(any(String.class)), with(new HashMap<String, Object>() {
                     {
                         put("device.state", "Ready");
                     }
@@ -142,7 +145,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("dev"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("dev"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("device.online", true);
                     }
@@ -151,7 +154,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("dev", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("dev", "srv", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, true);
             }
@@ -176,12 +179,12 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
                 }));
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("temp", 30);
                     }
@@ -190,27 +193,27 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave32", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave32", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -235,12 +238,12 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv1"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv1"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
                 }));
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
                     {
                         put("temp", 30);
                     }
@@ -249,22 +252,22 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv1", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv1", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave31", "srv1", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv1", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -289,12 +292,12 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
                 }));
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("temp", 30);
                     }
@@ -303,27 +306,27 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave32", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave34", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave34", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave35", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave35", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -348,7 +351,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
@@ -357,28 +360,28 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
 
-        eventManager.addEvent("zwave31", "srv2", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv2", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave34", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave34", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave35", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave35", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -403,7 +406,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
                     {
                         put(GDEventListener.DEVICE_ONLINE, true);
                         put("temp", 30);
@@ -413,19 +416,19 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, true);
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, true);
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, false);
                 put("temp", 30);
@@ -451,7 +454,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
                     {
                         put(GDEventListener.DEVICE_PROTOCOL, "banan");
                         put("temp", 30);
@@ -461,19 +464,19 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_PROTOCOL, "banan");
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_PROTOCOL, "banan");
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_PROTOCOL, "apa");
                 put("temp", 30);
@@ -505,7 +508,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -531,7 +534,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", (float) 104.34);
                         put("power__delta", (float) 4.24);
@@ -542,13 +545,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", (float) 100.10);
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", (float) 104.34);
             }
@@ -574,7 +577,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new Hashtable<String, Object>() {
+                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                         put("power__delta", 4);
@@ -585,13 +588,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 96);
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new Hashtable<String, Object>() {
+        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
@@ -606,7 +609,7 @@ public class EventManagerTest {
 //    @Test
     public void testFiltering() throws InvalidSyntaxException {
         Filter filter = FrameworkUtil.createFilter("(&(device.id=zwave31)(|(temp >= 30)(power <= 100)))");
-        assertTrue(filter.match(new Hashtable<String, Object>() {
+        assertTrue(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.id", "zwave31");
                 put("service.id", "banan");
@@ -614,7 +617,7 @@ public class EventManagerTest {
             }
         }));
 
-        assertTrue(filter.match(new Hashtable<String, Object>() {
+        assertTrue(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.id", "zwave31");
                 put("service.id", "apple");
@@ -622,7 +625,7 @@ public class EventManagerTest {
             }
         }));
 
-        assertFalse(filter.match(new Hashtable<String, Object>() {
+        assertFalse(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.id", "zwave31");
                 put("service.id", "apple");
@@ -632,7 +635,7 @@ public class EventManagerTest {
         }));
 
         filter = FrameworkUtil.createFilter("(&(device.id=32))");
-        assertTrue(filter.match(new Hashtable<String, Object>() {
+        assertTrue(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.id", 32);
                 put("service.id", "banan");
@@ -641,7 +644,7 @@ public class EventManagerTest {
         }));
 
         filter = FrameworkUtil.createFilter("(&(device.id=32)(p1 >= 20))");
-        assertTrue(filter.match(new Hashtable<String, Object>() {
+        assertTrue(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.id", 32);
                 put("p1", 22);
@@ -650,13 +653,13 @@ public class EventManagerTest {
         }));
 
         filter = FrameworkUtil.createFilter("(&(device.online=true)(|(CurrentPower=*)(CurrentTemperature=*)))");
-        assertTrue(filter.match(new Hashtable<String, Object>() {
+        assertTrue(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.online", true);
                 put("CurrentPower", 22);
             }
         }));
-        assertFalse(filter.match(new Hashtable<String, Object>() {
+        assertFalse(filter.matches(new HashMap<String, Object>() {
             {
                 put("device.online", false);
                 put("CurrentPower", 22);

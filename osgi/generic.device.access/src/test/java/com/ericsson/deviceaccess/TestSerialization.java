@@ -34,21 +34,24 @@
  */
 package com.ericsson.deviceaccess;
 
-import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.Serializable.Format;
-import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.event.EventManager;
-import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Map;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -174,7 +177,7 @@ public class TestSerialization {
         ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
-                oneOf(eventManager).addEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Dictionary.class)));
+                oneOf(eventManager).addEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Map.class)));
             }
         });
 

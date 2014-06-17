@@ -43,12 +43,11 @@ import com.ericsson.deviceaccess.api.service.homeautomation.power.SwitchPower;
 import com.ericsson.deviceaccess.api.service.media.ContentDirectory;
 import com.ericsson.deviceaccess.api.service.media.RenderingControl;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
+import com.ericsson.research.commonutil.LegacyUtil;
+import com.ericsson.research.commonutil.function.FunctionalUtil;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 import org.apache.regexp.RE;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -115,7 +114,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     public void start() {
         subscribeToEvents(UPnPFilterRule.deviceID(device.getId()));
         device.setState(State.ADDED);
-        devReg = context.registerService(GenericDevice.class, device, device.getDeviceProperties());
+        devReg = context.registerService(GenericDevice.class, device, LegacyUtil.toDictionary(device.getDeviceProperties()));
         device.setState(State.READY);
     }
 
@@ -143,9 +142,9 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             Filter filter;
             try {
                 filter = context.createFilter(rule.toFilterRule());
-                Dictionary<String, Object> props = new Hashtable<>();
+                Map<String, Object> props = new HashMap<>();
                 props.put(UPnPEventListener.UPNP_FILTER, filter);
-                this.eventListenerReg = context.registerService(UPnPEventListener.class, this, props);
+                this.eventListenerReg = context.registerService(UPnPEventListener.class, this, LegacyUtil.toDictionary(props));
             } catch (InvalidSyntaxException e) {
                 logger.error("Parsing failed: " + e);
             }
@@ -204,39 +203,37 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     @Override
     public void notifyUPnPEvent(String deviceId, String serviceId, Dictionary eventTable) {
+        Map<String, String> events = LegacyUtil.toMap(eventTable);
         logger.debug("UPnP event received for " + deviceId + "#" + serviceId);
         if (deviceId.equals(device.getId())) {
             GDService svc = device.getService(getSWoTServiceNameFromUPnPServiceId(serviceId));
             if (svc != null) {
-                Dictionary lastChangeVariables = null;
-                for (Enumeration events = eventTable.keys(); events.hasMoreElements();) {
-                    String event = (String) events.nextElement();
+                events.forEach((event, data) -> {
                     if (event.equals("LastChange")) {
                         logger.debug("Received LastChange variables event");
-                        Properties changedVars = UPnPUtil.parseLastChangeEvent((String) eventTable.get(event));
-                        for (Enumeration vars = changedVars.keys(); vars.hasMoreElements();) {
-                            String name = (String) vars.nextElement();
+                        Map<String, String> changedVars = UPnPUtil.parseLastChangeEvent(data);
+                        changedVars.forEach((name, value) -> {
                             if (null != name) {
                                 switch (name) {
                                     case "Volume":
                                         try {
-                                            svc.getProperties().setStringValue("CurrentVolume", changedVars.getProperty(name));
+                                            svc.getProperties().setStringValue("CurrentVolume", value);
                                         } catch (Exception e) {
                                             // TODO: Parsing error, it seems the string contains channel as well
                                         }
                                         break;
                                     case "AVTransportURI":
                                         // TODO: This does not work with the Noxon. It uses a different variable for this information
-                                        svc.getProperties().setStringValue("CurrentUrl", changedVars.getProperty(name));
+                                        svc.getProperties().setStringValue("CurrentUrl", value);
                                         break;
                                     case "CurrentTrackMetaData":
                                         // TODO: This does not work with the Noxon. It uses a different variable for this information
-                                        String title = getMediaTitle(changedVars.getProperty(name));
+                                        String title = getMediaTitle(value);
                                         logger.debug("Media title is " + title);
                                         svc.getProperties().setStringValue("CurrentTitle", title);
                                         break;
                                     case "TransportState":
-                                        String state = changedVars.getProperty(name).toLowerCase();
+                                        String state = value.toLowerCase();
                                         if (null != state) {
                                             switch (state) {
                                                 case "playing":
@@ -253,45 +250,44 @@ public class UPnPDeviceAgent implements UPnPEventListener {
                                         break;
                                 }
                             }
-                        }
+                        });
                         notifyUpdate(svc.getPath(true) + "/parameter");
                     }
-                }
+                });
             }
 
             /*
              * Update properties of each service
              */
-            Object service = this.idToService.get(serviceId);
-            if ((service != null)
-                    && (service instanceof UpdatePropertyInterface)
-                    && (service instanceof GDService)) {
-                logger.debug("Found UpdatePropertyInterface instance");
-                for (Enumeration events = eventTable.keys(); events.hasMoreElements();) {
-                    String name = (String) events.nextElement();
-                    Object value = eventTable.get(name);
-                    ((UpdatePropertyInterface) service).updateProperty(name, value);
-                    /*
-                     logger.debug("Event: " + event + " = " + eventValue);
-                     if ("LastChange".equals(event)) {
-                     logger.debug("Received LastChange variables event");
-                     Properties changedVars = UPnPUtil.parseLastChangeEvent((String)eventTable.get(event));
-                     for (Enumeration vars = changedVars.keys(); vars.hasMoreElements();) {
-                     String name = (String)vars.nextElement();
-                     String value = (String)changedVars.getProperty(name);
-                     }
-                     }
-                     */
-                }
+            GDService service = idToService.get(serviceId);
+            if (service != null) {
+                FunctionalUtil.doIfCan(UpdatePropertyInterface.class, service, s -> {
+                    logger.debug("Found UpdatePropertyInterface instance");
+                    events.forEach((name, value) -> {
+                        s.updateProperty(name, value);
+                        /*
+                         logger.debug("Event: " + event + " = " + eventValue);
+                         if ("LastChange".equals(event)) {
+                         logger.debug("Received LastChange variables event");
+                         Properties changedVars = UPnPUtil.parseLastChangeEvent((String)eventTable.get(event));
+                         for (Enumeration vars = changedVars.keys(); vars.hasMoreElements();) {
+                         String name = (String)vars.nextElement();
+                         String value = (String)changedVars.getProperty(name);
+                         }
+                         }
+                         */
+                    });
+
+                });
             }
         }
     }
 
     private void notifyUpdate(String path) {
         if (devReg != null) {
-            Dictionary<String, Object> props = device.getDeviceProperties();
+            Map<String, Object> props = device.getDeviceProperties();
             props.put(Constants.UPDATED_PATH, path);
-            devReg.setProperties(props);
+            devReg.setProperties(LegacyUtil.toDictionary(props));
         }
 
     }

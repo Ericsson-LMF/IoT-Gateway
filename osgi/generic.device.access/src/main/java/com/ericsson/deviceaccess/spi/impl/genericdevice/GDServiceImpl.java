@@ -108,7 +108,7 @@ public class GDServiceImpl extends GDService.Stub
         properties.removeDynamicProperty(propertyMetadata);
     }
 
-    protected void notifyEvent(Properties parameters) {
+    protected void notifyEvent(HashMap<String, Object> parameters) {
         parentDevice.notifyEvent(getName(), parameters);
     }
 

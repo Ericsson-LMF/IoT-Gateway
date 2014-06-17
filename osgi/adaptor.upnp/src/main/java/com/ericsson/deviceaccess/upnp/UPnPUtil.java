@@ -39,7 +39,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.regexp.RE;
@@ -234,15 +236,15 @@ public class UPnPUtil {
         return args;
     }
 
-    public static Properties parseLastChangeEvent(String value) {
-        Properties result = new Properties();
+    public static Map<String, String> parseLastChangeEvent(String value) {
+        Map<String, String> result = new HashMap<>();
 
         RE varRE = new RE("<(\\w+)\\s.*val=\"(.*)\".*/");
         String[] tags = new RE(">").split(value);
 
         for (String tag : tags) {
             if (varRE.match(tag)) {
-                result.setProperty(varRE.getParen(1), varRE.getParen(2));
+                result.put(varRE.getParen(1), varRE.getParen(2));
             }
         }
 

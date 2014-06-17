@@ -63,9 +63,9 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      * @param dev device to generate properties from
      * @return Properties object that can be used in registerService() method.
      */
-    public static Dictionary<String, Object> getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
+    public static Map<String, Object> getDeviceProperties(com.ericsson.deviceaccess.api.GenericDevice dev) {
         checkGetPermission(GenericDevice.class.getName());
-        Dictionary<String, Object> props = new Hashtable<>();
+        Map<String, Object> props = new HashMap<>();
         if (dev.getURN() != null) {
             props.put(Constants.PARAM_DEVICE_URN, dev.getURN());
         }
@@ -190,7 +190,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         String oldUrn = this.urn;
         this.urn = urn;
         if (isReady && !urn.equals(oldUrn)) {
-            notifyEvent("DeviceProperties", new Properties() {
+            notifyEvent("DeviceProperties", new HashMap() {
                 {
                     put(GDEventListener.DEVICE_URN, GenericDeviceImpl.this.urn);
                 }
@@ -207,7 +207,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         String oldName = this.name;
         this.name = name;
         if (isReady && !name.equals(oldName)) {
-            notifyEvent("DeviceProperties", new Properties() {
+            notifyEvent("DeviceProperties", new HashMap() {
                 {
                     put(GDEventListener.DEVICE_NAME, GenericDeviceImpl.this.name);
                 }
@@ -263,7 +263,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         boolean oldOnline = this.online;
         this.online = online;
         if (isReady && online != oldOnline) {
-            notifyEvent("DeviceProperties", new Properties() {
+            notifyEvent("DeviceProperties", new HashMap() {
                 {
                     put(GDEventListener.DEVICE_ONLINE, GenericDeviceImpl.this.online);
                 }
@@ -300,7 +300,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         State oldState = this.state;
         this.state = state;
         if (isReady && ((state == null && oldState != null) || (state != null && !state.equals(oldState)))) {
-            notifyEvent("DeviceProperties", new Properties() {
+            notifyEvent("DeviceProperties", new HashMap() {
                 {
                     put(GDEventListener.DEVICE_STATE, GenericDeviceImpl.this.state);
                 }
@@ -469,11 +469,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      *
      * @return
      */
-    public Dictionary<String, Object> getDeviceProperties() {
+    public Map<String, Object> getDeviceProperties() {
         return getDeviceProperties(this);
     }
 
-    public void notifyEvent(String serviceId, final Properties parameters) {
+    public void notifyEvent(String serviceId, final Map<String, Object> parameters) {
         GDActivator.getEventManager().addEvent(id, serviceId, parameters);
     }
 

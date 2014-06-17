@@ -44,6 +44,7 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import junit.framework.Assert;
@@ -168,7 +169,7 @@ public class GenericDeviceServiceImplTest {
     public void testFloatEvents() {
         context.checking(new Expectations() {
             {
-                oneOf(device).notifyEvent(with("srv"), with(new Properties() {
+                oneOf(device).notifyEvent(with("srv"), with(new HashMap() {
                     {
                         put("fProp", 23.0f);
                     }
@@ -185,7 +186,7 @@ public class GenericDeviceServiceImplTest {
     public void testIntEvents() {
         context.checking(new Expectations() {
             {
-                oneOf(device).notifyEvent(with("srv"), with(new Properties() {
+                oneOf(device).notifyEvent(with("srv"), with(new HashMap() {
                     {
                         put("iProp", 23);
                     }
@@ -202,7 +203,7 @@ public class GenericDeviceServiceImplTest {
     public void testStringEvents() {
         context.checking(new Expectations() {
             {
-                oneOf(device).notifyEvent(with("srv"), with(new Properties() {
+                oneOf(device).notifyEvent(with("srv"), with(new HashMap() {
                     {
                         put("sProp", "apa");
                     }

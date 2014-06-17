@@ -37,11 +37,9 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
-import java.util.Dictionary;
-import java.util.Enumeration;
+import com.ericsson.research.commonutil.LegacyUtil;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Properties;
+import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -50,28 +48,29 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer {
 
+    /**
+     * Singleton.
+     */
     INSTANCE;
 
     ServiceTracker deviceTracker;
-    HashMap devices = new HashMap();
-    Properties deviceProperties = new Properties();
+    Map<String, GenericDevice> devices = new HashMap<>();
+    Map<String, Object> deviceProperties = new HashMap<>();
     private BundleContext context;
     private ServiceRegistration sr;
     private RuleService ruleService;
     final Object mutex = new Object();
-    static PropertyManager instance;
 
     public void start(BundleContext context, RuleService rs) {
-        instance = this;
         this.context = context;
         this.ruleService = rs;
 
         deviceTracker = new ServiceTracker(context, GenericDevice.class.getName(), this);
         deviceTracker.open();
 
-        Dictionary<String, Object> props = new Hashtable<>();
+        Map<String, Object> props = new HashMap<>();
         props.put(GDEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
-        sr = context.registerService(GDEventListener.class, this, props);
+        sr = context.registerService(GDEventListener.class, this, LegacyUtil.toDictionary(props));
     }
 
     public void stop() {
@@ -80,12 +79,12 @@ public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer
         sr.unregister();
     }
 
-    public Properties getDeviceProperties() {
+    public Map<String, Object> getDeviceProperties() {
         return deviceProperties;
     }
 
     @Override
-    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Dictionary properties) {
+    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Map<String, Object> properties) {
         if (properties == null) {
             return;
         }
@@ -97,25 +96,22 @@ public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer
 
         synchronized (mutex) {
             if ("DeviceProperties".equals(serviceName) && properties.get(GDEventListener.DEVICE_STATE) != null && properties.get(GDEventListener.DEVICE_STATE).equals("Ready")) {
-                GenericDevice device = (GenericDevice) devices.get(deviceId);
+                GenericDevice device = devices.get(deviceId);
                 if (device != null) {
                     updateDevice(device);
                 }
             } else {
-                for (Enumeration i = properties.keys(); i.hasMoreElements();) {
-                    String propertyId = (String) i.nextElement();
-                    deviceProperties.put(deviceId + "." + serviceName + "." + propertyId, properties.get(propertyId));
-                    System.out.println(deviceId + "." + serviceName + "." + propertyId + "=" + properties.get(propertyId));
-                }
+                properties.forEach((key, value) -> {
+                    deviceProperties.put(deviceId + "." + serviceName + "." + key, value);
+                    System.out.println(deviceId + "." + serviceName + "." + key + "=" + value);
+                });
             }
         }
 
-        for (Enumeration i = properties.keys(); i.hasMoreElements();) {
-            String propertyName = (String) i.nextElement();
-
+        properties.forEach((key, value) -> {
             //TODO: Update weekDay and timeOfDay
-            ruleService.handlePropertyUpdate(deviceProperties, deviceId, serviceName, propertyName);
-        }
+            ruleService.handlePropertyUpdate(deviceProperties, deviceId, serviceName, key);
+        });
     }
 
     @Override

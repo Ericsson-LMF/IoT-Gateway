@@ -2,7 +2,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builde
 
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
@@ -18,18 +18,31 @@ public final class Javadoc {
     private static final String JAVADOC_END = " */";
     private static final String LINE_START = " * ";
     private static final String LINE_END = "\n";
-    private static final String TAG_INHERITED = "{@inheritDoc}";
-    private static final String TAG_PARAMETER = "@param";
-    private static final String TAG_RETURN = "@return";
+    
+    private enum Tag{
+        INHERITED("{@inheritDoc}"),
+        PARAMETER("@param"),
+        RETURN("@return"),
+        THROW("@throws");
+        private String string;
+        
+        Tag(String string){
+            this.string = string;
+        }
+        
+        public String get(){
+            return string;
+        }
+    }
     private StringBuilder builder;
-    private Map<String, List<String>> tags;
+    private Map<Tag, List<String>> tags;
 
     /**
      * New builder
      */
     public Javadoc() {
         builder = new StringBuilder();
-        tags = new HashMap<>();
+        tags = new EnumMap<>(Tag.class);
     }
 
     /**
@@ -143,7 +156,7 @@ public final class Javadoc {
      * @return this
      */
     public Javadoc inherit() {
-        addTag(TAG_INHERITED, "");
+        addTag(Tag.INHERITED, "");
         return this;
     }
 
@@ -155,7 +168,12 @@ public final class Javadoc {
      * @return this
      */
     public Javadoc parameter(Object name, Object description) {
-        addTag(TAG_PARAMETER, name + " " + description);
+        addTag(Tag.PARAMETER, name + " " + description);
+        return this;
+    }
+
+    public Javadoc exception(Object name, Object description) {
+        addTag(Tag.THROW, name + " " + description);
         return this;
     }
 
@@ -166,11 +184,11 @@ public final class Javadoc {
      * @return this
      */
     public Javadoc result(Object object) {
-        addTag(TAG_RETURN, object);
+        addTag(Tag.RETURN, object);
         return this;
     }
 
-    private void addTag(String tag, Object value) {
+    private void addTag(Tag tag, Object value) {
         tags.putIfAbsent(tag, new ArrayList<>());
         tags.get(tag).add(value.toString());
     }
@@ -210,7 +228,7 @@ public final class Javadoc {
             emptyLine(result);
         }
         tags.forEach((k, v) -> {
-            v.forEach(s -> line(result, k).append(" ").append(s));
+            v.forEach(s -> line(result, k.get()).append(" ").append(s));
         });
         return result.toString();
     }

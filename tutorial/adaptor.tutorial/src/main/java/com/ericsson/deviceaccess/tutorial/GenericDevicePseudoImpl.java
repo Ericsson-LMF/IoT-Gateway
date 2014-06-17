@@ -43,8 +43,9 @@ import com.ericsson.deviceaccess.api.service.util.PowerMeter;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceUpdateListener;
-import java.util.Dictionary;
+import com.ericsson.research.commonutil.LegacyUtil;
 import java.util.HashMap;
+import java.util.Map;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -100,9 +101,9 @@ public class GenericDevicePseudoImpl extends SBGenericDevice implements
 
     private void notifyUpdate(String path) {
         if (devReg != null) {
-            Dictionary<String, Object> props = this.getDeviceProperties();
+            Map<String, Object> props = this.getDeviceProperties();
             props.put(Constants.UPDATED_PATH, path);
-            devReg.setProperties(props);
+            devReg.setProperties(LegacyUtil.toDictionary(props));
         }
     }
 

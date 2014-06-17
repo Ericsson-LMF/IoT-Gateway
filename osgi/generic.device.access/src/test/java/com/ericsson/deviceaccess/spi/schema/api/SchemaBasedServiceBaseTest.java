@@ -36,22 +36,25 @@ package com.ericsson.deviceaccess.spi.schema.api;
 
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
-import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.deviceaccess.spi.schema.based.SBService;
-import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchemaError;
+import com.ericsson.deviceaccess.spi.schema.based.SBService;
+import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -239,7 +242,7 @@ public class SchemaBasedServiceBaseTest {
         ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
-                oneOf(device).notifyEvent("@@TEST@@", new Properties() {
+                oneOf(device).notifyEvent("@@TEST@@", new HashMap() {
                     {
                         put("dyn", 42);
                     }
@@ -265,7 +268,7 @@ public class SchemaBasedServiceBaseTest {
         ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
-                allowing(eventManager).addEvent(with(any(String.class)), with(any(String.class)), with(any(Dictionary.class)));
+                allowing(eventManager).addEvent(with(any(String.class)), with(any(String.class)), with(any(Map.class)));
             }
         });
 

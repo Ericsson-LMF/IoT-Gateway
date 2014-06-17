@@ -49,6 +49,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
@@ -250,7 +251,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
     }
 
     @Override
-    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Dictionary properties) {
+    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Map<String, Object> properties) {
 //		logger.log(LogService.LOG_DEBUG, "REST Servlet received event: " + deviceId + ", " + serviceName + ", " + properties);
         logger.debug("REST Servlet received event: " + deviceId + ", " + serviceName + ", " + properties);
     }

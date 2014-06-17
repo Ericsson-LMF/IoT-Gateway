@@ -167,7 +167,7 @@ public class GDPropertiesImpl extends GDProperties.Stub
         }
         if (parentService != null && parentService.getParentDevice() != null) {
             if ((value == null && oldValue != null) || (value != null && !value.equals(oldValue))) {
-                parentService.notifyEvent(new Properties() {
+                parentService.notifyEvent(new HashMap() {
                     {
                         put(key, value);
                     }

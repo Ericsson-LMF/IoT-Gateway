@@ -55,10 +55,6 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
         // this.putAction(new UPnPBrowse()); // Adds native upnp browse action
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    // @Override
     @Override
     public BrowseResult executeBrowse(String objectId, String browseFlag, int startIndex, int requestedCount, String sortCriteria, String filter) throws GDException {
         Properties args = new Properties();

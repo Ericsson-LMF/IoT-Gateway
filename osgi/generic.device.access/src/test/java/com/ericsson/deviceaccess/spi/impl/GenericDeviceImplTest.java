@@ -34,13 +34,14 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
-import com.ericsson.deviceaccess.api.Serializable.Format;
+import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.genericdevice.GDService;
-import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
+import java.util.HashMap;
 import java.util.Properties;
 import junit.framework.Assert;
 import static junit.framework.Assert.fail;
@@ -103,13 +104,13 @@ public class GenericDeviceImplTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(eventManager).addEvent("devId", "DeviceProperties", new Properties() {
+                oneOf(eventManager).addEvent("devId", "DeviceProperties", new HashMap() {
                     {
                         put(GDEventListener.DEVICE_ONLINE, true);
                     }
                 });
 
-                oneOf(eventManager).addEvent("devId", "DeviceProperties", new Properties() {
+                oneOf(eventManager).addEvent("devId", "DeviceProperties", new HashMap() {
                     {
                         put(GDEventListener.DEVICE_NAME, "banan");
                     }
