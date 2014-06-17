@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.research.commonutil.LegacyUtil;
-import com.ericsson.research.commonutil.function.FunctionalUtil;
+import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.commonutil.function.FunctionalUtil;
 import java.security.BasicPermission;
 import java.security.Permission;
 import java.security.PermissionCollection;

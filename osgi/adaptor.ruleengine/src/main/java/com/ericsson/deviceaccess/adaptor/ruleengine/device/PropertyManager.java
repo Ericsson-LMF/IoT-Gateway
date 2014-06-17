@@ -34,10 +34,10 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
+import com.ericsson.commonutil.LegacyUtil;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
-import com.ericsson.research.commonutil.LegacyUtil;
 import java.util.HashMap;
 import java.util.Map;
 import org.osgi.framework.BundleContext;
@@ -84,7 +84,7 @@ public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer
     }
 
     @Override
-    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Map<String, Object> properties) {
+    public void notifyGDEvent(String deviceId, String serviceName, Map<String, Object> properties) {
         if (properties == null) {
             return;
         }
@@ -115,14 +115,13 @@ public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer
     }
 
     @Override
-    public void notifyGenericDevicePropertyAddedEvent(String deviceId, String serviceName, String propertyId) {
-        // TOOD: Add property?
-    }
-
-    @Override
-    public void notifyGenericDevicePropertyRemovedEvent(String deviceId, String serviceName, String propertyId) {
-        synchronized (mutex) {
-            deviceProperties.remove(deviceId + "." + serviceName + "." + propertyId);
+    public void notifyGDPropertyEvent(Type type, String deviceId, String serviceName, String propertyId) {
+        if (type == Type.REMOVED) {
+            synchronized (mutex) {
+                deviceProperties.remove(deviceId + "." + serviceName + "." + propertyId);
+            }
+        } else {
+            // TODO: Add property?
         }
     }
 

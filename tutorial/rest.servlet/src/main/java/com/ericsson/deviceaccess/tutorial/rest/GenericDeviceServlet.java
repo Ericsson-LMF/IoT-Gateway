@@ -251,21 +251,13 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
     }
 
     @Override
-    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Map<String, Object> properties) {
-//		logger.log(LogService.LOG_DEBUG, "REST Servlet received event: " + deviceId + ", " + serviceName + ", " + properties);
+    public void notifyGDEvent(String deviceId, String serviceName, Map<String, Object> properties) {
         logger.debug("REST Servlet received event: " + deviceId + ", " + serviceName + ", " + properties);
     }
 
     @Override
-    public void notifyGenericDevicePropertyRemovedEvent(String deviceId, String serviceName, String propertyId) {
-//		logger.log(LogService.LOG_DEBUG, "Removed property " + propertyId + " from " + deviceId + "." + propertyId);
-        logger.debug("Removed property " + propertyId + " from " + deviceId + "." + propertyId);
-    }
-
-    @Override
-    public void notifyGenericDevicePropertyAddedEvent(String deviceId, String serviceName, String propertyId) {
-//		logger.log(LogService.LOG_DEBUG, "Added property " + propertyId + " to " + deviceId + "." + propertyId);
-        logger.debug("Added property " + propertyId + " to " + deviceId + "." + propertyId);
+    public void notifyGDPropertyEvent(Type type, String deviceId, String serviceName, String propertyId) {
+        logger.debug(type + " property " + propertyId + " from " + deviceId + "." + propertyId);
     }
 
     @Override

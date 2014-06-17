@@ -45,8 +45,8 @@ import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.check
 import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.research.commonutil.StringUtil;
-import com.ericsson.research.commonutil.function.FunctionalUtil;
+import com.ericsson.commonutil.StringUtil;
+import com.ericsson.commonutil.function.FunctionalUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

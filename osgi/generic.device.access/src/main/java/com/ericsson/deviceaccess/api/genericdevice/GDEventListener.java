@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import java.util.Dictionary;
 import java.util.Map;
 
 /**
@@ -90,42 +89,45 @@ import java.util.Map;
  * </ul>
  * <p/>
  * Example:
- * <pre>
- *   org.osgi.framework.BundleContext bc = ...;
+ * <blockquote><pre>
+ *   import org.osgi.framework.BundleContext;
+ *   import org.osgi.framework.Filter;
+ *   import org.osgi.framework.FrameworkUtil;
+ *   import com.ericsson.commonutil.LegacyUtil;
+ *
+ *   BundleContext bc = ...;
  *   GenericDeviceEventListener myListener = ...;
+ *
  *   // listen only for changes where temp exceeds 30 or power sinks below 100 on device with ID=zwave31
- *   final org.osgi.framework.Filter filter = org.osgi.framework.FrameworkUtil.createFilter("(&(device.id=zwave31)(|(temp >= 31)(power <= 99)))");
- *   bc.registerService(GenericDeviceEventListener.class.getName(), myListener, new Properties() {{
- *       put(GENERICDEVICE_FILTER, filter);
- *   }});
- * </pre> <p/> Example filters: <ul> <li>(device.name=tempsensor1): listen for
- * changes in any property in any service in the device with name 'tempsensor1'
- * .</ l i > <
- * l
- * i
- * >
- * (
- * d
- * e
- * vice.id=zwave1): listen for changes in any property in any service in the
- * device with ID 'zwave1' .</li>
- * <li>(&(device.id=zwave1)(service.name=TemperatureSensor)): listen for changes
- * in any property in the 'TemperatureSensor' service in the device with ID
- * 'zwave1' .</li>
- * <li>(&(device.id=zwave1)(service.name=TemperatureSensor)(CurrentTemperature
- * >= 30)): be notified each time the 'CurrentTemperature' property, in the
+ *   Filter filter = FrameworkUtil.createFilter("(&(device.id=zwave31)(|(temp >= 31)(power &lt;= 99)))");
+ *   Map&lt;String, Object> props = new HashMap&lt;>();
+ *   props.put(GENERICDEVICE_FILTER, filter);
+ *   bc.registerService(GenericDeviceEventListener.class, myListener, LegacyUtil.toDictionary(props));
+ * </pre></blockquote>
+ * <p/>
+ * Example filters: <ul>
+ * <li><b>(device.name=tempsensor1)</b>: listen for changes in any property in
+ * any service in the device with name 'tempsensor1' .</li>
+ * <li><b>(device.id=zwave1)</b>: listen for changes in any property in any
+ * service in the device with ID 'zwave1' .</li>
+ * <li><b>(&(device.id=zwave1)(service.name=TemperatureSensor))</b>: listen for
+ * changes in any property in the 'TemperatureSensor' service in the device with
+ * ID 'zwave1' .</li>
+ * <li><b>(&(device.id=zwave1)(service.name=TemperatureSensor)(CurrentTemperature
+ * >= 30))</b>: be notified each time the 'CurrentTemperature' property, in the
  * 'TemperatureSensor' service, in the device with ID 'zwave1', changes and is
  * greater than or equal to 30.</li>
- * <li>(&(service.name=TemperatureSensor)(CurrentTemperature>=30)): be notified
- * each time the 'CurrentTemperature' property, in the 'TemperatureSensor'
- * service, in any device, changes and is greater than or equal to 30.</li>
- * <li>(&(CurrentTemperature>=30)): be notified each time the
+ * <li><b>(&(service.name=TemperatureSensor)(CurrentTemperature>=30))</b>: be
+ * notified each time the 'CurrentTemperature' property, in the
+ * 'TemperatureSensor' service, in any device, changes and is greater than or
+ * equal to 30.</li>
+ * <li><b>(&(CurrentTemperature>=30))</b>: be notified each time the
  * 'CurrentTemperature' property, in any service, in any device, changes and is
  * greater than or equal to 30.</li>
  * <li>NOT IMPLEMENTED YET
- * (&(device.online=true)(|(CurrentPower=*)(CurrentTemperature=*))): be notified
- * each time any of the 'CurrentTemperature' or 'CurrentPower' property changes,
- * in any service, in devices that are online.</li>
+ * <b>(&(device.online=true)(|(CurrentPower=*)(CurrentTemperature=*)))</b>: be
+ * notified each time any of the 'CurrentTemperature' or 'CurrentPower' property
+ * changes, in any service, in devices that are online.</li>
  * </ul>
  */
 public interface GDEventListener {
@@ -150,9 +152,13 @@ public interface GDEventListener {
      * @param serviceName the name of the service that the change affect
      * @param properties the properties that was changed
      */
-    public void notifyGenericDeviceEvent(String deviceId, String serviceName, Map<String, Object> properties);
+    public void notifyGDEvent(String deviceId, String serviceName, Map<String, Object> properties);
 
-    public void notifyGenericDevicePropertyRemovedEvent(String deviceId, String serviceName, String propertyId);
+    public void notifyGDPropertyEvent(Type type, String deviceId, String serviceName, String propertyId);
 
-    public void notifyGenericDevicePropertyAddedEvent(String deviceId, String serviceName, String propertyId);
+    public enum Type {
+
+        REMOVED,
+        ADDED;
+    }
 }

@@ -36,7 +36,7 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
-import com.ericsson.research.commonutil.LegacyUtil;
+import com.ericsson.commonutil.LegacyUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 

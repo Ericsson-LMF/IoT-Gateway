@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceDiscoveryListener;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceManager;
-import com.ericsson.research.commonutil.LegacyUtil;
+import com.ericsson.commonutil.LegacyUtil;
 import java.util.HashMap;
 import java.util.Map;
 import org.osgi.framework.BundleActivator;

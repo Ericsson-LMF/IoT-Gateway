@@ -17,7 +17,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
-import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.commonutil.StringUtil;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;

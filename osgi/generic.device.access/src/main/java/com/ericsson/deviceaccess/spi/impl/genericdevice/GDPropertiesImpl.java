@@ -41,7 +41,7 @@ import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
-import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.commonutil.StringUtil;
 import java.util.HashMap;
 import java.util.Map;
 

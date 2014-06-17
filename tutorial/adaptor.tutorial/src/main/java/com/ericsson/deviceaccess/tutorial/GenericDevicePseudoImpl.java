@@ -43,7 +43,7 @@ import com.ericsson.deviceaccess.api.service.util.PowerMeter;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceUpdateListener;
-import com.ericsson.research.commonutil.LegacyUtil;
+import com.ericsson.commonutil.LegacyUtil;
 import java.util.HashMap;
 import java.util.Map;
 import org.osgi.framework.ServiceRegistration;

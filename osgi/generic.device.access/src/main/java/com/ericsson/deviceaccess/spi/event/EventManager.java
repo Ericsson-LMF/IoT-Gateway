@@ -43,7 +43,7 @@ import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE
 import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_URN;
 import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.GENERICDEVICE_FILTER;
 import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.SERVICE_NAME;
-import com.ericsson.research.commonutil.function.TriMonoConsumer;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener.Type;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +75,6 @@ public class EventManager implements ServiceListener, Runnable,
         ServiceTrackerCustomizer<GenericDevice, Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
-//    private static final String REGEX_DELTA = "/state/([^/]+)$";
     private BundleContext context;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final Map<GDEventListener, Filter> listeners = new ConcurrentHashMap<>();
@@ -125,17 +124,15 @@ public class EventManager implements ServiceListener, Runnable,
         startListenGenericDeviceEvents();
         createTracker();
 
-        // Wait for a GenericDeviceEvent to be received and forward this to all listeners
+        GenericDeviceEvent event;
         while (running.get()) {
-            GenericDeviceEvent event;
             try {
+                // Wait for a GenericDeviceEvent to be received and forward this to all listeners
                 event = events.take();
             } catch (InterruptedException ex) {
                 continue;
             }
-            if (event == POISON) {
-                break;
-            }
+            //POISON is invalid and because running is set to false this exits.
             if (isEventInvalid(event)) {
                 continue;
             }
@@ -145,9 +142,11 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
+    /**
+     * Track GenericDevice service registrations (used to only allow events from
+     * registered instances)
+     */
     private void createTracker() {
-        // Track GenericDevice service registrations (used to only allow events
-        // from registered instances)
         deviceTracker = new ServiceTracker(context, GenericDevice.class.getName(), this);
         deviceTracker.open();
     }
@@ -176,16 +175,10 @@ public class EventManager implements ServiceListener, Runnable,
         listeners.forEach((listener, filter) -> {
             checkForDeltaProperty(filter, event, matchingProperties);
             if (event.propertyEvent) {
-                TriMonoConsumer<String> consumer;
-                if (event.propertyAdded) {
-                    consumer = listener::notifyGenericDevicePropertyAddedEvent;
-                } else {
-                    consumer = listener::notifyGenericDevicePropertyRemovedEvent;
-                }
-                consumer.consume(deviceId, serviceName, event.propertyId);
+                listener.notifyGDPropertyEvent(event.type, deviceId, serviceName, event.propertyId);
             } else if (filter.matches(matchingProperties)) {
-                System.out.println(deviceId + " " + serviceName + " " + event.properties);
-                listener.notifyGenericDeviceEvent(deviceId, serviceName, event.properties);
+                System.out.println(event);
+                listener.notifyGDEvent(deviceId, serviceName, event.properties);
             }
         });
     }
@@ -239,9 +232,14 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
+    /**
+     * Hack to get around bit errors when doing subtract of floats
+     *
+     * @param a
+     * @param b
+     * @return a - b
+     */
     private float substract(float a, float b) {
-        // Hack to get around bit errors
-        // when doing subtract of floats
         float delta = (Math.round(a * 1000) - Math.round(b * 1000));
         return delta / 1000;
     }
@@ -283,20 +281,20 @@ public class EventManager implements ServiceListener, Runnable,
     }
 
     /**
-     * Starts the event manager
+     * Starts the event manager.
      */
     public void start() {
         synchronized (running) {
-            if (running.get()) {
+            if (!running.compareAndSet(false, true)) {
                 throw new IllegalStateException("There is thread already running.");
             }
             thread = new Thread(this);
-            running.set(true);
             try {
                 thread.start();
             } catch (Throwable e) {
-                logger.warn("Failed to start Event Manager.");
-                running.set(true);
+                logger.warn("Failed to start Event Manager. " + e);
+                running.set(false);
+                thread = null;
             }
         }
     }
@@ -306,10 +304,9 @@ public class EventManager implements ServiceListener, Runnable,
      */
     public void shutdown() {
         synchronized (running) {
-            if (!running.get()) {
+            if (!running.compareAndSet(true, false)) {
                 throw new IllegalStateException("There wasn't thread running to shutdown.");
             }
-            running.set(false);
             events.add(POISON);
             thread = null;
             if (deviceTracker != null) {
@@ -330,11 +327,11 @@ public class EventManager implements ServiceListener, Runnable,
     }
 
     public void addRemoveEvent(String deviceId, String serviceId, String propertyId) {
-        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, false));
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, Type.REMOVED));
     }
 
     public void addAddEvent(String deviceId, String serviceId, String propertyId) {
-        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, true));
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, Type.ADDED));
     }
 
     private void addEvent(String deviceId, Function<GenericDevice, GenericDeviceEvent> func) {
@@ -383,7 +380,7 @@ public class EventManager implements ServiceListener, Runnable,
         public Map<String, Object> properties;
         public boolean propertyEvent;
         public String propertyId;
-        public boolean propertyAdded;
+        public Type type;
         public GenericDevice device;
 
         GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, Map<String, Object> properties) {
@@ -394,13 +391,13 @@ public class EventManager implements ServiceListener, Runnable,
             this.properties = properties;
         }
 
-        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, String propertyId, boolean propertyAdded) {
+        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, String propertyId, Type type) {
             propertyEvent = true;
             this.device = device;
             this.deviceId = deviceId;
             this.serviceId = serviceId;
             this.propertyId = propertyId;
-            this.propertyAdded = propertyAdded;
+            this.type = type;
             this.properties = new HashMap<>();
             properties.put(GDEventListener.DEVICE_ID, deviceId);
             properties.put(propertyId, new Object());
@@ -409,11 +406,10 @@ public class EventManager implements ServiceListener, Runnable,
 
         @Override
         public String toString() {
-            if (propertyId != null) {
-                return deviceId + " " + serviceId + " " + propertyId + " " + propertyAdded;
-            } else {
+            if (propertyId == null) {
                 return deviceId + " " + serviceId + " " + properties;
             }
+            return deviceId + " " + serviceId + " " + propertyId + " " + type;
         }
     }
 }

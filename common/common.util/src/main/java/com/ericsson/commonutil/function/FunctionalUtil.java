@@ -1,4 +1,4 @@
-package com.ericsson.research.commonutil.function;
+package com.ericsson.commonutil.function;
 
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;

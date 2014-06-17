@@ -89,7 +89,7 @@ public class EventManagerTest {
             {
                 oneOf(bundleContext).getService(deviceReference);
                 will(returnValue(device));
-                allowing(listener).notifyGenericDeviceEvent(with(aNonNull(String.class)), with(any(String.class)), with(new HashMap<String, Object>() {
+                allowing(listener).notifyGDEvent(with(aNonNull(String.class)), with(any(String.class)), with(new HashMap<String, Object>() {
                     {
                         put("device.state", "Ready");
                     }
@@ -145,7 +145,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("dev"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("dev"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("device.online", true);
                     }
@@ -179,12 +179,12 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
                 }));
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("temp", 30);
                     }
@@ -238,12 +238,12 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv1"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv1"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
                 }));
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
                     {
                         put("temp", 30);
                     }
@@ -292,12 +292,12 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
                 }));
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave32"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("temp", 30);
                     }
@@ -351,7 +351,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                     }
@@ -406,7 +406,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
                     {
                         put(GDEventListener.DEVICE_ONLINE, true);
                         put("temp", 30);
@@ -454,7 +454,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave32"), with("srv2"), with(new HashMap<String, Object>() {
                     {
                         put(GDEventListener.DEVICE_PROTOCOL, "banan");
                         put("temp", 30);
@@ -534,7 +534,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", (float) 104.34);
                         put("power__delta", (float) 4.24);
@@ -577,7 +577,7 @@ public class EventManagerTest {
                 oneOf(serviceReference).getProperty(GDEventListener.GENERICDEVICE_FILTER);
                 will(returnValue(listenerFilter));
 
-                oneOf(listener).notifyGenericDeviceEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
+                oneOf(listener).notifyGDEvent(with("zwave31"), with("srv"), with(new HashMap<String, Object>() {
                     {
                         put("power", 100);
                         put("power__delta", 4);

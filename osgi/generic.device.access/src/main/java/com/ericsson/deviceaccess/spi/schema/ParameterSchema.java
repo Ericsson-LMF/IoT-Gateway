@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
-import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.commonutil.StringUtil;
 import java.util.Arrays;
 
 /**

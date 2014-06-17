@@ -34,13 +34,13 @@
  */
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
+import com.ericsson.commonutil.StringUtil;
+import com.ericsson.commonutil.function.TriConsumer;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders.JavaClass;
-import com.ericsson.research.commonutil.StringUtil;
-import com.ericsson.research.commonutil.function.TriConsumer;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -96,10 +96,8 @@ public class Main {
             CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
             for (Service service : services.getServiceArray()) {
                 DefinitionsAdder.addService(code, service);
-                //Generate SPI file
-                createFile(spiDirBase, "Base", service, version, ImplementationAdder::addServiceImplementation, "SPI base");
-                //Generate API file
-                createFile(apiDirBase, "", service, version, InterfaceAdder::addServiceInterface, "API");
+                createFile("SPI", spiDirBase, "Base", service, version, ImplementationAdder::addServiceImplementation);
+                createFile("API", apiDirBase, "", service, version, InterfaceAdder::addServiceInterface);
             }
             schemaDefStream.append(builder.build());
         }
@@ -118,7 +116,7 @@ public class Main {
      * @param what description what is generated
      * @throws IOException
      */
-    private void createFile(File baseDir, String postfix, Service service, String version, TriConsumer<JavaClass, Service, String> generator, String what) throws IOException {
+    private void createFile(String what, File baseDir, String postfix, Service service, String version, TriConsumer<JavaClass, Service, String> generator) throws IOException {
         File packageDir = new File(baseDir, makePath(service));
         packageDir.mkdirs();
         File sourceFile = new File(packageDir, StringUtil.capitalize(service.getName() + postfix) + ".java");
@@ -127,7 +125,7 @@ public class Main {
             generator.consume(builder, service, version);
             stream.append(builder.build());
         }
-        System.out.println("Generated SPI base for '" + service.getName() + "' to " + sourceFile.getAbsolutePath() + "\n");
+        System.out.println("Generated " + what + " for '" + service.getName() + "' to " + sourceFile.getAbsolutePath());
     }
 
     /**

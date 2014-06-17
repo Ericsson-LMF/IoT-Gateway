@@ -1,4 +1,4 @@
-package com.ericsson.research.commonutil;
+package com.ericsson.commonutil;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;

@@ -1,6 +1,6 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder;
 
-import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.commonutil.StringUtil;
 
 /**
  * Parameter for

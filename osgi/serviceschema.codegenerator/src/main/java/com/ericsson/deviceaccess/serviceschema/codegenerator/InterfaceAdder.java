@@ -12,7 +12,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builder
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
-import com.ericsson.research.commonutil.StringUtil;
+import com.ericsson.commonutil.StringUtil;
 
 /**
  * This generates interfaces in
