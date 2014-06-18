@@ -74,13 +74,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>jakarta-regexp</groupId>
-            <artifactId>jakarta-regexp</artifactId>
-            <version>1.4</version>
-        </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>

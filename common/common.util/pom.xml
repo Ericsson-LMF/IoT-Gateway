@@ -11,7 +11,7 @@
     <artifactId>common.util</artifactId>
     <packaging>jar</packaging>
 
-    <name>Ericsson Research Connected Home Common Utilities</name>
+    <name>Ericsson Connected Home Common Utilities</name>
 
     <dependencies>
         <dependency>

@@ -34,6 +34,8 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
+import com.ericsson.commonutil.StringUtil;
+import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
@@ -43,8 +45,6 @@ import com.ericsson.deviceaccess.spi.GenericDevice;
 import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkPermission;
 import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
-import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.function.FunctionalUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;

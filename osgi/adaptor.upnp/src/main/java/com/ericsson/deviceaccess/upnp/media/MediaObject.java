@@ -36,7 +36,7 @@ package com.ericsson.deviceaccess.upnp.media;
 
 import java.util.HashMap;
 
-public class MediaObject extends HashMap {
+public class MediaObject extends HashMap<String, String> {
 
     /**
      *
@@ -58,7 +58,7 @@ public class MediaObject extends HashMap {
     }
 
     public String getId() {
-        return (String) get(ID);
+        return get(ID);
     }
 
     public void setParent(String parent) {
@@ -66,7 +66,7 @@ public class MediaObject extends HashMap {
     }
 
     public String getParent() {
-        return (String) get(PARENT);
+        return get(PARENT);
     }
 
     public void setName(String name) {
@@ -74,6 +74,6 @@ public class MediaObject extends HashMap {
     }
 
     public String getName() {
-        return (String) get(NAME);
+        return get(NAME);
     }
 }

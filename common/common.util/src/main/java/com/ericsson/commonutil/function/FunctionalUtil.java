@@ -43,7 +43,8 @@ public enum FunctionalUtil {
     }
 
     /**
-     * Executes code if target object is certain type.
+     * Executes code if target object is of certain type. Code doesn't get
+     * executed if object is null.
      *
      * Simplifies code
      * <blockquote><pre>
@@ -66,7 +67,7 @@ public enum FunctionalUtil {
      * @return did the code get executed?
      */
     public static <T> boolean doIfCan(Class<T> type, Object object, Consumer<T> code) {
-        if (type.isAssignableFrom(object.getClass())) {
+        if (type.isInstance(object)) {
             code.accept((T) object);
             return true;
         }

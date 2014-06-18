@@ -52,6 +52,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -197,39 +199,42 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
+    private static final Pattern DELTA_PATTERN = Pattern.compile("\\((([^(]*)__delta)");
+
     private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Map<String, Object> matchingProperties) {
         if (filter != null) {
             String deltaProperty = filter.toString();
-            if (deltaProperty.contains("__delta")) {
-                deltaProperty = deltaProperty.replaceAll("__delta.*", "");
-                deltaProperty = deltaProperty.replaceAll(".*\\(", "");
-                String deltaString = deltaProperty + "__delta";
+            Matcher matcher = DELTA_PATTERN.matcher(deltaProperty);
+            if (matcher.find()) {
+                deltaProperty = matcher.group(2);
 
                 Map<String, Object> properties = event.properties;
                 // Is this an event update for the delta property?
                 if (properties.get(deltaProperty) != null) {
-                    Object property = matchingProperties.get(deltaProperty);
+                    Object newProperty = matchingProperties.get(deltaProperty);
                     String id = event.deviceId + event.serviceId + deltaProperty;
                     // Any old values saved to calculate delta from?
                     if (deltaValues.containsKey(id)) {
-                        if (property instanceof Integer) {
-                            int oldValue = (Integer) deltaValues.get(id);
-                            int newValue = (Integer) property;
-                            int delta = Math.abs(oldValue - newValue);
-                            properties.put(deltaString, delta);
-                            matchingProperties.put(deltaString, delta);
-                        } else if (property instanceof Float) {
-                            float oldValue = (Float) deltaValues.get(id);
-                            float newValue = (Float) property;
-                            float delta = Math.abs(substract(oldValue, newValue));
+                        Object delta = calculateDelta(newProperty, deltaValues.get(id));
+                        if (delta != null) {
+                            String deltaString = matcher.group(1);
                             properties.put(deltaString, delta);
                             matchingProperties.put(deltaString, delta);
                         }
                     }
-                    deltaValues.put(id, property);
+                    deltaValues.put(id, newProperty);
                 }
             }
         }
+    }
+
+    private Object calculateDelta(Object newPropert, Object oldProperty) {
+        if (newPropert instanceof Integer) {
+            return Math.abs((Integer) oldProperty - (Integer) newPropert);
+        } else if (newPropert instanceof Float) {
+            return Math.abs(substract((Float) oldProperty, (Float) newPropert));
+        }
+        return null;
     }
 
     /**

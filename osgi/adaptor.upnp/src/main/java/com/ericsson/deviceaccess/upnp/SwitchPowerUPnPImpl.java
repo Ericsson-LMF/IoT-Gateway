@@ -34,10 +34,11 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
+import com.ericsson.commonutil.LegacyUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
-import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.service.homeautomation.power.SwitchPowerBase;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import org.osgi.service.upnp.UPnPAction;
 import org.osgi.service.upnp.UPnPDevice;
 import org.osgi.service.upnp.UPnPException;
@@ -47,45 +48,36 @@ import org.slf4j.Logger;
 public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAgent.UpdatePropertyInterface {
 
     private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
-        UPnPService[] services = device.getServices();
-
-        for (int i = 0; i < services.length; ++i) {
-            UPnPAction action = services[i].getAction(actionName);
+        for (UPnPService service : device.getServices()) {
+            UPnPAction action = service.getAction(actionName);
             if (action != null) {
                 return action;
             }
         }
-        throw new UPnPException(UPnPException.INVALID_ACTION,
-                "No such action supported " + actionName);
+        throw new UPnPException(UPnPException.INVALID_ACTION, "No such action supported " + actionName);
     }
 
-    final private UPnPDevice upnpDev;
-    final private Logger logger;
+    private final UPnPDevice upnpDev;
+    private final Logger logger;
 
     public SwitchPowerUPnPImpl(UPnPDevice upnpDev, UPnPService upnpService, Logger logger) {
         this.upnpDev = upnpDev;
         this.logger = logger;
     }
 
-    // @Override
     @Override
     public void executeSetTarget(int target) throws GDException {
-        // TODO Auto-generated method stub
-        UPnPAction action = null;
         try {
-            action = SwitchPowerUPnPImpl.getUPnPAction(this.upnpDev, "SetTarget");
-            Properties args = new Properties();
-            if (target == 0) {
-                args.put("newTargetValue", "False");
-            } else {
-                args.put("newTargetValue", "True");
-            }
-            action.invoke(args);
-        } catch (UPnPException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+            UPnPAction action = SwitchPowerUPnPImpl.getUPnPAction(this.upnpDev, "SetTarget");
+            Map<String, Object> args = new HashMap<>();
+            args.put("newTargetValue", target == 1 ? "True" : "False");
+            action.invoke(LegacyUtil.toDictionary(args));
+        } catch (UPnPException ex) {
+            logger.error("Exception: " + ex);
+        } catch (Exception ex) {
+            logger.error("Exception: " + ex);
         }
+
     }
 
     // @Override
@@ -99,8 +91,6 @@ public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAg
     @Override
     public void updateProperty(String name, Object value) {
         logger.debug("updateProperty(" + name + ")");
-
-        GDProperties properties = this.getProperties();
         if ("Status".equalsIgnoreCase(name)) {
             if (value instanceof Boolean) {
                 logger.debug("updateCurrentTarget(" + value + ")");

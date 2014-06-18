@@ -136,4 +136,11 @@ public enum StringUtil {
         return DatatypeConverter.parseHexBinary(encoded);
     }
 
+    public static boolean looseEquals(Object a, Object b) {
+        if (a == null || b == null) {
+            return a == null && b == null;
+        }
+        return a.toString().toLowerCase().equals(b.toString().toLowerCase());
+    }
+
 }

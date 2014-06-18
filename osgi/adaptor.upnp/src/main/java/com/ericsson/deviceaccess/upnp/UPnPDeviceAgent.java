@@ -34,18 +34,21 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
+import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.commonutil.StringUtil;
+import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDevice.State;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
-import com.ericsson.commonutil.LegacyUtil;
-import com.ericsson.commonutil.function.FunctionalUtil;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.regexp.RE;
+import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -60,10 +63,12 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
 
+    private static final Pattern TITLE_PATTERN = Pattern.compile("dc:title[>&gt;]+([^&]*)[&<lt;]+/dc:title");
+
     protected static String getMediaTitle(String didl) {
-        RE titleRE = new RE("dc:title[>&gt;]+([^&]*)[&<lt;]+/dc:title");
-        if (titleRE.match(didl)) {
-            return titleRE.getParen(1);
+        Matcher matcher = TITLE_PATTERN.matcher(didl);
+        if (matcher.find()) {
+            return matcher.group(1);
         }
         return "";
     }
@@ -74,6 +79,37 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     private ServiceRegistration devReg;
 
     final private Map<String, GDService> idToService = new HashMap<>();
+
+    private static final Map<String, BiConsumer<GDProperties, String>> eventTypes = new HashMap<>();
+    private static final BiConsumer<GDProperties, String> EMPTY = (a, b) -> {
+    };
+
+    static {
+        eventTypes.put("Volume", (properties, value) -> {
+            try {
+                properties.setStringValue("CurrentVolume", value);
+            } catch (Exception e) {
+                // TODO: Parsing error, it seems the string contains channel as well
+            }
+        });
+        // TODO: This does not work with the Noxon. It uses a different variable for this information
+        eventTypes.put("AVTransportURI", (properties, value) -> properties.setStringValue("CurrentUrl", value));
+        // TODO: This does not work with the Noxon. It uses a different variable for this information
+        eventTypes.put("CurrentTrackMetaData", (properties, value) -> {
+            String title = getMediaTitle(value);
+            logger.debug("Media title is " + title);
+            properties.setStringValue("CurrentTitle", title);
+        });
+        eventTypes.put("TransportState", (properties, value) -> {
+            String state = value.toLowerCase();
+            switch (state) {
+                case "playing":
+                case "stopped":
+                case "paused":
+                    properties.setStringValue("Status", StringUtil.capitalize(state));
+            }
+        });
+    }
 
     public UPnPDeviceAgent(BundleContext bc, UPnPDevice upnpdev) {
         this.context = bc;
@@ -140,6 +176,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
                 Filter filter = context.createFilter(rule.toFilterRule());
                 Map<String, Object> props = new HashMap<>();
                 props.put(UPnPEventListener.UPNP_FILTER, filter);
+
                 this.eventListenerReg = context.registerService(UPnPEventListener.class, this, LegacyUtil.toDictionary(props));
             } catch (InvalidSyntaxException e) {
                 logger.error("Parsing failed: " + e);
@@ -200,48 +237,11 @@ public class UPnPDeviceAgent implements UPnPEventListener {
         if (deviceId.equals(device.getId())) {
             GDService svc = device.getService(getSWoTServiceNameFromUPnPServiceId(serviceId));
             if (svc != null) {
-                GDProperties properties = svc.getProperties();
                 events.forEach((event, data) -> {
                     if (event.equals("LastChange")) {
                         logger.debug("Received LastChange variables event");
                         UPnPUtil.parseLastChangeEvent(data).forEach((name, value) -> {
-                            if (null != name) {
-                                switch (name) {
-                                    case "Volume":
-                                        try {
-                                            properties.setStringValue("CurrentVolume", value);
-                                        } catch (Exception e) {
-                                            // TODO: Parsing error, it seems the string contains channel as well
-                                        }
-                                        break;
-                                    case "AVTransportURI":
-                                        // TODO: This does not work with the Noxon. It uses a different variable for this information
-                                        properties.setStringValue("CurrentUrl", value);
-                                        break;
-                                    case "CurrentTrackMetaData":
-                                        // TODO: This does not work with the Noxon. It uses a different variable for this information
-                                        String title = getMediaTitle(value);
-                                        logger.debug("Media title is " + title);
-                                        properties.setStringValue("CurrentTitle", title);
-                                        break;
-                                    case "TransportState":
-                                        String state = value.toLowerCase();
-                                        if (null != state) {
-                                            switch (state) {
-                                                case "playing":
-                                                    properties.setStringValue("Status", "Playing");
-                                                    break;
-                                                case "stopped":
-                                                    properties.setStringValue("Status", "Stopped");
-                                                    break;
-                                                case "paused":
-                                                    properties.setStringValue("Status", "Paused");
-                                                    break;
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
+                            eventTypes.getOrDefault(name, EMPTY).accept(svc.getProperties(), value);
                         });
                         notifyUpdate(svc.getPath(true) + "/parameter");
                     }
@@ -251,27 +251,23 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             /*
              * Update properties of each service
              */
-            GDService service = idToService.get(serviceId);
-            if (service != null) {
-                FunctionalUtil.doIfCan(UpdatePropertyInterface.class, service, s -> {
-                    logger.debug("Found UpdatePropertyInterface instance");
-                    events.forEach((name, value) -> {
-                        s.updateProperty(name, value);
-                        /*
-                         logger.debug("Event: " + event + " = " + eventValue);
-                         if ("LastChange".equals(event)) {
-                         logger.debug("Received LastChange variables event");
-                         Properties changedVars = UPnPUtil.parseLastChangeEvent((String)eventTable.get(event));
-                         for (Enumeration vars = changedVars.keys(); vars.hasMoreElements();) {
-                         String name = (String)vars.nextElement();
-                         String value = (String)changedVars.getProperty(name);
-                         }
-                         }
-                         */
-                    });
-
+            FunctionalUtil.doIfCan(UpdatePropertyInterface.class, idToService.get(serviceId), service -> {
+                logger.debug("Found UpdatePropertyInterface instance");
+                events.forEach((name, value) -> {
+                    service.updateProperty(name, value);
+                    /*
+                     logger.debug("Event: " + event + " = " + eventValue);
+                     if ("LastChange".equals(event)) {
+                     logger.debug("Received LastChange variables event");
+                     Properties changedVars = UPnPUtil.parseLastChangeEvent((String)eventTable.get(event));
+                     for (Enumeration vars = changedVars.keys(); vars.hasMoreElements();) {
+                     String name = (String)vars.nextElement();
+                     String value = (String)changedVars.getProperty(name);
+                     }
+                     }
+                     */
                 });
-            }
+            });
         }
     }
 
@@ -291,6 +287,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             return "ContentDirectory";
         }
         return "unsupported";
+
     }
 
     public interface UpdatePropertyInterface {

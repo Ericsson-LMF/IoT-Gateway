@@ -36,10 +36,11 @@ package com.ericsson.deviceaccess.upnp;
 
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.media.ContentDirectoryBase;
+import com.ericsson.deviceaccess.upnp.media.MediaObject;
 import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.osgi.service.upnp.UPnPDevice;
 import org.osgi.service.upnp.UPnPException;
@@ -51,13 +52,11 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
 
     public ContentDirectoryUPnPImpl(UPnPDevice dev) {
         this.dev = dev;
-
-        // this.putAction(new UPnPBrowse()); // Adds native upnp browse action
     }
 
     @Override
     public BrowseResult executeBrowse(String objectId, String browseFlag, int startIndex, int requestedCount, String sortCriteria, String filter) throws GDException {
-        Properties args = new Properties();
+        Map<String, Object> args = new HashMap<>();
         args.put("ObjectID", objectId);
         args.put("BrowseFlag", browseFlag);
         args.put("Filter", filter);
@@ -65,12 +64,12 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
         args.put("RequestedCount", requestedCount);
         args.put("SortCriteria", sortCriteria);
         try {
-            Dictionary result = UPnPUtil.browse(dev, args);
+            Map<String, Object> result = UPnPUtil.browse(dev, args);
             BrowseResult browseResult = new BrowseResult();
             browseResult.DidlDocument = (String) result.get("Result");
-            browseResult.NumberReturned = ((Number) result.get("NumberReturned")).intValue();
-            browseResult.TotalMatches = ((Number) result.get("TotalMatches")).intValue();
-            browseResult.UpdateID = ((Number) result.get("UpdateID")).intValue();
+            browseResult.NumberReturned = (Integer) result.get("NumberReturned");
+            browseResult.TotalMatches = (Integer) result.get("TotalMatches");
+            browseResult.UpdateID = (Integer) result.get("UpdateID");
             return browseResult;
         } catch (UPnPException e) {
             throw new GDException("Failed in invoking browse action" + e.getMessage());
@@ -80,11 +79,10 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
     @Override
     public SimpleBrowseResult executeSimpleBrowse(String id, int startingIndex,
             int requestedCount, String sortCriteria) throws GDException {
-        Dictionary result;
         SimpleBrowseResult actionResult = new SimpleBrowseResult();
         try {
-            result = UPnPUtil.browse(dev, getProperties(id, startingIndex, requestedCount, sortCriteria));
-            Vector objects = DidlXmlPullParser.parseDidl((String) result.get("Result"));
+            Map<String, Object> result = UPnPUtil.browse(dev, getProperties(id, startingIndex, requestedCount, sortCriteria));
+            List<MediaObject> objects = DidlXmlPullParser.parseDidl("" + result.get("Result"));
             actionResult.Result = new JSONArray(objects).toString();
         } catch (UPnPException e) {
             throw new GDException("Failed in invoking browse action" + e.getMessage());
@@ -94,11 +92,11 @@ public class ContentDirectoryUPnPImpl extends ContentDirectoryBase {
         return actionResult;
     }
 
-    private Properties getProperties(String id, int startingIndex,
+    private Map<String, Object> getProperties(String id, int startingIndex,
             int requestedCount, String sortCriteria) {
-        Properties props = new Properties();
+        Map<String, Object> props = new HashMap<>();
         if (id == null || id.isEmpty()) {
-            props.put("ObjectID", "0");
+            props.put("ObjectID", 0);
         } else {
             props.put("ObjectID", id);
         }

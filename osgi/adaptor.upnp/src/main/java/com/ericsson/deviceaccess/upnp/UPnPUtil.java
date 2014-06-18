@@ -34,6 +34,8 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
+import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.commonutil.StringUtil;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -41,7 +43,8 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.regexp.RE;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -135,7 +138,7 @@ public class UPnPUtil {
                 throw new UPnPUtilException(404, "Could not determine content type");
             }
             debug("Content type is " + contentType);
-            if (contentType.indexOf(';') > 0) {
+            if (contentType.contains(";")) {
                 /*
                  * remove optional data such as character encoding.
                  * e.g. video/mp4;UTF-8
@@ -149,7 +152,7 @@ public class UPnPUtil {
          * Workaround for ustream mp4 file which returns audio/mp4
          * 20100917 Kenta
          */
-        if (url.indexOf("ustream") > 0) {
+        if (url.contains("ustream")) {
             contentType = "video/mp4";
         }
         return contentType;
@@ -199,22 +202,21 @@ public class UPnPUtil {
 
     }
 
-    public static Dictionary browse(UPnPDevice dev, Properties givenArgs) throws UPnPException {
+    public static Map<String, Object> browse(UPnPDevice dev, Map<String, Object> givenArgs) throws UPnPException {
         UPnPAction action = getUPnPAction(dev, BROWSE_ACTION);
         if (action == null) {
             throw new UPnPException(404, "No such action supported by " + getFriendlyName(dev));
         }
-        Properties args = getDefaultBrowseArguments();
-        String[] argNames = action.getInputArgumentNames();
-        for (String argName : argNames) {
+        Map<String, Object> args = getDefaultBrowseArguments();
+        for (String argName : action.getInputArgumentNames()) {
             if (givenArgs.containsKey(argName)) {
                 debug("Setting " + argName + " to " + givenArgs.get(argName));
-                args.put(argName, givenArgs.get(argName).toString());
+                args.put(argName, givenArgs.get(argName));
             }
         }
         try {
             debug(args.toString());
-            return action.invoke(args);
+            return LegacyUtil.toMap(action.invoke(LegacyUtil.toDictionary(args)));
         } catch (Exception e) {
             String msg = ("Failed to invoke UPnP action." + e);
             error(msg);
@@ -222,43 +224,34 @@ public class UPnPUtil {
         }
     }
 
-    private static Properties getDefaultBrowseArguments() {
-        Properties args = new Properties();
-        args.put("ObjectID", "0");
+    private static Map<String, Object> getDefaultBrowseArguments() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("ObjectID", 0);
         args.put("BrowseFlag", "BrowseDirectChildren");
         args.put("Filter", "*");
-        args.put("StartingIndex", "0");
-        args.put("RequestedCount", "0");
+        args.put("StartingIndex", 0);
+        args.put("RequestedCount", 0);
         args.put("SortCriteria", "");
         return args;
     }
 
+    private static final Pattern varPattern = Pattern.compile("<(\\w+)\\s.*val=\"(.*)\".*/");
+
     public static Map<String, String> parseLastChangeEvent(String value) {
         Map<String, String> result = new HashMap<>();
-
-        RE varRE = new RE("<(\\w+)\\s.*val=\"(.*)\".*/");
-        String[] tags = new RE(">").split(value);
-
-        for (String tag : tags) {
-            if (varRE.match(tag)) {
-                result.put(varRE.getParen(1), varRE.getParen(2));
+        for (String tag : value.split(">")) {
+            Matcher matcher = varPattern.matcher(tag);
+            if (matcher.find()) {
+                result.put(matcher.group(1), matcher.group(2));
             }
         }
-
         return result;
     }
 
-    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName)
-            throws UPnPException {
-        UPnPService[] services = device.getServices();
-
-        for (int i = 0; i < services.length; ++i) {
-            UPnPAction action = services[i].getAction(actionName);
+    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
+        for (UPnPService service : device.getServices()) {
+            UPnPAction action = service.getAction(actionName);
             if (action != null) {
-                /*
-                 * log.debug("invoking " + action.getName() + " on " +
-                 * device.getDescriptions(null).get( UPnPDevice.FRIENDLY_NAME));
-                 */
                 return action;
             }
         }
@@ -318,18 +311,10 @@ public class UPnPUtil {
 
         try {
             // String uuidFilter = "(" + UPnPDevice.UDN + "=" + uuid + ")";
-            ServiceReference[] refs = context.getServiceReferences(
-                    UPnPDevice.class.getName(), null);
-            // context.getServiceReferences(UPnPDevice.class.getName(),
-            // uuidFilter);
-
-            if (refs != null) {
-                for (ServiceReference ref : refs) {
-                    UPnPDevice dev = (UPnPDevice) context.getService(ref);
-                    if (uuid.equalsIgnoreCase((String) dev
-                            .getDescriptions(null).get(UPnPDevice.UDN))) {
-                        return dev;
-                    }
+            for (ServiceReference<UPnPDevice> ref : context.getServiceReferences(UPnPDevice.class, null)) {
+                UPnPDevice dev = context.getService(ref);
+                if (StringUtil.looseEquals(uuid, dev.getDescriptions(null).get(UPnPDevice.UDN))) {
+                    return dev;
                 }
             }
         } catch (InvalidSyntaxException e) {
@@ -359,23 +344,7 @@ public class UPnPUtil {
 
     static public String[] parseServiceType(String serviceType) {
         return serviceType.split(":");
-        //UPnPUtil.stringSplit(serviceType, ":");
     }
-//
-//    static private String[] stringSplit(String str, String delimiter) {
-//        StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
-//        List<String> tokenList = new ArrayList<>();
-//
-//        while (tokenizer.hasMoreElements()) {
-//            String token = tokenizer.nextToken();
-//            if (token == null) {
-//                continue;
-//            }
-//            tokenList.add(token);
-//        }
-//
-//        return tokenList.toArray(new String[tokenList.size()]);
-//    }
 
     private UPnPUtil() {
     }

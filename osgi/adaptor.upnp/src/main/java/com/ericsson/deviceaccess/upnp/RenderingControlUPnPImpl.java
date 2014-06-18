@@ -40,16 +40,12 @@ import org.osgi.service.upnp.UPnPDevice;
 
 public class RenderingControlUPnPImpl extends RenderingControlBase {
 
-    private UPnPDevice dev;
+    private final UPnPDevice dev;
 
     public RenderingControlUPnPImpl(UPnPDevice dev) {
         this.dev = dev;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    //@Override
     @Override
     public void executePlay(String url, String title) throws GDException {
         try {
@@ -73,10 +69,8 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
 //				throw new GDException(e.getMessage(), e);
 //			}
 //		}
-    //@Override
     @Override
     public void executeStop() throws GDException {
-
         try {
             UPnPUtil.stopMedia(dev);
         } catch (Exception e) {
@@ -84,7 +78,6 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
         }
     }
 
-    //@Override
     @Override
     public void executePause() throws GDException {
         try {
@@ -94,7 +87,6 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
         }
     }
 
-    //@Override
     @Override
     public void executeResume() throws GDException {
         try {
@@ -104,7 +96,6 @@ public class RenderingControlUPnPImpl extends RenderingControlBase {
         }
     }
 
-    //@Override
     @Override
     public void executeSetVolume(int volume) throws GDException {
         try {

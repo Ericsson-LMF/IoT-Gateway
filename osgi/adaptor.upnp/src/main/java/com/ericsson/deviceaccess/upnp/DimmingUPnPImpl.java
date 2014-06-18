@@ -35,7 +35,6 @@
 package com.ericsson.deviceaccess.upnp;
 
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
-import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.service.homeautomation.lighting.DimmingBase;
 import java.util.Properties;
 import org.osgi.service.upnp.UPnPAction;
@@ -55,10 +54,8 @@ import org.slf4j.Logger;
 public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.UpdatePropertyInterface {
 
     private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
-        UPnPService[] services = device.getServices();
-
-        for (int i = 0; i < services.length; ++i) {
-            UPnPAction action = services[i].getAction(actionName);
+        for (UPnPService service : device.getServices()) {
+            UPnPAction action = service.getAction(actionName);
             if (action != null) {
                 return action;
             }
@@ -92,7 +89,6 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
         this.dimmingService_setLoadLevelTarget = action;
     }
 
-    //@Override
     @Override
     public void executeOff() throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeOff()");
@@ -103,11 +99,10 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
             this.switchPower_setTarget.invoke(args);
             this.updateCurrentLoadLevel(0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception; " + e);
         }
     }
 
-    //@Override
     @Override
     public void executeOn() throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeOn()");
@@ -118,11 +113,10 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
             this.switchPower_setTarget.invoke(args);
             this.updateCurrentLoadLevel(100);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception; " + e);
         }
     }
 
-    //@Override
     @Override
     public void executeSetLoadLevelTarget(int lvl)
             throws GDException {
@@ -134,31 +128,25 @@ public class DimmingUPnPImpl extends DimmingBase implements UPnPDeviceAgent.Upda
             this.dimmingService_setLoadLevelTarget.invoke(args);
             this.updateCurrentLoadLevel(lvl);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception; " + e);
         }
 
     }
 
-    //@Override
     @Override
-    public void executeSetLoadLevelTargetWithRate(int lvl, float rate)
-            throws GDException {
+    public void executeSetLoadLevelTargetWithRate(int lvl, float rate) throws GDException {
         this.logger.debug("DimmingUPnPImpl::executeSetLoadLevelTargetWithRate(" + lvl + "," + rate + ")");
-
         this.executeSetLoadLevelTarget(lvl);
     }
 
-    //@Override
     @Override
     protected void refreshProperties() {
         this.logger.debug("DimmingUPnPImpl::refreshProperties()");
     }
 
-    // @Override
     @Override
     public void updateProperty(String name, Object value) {
         logger.debug("updateProperty(" + name + ")");
-        GDProperties properties = this.getProperties();
         if ("LoadLevelStatus".equalsIgnoreCase(name)) {
             if (value instanceof Integer) {
                 logger.debug("updateCurrentLoadLevel(" + value + ")");

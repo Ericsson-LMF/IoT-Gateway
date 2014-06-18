@@ -34,15 +34,17 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
+import com.ericsson.commonutil.function.QuadConsumer;
 import com.ericsson.deviceaccess.upnp.media.MediaContainer;
 import com.ericsson.deviceaccess.upnp.media.MediaItem;
+import com.ericsson.deviceaccess.upnp.media.MediaObject;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Stack;
-import java.util.Vector;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -66,7 +68,66 @@ public class DidlXmlPullParser {
     private static final String SIZE = "size";
     private static final String TAG_ATTRIBUTES = "tagAttributes";
 
-    public static Vector parseDidl(String didl) throws XmlPullParserException, IOException {
+    private static final Map<Integer, QuadConsumer<XmlPullParser, Stack<String>, Map<String, String>, List<MediaObject>>> eventTypes = new HashMap<>();
+    private static QuadConsumer<XmlPullParser, Stack<String>, Map<String, String>, List<MediaObject>> EMPTY = (a, b, c, d) -> {
+    };
+
+    static {
+        eventTypes.put(XmlPullParser.START_TAG, (xpp, tagStack, properties, results) -> {
+            String tag = xpp.getName();
+            tagStack.push(tag);
+            switch (tag) {
+                case "container":
+                case "item":
+                    properties.put(ID, xpp.getAttributeValue(null, ID));
+                    break;
+                case "res":
+                    properties.put("protocolInfo", xpp.getAttributeValue(null, "protocolInfo"));
+                    int nAttr = xpp.getAttributeCount();
+                    Map<String, String> attributes = new HashMap<>();
+                    for (int i = 0; i < nAttr; i++) {
+                        attributes.put(xpp.getAttributeName(i), xpp.getAttributeValue(i));
+                    }
+                    break;
+            }
+        });
+        eventTypes.put(XmlPullParser.END_TAG, (xpp, tagStack, properties, results) -> {
+            switch (tagStack.pop()) {
+                case "container":
+                    MediaContainer container = new MediaContainer();
+                    container.setId(properties.get(ID));
+                    container.setName(properties.get(TITLE));
+                    properties.clear();
+                    results.add(container);
+                    break;
+                case "item":
+                    MediaItem item = new MediaItem();
+                    item.setId(properties.get(ID));
+                    item.setName(properties.get(TITLE));
+                    item.setUrl(properties.get(URL));
+                    item.setType(getTypeFromUpnpClass(properties.get(UPNP_CLASS)));
+                    properties.clear();
+                    results.add(item);
+                    break;
+            }
+        });
+        eventTypes.put(XmlPullParser.TEXT, (xpp, tagStack, properties, results) -> {
+            String tag = tagStack.peek();
+            if (tag.equals("title")) {
+                properties.put(TITLE, xpp.getText());
+            } else if (tag.equals("res")) {
+                properties.put(URL, xpp.getText());
+            } else if (tag.contains("artist")) {
+                properties.put(ARTIST, xpp.getText());
+            } else if (tag.contains("albumArtURI")) {
+                properties.put(ALBUMART_URI, xpp.getText());
+            } else if (tag.contains(UPNP_CLASS)) {
+                properties.put(UPNP_CLASS, xpp.getText());
+            }
+        });
+    }
+
+    public static List<MediaObject> parseDidl(String didl) throws XmlPullParserException, IOException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
         XmlPullParser xpp = factory.newPullParser();
@@ -74,74 +135,12 @@ public class DidlXmlPullParser {
         xpp.setInput(new StringReader(didl));
         int eventType = xpp.getEventType();
 
-        Vector results = new Vector();
-        Properties properties = new Properties();
-        Stack tagStack = new Stack();
+        List<MediaObject> results = new ArrayList<>();
+        Map<String, String> properties = new HashMap<>();
+        Stack<String> tagStack = new Stack<>();
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
-            switch (eventType) {
-                case XmlPullParser.START_TAG: {
-                    final String tag = xpp.getName();
-                    tagStack.push(tag);
-                    switch (tag) {
-                        case "container":
-                        case "item":
-                            properties.setProperty(ID, xpp.getAttributeValue(null, ID));
-                            break;
-                        case "res":
-                            properties.setProperty("protocolInfo", xpp.getAttributeValue(null, "protocolInfo"));
-                            int nAttr = xpp.getAttributeCount();
-                            Map<String, String> attributes = new HashMap<>();
-                            for (int i = 0; i < nAttr; i++) {
-                                attributes.put(xpp.getAttributeName(i), xpp.getAttributeValue(i));
-                            }
-                            break;
-                    }
-                    break;
-                }
-                case XmlPullParser.END_TAG: {
-                    String tag = (String) tagStack.pop();
-                    switch (tag) {
-                        case "container":
-                            MediaContainer container = new MediaContainer();
-                            container.setId(properties.getProperty(ID));
-                            container.setName(properties.getProperty(TITLE));
-                            properties.clear();
-                            results.add(container);
-                            break;
-                        case "item":
-                            MediaItem item = new MediaItem();
-                            item.setId(properties.getProperty(ID));
-                            item.setName(properties.getProperty(TITLE));
-                            item.setUrl(properties.getProperty(URL));
-                            item.setType(getTypeFromUpnpClass(properties.getProperty(UPNP_CLASS)));
-                            properties.clear();
-                            results.add(item);
-                            break;
-                    }
-
-                    break;
-                }
-                case XmlPullParser.TEXT: {
-                    String tag = (String) tagStack.peek();
-                    if (tag.equals("title")) {
-                        properties.setProperty(TITLE, xpp.getText());
-                    } else if (tag.equals("res")) {
-                        properties.setProperty(URL, xpp.getText());
-                    } else if (tag.contains("artist")) {
-                        properties.setProperty(ARTIST, xpp.getText());
-                    } else if (tag.contains("albumArtURI")) {
-                        properties.setProperty(ALBUMART_URI, xpp.getText());
-                    } else if (tag.contains(UPNP_CLASS)) {
-                        properties.setProperty(UPNP_CLASS, xpp.getText());
-                    }
-                    break;
-                }
-                default:
-                    break;
-
-            }
-
+            eventTypes.getOrDefault(eventType, EMPTY).consume(xpp, tagStack, properties, results);
             eventType = xpp.next();
         }
         return results;
