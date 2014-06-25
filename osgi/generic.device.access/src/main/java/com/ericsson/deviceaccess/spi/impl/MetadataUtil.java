@@ -42,7 +42,6 @@ import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -93,27 +92,19 @@ public enum MetadataUtil {
                 try {
                     Float.parseFloat((String) propertyValue);
                 } catch (NumberFormatException e) {
-                    throw new GDError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not parsable to '" + type + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
             } else if (Float.class.isAssignableFrom(type)) {
                 if (!(propertyValue instanceof Float)) {
-                    throw new GDError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not assignable to '" + type + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
             } else if (Long.class.isAssignableFrom(type)) {
                 if (!(propertyValue instanceof Long)) {
-                    throw new GDError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not assignable to '" + type + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
             } else {
                 if (!(propertyValue instanceof Integer || propertyValue instanceof Short || propertyValue instanceof Byte)) {
-                    throw new GDError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass()
-                            + "' which not assignable to '" + type + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
             }
 
@@ -133,10 +124,23 @@ public enum MetadataUtil {
                 if (Arrays.binarySearch(validValues, value) < 0) {
                     throw new GDError(
                             "The property: '" + propertyName + "'=" + propertyValue + " with the value '" + value
-                            + "' is not among the allowed values '" + arrayToString(validValues) + "'");
+                            + "' is not among the allowed values '" + Arrays.toString(validValues) + "'");
                 }
             }
         }
+    }
+
+    private void throwError(String propertyName, Object propertyValue, Class<?> type) throws GDError {
+        StringBuilder builder = new StringBuilder();
+        builder.append("The property: ")
+                .append("'").append(propertyName).append("'")
+                .append("=")
+                .append(propertyValue)
+                .append(" is a ")
+                .append("'").append(propertyValue.getClass()).append("'")
+                .append(" which not parsable to ")
+                .append("'").append(type).append("'");
+        throw new GDError(builder.toString());
     }
 
     /**
@@ -164,25 +168,6 @@ public enum MetadataUtil {
     }
 
     /**
-     * Makes a string of the specified array
-     *
-     * @param validValues
-     * @return the array
-     */
-    private static String arrayToString(String[] validValues) {
-        StringBuilder sb = new StringBuilder();
-        sb.append('[');
-        for (String string : validValues) {
-            sb.append(string).append(',');
-        }
-        if (sb.length() > 1) {
-            sb.setLength(sb.length() - 1);
-        }
-        sb.append(']');
-        return sb.toString();
-    }
-
-    /**
      * Makes a JSON string of the specified metadata.
      *
      * @param path
@@ -192,27 +177,28 @@ public enum MetadataUtil {
      * @return JSON string of the specified metadata
      * @throws GDException
      */
-    public String metadataToJson(String path, Format format, String name, Collection metadata) throws GDException {
+    public String metadataToJson(String path, Format format, String name, Collection<GDPropertyMetadata> metadata) throws GDException {
         String retVal = "";
         if (path == null) {
             path = "";
         }
         if (format.isJson()) {
             if (metadata.size() > 0) {
-                StringBuilder sb = new StringBuilder();
-                sb.append('"').append(name).append("\": {");
-                for (Iterator iterator = metadata.iterator(); iterator.hasNext();) {
-                    GDPropertyMetadata md = (GDPropertyMetadata) iterator.next();
+                StringBuilder builder = new StringBuilder();
+                builder.append('"').append(name).append("\": {");
+                for (GDPropertyMetadata meta : metadata) {
                     if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
-                        sb.append('"').append(md.getName()).append("\":").append(md.getSerializedNode(path.substring(path.indexOf(Constants.PATH_DELIMITER)), format));
+                        builder.append('"').append(meta.getName()).append('"').append(':')
+                                .append(meta.getSerializedNode(path.substring(path.indexOf(Constants.PATH_DELIMITER)), format));
                     } else {
-                        sb.append('"').append(md.getName()).append("\":").append(md.getSerializedNode("", format));
+                        builder.append('"').append(meta.getName()).append('"').append(':')
+                                .append(meta.getSerializedNode("", format));
                     }
-                    sb.append(',');
+                    builder.append(',');
                 }
-                sb.setLength(sb.length() - 1);
-                sb.append('}');
-                retVal = sb.toString();
+                builder.setLength(builder.length() - 1);
+                builder.append('}');
+                retVal = builder.toString();
             }
         } else {
             throw new GDException(405, "No such format supported");
