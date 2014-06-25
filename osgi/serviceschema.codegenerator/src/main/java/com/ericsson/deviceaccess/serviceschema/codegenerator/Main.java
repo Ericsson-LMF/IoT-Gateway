@@ -45,11 +45,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import org.apache.xmlbeans.XmlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main class that is used to generate Java code from schema XML file.
  */
-public class Main {
+public class Main implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     /**
      * Runs the code generation between xml file in first argument and output
@@ -64,45 +68,59 @@ public class Main {
             System.out.println("The schema file AND the output base directory must be specified");
             System.exit(1);
         }
-
-        Main main = new Main();
-        main.run(new File(args[0]), new File(args[1]));
+        Main main = new Main(args[0], args[1]);
+        main.run();
     }
 
     private ServiceSchemaDocument serviceSchemaDocument;
+    private final String output;
+    private final String input;
+    private final File serviceSchemaXml;
+    private final File outputBaseDir;
 
     /**
-     * Runs code generation from schema XML to java code
-     *
      * @param serviceSchemaXml xml file to read from
      * @param outputBaseDir java file to write to
-     * @throws XmlException
-     * @throws IOException
      */
-    public void run(File serviceSchemaXml, File outputBaseDir) throws XmlException, IOException {
-        System.out.println("Starting code generation from " + serviceSchemaXml + " to " + outputBaseDir);
+    private Main(String input, String output) {
+        this.output = parsePackageName(output);
+        this.input = parsePackageName(input);
+        serviceSchemaXml = new File(input);
+        outputBaseDir = new File(output);
+    }
 
-        serviceSchemaDocument = ServiceSchemaDocument.Factory.parse(serviceSchemaXml);
-        File spiDirBase = new File(outputBaseDir, "/com/ericsson/deviceaccess/spi/service");
-        spiDirBase.mkdirs();
-        File apiDirBase = new File(outputBaseDir, "/com/ericsson/deviceaccess/api/service");
-        apiDirBase.mkdirs();
+    /**
+     * Runs code generation from schema XML to java code.
+     */
+    @Override
+    public void run() {
+        try {
+            System.out.println("Starting code generation from " + serviceSchemaXml + " to " + outputBaseDir);
 
-        String version = serviceSchemaDocument.getServiceSchema().getVersion();
-        Services services = serviceSchemaDocument.getServiceSchema().getServices();
-        // Generate schema definition
-        try (PrintStream schemaDefStream = new PrintStream(new File(spiDirBase, "SchemaDefinitions.java"))) {
-            JavaClass builder = new JavaClass();
-            CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
-            for (Service service : services.getServiceArray()) {
-                DefinitionsAdder.addService(code, service);
-                createFile("SPI", spiDirBase, "Base", service, version, ImplementationAdder::addServiceImplementation);
-                createFile("API", apiDirBase, "", service, version, InterfaceAdder::addServiceInterface);
+            serviceSchemaDocument = ServiceSchemaDocument.Factory.parse(serviceSchemaXml);
+            File spiDirBase = new File(outputBaseDir, "/com/ericsson/deviceaccess/spi/service");
+            spiDirBase.mkdirs();
+            File apiDirBase = new File(outputBaseDir, "/com/ericsson/deviceaccess/api/service");
+            apiDirBase.mkdirs();
+
+            String version = serviceSchemaDocument.getServiceSchema().getVersion();
+            Services services = serviceSchemaDocument.getServiceSchema().getServices();
+            // Generate schema definition
+            try (PrintStream schemaDefStream = new PrintStream(new File(spiDirBase, "SchemaDefinitions.java"))) {
+                JavaClass builder = new JavaClass(input);
+                CodeBlock code = DefinitionsAdder.addDefinitionsStart(builder);
+                for (Service service : services.getServiceArray()) {
+                    DefinitionsAdder.addService(code, service);
+                    createFile("SPI", spiDirBase, "Base", service, version, ImplementationAdder::addServiceImplementation);
+                    createFile("API", apiDirBase, "", service, version, InterfaceAdder::addServiceInterface);
+                }
+                schemaDefStream.append(builder.build());
             }
-            schemaDefStream.append(builder.build());
-        }
 
-        System.out.println("Code generation completed!");
+            System.out.println("Code generation completed!");
+        } catch (XmlException | IOException ex) {
+            logger.error("Exception: " + ex);
+        }
     }
 
     /**
@@ -121,7 +139,7 @@ public class Main {
         packageDir.mkdirs();
         File sourceFile = new File(packageDir, StringUtil.capitalize(service.getName() + postfix) + ".java");
         try (PrintStream stream = new PrintStream(sourceFile)) {
-            JavaClass builder = new JavaClass();
+            JavaClass builder = new JavaClass(input);
             generator.consume(builder, service, version);
             stream.append(builder.build());
         }
@@ -141,6 +159,12 @@ public class Main {
         } else {
             return category.replace('.', '/');
         }
+    }
+
+    private static final String DIRECTORY = "osgi";
+
+    private String parsePackageName(String path) {
+        return DIRECTORY + path.split(DIRECTORY)[1];
     }
 
 }

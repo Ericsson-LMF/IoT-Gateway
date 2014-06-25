@@ -1,5 +1,6 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
+import com.ericsson.commonutil.StringUtil;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
@@ -17,7 +18,6 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
-import com.ericsson.commonutil.StringUtil;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -43,11 +43,16 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
     private String superType;
     private ClassModifier classModifier;
     private final EnumSet<OptionalModifier> modifiers;
+    private final String source;
 
     /**
      * Creates new builder for Java Class
      */
     public JavaClass() {
+        this(null);
+    }
+
+    public JavaClass(String source) {
         packageString = null;
         imports = new ArrayList<>();
         innerClasses = new ArrayList<>();
@@ -59,6 +64,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         javadoc = null;
         accessModifier = AccessModifier.PUBLIC;
         classModifier = ClassModifier.CLASS;
+        this.source = source;
     }
 
     /**
@@ -325,7 +331,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      * @param indent indent
      */
     private void addJavadoc(StringBuilder builder, int indent) {
-        String warning = getGenerationWarning(this.getClass());
+        String warning = getGenerationWarning(this.getClass(), source);
         builder.append(new Javadoc(warning).append(javadoc).build(indent));
     }
 
