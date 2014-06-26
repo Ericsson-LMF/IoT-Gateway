@@ -113,16 +113,18 @@ public enum DefinitionsAdder {
     private static void addParameters(CodeBlock block, Parameter[] parameters, String method) {
         for (Parameter parameter : parameters) {
             block.addBlock(method + "(p ->", parameterBlock -> {
+                boolean isString = "String".equals(StringUtil.getType(parameter.getType()));
                 parameterBlock.add("p.setName(\"").append(parameter.getName()).append("\");");
                 parameterBlock.add("p.setType(").append(parameter.getType()).append(".class);");
                 String defaultStr = parameter.getDefault();
-                if (defaultStr == null && parameter.isSetValues()) {
+                //TODO: Should values be allowed for other types as well? In services.xml there is Float types with string values as value list...
+                if (isString && defaultStr == null && parameter.isSetValues()) {
                     defaultStr = parameter.getValues().getValueArray(0);
                 }
                 if (defaultStr != null) {
                     parameterBlock.add("p.setDefault(\"").append(defaultStr).append("\");");
                 }
-                if ("String".equals(StringUtil.getType(parameter.getType()))) {
+                if (isString) {
                     if (parameter.isSetValues()) {
                         parameterBlock.addBlock("p.setValidValues(new String[]", defaultBlock -> {
                             boolean first = true;
