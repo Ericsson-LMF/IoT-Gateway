@@ -1,0 +1,24 @@
+{
+    "result": {
+        "string": {
+            "type": "String"
+        },
+        "float": {
+            "type": "Float"
+        },
+        "int": {
+            "type": "Integer"
+        }
+    },
+    "arguments": {
+        "string": {
+            "type": "String"
+        },
+        "float": {
+            "type": "Float"
+        },
+        "int": {
+            "type": "Integer"
+        }
+    }
+}

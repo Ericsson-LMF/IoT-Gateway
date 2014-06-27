@@ -65,8 +65,8 @@ public enum MetadataUtil {
         if (metadataMap == null) {
             return;
         }
-        for (String name : props.getNames()) {
-            verifyPropertyAgainstMetadata(metadataMap, name, props.getValue(name));
+        for (String name : props.getProperties().keySet()) {
+            verifyPropertyAgainstMetadata(metadataMap.get(name), name, props.getValue(name));
         }
     }
 
@@ -74,14 +74,12 @@ public enum MetadataUtil {
      * Verifies the specified property, with the specified name, against the
      * specified metadata.
      *
-     * @param metadataMap name:String -> {@link GDPropertyMetadata}
+     * @param metadata
      * @param propertyName
      * @param propertyValue
      * @throws GDError thrown if value does not adhere to the metadata
      */
-    public void verifyPropertyAgainstMetadata(Map<String, GDPropertyMetadata> metadataMap, String propertyName, Object propertyValue) throws GDError {
-        GDPropertyMetadata metadata = metadataMap.get(propertyName);
-
+    public void verifyPropertyAgainstMetadata(GDPropertyMetadata metadata, String propertyName, Object propertyValue) throws GDError {
         if (metadata == null) {
             return;
         }
@@ -206,4 +204,5 @@ public enum MetadataUtil {
 
         return retVal;
     }
+
 }

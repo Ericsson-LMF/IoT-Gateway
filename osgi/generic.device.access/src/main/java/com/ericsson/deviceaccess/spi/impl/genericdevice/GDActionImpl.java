@@ -35,6 +35,7 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.commonutil.json.JsonUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
@@ -44,7 +45,8 @@ import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
-import com.ericsson.commonutil.StringUtil;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,22 +117,21 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
             return output;
         }
 
-        String keys[] = output.getNames();
-        for (String key : keys) {
+        output.getProperties().forEach((key, data) -> {
+            Object value = data.currentValue;
             if (!input.hasProperty(key)) {
-                continue;
+                return;
             }
-            Object value = input.getValue(key);
             if (value instanceof String) {
                 output.setStringValue(key, (String) value);
             } else if (value instanceof Integer) {
-                output.setIntValue(key, ((Integer) value));
+                output.setIntValue(key, (Integer) value);
             } else if (value instanceof Float) {
-                output.setFloatValue(key, ((Float) value));
+                output.setFloatValue(key, (Float) value);
             } else if (value instanceof Long) {
-                output.setLongValue(key, ((Long) value));
+                output.setLongValue(key, (Long) value);
             }
-        }
+        });
 
         MetadataUtil.INSTANCE.verifyPropertiesAgainstMetadata(output, argumentsMetadata);
 
@@ -141,18 +142,16 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
      * {@inheritDoc}
      */
     @Override
-    public GDPropertyMetadata[] getResultMetadata() {
-        return resultMetadata.values().toArray(
-                new GDPropertyMetadata[resultMetadata.size()]);
+    public Map<String, GDPropertyMetadata> getResultMetadata() {
+        return Collections.unmodifiableMap(resultMetadata);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GDPropertyMetadata[] getArgumentsMetadata() {
-        return argumentsMetadata.values().toArray(
-                new GDPropertyMetadata[argumentsMetadata.size()]);
+    public Map<String, GDPropertyMetadata> getArgumentsMetadata() {
+        return Collections.unmodifiableMap(argumentsMetadata);
     }
 
     /**
@@ -233,23 +232,11 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
         }
     }
 
-    private String toJsonString(Format format, int indent)
-            throws GDException {
-        String json = "{";
-        json += "\"name\":\"" + StringUtil.escapeJSON(getName()) + "\"";
-        StringBuffer sb = new StringBuffer(",");
-        if (argumentsMetadata != null && argumentsMetadata.size() > 0) {
-            sb.append(MetadataUtil.INSTANCE.metadataToJson("", Format.JSON, "arguments", argumentsMetadata.values())).append(',');
+    private String toJsonString(Format format, int indent) throws GDException {
+        try {
+            return JsonUtil.execute(mapper -> mapper.writerWithView(JsonUtil.ID.Ignore.class).writeValueAsString(this));
+        } catch (IOException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
-        if (resultMetadata != null && resultMetadata.size() > 0) {
-            sb.append(MetadataUtil.INSTANCE.metadataToJson("", Format.JSON, "result", resultMetadata.values())).append(',');
-        }
-        if (sb.length() > 1) {
-            // Remove last ','
-            sb.setLength(sb.length() - 1);
-            json += sb;
-        }
-        json += "}";
-        return json;
     }
 }

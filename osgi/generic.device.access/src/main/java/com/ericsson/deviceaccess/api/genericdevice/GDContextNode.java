@@ -35,6 +35,7 @@
 package com.ericsson.deviceaccess.api.genericdevice;
 
 import com.ericsson.deviceaccess.api.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * GenericDeviceContextNode represents a node in a tree built by Generic devices
@@ -66,6 +67,7 @@ public interface GDContextNode extends Serializable {
      *
      * @return path from the device node to the node with "/" as delimiter.
      */
+    @JsonIgnore
     public String getPath();
 
     String getSerializedNode(String path, Format format) throws GDException;

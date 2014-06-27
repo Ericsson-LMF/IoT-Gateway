@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.commonutil.StringUtil;
 import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.commonutil.json.JsonUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
@@ -45,6 +46,8 @@ import com.ericsson.deviceaccess.spi.GenericDevice;
 import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkPermission;
 import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -96,7 +99,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     private State state = State.READY;
 
     private Map<String, GDService> service = new HashMap<>();
-    private boolean isReady = false;
+    private transient boolean isReady = false;
 
     /**
      *
@@ -127,7 +130,8 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      *
      * @return Map of service instances with their names as key.
      */
-    public Map<String, GDService> getService() {
+    @Override
+    public Map<String, GDService> getServices() {
         checkPermission(GenericDevice.class, Type.GET);
         return new HashMap<>(service);
     }
@@ -453,6 +457,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      *
      * @return
      */
+    @JsonIgnore
     public Map<String, Object> getDeviceProperties() {
         return getDeviceProperties(this);
     }
@@ -482,26 +487,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     }
 
     private String toJsonString(Format format, int indent, boolean stateOnly) throws GDException {
-        String json = "{";
-        json += "\"id\":\"" + getId() + "\"";
-        json += ",";
-        String[] fields = {"URN", "name", "type", "icon", "protocol", "location", "manufacturer", "contact", "description", "modelName", "productClass", "serialNumber", "state"};
-        for (int i = 0; i < fields.length; i++) {
-            Object value = getFieldValue(fields[i]);
-            if (value != null) {
-                json += "\"" + fields[i] + "\":";
-                json += "\"" + StringUtil.escapeJSON(value.toString()) + "\"";
-                if (i < fields.length - 1) {
-                    json += ",";
-                }
-            }
+        try {
+            return JsonUtil.execute(mapper -> mapper.writeValueAsString(this));
+        } catch (IOException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
-        json += ",";
-        json += "\"online\":" + isOnline();
-        json += ",";
-        json += "\"services\": {" + getServiceListJsonString(format, indent, stateOnly) + "}";
-        json += "}";
-        return json;
     }
 
     private String getServiceListJsonString(Format format, int indent, boolean stateOnly) throws GDException {
@@ -528,7 +518,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     private Object getFieldValue(String name) throws GDException {
         Method method;
         try {
-            method = getClass().getMethod("get" + makeFirstCharToUpperCase(name));
+            method = getClass().getMethod("get" + StringUtil.capitalize(name));
             if (method != null) {
                 return method.invoke(this);
             }
@@ -536,19 +526,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
             throw new GDException("Exception when getting field value", e);
         }
         return null;
-    }
-
-    private String makeFirstCharToUpperCase(String value) {
-        if (value != null && value.length() > 0) {
-            return value.substring(0, 1).toUpperCase() + value.substring(1);
-        }
-        return "";
-    }
-
-    @Override
-    public String[] getServiceNames() {
-        checkPermission(GenericDevice.class, Type.GET);
-        return service.keySet().toArray(new String[0]);
     }
 
 }

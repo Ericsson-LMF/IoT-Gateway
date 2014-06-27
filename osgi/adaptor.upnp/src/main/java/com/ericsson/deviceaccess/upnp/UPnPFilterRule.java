@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
+import java.util.Objects;
 import org.osgi.service.upnp.UPnPDevice;
 import org.osgi.service.upnp.UPnPService;
 
@@ -58,10 +59,7 @@ class FR_DeviceType extends UPnPFilterRule {
     private String type = null;
 
     protected FR_DeviceType(String deviceType) {
-        if (deviceType == null) {
-            throw new NullPointerException("FR_DeviceType()");
-        }
-        this.type = deviceType;
+        type = Objects.requireNonNull(deviceType, getClass().getName());
     }
 
     @Override
@@ -75,10 +73,7 @@ class FR_DeviceID extends UPnPFilterRule {
     private String id = null;
 
     protected FR_DeviceID(String deviceID) {
-        if (deviceID == null) {
-            throw new NullPointerException("FR_DeviceID()");
-        }
-        this.id = deviceID;
+        this.id = Objects.requireNonNull(deviceID, getClass().getName());
     }
 
     @Override
@@ -92,10 +87,7 @@ class FR_ServiceType extends UPnPFilterRule {
     private String type = null;
 
     protected FR_ServiceType(String serviceType) {
-        if (serviceType == null) {
-            throw new NullPointerException("FR_ServiceType()");
-        }
-        this.type = serviceType;
+        this.type = Objects.requireNonNull(serviceType, getClass().getName());
     }
 
     @Override
@@ -109,10 +101,7 @@ class FR_ServiceID extends UPnPFilterRule {
     private String id = null;
 
     protected FR_ServiceID(String serviceID) {
-        if (serviceID == null) {
-            throw new NullPointerException("FR_ServiceID()");
-        }
-        this.id = serviceID;
+        this.id = Objects.requireNonNull(serviceID, getClass().getName());
     }
 
     @Override
@@ -126,11 +115,8 @@ class FR_and extends UPnPFilterRule {
     private UPnPFilterRule fr1 = null, fr2 = null;
 
     protected FR_and(UPnPFilterRule fr1, UPnPFilterRule fr2) {
-        if (fr1 == null || fr2 == null) {
-            throw new NullPointerException("FR_and()");
-        }
-        this.fr1 = fr1;
-        this.fr2 = fr2;
+        this.fr1 = Objects.requireNonNull(fr1, getClass().getName());
+        this.fr2 = Objects.requireNonNull(fr2, getClass().getName());
     }
 
     @Override
@@ -144,11 +130,8 @@ class FR_or extends UPnPFilterRule {
     private UPnPFilterRule fr1 = null, fr2 = null;
 
     protected FR_or(UPnPFilterRule fr1, UPnPFilterRule fr2) {
-        if (fr1 == null || fr2 == null) {
-            throw new NullPointerException("FR_or()");
-        }
-        this.fr1 = fr1;
-        this.fr2 = fr2;
+        this.fr1 = Objects.requireNonNull(fr1, getClass().getName());
+        this.fr2 = Objects.requireNonNull(fr2, getClass().getName());
     }
 
     @Override
@@ -162,10 +145,7 @@ class FR_not extends UPnPFilterRule {
     private UPnPFilterRule fr1 = null;
 
     protected FR_not(UPnPFilterRule fr1) {
-        if (fr1 == null) {
-            throw new NullPointerException("FR_not()");
-        }
-        this.fr1 = fr1;
+        this.fr1 = Objects.requireNonNull(fr1, getClass().getName());
     }
 
     @Override

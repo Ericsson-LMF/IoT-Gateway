@@ -34,12 +34,14 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.commonutil.json.JsonUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
+import java.io.IOException;
 
 public class GDActionContextImpl extends GDActionContext.Stub implements GDActionContext {
 
@@ -193,28 +195,37 @@ public class GDActionContextImpl extends GDActionContext.Stub implements GDActio
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
         if (format.isJson()) {
-            StringBuilder sb = new StringBuilder("{");
-            sb.append("\"device\":\"").append(getDevice()).append("\",");
-            sb.append("\"service\":\"").append(getService()).append("\",");
-            sb.append("\"action\":\"").append(getAction()).append("\",");
-            sb.append("\"requester\":\"").append(getRequester()).append("\",");
-            sb.append("\"owner\":\"").append(getOwner()).append("\",");
-            sb.append("\"firstTime\":\"").append(isFirstTime()).append("\",");
-            sb.append("\"authorized\":\"").append(isAuthorized()).append("\",");
-            sb.append("\"requesterContact\":\"").append(getRequesterContact()).append("\",");
-            if (arguments != null) {
-                sb.append("\"arguments\":").append(getArguments().serialize(format)).append(",");
-            } else {
-                sb.append("\"arguments\":null,");
+//            boolean old = false;
+//            if (!old) {
+            try {
+                return JsonUtil.execute(mapper -> mapper.writeValueAsString(this));
+            } catch (IOException ex) {
+                throw new GDException(ex.getMessage(), ex);
             }
-            if (result != null) {
-                sb.append("\"result\":").append(getResult().serialize(format));
-            } else {
-                sb.append("\"result\":null");
-            }
-            sb.append("}");
-
-            return sb.toString();
+//            } else {
+//                StringBuilder sb = new StringBuilder("{");
+//                sb.append("\"device\":\"").append(getDevice()).append("\",");
+//                sb.append("\"service\":\"").append(getService()).append("\",");
+//                sb.append("\"action\":\"").append(getAction()).append("\",");
+//                sb.append("\"requester\":\"").append(getRequester()).append("\",");
+//                sb.append("\"owner\":\"").append(getOwner()).append("\",");
+//                sb.append("\"firstTime\":\"").append(isFirstTime()).append("\",");
+//                sb.append("\"authorized\":\"").append(isAuthorized()).append("\",");
+//                sb.append("\"requesterContact\":\"").append(getRequesterContact()).append("\",");
+//                if (arguments != null) {
+//                    sb.append("\"arguments\":").append(getArguments().serialize(format)).append(",");
+//                } else {
+//                    sb.append("\"arguments\":null,");
+//                }
+//                if (result != null) {
+//                    sb.append("\"result\":").append(getResult().serialize(format));
+//                } else {
+//                    sb.append("\"result\":null");
+//                }
+//                sb.append("}");
+//
+//                return sb.toString();
+//            }
         }
         throw new GDException(405, "No such format supported");
     }

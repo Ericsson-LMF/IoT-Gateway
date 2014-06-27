@@ -34,11 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
+import com.ericsson.commonutil.json.JsonUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
-import com.ericsson.commonutil.StringUtil;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -187,35 +188,12 @@ public class ParameterSchema implements GDPropertyMetadata {
         }
     }
 
-    private String toJsonString(Format format, int indent) {
-        StringBuilder json = new StringBuilder("{");
-        json.append("\"name\":\"").append(StringUtil.escapeJSON(name)).append("\",");
-        json.append("\"type\":\"").append(getTypeName()).append("\",");
-        if (minValue != null) {
-            json.append("\"minValue\":\"").append(minValue).append("\",");
+    private String toJsonString(Format format, int indent) throws GDException {
+        try {
+            return JsonUtil.execute(mapper -> mapper.writeValueAsString(this));
+        } catch (IOException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
-        if (maxValue != null) {
-            json.append("\"maxValue\":\"").append(maxValue).append("\",");
-        }
-
-        if (defaultValue != null) {
-            json.append("\"defaultValue\":\"").append(StringUtil.escapeJSON(defaultValue.toString())).append("\",");
-        }
-        if (validValues != null) {
-            json.append("\"validValues\":[");
-            for (int i = 0; i < validValues.length; i++) {
-                String value = StringUtil.escapeJSON(validValues[i]);
-                json.append('"').append(value).append('"');
-                if (i < validValues.length - 1) {
-                    json.append(',');
-                }
-            }
-            json.append("],");
-        }
-        // remove last ','
-        json.setLength(json.length() - 1);
-        json.append("}");
-        return json.toString();
     }
 
     /**

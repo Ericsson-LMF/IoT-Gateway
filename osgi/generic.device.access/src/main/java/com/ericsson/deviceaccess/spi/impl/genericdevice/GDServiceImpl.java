@@ -34,6 +34,9 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.commonutil.StringUtil;
+import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.commonutil.json.JsonUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
@@ -45,9 +48,10 @@ import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.check
 import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
-import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +60,11 @@ public class GDServiceImpl extends GDService.Stub
         implements GDService {
 
     private final String name;
-    private String path;
-    private GenericDeviceImpl parentDevice;
+    private transient String path;
+    private transient GenericDeviceImpl parentDevice;
     private final Map<String, GDAction> action = new HashMap<>();
     private final GDPropertiesImpl properties;
-    private final List<GDPropertyMetadata> propertyMetadata;
+    private transient final List<GDPropertyMetadata> propertyMetadata;
 
     public GDServiceImpl(String name,
             List<? extends GDPropertyMetadata> propertyMetadata) {
@@ -79,9 +83,9 @@ public class GDServiceImpl extends GDService.Stub
      * {@inheritDoc}
      */
     @Override
-    public String[] getActionNames() {
+    public Map<String, GDAction> getActions() {
         checkPermission(getClass(), Type.GET);
-        return action.keySet().toArray(new String[0]);
+        return Collections.unmodifiableMap(action);
     }
 
     /**
@@ -179,8 +183,8 @@ public class GDServiceImpl extends GDService.Stub
      * {@inheritDoc}
      */
     @Override
-    public GDPropertyMetadata[] getPropertiesMetadata() {
-        return propertyMetadata.toArray(new GDPropertyMetadata[propertyMetadata.size()]);
+    public List<GDPropertyMetadata> getPropertiesMetadata() {
+        return Collections.unmodifiableList(propertyMetadata);
     }
 
     /**
@@ -268,14 +272,12 @@ public class GDServiceImpl extends GDService.Stub
         }
     }
 
-    private String toJsonString(Format format, int indent)
-            throws GDException {
-        String json = "{";
-        json += "\"name\":\"" + StringUtil.escapeJSON(getName()) + "\",";
-        json += "\"actions\":" + getActionListJsonString(format, indent) + ",";
-        json += "\"properties\": " + properties.serialize(format);
-        json += "}";
-        return json;
+    private String toJsonString(Format format, int indent) throws GDException {
+        try {
+            return JsonUtil.execute(mapper -> mapper.writerWithView(JsonUtil.ID.Ignore.class).writeValueAsString(this));
+        } catch (IOException ex) {
+            throw new GDException(ex.getMessage(), ex);
+        }
     }
 
     private String getActionListJsonString(Format format, int indent)
@@ -298,6 +300,7 @@ public class GDServiceImpl extends GDService.Stub
         return json.append("}").toString();
     }
 
+    @JsonIgnore
     public GenericDevice getParentDevice() {
         return parentDevice;
     }

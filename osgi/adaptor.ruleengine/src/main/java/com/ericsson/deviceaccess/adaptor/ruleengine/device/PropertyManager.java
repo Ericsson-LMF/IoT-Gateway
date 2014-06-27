@@ -37,7 +37,6 @@ package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 import com.ericsson.commonutil.LegacyUtil;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
-import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import java.util.HashMap;
 import java.util.Map;
 import org.osgi.framework.BundleContext;
@@ -143,15 +142,11 @@ public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer
 
         synchronized (mutex) {
             // Remove all service properties
-            String[] serviceNames = device.getServiceNames();
-            for (String serviceName : serviceNames) {
-                GDService srv = device.getService(serviceName);
-                String[] propertyIds = srv.getProperties().getNames();
-                for (String propertyId : propertyIds) {
-                    Object value = srv.getProperties().getValue(propertyId);
-                    deviceProperties.remove(device.getId() + "." + serviceName + "." + propertyId);
-                }
-            }
+            device.getServices().forEach((name, srv) -> {
+                srv.getProperties().getProperties().forEach((key, propertyID) -> {
+                    deviceProperties.remove(device.getId() + "." + name + "." + propertyID);
+                });
+            });
 
             // Remove all device properties
             deviceProperties.remove(device.getId() + ".DeviceProperties.device.id");
@@ -170,22 +165,17 @@ public enum PropertyManager implements GDEventListener, ServiceTrackerCustomizer
     private void updateDevice(GenericDevice device) {
         synchronized (mutex) {
             // Add or update all service properties
-            String[] serviceNames = device.getServiceNames();
-            for (String serviceName : serviceNames) {
-                GDService service = device.getService(serviceName);
-                String[] propertyIds = service.getProperties().getNames();
-                for (String propertyId : propertyIds) {
-                    if ("lastUpdateTime".equals(propertyId)) {
-                        continue;
+            device.getServices().forEach((name, service) -> {
+                service.getProperties().getProperties().forEach((propertyID, value) -> {
+                    if ("lastUpdateTime".equals(propertyID)) {
+                        return;
                     }
-                    Object value = service.getProperties().getValue(propertyId);
                     if (value != null) {
-                        System.out.println(device.getId() + "." + serviceName + "." + propertyId + "=" + value);
-                        deviceProperties.put(device.getId() + "." + serviceName + "." + propertyId, value);
+                        System.out.println(device.getId() + "." + name + "." + propertyID + "=" + value);
+                        deviceProperties.put(device.getId() + "." + name + "." + propertyID, value);
                     }
-                }
-            }
-
+                });
+            });
             // Add or update all device properties
             deviceProperties.put(device.getId() + ".DeviceProperties.device.id", device.getId());
             deviceProperties.put(device.getId() + ".DeviceProperties.device.manufacturer", device.getManufacturer());

@@ -34,11 +34,13 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import com.ericsson.commonutil.json.JsonUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
+import java.io.IOException;
 
 public class GDActionResultImpl implements GDActionResult {
 
@@ -94,17 +96,11 @@ public class GDActionResultImpl implements GDActionResult {
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
         if (format.isJson()) {
-            StringBuilder sb = new StringBuilder("{");
-            sb.append("\"code\":\"").append(getCode()).append("\",");
-            sb.append("\"reason\":\"").append(getReason()).append("\",");
-            if (value != null) {
-                sb.append("\"value\":").append(getValue().serialize(format));
-            } else {
-                sb.append("\"value\":null");
+            try {
+                return JsonUtil.execute(mapper -> mapper.writerWithView(JsonUtil.ID.Ignore.class).writeValueAsString(this));
+            } catch (IOException ex) {
+                throw new GDException(ex.getMessage(), ex);
             }
-            sb.append("}");
-
-            return sb.toString();
         } else {
             throw new GDException(405, "No such format supported");
         }

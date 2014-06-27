@@ -34,10 +34,10 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable.Format;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
 import java.util.ArrayList;
 import java.util.List;
 import junit.framework.Assert;
@@ -81,6 +81,10 @@ public class GenericDevicePropertiesImplTest {
                 will(returnValue("fProp"));
                 allowing(metadataFloat).getType();
                 will(returnValue(Float.class));
+                allowing(metadataFloat).getTypeName();
+                will(returnValue("Float"));
+                allowing(metadataFloat).getValidValues();
+                will(returnValue(new String[0]));
                 allowing(metadataFloat).getMinValue();
                 will(returnValue(Float.NEGATIVE_INFINITY));
                 allowing(metadataFloat).getMaxValue();

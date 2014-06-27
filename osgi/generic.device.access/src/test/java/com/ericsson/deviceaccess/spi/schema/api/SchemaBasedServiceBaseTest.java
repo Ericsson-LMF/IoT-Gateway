@@ -120,7 +120,7 @@ public class SchemaBasedServiceBaseTest {
     @Test
     public void testServiceWithProperty() throws GDException {
         SBService service = new SBServiceBase(serviceSchema);
-        assertEquals("prop1", service.getProperties().getNames()[0]);
+        assertEquals("prop1", service.getProperties().getProperties().keySet().toArray()[0]);
     }
 
     @Test

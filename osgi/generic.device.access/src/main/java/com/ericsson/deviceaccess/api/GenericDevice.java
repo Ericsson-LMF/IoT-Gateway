@@ -34,9 +34,11 @@
  */
 package com.ericsson.deviceaccess.api;
 
-import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDContextNode;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 
 public interface GenericDevice extends GDContextNode {
 
@@ -67,18 +69,18 @@ public interface GenericDevice extends GDContextNode {
     public GDService getService(String name);
 
     /**
-     * Method to return an array of service names to iterate services offered by
-     * the device.
+     * Method to return map from service name to service offered by device
      *
-     * @return array of service names
+     * @return name to service map
      */
-    public String[] getServiceNames();
+    public Map<String, GDService> getServices();
 
     /**
      * Getter for the device ID field. This is a gateway local ID.
      *
      * @return Device id.
      */
+    @JsonProperty("ID")
     public String getId();
 
     /**
@@ -86,6 +88,7 @@ public interface GenericDevice extends GDContextNode {
      *
      * @param URN
      */
+    @JsonProperty("URN")
     public void setURN(String URN);
 
     /**
@@ -199,7 +202,7 @@ public interface GenericDevice extends GDContextNode {
      *
      * @return JSON of the state. Example:
      * <code>{"Service1" : {"property1" : "99","property2" : "99"},"Service2" : {"property3" : "99","property4" : "99"}}</code>
-     * @throws com.ericsson.deviceaccess.api.GenericDeviceException
+     * @throws com.ericsson.deviceaccess.api.genericdevice.GDException
      */
     public String serializeState() throws GDException;
 
@@ -229,7 +232,6 @@ public interface GenericDevice extends GDContextNode {
          * permanently removed/unpaired
          */
         REMOVED("Removed");
-
         private final String string;
 
         State(String string) {

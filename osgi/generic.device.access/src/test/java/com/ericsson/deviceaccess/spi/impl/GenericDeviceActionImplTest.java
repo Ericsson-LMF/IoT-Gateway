@@ -34,15 +34,16 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable.Format;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import java.util.ArrayList;
 import java.util.List;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.api.ExpectationError;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,17 +83,48 @@ public class GenericDeviceActionImplTest {
             {
                 allowing(intPropMetadata).getName();
                 will(returnValue("int"));
+                allowing(intPropMetadata).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(intPropMetadata).getMaxValue();
+                will(returnValue(null));
+                allowing(intPropMetadata).getMinValue();
+                will(returnValue(null));
+                allowing(intPropMetadata).getTypeName();
+                will(returnValue("Integer"));
+                allowing(intPropMetadata).getValidValues();
+                will(returnValue(null));
                 allowing(intPropMetadata).getSerializedNode("", Format.JSON);
                 will(returnValue("{\"type\":\"int\"}"));
+
                 allowing(floatPropMetadata).getName();
                 will(returnValue("float"));
+                allowing(floatPropMetadata).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(floatPropMetadata).getMaxValue();
+                will(returnValue(null));
+                allowing(floatPropMetadata).getMinValue();
+                will(returnValue(null));
+                allowing(floatPropMetadata).getTypeName();
+                will(returnValue("Float"));
+                allowing(floatPropMetadata).getValidValues();
+                will(returnValue(null));
                 allowing(floatPropMetadata).getSerializedNode("", Format.JSON);
                 will(returnValue("{\"type\":\"float\"}"));
+
                 allowing(stringPropMetadata).getName();
                 will(returnValue("string"));
                 allowing(stringPropMetadata).getSerializedNode("", Format.JSON);
                 will(returnValue("{\"type\":\"string\"}"));
-
+                allowing(stringPropMetadata).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(stringPropMetadata).getMaxValue();
+                will(returnValue(null));
+                allowing(stringPropMetadata).getMinValue();
+                will(returnValue(null));
+                allowing(stringPropMetadata).getTypeName();
+                will(returnValue("String"));
+                allowing(stringPropMetadata).getValidValues();
+                will(returnValue(null));
             }
         });
 
@@ -101,7 +133,12 @@ public class GenericDeviceActionImplTest {
 
     @Test
     public void testSerialize() throws GDException, JSONException {
-        String json = action.serialize(Format.JSON);
+        String json = null;
+        try {
+            json = action.serialize(Format.JSON);
+        } catch (ExpectationError ex) {
+            System.out.println(ex.invocation);
+        }
 
         context.assertIsSatisfied();
         // Just check that JSON parsing works

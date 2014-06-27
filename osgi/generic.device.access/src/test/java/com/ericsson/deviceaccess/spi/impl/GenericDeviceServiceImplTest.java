@@ -34,19 +34,18 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
-import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
+import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
-import com.ericsson.deviceaccess.api.Serializable.Format;
-import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.event.EventManager;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import junit.framework.Assert;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
@@ -114,6 +113,10 @@ public class GenericDeviceServiceImplTest {
                 will(returnValue("fProp"));
                 allowing(metadataFloat).getType();
                 will(returnValue(Float.class));
+                allowing(metadataFloat).getTypeName();
+                will(returnValue("Float"));
+                allowing(metadataFloat).getValidValues();
+                will(returnValue(null));
                 allowing(metadataFloat).getMinValue();
                 will(returnValue(Float.NEGATIVE_INFINITY));
                 allowing(metadataFloat).getMaxValue();
@@ -129,6 +132,10 @@ public class GenericDeviceServiceImplTest {
                 will(returnValue("iProp"));
                 allowing(metadataInt).getType();
                 will(returnValue(Integer.class));
+                allowing(metadataInt).getTypeName();
+                will(returnValue("Integer"));
+                allowing(metadataInt).getValidValues();
+                will(returnValue(null));
                 allowing(metadataInt).getMinValue();
                 will(returnValue(Integer.MIN_VALUE));
                 allowing(metadataInt).getMaxValue();
@@ -136,13 +143,21 @@ public class GenericDeviceServiceImplTest {
                 allowing(metadataInt).serialize(Format.JSON);
                 will(returnValue("{\"type\":\"int\"}"));
 
+                allowing(metadataString).getDefaultNumberValue();
+                will(returnValue(null));
                 allowing(metadataString).getDefaultStringValue();
                 will(returnValue("Forty-two"));
                 allowing(metadataString).getName();
                 will(returnValue("sProp"));
                 allowing(metadataString).getType();
                 will(returnValue(String.class));
+                allowing(metadataString).getTypeName();
+                will(returnValue("String"));
                 allowing(metadataString).getValidValues();
+                will(returnValue(null));
+                allowing(metadataString).getMinValue();
+                will(returnValue(null));
+                allowing(metadataString).getMaxValue();
                 will(returnValue(null));
                 allowing(metadataString).serialize(Format.JSON);
                 will(returnValue("{\"type\":\"string\"}"));
@@ -150,6 +165,10 @@ public class GenericDeviceServiceImplTest {
                 allowing(action).getName();
                 will(returnValue("action1"));
                 allowing(action).updatePath(with(aNonNull(String.class)));
+                allowing(action).getArgumentsMetadata();
+                will(returnValue(new HashMap<>()));
+                allowing(action).getResultMetadata();
+                will(returnValue(new HashMap<>()));
             }
         });
 
@@ -220,11 +239,12 @@ public class GenericDeviceServiceImplTest {
     public void testSerialize() throws GDException, JSONException {
         context.checking(new Expectations() {
             {
-                oneOf(action).serialize(Format.JSON);
+                allowing(action).serialize(Format.JSON);
                 will(returnValue("{\"name\":\"action1\"}"));
             }
         });
         String json = service.serialize(Format.JSON);
+        System.out.println(json);
 
         context.assertIsSatisfied();
         // Just check that JSON parsing works

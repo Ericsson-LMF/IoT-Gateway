@@ -82,7 +82,7 @@ public class UPnPAgentFactory implements BundleActivator, ServiceTrackerCustomiz
     }
 
     private void addGDADevice(UPnPDevice devOSGi) {
-        logger.debug("Creating agent for " + UPnPUtil.getFriendlyName(devOSGi));
+        logger.warn("Creating agent for " + UPnPUtil.getFriendlyName(devOSGi));
         UPnPDeviceAgent agent = new UPnPDeviceAgent(context, devOSGi);
 
         agents.put(devOSGi, agent);
