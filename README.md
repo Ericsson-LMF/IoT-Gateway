@@ -197,7 +197,7 @@ This instruction is for Ubuntu 14.04. It can work on other linux distributions a
 On host machine download Raspbian image from: http://downloads.raspberrypi.org/raspbian_latest 
 
 2.
-Insert SD-Card and get name of the SD-Card for example in Ubuntu you can do it with  
+Insert SD-Card into host machine and get the name of the SD-Card. For example in Ubuntu you can do it with:  
 ```
 df -ah
 ```
@@ -205,7 +205,7 @@ SD-card should be something like mmcblk0.
 ##### NOTICE: Remember to check only the card name and not the partition name.
 Write the name down and unmount the SD-Card with 
 ```
-sudo umount /dev/“name of the card”
+sudo umount /dev/“name of the SD-card”
 ```
 
 3.
