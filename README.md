@@ -194,51 +194,39 @@ Target: This is the machine where the compiled Java bytecode executes
 This instruction is for Ubuntu 14.04. It can work on other linux distributions and OS X Maverics with minor changes.
 
 1.
-
 On host machine download Raspbian image from: http://downloads.raspberrypi.org/raspbian_latest 
 
 2.
-
 Insert SD-Card and get name of the SD-Card for example in Ubuntu you can do it with  
 ```
 df -ah
 ```
-
 SD-card should be something like mmcblk0. 
-
-#### NOTICE: Remember to check only the card name and not the partition name.
-
+##### NOTICE: Remember to check only the card name and not the partition name.
 Write the name down and unmount the SD-Card with 
-
 ```
 sudo umount /dev/“name of the card”
 ```
 
 3.
-
 Go to the folder with Raspbian image and do 
 ```
 dd if=“name of the raspbian image ”.img of =/dev/“name of the SD-card” bs=2M
 ```
-
-#### NOTICE: depending on your host machine operating system, last M could be capital or lower case!
+##### NOTICE: depending on your host machine operating system, last M could be capital or lower case!
 
 4.
-
 Now you can take out the SD-card with operating system and put it in the Raspberry pi and power it up.
 Make sure Raspberry pi is connected to the internet.
 
 Password for default user pi is raspberry.
 
 5.
-
 Update Raspbian default Java version to Java 8 with 
 ```
 sudo apt-get remove oracle-java7-jdk
 ```
 This command will remove Java 7 and download Java 8.
-
-
 Now you should have working platform for iot-gateway
  
 
