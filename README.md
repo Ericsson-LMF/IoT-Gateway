@@ -206,7 +206,7 @@ df -ah
 
 SD-card should be something like mmcblk0. 
 
-# NOTICE: Remember to check only the card name and not the partition name.
+#### NOTICE: Remember to check only the card name and not the partition name.
 
 Write the name down and unmount the SD-Card with 
 
@@ -221,7 +221,7 @@ Go to the folder with Raspbian image and do
 dd if=“name of the raspbian image ”.img of =/dev/“name of the SD-card” bs=2M
 ```
 
-# NOTICE: depending on your host machine operating system, last M could be capital or lower case!
+#### NOTICE: depending on your host machine operating system, last M could be capital or lower case!
 
 4.
 
