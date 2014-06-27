@@ -63,9 +63,9 @@ EXECUTION section below.
 The project was built on a host with the following development environment
 
 * Maven 3.0.4
-* Java 1.6.0_41
+* Java 1.8.0_05
 
-Ii is assumed that any host platform that supports Java 1.6 or later and
+Ii is assumed that any host platform that supports Java 1.8 or later and
 Maven 3.0.4 or later would be fine.
 
 ### Building the bare bones project
@@ -127,9 +127,9 @@ otherwise there will be run-time exceptions.
 
 The project was executed on the following platforms
 * Linux target which is the same as the host machine
-    - Java 1.6.0_XYZ
+    - Java 1.8.0_XYZ
 * Raspberry Pi target
-    - Java 1.6.0_XYZ
+    - Java 1.8.0_XYZ
 
 ### Command line execution
 
