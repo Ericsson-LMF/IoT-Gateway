@@ -34,10 +34,12 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
+import static com.ericsson.commonutil.PathUtil.andThen;
+import static com.ericsson.commonutil.PathUtil.splits;
+import static com.ericsson.commonutil.PathUtil.startsWith;
 import com.ericsson.commonutil.StringUtil;
 import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.commonutil.json.JsonUtil;
-import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
@@ -217,50 +219,45 @@ public class GDServiceImpl extends GDService.Stub
             throw new GDException(405, "Path cannot be null");
         }
 
-        if (path.length() == 0) {
-            return serialize(format);
-        } else if (path.equals("name")) {
-            return getName();
-        } else if (path.startsWith("action")) {
-            if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
-                path = path
-                        .substring(path.indexOf(Constants.PATH_DELIMITER) + 1);
-                String actName;
-                if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
-                    actName = path.substring(0,
-                            path.indexOf(Constants.PATH_DELIMITER));
-                    path = path.substring(path
-                            .indexOf(Constants.PATH_DELIMITER) + 1);
-                } else {
-                    actName = path;
-                    path = "";
-                }
-                GDAction act = action
-                        .get(actName);
-                if (act != null) {
-                    return act.getSerializedNode(path, format);
-                } else {
-                    throw new GDException(404, "No such node found");
-                }
-            } else {
-                return serializeActionList(format);
-            }
-        } else if (path.startsWith("parameter") && !propertyMetadata.isEmpty()) {
-            if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
-                path = path
-                        .substring(path.indexOf(Constants.PATH_DELIMITER) + 1);
-                if (path.length() > 0) {
-                    return properties.getStringValue(path.substring(path
-                            .indexOf(Constants.PATH_DELIMITER) + 1));
-                } else {
-                    return properties.serialize(format);
-                }
-            } else {
-                return properties.serialize(format);
-            }
-        } else {
+        try {
+            return startsWith("name", p -> getName())
+                    .orBy("action", andThen(splits((first, rest) -> action.get(first).getSerializedNode(rest, format)))
+                            .otherwise(() -> serializeActionList(format)))
+                    .orBy("parameter", andThen(properties::getStringValue)
+                            .otherwise(() -> properties.serialize(format)))
+                    .otherwise(() -> serialize(format)).apply(path);
+        } catch (Exception ex) {
             throw new GDException(404, "No such node found");
         }
+//        if (path.isEmpty()) {
+//            return serialize(format);
+//        } else if (path.equals("name")) {
+//            return getName();
+//        } else if (path.startsWith("action")) {
+//            String[] split = path.split(Constants.PATH_DELIMITER, 3);
+//            if (split.length > 1 && !split[1].isEmpty()) {
+//                path = "";
+//                if (split.length > 2) {
+//                    path = split[2];
+//                }
+//                GDAction act = action.get(split[1]);
+//                if (act != null) {
+//                    return act.getSerializedNode(path, format);
+//                } else {
+//                    throw new GDException(404, "No such node found");
+//                }
+//            } else {
+//                return serializeActionList(format);
+//            }
+//        } else if (path.startsWith("parameter")) {
+//            String[] split = path.split(Constants.PATH_DELIMITER, 2);
+//            if (split.length > 1 && !split[1].isEmpty()) {
+//                return properties.getStringValue(split[1]);
+//            }
+//            return properties.serialize(format);
+//        } else {
+//            throw new GDException(404, "No such node found");
+//        }
     }
 
     private String serializeActionList(Format format)
