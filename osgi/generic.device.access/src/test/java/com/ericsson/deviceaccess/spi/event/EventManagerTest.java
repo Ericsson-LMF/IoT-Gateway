@@ -154,7 +154,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("dev", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("dev", "srv", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, true);
             }
@@ -193,27 +193,27 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave32", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave32", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -252,22 +252,22 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv1", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv1", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave31", "srv1", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv1", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -306,27 +306,27 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave32", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave34", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave34", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave35", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave35", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -360,28 +360,28 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }
         });
 
-        eventManager.addEvent("zwave31", "srv2", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv2", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave34", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave34", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 101);
             }
         });
-        eventManager.addEvent("zwave35", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave35", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -416,19 +416,19 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, true);
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, true);
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_ONLINE, false);
                 put("temp", 30);
@@ -464,19 +464,19 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_PROTOCOL, "banan");
                 put("power", 100);
             }
         });
-        eventManager.addEvent("zwave32", "srv2", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave32", "srv2", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_PROTOCOL, "banan");
                 put("temp", 30);
             }
         });
-        eventManager.addEvent("zwave33", "srv5", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave33", "srv5", new HashMap<String, Object>() {
             {
                 put(GDEventListener.DEVICE_PROTOCOL, "apa");
                 put("temp", 30);
@@ -508,7 +508,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("temp", 29);
             }
@@ -545,13 +545,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", (float) 100.10);
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", (float) 104.34);
             }
@@ -588,13 +588,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 96);
             }
         });
 
-        eventManager.addEvent("zwave31", "srv", new HashMap<String, Object>() {
+        eventManager.addPropertyEvent("zwave31", "srv", new HashMap<String, Object>() {
             {
                 put("power", 100);
             }

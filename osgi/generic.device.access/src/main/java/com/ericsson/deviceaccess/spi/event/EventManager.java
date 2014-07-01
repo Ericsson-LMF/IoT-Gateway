@@ -60,6 +60,9 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
+import static org.osgi.framework.ServiceEvent.MODIFIED;
+import static org.osgi.framework.ServiceEvent.REGISTERED;
+import static org.osgi.framework.ServiceEvent.UNREGISTERING;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -139,7 +142,9 @@ public class EventManager implements ServiceListener, Runnable,
                 continue;
             }
             Map<String, Object> matching = new HashMap<>();
-            addForNoPropertyEvent(event, matching);
+            if (!event.propertyEvent) {
+                addForChangeEvent(event, matching);
+            }
             invokeListeners(event, matching);
         }
     }
@@ -153,6 +158,12 @@ public class EventManager implements ServiceListener, Runnable,
         deviceTracker.open();
     }
 
+    /**
+     * Checks if event is invalid
+     *
+     * @param event
+     * @return is invalid?
+     */
     private boolean isEventInvalid(GenericDeviceEvent event) {
         if (event.serviceId == null || event.deviceId == null) {
             return true;
@@ -160,17 +171,27 @@ public class EventManager implements ServiceListener, Runnable,
         return event.properties == null && !event.propertyEvent;
     }
 
-    private void addForNoPropertyEvent(GenericDeviceEvent event, Map<String, Object> matching) {
-        if (!event.propertyEvent) {
-            matching.put(DEVICE_ID, event.deviceId);
-            matching.put(SERVICE_NAME, event.serviceId);
-            matching.put(DEVICE_PROTOCOL, event.device.getProtocol());
-            matching.put(DEVICE_URN, event.device.getURN());
-            matching.put(DEVICE_NAME, event.device.getName());
-            event.properties.forEach(matching::put);
-        }
+    /**
+     * Adds properties needed in state change events
+     *
+     * @param event
+     * @param matching
+     */
+    private void addForChangeEvent(GenericDeviceEvent event, Map<String, Object> matching) {
+        matching.put(DEVICE_ID, event.deviceId);
+        matching.put(SERVICE_NAME, event.serviceId);
+        matching.put(DEVICE_PROTOCOL, event.device.getProtocol());
+        matching.put(DEVICE_URN, event.device.getURN());
+        matching.put(DEVICE_NAME, event.device.getName());
+        matching.putAll(event.properties);
     }
 
+    /**
+     * Invokes listeners that listen this kind of event
+     *
+     * @param event
+     * @param matchingProperties
+     */
     private void invokeListeners(GenericDeviceEvent event, Map<String, Object> matchingProperties) {
         String deviceId = event.deviceId;
         String serviceName = event.serviceId;
@@ -185,8 +206,12 @@ public class EventManager implements ServiceListener, Runnable,
         });
     }
 
-    private static final String LISTENER_FILTER = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
+    private static final String LISTENER_FILTER = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class
+            .getName() + ")";
 
+    /**
+     * Registers EventManager to listen generic device events
+     */
     private void startListenGenericDeviceEvents() {
         try {
             context.addServiceListener(this, LISTENER_FILTER);
@@ -201,33 +226,57 @@ public class EventManager implements ServiceListener, Runnable,
 
     private static final Pattern DELTA_PATTERN = Pattern.compile("\\((([^(]*)__delta)");
 
+    /**
+     * If filter and event is for delta property, this then updates it
+     *
+     * @param filter
+     * @param event
+     * @param matchingProperties
+     */
     private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Map<String, Object> matchingProperties) {
         if (filter != null) {
             String deltaProperty = filter.toString();
             Matcher matcher = DELTA_PATTERN.matcher(deltaProperty);
             if (matcher.find()) {
                 deltaProperty = matcher.group(2);
-
-                Map<String, Object> properties = event.properties;
                 // Is this an event update for the delta property?
-                if (properties.get(deltaProperty) != null) {
-                    Object newProperty = matchingProperties.get(deltaProperty);
-                    String id = event.deviceId + event.serviceId + deltaProperty;
-                    // Any old values saved to calculate delta from?
-                    if (deltaValues.containsKey(id)) {
-                        Object delta = calculateDelta(newProperty, deltaValues.get(id));
-                        if (delta != null) {
-                            String deltaString = matcher.group(1);
-                            properties.put(deltaString, delta);
-                            matchingProperties.put(deltaString, delta);
-                        }
-                    }
-                    deltaValues.put(id, newProperty);
+                if (event.properties.get(deltaProperty) != null) {
+                    updateDelta(matchingProperties, deltaProperty, event, matcher);
                 }
             }
         }
     }
 
+    /**
+     * Updates delta property
+     *
+     * @param matchingProperties
+     * @param deltaProperty
+     * @param event
+     * @param matcher
+     */
+    private void updateDelta(Map<String, Object> matchingProperties, String deltaProperty, GenericDeviceEvent event, Matcher matcher) {
+        Object newProperty = matchingProperties.get(deltaProperty);
+        String id = event.deviceId + event.serviceId + deltaProperty;
+        // Any old values saved to calculate delta from?
+        if (deltaValues.containsKey(id)) {
+            Object delta = calculateDelta(newProperty, deltaValues.get(id));
+            if (delta != null) {
+                String deltaString = matcher.group(1);
+                event.properties.put(deltaString, delta);
+                matchingProperties.put(deltaString, delta);
+            }
+        }
+        deltaValues.put(id, newProperty);
+    }
+
+    /**
+     * Calculates delta value between new and old values
+     *
+     * @param newPropert
+     * @param oldProperty
+     * @return delta
+     */
     private Object calculateDelta(Object newPropert, Object oldProperty) {
         if (newPropert instanceof Integer) {
             return Math.abs((Integer) oldProperty - (Integer) newPropert);
@@ -245,7 +294,7 @@ public class EventManager implements ServiceListener, Runnable,
      * @return a - b
      */
     private float substract(float a, float b) {
-        float delta = (Math.round(a * 1000) - Math.round(b * 1000));
+        float delta = Math.round(a * 1000) - Math.round(b * 1000);
         return delta / 1000;
     }
 
@@ -258,30 +307,38 @@ public class EventManager implements ServiceListener, Runnable,
     public void serviceChanged(ServiceEvent event) {
         ServiceReference reference = event.getServiceReference();
         GDEventListener listener = (GDEventListener) context.getService(reference);
-        Object filterObj = reference.getProperty(GENERICDEVICE_FILTER);
-        Filter filter;
-        if (filterObj instanceof String) {
-            try {
-                filter = FrameworkUtil.createFilter((String) filterObj);
-            } catch (InvalidSyntaxException e) {
-                throw new IllegalArgumentException("The filter string could not be parsed into a filter. " + e);
-            }
-        } else if (filterObj instanceof Filter) {
-            filter = (Filter) filterObj;
-        } else if (filterObj == null) {
-            filter = ALLOW_ALL;
-        } else {
-            throw new IllegalArgumentException("The filter must be null, string or Filter");
-        }
         switch (event.getType()) {
-            case ServiceEvent.REGISTERED:
-                listeners.put(listener, filter);
+            case REGISTERED:
+                Object filter = reference.getProperty(GENERICDEVICE_FILTER);
+                listeners.put(listener, getFilter(filter));
                 break;
-            case ServiceEvent.MODIFIED:
+            case MODIFIED:
                 break;
-            case ServiceEvent.UNREGISTERING:
+            case UNREGISTERING:
                 listeners.remove(listener);
                 break;
+        }
+    }
+
+    /**
+     * Gets filter from an object
+     *
+     * @param object
+     * @return filter
+     */
+    private Filter getFilter(Object object) {
+        if (object instanceof String) {
+            try {
+                return FrameworkUtil.createFilter((String) object);
+            } catch (InvalidSyntaxException e) {
+                throw new IllegalArgumentException("The filter string could not be parsed into a filter", e);
+            }
+        } else if (object instanceof Filter) {
+            return (Filter) object;
+        } else if (object == null) {
+            return ALLOW_ALL;
+        } else {
+            throw new IllegalArgumentException("The filter must be null, string or Filter");
         }
     }
 
@@ -291,13 +348,13 @@ public class EventManager implements ServiceListener, Runnable,
     public void start() {
         synchronized (running) {
             if (!running.compareAndSet(false, true)) {
-                throw new IllegalStateException("There is thread already running.");
+                throw new IllegalStateException("There is thread already running");
             }
             thread = new Thread(this);
             try {
                 thread.start();
             } catch (Throwable e) {
-                logger.warn("Failed to start Event Manager. " + e);
+                logger.warn("Failed to start Event Manager: " + e);
                 running.set(false);
                 thread = null;
             }
@@ -305,12 +362,12 @@ public class EventManager implements ServiceListener, Runnable,
     }
 
     /**
-     * Shuts down the event manager.
+     * Shuts the event manager.
      */
     public void shutdown() {
         synchronized (running) {
             if (!running.compareAndSet(true, false)) {
-                throw new IllegalStateException("There wasn't thread running to shutdown.");
+                throw new IllegalStateException("There wasn't thread running to shutdown");
             }
             events.add(POISON);
             thread = null;
@@ -327,18 +384,20 @@ public class EventManager implements ServiceListener, Runnable,
      * @param serviceId
      * @param properties
      */
-    public void addEvent(String deviceId, String serviceId, Map<String, Object> properties) {
+    public void addPropertyEvent(String deviceId, String serviceId, Map<String, Object> properties) {
         addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, properties));
     }
 
-    public void addRemoveEvent(String deviceId, String serviceId, String propertyId) {
-        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, Type.REMOVED));
+    public void addStateEvent(String deviceId, String serviceId, String propertyId, Type type) {
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, type));
     }
 
-    public void addAddEvent(String deviceId, String serviceId, String propertyId) {
-        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, Type.ADDED));
-    }
-
+    /**
+     * Adds event to be received by listeners from existing devices only
+     *
+     * @param deviceId
+     * @param func
+     */
     private void addEvent(String deviceId, Function<GenericDevice, GenericDeviceEvent> func) {
         if (running.get()) {
             logger.warn("Tried to notify event on closed event manager, dropping it!");
@@ -362,7 +421,7 @@ public class EventManager implements ServiceListener, Runnable,
         // Always generate a state event when a new device is registered
         Map<String, Object> properties = new HashMap<>();
         properties.put(DEVICE_STATE, device.getState());
-        addEvent(device.getId(), "DeviceProperties", properties);
+        addPropertyEvent(device.getId(), "DeviceProperties", properties);
         return device;
     }
 

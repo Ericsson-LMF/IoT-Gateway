@@ -44,7 +44,7 @@ import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.GenericDevice;
 import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.checkPermission;
-import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import static com.ericsson.deviceaccess.spi.genericdevice.GDActivator.getEventManager;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.IOException;
@@ -463,15 +463,15 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     }
 
     public void notifyEvent(String serviceId, final Map<String, Object> parameters) {
-        GDActivator.getEventManager().addEvent(id, serviceId, parameters);
+        getEventManager().addPropertyEvent(id, serviceId, parameters);
     }
 
     public void notifyEventRemoved(String serviceId, String propertyId) {
-        GDActivator.getEventManager().addRemoveEvent(id, serviceId, propertyId);
+        getEventManager().addStateEvent(id, serviceId, propertyId, GDEventListener.Type.REMOVED);
     }
 
     public void notifyEventAdded(String serviceId, String propertyId) {
-        GDActivator.getEventManager().addAddEvent(id, serviceId, propertyId);
+        getEventManager().addStateEvent(id, serviceId, propertyId, GDEventListener.Type.ADDED);
     }
 
     private String serializeServiceList(Format format) throws GDException {

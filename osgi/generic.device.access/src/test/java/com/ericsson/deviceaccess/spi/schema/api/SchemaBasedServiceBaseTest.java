@@ -266,7 +266,7 @@ public class SchemaBasedServiceBaseTest {
         ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
-                allowing(eventManager).addEvent(with(any(String.class)), with(any(String.class)), with(any(Map.class)));
+                allowing(eventManager).addPropertyEvent(with(any(String.class)), with(any(String.class)), with(any(Map.class)));
             }
         });
 

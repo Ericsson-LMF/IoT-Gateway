@@ -117,13 +117,13 @@ public class GenericDeviceImplTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(eventManager).addEvent("devId", "DeviceProperties", new HashMap() {
+                oneOf(eventManager).addPropertyEvent("devId", "DeviceProperties", new HashMap() {
                     {
                         put(GDEventListener.DEVICE_ONLINE, true);
                     }
                 });
 
-                oneOf(eventManager).addEvent("devId", "DeviceProperties", new HashMap() {
+                oneOf(eventManager).addPropertyEvent("devId", "DeviceProperties", new HashMap() {
                     {
                         put(GDEventListener.DEVICE_NAME, "banan");
                     }

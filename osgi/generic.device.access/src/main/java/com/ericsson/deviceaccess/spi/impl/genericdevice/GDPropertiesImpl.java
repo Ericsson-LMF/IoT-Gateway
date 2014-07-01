@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class GDPropertiesImpl extends GDProperties.Stub
         implements GDProperties {
@@ -178,19 +179,7 @@ public class GDPropertiesImpl extends GDProperties.Stub
      */
     @Override
     public int getIntValue(String key) {
-        Data data = properties.get(key);
-        Object value = data.currentValue;
-        Number defaultValue = data.metadata.getDefaultNumberValue();
-        if (value instanceof String) {
-            try {
-                return Integer.parseInt((String) value);
-            } catch (NumberFormatException e) {
-                return defaultValue.intValue();
-            }
-        } else if (value instanceof Number) {
-            return ((Number) value).intValue();
-        }
-        return defaultValue.intValue();
+        return getValue(key, Integer::parseInt, value -> value.intValue());
     }
 
     /**
@@ -198,19 +187,7 @@ public class GDPropertiesImpl extends GDProperties.Stub
      */
     @Override
     public long getLongValue(String key) {
-        Data data = properties.get(key);
-        Object value = data.currentValue;
-        Number defaultValue = data.metadata.getDefaultNumberValue();
-        if (value instanceof String) {
-            try {
-                return Long.parseLong((String) value);
-            } catch (NumberFormatException e) {
-                return defaultValue.intValue();
-            }
-        } else if (value instanceof Number) {
-            return ((Number) value).longValue();
-        }
-        return defaultValue.intValue();
+        return getValue(key, Long::parseLong, value -> value.longValue());
     }
 
     /**
@@ -218,19 +195,23 @@ public class GDPropertiesImpl extends GDProperties.Stub
      */
     @Override
     public float getFloatValue(String key) {
+        return getValue(key, Float::parseFloat, value -> value.floatValue());
+    }
+
+    private <T extends Number> T getValue(String key, Function<String, T> parser, Function<Number, T> getter) {
         Data data = properties.get(key);
         Object value = data.currentValue;
         Number defaultValue = data.metadata.getDefaultNumberValue();
         if (value instanceof String) {
             try {
-                return Float.parseFloat((String) value);
+                return parser.apply((String) value);
             } catch (NumberFormatException e) {
-                return defaultValue.floatValue();
+                return getter.apply(defaultValue);
             }
         } else if (value instanceof Number) {
-            return ((Number) value).floatValue();
+            return getter.apply((Number) value);
         }
-        return defaultValue.floatValue();
+        return getter.apply(defaultValue);
     }
 
     /**

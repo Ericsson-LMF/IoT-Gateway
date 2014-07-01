@@ -173,7 +173,7 @@ public class TestSerialization {
         ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         context.checking(new Expectations() {
             {
-                oneOf(eventManager).addEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Map.class)));
+                oneOf(eventManager).addPropertyEvent(with(aNonNull(String.class)), with(aNonNull(String.class)), with(aNonNull(Map.class)));
             }
         });
 
