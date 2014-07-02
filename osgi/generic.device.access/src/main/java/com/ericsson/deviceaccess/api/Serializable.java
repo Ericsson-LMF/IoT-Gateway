@@ -34,21 +34,13 @@
  */
 package com.ericsson.deviceaccess.api;
 
+import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 
 /**
  * Interface of something that shall be possible to serialize.
  */
 public interface Serializable {
-
-    public enum Format {
-
-        JSON, JSON_WDC, XML;
-
-        public boolean isJson() {
-            return this == JSON || this == JSON_WDC;
-        }
-    }
 
     String serialize(Format format) throws GDException;
 }

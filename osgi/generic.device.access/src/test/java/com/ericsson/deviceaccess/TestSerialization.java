@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess;
 
-import com.ericsson.deviceaccess.api.Serializable.Format;
+import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
@@ -132,7 +132,7 @@ public class TestSerialization {
         TestService test = new TestService();
         test.getProperties().setIntValue("prop1", 10);
         dev.putService(test);
-        String node = dev.getSerializedNode("service/test/parameter/prop1", Format.JSON);
+        String node = dev.getSerializedNode("services/test/properties/prop1/currentValue", Format.JSON);
 
         assertEquals("10", node);
     }
@@ -144,25 +144,25 @@ public class TestSerialization {
         TestService test = new TestService();
         test.getProperties().setIntValue("prop1", 100);
         dev.putService(test);
-        String node = dev.getSerializedNode("service/test", Format.JSON);
+        String node = dev.getSerializedNode("services/test", Format.JSON);
         System.out.println(node);
 
-        assertTrue(node.indexOf("prop1") > 0);
+        assertTrue(node.contains("prop1"));
 
-        node = dev.getSerializedNode("service/test/parameter", Format.JSON);
+        node = dev.getSerializedNode("services/test/properties", Format.JSON);
         System.out.println(node);
 
-        assertTrue(node.indexOf("prop1") > 0);
+        assertTrue(node.contains("prop1"));
 
-        node = dev.getSerializedNode("service/test/action", Format.JSON);
+        node = dev.getSerializedNode("services/test/action", Format.JSON);
         System.out.println(node);
-        assertTrue(node.indexOf("arg2") > 0);
+        assertTrue(node.contains("arg2"));
 
-        node = dev.getSerializedNode("service/test/action/action", Format.JSON);
+        node = dev.getSerializedNode("services/test/action/arguments", Format.JSON);
         System.out.println(node);
 
-        assertTrue(node.indexOf("arg2") > 0);
-        assertTrue(node.indexOf("res1") > 0);
+        assertTrue(node.contains("arg2"));
+        assertTrue(node.contains("res1"));
     }
 
     @Test
@@ -180,7 +180,7 @@ public class TestSerialization {
         dev.setName("dev");
         Object node = null;
         try {
-            node = dev.getSerializedNode("service/nonexist", Format.JSON);
+            node = dev.getSerializedNode("services/nonexist", Format.JSON);
         } catch (GDException e) {
 
         }

@@ -1,50 +1,50 @@
-package com.ericsson.commonutil.json;
+package com.ericsson.commonutil.serialization;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk7.Jdk7Module;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import java.io.IOException;
 
 /**
  *
  * @author aopkarja
  */
-public enum JsonUtil {
+public enum SerializationUtil {
 
     /**
      * Singleton.
      */
     INSTANCE;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final JacksonXmlModule XML_MODULE = new JacksonXmlModule();
 
     static {
-        MAPPER.registerModule(new Jdk7Module());
-        MAPPER.registerModule(new ParameterNamesModule());
-        MAPPER.registerModule(new MrBeanModule());
+        //XML configuration
+    }
+    private static final ObjectMapper XML_MAPPER = new XmlMapper(XML_MODULE);
 
-        MAPPER.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false);
-        MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        MAPPER.setSerializationInclusion(Include.NON_EMPTY);
-//        MAPPER.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
+    static {
+        JSON_MAPPER.registerModule(new Jdk7Module());
+        JSON_MAPPER.registerModule(new ParameterNamesModule());
+        JSON_MAPPER.registerModule(new MrBeanModule());
+
+        JSON_MAPPER.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false);
+        JSON_MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        JSON_MAPPER.setSerializationInclusion(Include.NON_EMPTY);
     }
 
-    public static ObjectMapper get() {
-        return MAPPER;
-    }
-
-    public static <T> T execute(Mapper<T> executable) throws IOException {
-        return executable.apply(MAPPER);
-    }
-
-    public interface Mapper<T> {
-
-        T apply(ObjectMapper mapper) throws JsonProcessingException;
+    public static ObjectMapper get(Format format) {
+        if (format.isJson()) {
+            return JSON_MAPPER;
+        }
+        return XML_MAPPER;
     }
 
     /**

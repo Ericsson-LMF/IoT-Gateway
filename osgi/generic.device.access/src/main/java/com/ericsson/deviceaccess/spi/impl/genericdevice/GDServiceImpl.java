@@ -34,12 +34,9 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import static com.ericsson.commonutil.PathUtil.andThen;
-import static com.ericsson.commonutil.PathUtil.splits;
-import static com.ericsson.commonutil.PathUtil.startsWith;
-import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.function.FunctionalUtil;
-import com.ericsson.commonutil.json.JsonUtil;
+import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
@@ -51,7 +48,8 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -195,11 +193,10 @@ public class GDServiceImpl extends GDService.Stub
     @Override
     public String serialize(Format format) throws GDException {
         checkPermission(getClass(), Type.GET);
-        if (format.isJson()) {
-            int indent = 0;
-            return toJsonString(format, indent);
-        } else {
-            throw new GDException(405, "No such format supported");
+        try {
+            return SerializationUtil.get(format).writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
     }
 
@@ -212,89 +209,21 @@ public class GDServiceImpl extends GDService.Stub
      * {@inheritDoc}
      */
     @Override
-    public String getSerializedNode(String path, Format format)
-            throws GDException {
+    public String getSerializedNode(String path, Format format) throws GDException {
         checkPermission(getClass(), Type.GET);
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }
-
-        try {
-            return startsWith("name", p -> getName())
-                    .orBy("action", andThen(splits((first, rest) -> action.get(first).getSerializedNode(rest, format)))
-                            .otherwise(() -> serializeActionList(format)))
-                    .orBy("parameter", andThen(properties::getStringValue)
-                            .otherwise(() -> properties.serialize(format)))
-                    .otherwise(() -> serialize(format)).apply(path);
-        } catch (Exception ex) {
-            throw new GDException(404, "No such node found");
+        JsonNode node = SerializationUtil.get(format).valueToTree(this);
+        int n = 1;
+        for (String pathPiece : path.split(Constants.PATH_DELIMITER)) {
+            node = node.findPath(pathPiece);
+            if (node.isMissingNode()) {
+                throw new GDException(404, "No such node found (" + path + " " + n + ")");
+            }
+            n++;
         }
-//        if (path.isEmpty()) {
-//            return serialize(format);
-//        } else if (path.equals("name")) {
-//            return getName();
-//        } else if (path.startsWith("action")) {
-//            String[] split = path.split(Constants.PATH_DELIMITER, 3);
-//            if (split.length > 1 && !split[1].isEmpty()) {
-//                path = "";
-//                if (split.length > 2) {
-//                    path = split[2];
-//                }
-//                GDAction act = action.get(split[1]);
-//                if (act != null) {
-//                    return act.getSerializedNode(path, format);
-//                } else {
-//                    throw new GDException(404, "No such node found");
-//                }
-//            } else {
-//                return serializeActionList(format);
-//            }
-//        } else if (path.startsWith("parameter")) {
-//            String[] split = path.split(Constants.PATH_DELIMITER, 2);
-//            if (split.length > 1 && !split[1].isEmpty()) {
-//                return properties.getStringValue(split[1]);
-//            }
-//            return properties.serialize(format);
-//        } else {
-//            throw new GDException(404, "No such node found");
-//        }
-    }
-
-    private String serializeActionList(Format format)
-            throws GDException {
-        if (format.isJson()) {
-            return getActionListJsonString(format, 0);
-        } else {
-            throw new GDException(405, "No such format supported");
-        }
-    }
-
-    private String toJsonString(Format format, int indent) throws GDException {
-        try {
-            return JsonUtil.execute(mapper -> mapper.writerWithView(JsonUtil.ID.Ignore.class).writeValueAsString(this));
-        } catch (IOException ex) {
-            throw new GDException(ex.getMessage(), ex);
-        }
-    }
-
-    private String getActionListJsonString(Format format, int indent)
-            throws GDException {
-        StringBuilder json = new StringBuilder("{");
-        try {
-            action.forEach((k, act) -> {
-                if (act != null) {
-                    json.append('"').append(StringUtil.escapeJSON(act.getName())).append('"').append(':');
-                    json.append(FunctionalUtil.smuggle(() -> act.serialize(format)));
-                    json.append(',');
-                }
-            });
-        } catch (RuntimeException ex) {
-            throw (GDException) ex.getCause();
-        }
-        if (json.length() > 0) {
-            json.setLength(json.length() - 1);
-        }
-        return json.append("}").toString();
+        return node.toString();
     }
 
     @JsonIgnore

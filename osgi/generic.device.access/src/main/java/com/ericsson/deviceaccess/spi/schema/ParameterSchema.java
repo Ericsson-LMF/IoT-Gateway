@@ -34,12 +34,15 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
-import com.ericsson.commonutil.json.JsonUtil;
+import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Arrays;
 
 /**
@@ -165,10 +168,10 @@ public class ParameterSchema implements GDPropertyMetadata {
      */
     @Override
     public String serialize(Format format) throws GDException {
-        if (format.isJson()) {
-            return toJsonString(format, 0);
-        } else {
-            throw new GDException(405, "No such format supported");
+        try {
+            return SerializationUtil.get(format).writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
     }
 
@@ -180,20 +183,16 @@ public class ParameterSchema implements GDPropertyMetadata {
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }
-
-        if (path.length() == 0) {
-            return serialize(format);
-        } else {
-            return getDefaultStringValue();
+        JsonNode node = SerializationUtil.get(format).valueToTree(this);
+        int n = 1;
+        for (String pathPiece : path.split(Constants.PATH_DELIMITER)) {
+            node = node.findPath(pathPiece);
+            if (node.isMissingNode()) {
+                throw new GDException(404, "No such node found (" + path + " " + n + ")");
+            }
+            n++;
         }
-    }
-
-    private String toJsonString(Format format, int indent) throws GDException {
-        try {
-            return JsonUtil.execute(mapper -> mapper.writeValueAsString(this));
-        } catch (IOException ex) {
-            throw new GDException(ex.getMessage(), ex);
-        }
+        return node.toString();
     }
 
     /**

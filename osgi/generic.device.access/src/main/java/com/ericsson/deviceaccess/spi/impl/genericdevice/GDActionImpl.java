@@ -35,7 +35,9 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import com.ericsson.commonutil.json.JsonUtil;
+import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
@@ -45,7 +47,8 @@ import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -205,10 +208,10 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
     @Override
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
-        if (format.isJson()) {
-            return toJsonString(format, 0);
-        } else {
-            throw new GDException(405, "No such format supported");
+        try {
+            return SerializationUtil.get(format).writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
     }
 
@@ -218,25 +221,15 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }
-
-        if (path.length() == 0) {
-            return serialize(format);
-        } else if (path.equals("name")) {
-            return getName();
-        } else if (path.startsWith("arguments") && argumentsMetadata.size() > 0) {
-            return MetadataUtil.INSTANCE.metadataToJson(path, format, "arguments", argumentsMetadata.values());
-        } else if (path.startsWith("result") && resultMetadata.size() > 0) {
-            return MetadataUtil.INSTANCE.metadataToJson(path, format, "result", resultMetadata.values());
-        } else {
-            throw new GDException(404, "No such node found");
+        JsonNode node = SerializationUtil.get(format).valueToTree(this);
+        int n = 1;
+        for (String pathPiece : path.split(Constants.PATH_DELIMITER)) {
+            node = node.findPath(pathPiece);
+            if (node.isMissingNode()) {
+                throw new GDException(404, "No such node found (" + path + " " + n + ")");
+            }
+            n++;
         }
-    }
-
-    private String toJsonString(Format format, int indent) throws GDException {
-        try {
-            return JsonUtil.execute(mapper -> mapper.writerWithView(JsonUtil.ID.Ignore.class).writeValueAsString(this));
-        } catch (IOException ex) {
-            throw new GDException(ex.getMessage(), ex);
-        }
+        return node.toString();
     }
 }

@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
+import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

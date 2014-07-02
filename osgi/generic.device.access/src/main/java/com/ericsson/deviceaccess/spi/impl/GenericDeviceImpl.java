@@ -34,9 +34,8 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.function.FunctionalUtil;
-import com.ericsson.commonutil.json.JsonUtil;
+import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
@@ -47,9 +46,8 @@ import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.check
 import static com.ericsson.deviceaccess.spi.genericdevice.GDActivator.getEventManager;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -335,6 +333,9 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
      */
     public void setService(Map service) {
         checkPermission(GenericDevice.class, Type.SET);
+        if (service == null) {
+            throw new NullPointerException("Map cannot be null");
+        }
         this.service = service;
     }
 
@@ -421,33 +422,16 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         if (path == null) {
             throw new GDException(405, "Path cannot be null");
         }
-        if (path.isEmpty()) {
-            return serialize(format);
-        } else if (path.startsWith("service") && service != null) {
-            if (path.contains(Constants.PATH_DELIMITER)) {
-                path = path.substring(path.indexOf(Constants.PATH_DELIMITER) + 1);
-                String svcName;
-                if (path.contains(Constants.PATH_DELIMITER)) {
-                    svcName = path.substring(0, path.indexOf(Constants.PATH_DELIMITER));
-                    path = path.substring(path.indexOf(Constants.PATH_DELIMITER) + 1);
-                } else {
-                    svcName = path;
-                    path = "";
-                }
-                GDService svc = service.get(svcName);
-                if (svc != null) {
-                    return svc.getSerializedNode(path, format);
-                } else {
-                    throw new GDException(404, "No such node found");
-                }
-            } else {
-                return serializeServiceList(format);
+        JsonNode node = SerializationUtil.get(format).valueToTree(this);
+        int n = 1;
+        for (String pathPiece : path.split(Constants.PATH_DELIMITER)) {
+            node = node.findPath(pathPiece);
+            if (node.isMissingNode()) {
+                throw new GDException(404, "No such node found (" + path + " " + n + ")");
             }
-        } else if (!path.contains(Constants.PATH_DELIMITER)) {
-            return (String) getFieldValue(path);
-        } else {
-            throw new GDException(404, "No such node found");
+            n++;
         }
+        return node.toString();
     }
 
     /**
@@ -474,58 +458,12 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         getEventManager().addStateEvent(id, serviceId, propertyId, GDEventListener.Type.ADDED);
     }
 
-    private String serializeServiceList(Format format) throws GDException {
-        if (format.isJson()) {
-            int indent = 0;
-            if (format == Format.JSON_WDC) {
-                indent = 3;
-            }
-            return getServiceListJsonString(format, indent, false);
-        } else {
-            throw new GDException(405, "No such format supported");
-        }
-    }
-
     private String toJsonString(Format format, int indent, boolean stateOnly) throws GDException {
         try {
-            return JsonUtil.execute(mapper -> mapper.writeValueAsString(this));
-        } catch (IOException ex) {
+            return SerializationUtil.get(format).writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
-    }
-
-    private String getServiceListJsonString(Format format, int indent, boolean stateOnly) throws GDException {
-        StringBuilder json = new StringBuilder();
-        try {
-            service.forEach((k, srv) -> {
-                json.append('"').append(StringUtil.escapeJSON(srv.getName())).append('"').append(':');
-                if (stateOnly) {
-                    json.append(srv.serializeState());
-                } else {
-                    json.append(FunctionalUtil.smuggle(() -> srv.serialize(format)));
-                }
-                json.append(",");
-            });
-        } catch (RuntimeException ex) {
-            throw (GDException) ex.getCause();
-        }
-        if (json.length() > 0) {
-            json.setLength(json.length() - 1);
-        }
-        return json.toString();
-    }
-
-    private Object getFieldValue(String name) throws GDException {
-        Method method;
-        try {
-            method = getClass().getMethod("get" + StringUtil.capitalize(name));
-            if (method != null) {
-                return method.invoke(this);
-            }
-        } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-            throw new GDException("Exception when getting field value", e);
-        }
-        return null;
     }
 
 }

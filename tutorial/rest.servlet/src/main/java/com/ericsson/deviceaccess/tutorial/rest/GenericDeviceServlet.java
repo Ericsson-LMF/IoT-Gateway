@@ -34,9 +34,9 @@
  */
 package com.ericsson.deviceaccess.tutorial.rest;
 
+import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.Serializable.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;

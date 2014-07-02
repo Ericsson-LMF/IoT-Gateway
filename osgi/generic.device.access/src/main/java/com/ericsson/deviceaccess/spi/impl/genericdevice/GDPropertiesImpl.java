@@ -35,7 +35,8 @@
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
 import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.json.JsonUtil;
+import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
@@ -45,7 +46,7 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -237,10 +238,10 @@ public class GDPropertiesImpl extends GDProperties.Stub
     @Override
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
-        if (format.isJson()) {
-            return valuesToJson(format);
-        } else {
-            throw new GDException(405, "No such format supported");
+        try {
+            return SerializationUtil.get(format).writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
     }
 
@@ -265,24 +266,16 @@ public class GDPropertiesImpl extends GDProperties.Stub
      */
     @Override
     public void addAll(GDProperties source) {
-        source.getProperties().keySet().forEach(name -> {
-            if (String.class.getName().equals(source.getValueType(name))) {
+        source.getProperties().forEach((name, data) -> {
+            Class type = data.metadata.getType();
+            if (String.class.isAssignableFrom(type)) {
                 setStringValue(name, source.getStringValue(name));
-            } else if (Integer.class.getName()
-                    .equals(source.getValueType(name))) {
+            } else if (Integer.class.isAssignableFrom(type)) {
                 setIntValue(name, source.getIntValue(name));
-            } else if (Float.class.getName().equals(source.getValueType(name))) {
+            } else if (Float.class.isAssignableFrom(type)) {
                 setFloatValue(name, source.getFloatValue(name));
             }
         });
-    }
-
-    private String valuesToJson(Format format) throws GDException {
-        try {
-            return JsonUtil.execute(mapper -> mapper.writerWithView(JsonUtil.ID.Ignore.class).writeValueAsString(this));
-        } catch (IOException ex) {
-            throw new GDException(ex.getMessage(), ex);
-        }
     }
 
     public void addDynamicProperty(GDPropertyMetadata propertyMetadata) {

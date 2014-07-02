@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.Serializable.Format;
+import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;

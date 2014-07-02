@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.commonutil.json.JsonUtil;
+import com.ericsson.commonutil.serialization.SerializationUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.util.Map;
@@ -61,7 +61,7 @@ public interface GDAction extends GDContextNode {
      *
      * @return Name of the action.
      */
-    @JsonView(JsonUtil.ID.class)
+    @JsonView(SerializationUtil.ID.class)
     public String getName();
 
     /**
