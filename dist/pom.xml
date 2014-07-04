@@ -296,9 +296,9 @@
             </build>
             <dependencies>
                 <dependency>
-                    <groupId>org.json</groupId>
-                    <artifactId>json</artifactId>
-                    <version>20090211</version>
+                    <groupId>com.ericsson.research.connectedhome</groupId>
+                    <artifactId>common.util</artifactId>
+                    <version>1.20-SNAPSHOT</version>
                 </dependency>
                 <dependency>
                     <groupId>com.ericsson.deviceaccess</groupId>

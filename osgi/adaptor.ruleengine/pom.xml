@@ -34,11 +34,7 @@
             <artifactId>json</artifactId>
             <version>${osgi.base.version}</version>
         </dependency>
-        -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-        </dependency>        
+        -->        
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.osgi.log.util</artifactId>
@@ -101,7 +97,7 @@
                             org.osgi.*;version="[1.0,2.0)",
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.api.*,
-                            org.json
+                            com.ericsson.commonutil.*
                         </Import-Package>
                         <Bundle-Activator>com.ericsson.deviceaccess.adaptor.ruleengine.Activator</Bundle-Activator>
                     </instructions>

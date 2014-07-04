@@ -106,7 +106,8 @@
                             org.slf4j.*;-split-package:=merge-first
                         </Private-Package>
                         <Import-Package>
-                            org.osgi.*;version="[1.0,4.0)"
+                            org.osgi.*;version="[1.0,4.0)",
+                            com.ericsson.commonutil.*
                         </Import-Package>
                         <Export-Package>
                             com.ericsson.deviceaccess.*

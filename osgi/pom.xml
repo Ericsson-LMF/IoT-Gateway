@@ -143,17 +143,11 @@
                 <artifactId>common.osgi.log.util</artifactId>
                 <version>${connectedhome.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>20090211</version>
-            </dependency>
                 
         </dependencies>
     </dependencyManagement>
     <modules>
         <!-- nrjmata added the common.packages module including json, -->
-        <module>common.packages</module>
         
         <module>serviceschema.xmlparser</module>
         <module>serviceschema.codegenerator</module>

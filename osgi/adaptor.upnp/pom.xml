@@ -64,11 +64,6 @@
             <scope>provided</scope>
         </dependency>
         -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <scope>provided</scope>
-        </dependency>
                             
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -111,10 +106,10 @@
                         <Import-Package>
                             org.xmlpull.v1.*,
                             org.kxml2.io.*,
-                            org.json.*,
                             javax.servlet.*,
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.api.*,
+                            com.ericsson.commonutil.*,
                             org.osgi.*;version="[1.0,4.2)"
                         </Import-Package>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>

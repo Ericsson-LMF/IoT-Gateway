@@ -62,6 +62,7 @@
                         </Private-Package>
                         <Import-Package>
                             com.ericsson.deviceaccess.*,
+                            com.ericsson.commonutil.*,
                             org.osgi.*;version="[1.0,4.0)"
                         </Import-Package>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>

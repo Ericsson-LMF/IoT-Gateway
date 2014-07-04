@@ -56,7 +56,6 @@
 -install com.springsource.org.apache.commons.logging-1.1.1.jar
 -install com.springsource.org.apache.log4j-1.2.15.jar
 -install org.osgi.compendium-5.0.0.jar
--install json-20090211.jar
 -install rest.servlet-1.42-SNAPSHOT.jar
 
 # Start of these bundles are delayed since this makes start
@@ -88,7 +87,6 @@
 -start com.springsource.org.apache.commons.logging-1.1.1.jar
 -start com.springsource.org.apache.log4j-1.2.15.jar
 -start org.osgi.compendium-5.0.0.jar
--start json-20090211.jar
 -start rest.servlet-1.42-SNAPSHOT.jar
 
 -startlevel 8

@@ -103,21 +103,11 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                         if (dev == null) {
                             return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "Device " + deviceId + " not found");
                         }
-
-                        String json = dev.getSerializedNode(requestedNode, Format.JSON);
-                        try {
-                            resource = new JSONObject(json).toString(3);
-                        } catch (JSONException e) {
-                            // Assumes the request is for a leaf node
-                            resource = json;
-                            return new NanoHTTPD.Response(HTTP_OK, "text/plain", resource);
-                        }
-
+                        resource = dev.getSerializedNode(requestedNode, Format.JSON);
                         return new NanoHTTPD.Response(HTTP_OK, "application/json", resource);
                     } else {
                         deviceId = uri.substring(1, pathIndex);
                         requestedNode = uri.substring(pathIndex + 1);
-
                         return handleAction(deviceId, requestedNode, parms);
                     }
                 }

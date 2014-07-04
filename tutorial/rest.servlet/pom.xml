@@ -38,10 +38,6 @@
             <version>${osgi.base.version}</version>
         </dependency>
         -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-        </dependency>
         <!-- 
         <dependency>
           <groupId>com.springsource.org.apache.commons</groupId>
