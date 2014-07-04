@@ -47,7 +47,6 @@ import static com.ericsson.deviceaccess.spi.genericdevice.GDActivator.getEventMa
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -419,19 +418,11 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     @Override
     public String getSerializedNode(String path, Format format) throws GDException {
         checkPermission(GenericDevice.class, Type.GET);
-        if (path == null) {
-            throw new GDException(405, "Path cannot be null");
+        try {
+            return SerializationUtil.serializeAccordingPath(format, path, Constants.PATH_DELIMITER, this);
+        } catch (SerializationUtil.SerializationException ex) {
+            throw new GDException(404, ex.getMessage(), ex);
         }
-        JsonNode node = SerializationUtil.get(format).valueToTree(this);
-        int n = 1;
-        for (String pathPiece : path.split(Constants.PATH_DELIMITER)) {
-            node = node.findPath(pathPiece);
-            if (node.isMissingNode()) {
-                throw new GDException(404, "No such node found (" + path + " " + n + ")");
-            }
-            n++;
-        }
-        return node.toString();
     }
 
     /**

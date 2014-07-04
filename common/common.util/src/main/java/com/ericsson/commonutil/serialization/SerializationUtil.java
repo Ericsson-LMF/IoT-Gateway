@@ -1,6 +1,7 @@
 package com.ericsson.commonutil.serialization;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -9,6 +10,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk7.Jdk7Module;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -47,12 +50,28 @@ public enum SerializationUtil {
         return XML_MAPPER;
     }
 
-    /**
-     * Reduces how many interfaces Ignores have to implement for Views without
-     * Ignore
-     */
-    public static interface NonIgnorableView {
-
+    public static <T> String serializeAccordingPath(Format format, String path, String delimiter, T object) throws SerializationException {
+        if (path == null) {
+            throw new SerializationException("Path cannot be null");
+        }
+        JsonNode node = SerializationUtil.get(format).valueToTree(object);
+        String[] split = path.split(Pattern.quote(delimiter));
+        for (String pathPiece : split) {
+            if (pathPiece.isEmpty()) {
+                break;
+            }
+            node = node.findPath(pathPiece);
+            if (node.isMissingNode()) {
+                String pathString = Arrays.stream(split).reduce("", (before, after) -> {
+                    if (after.equals(pathPiece)) {
+                        after = after.toUpperCase();
+                    }
+                    return before + delimiter + after;
+                });
+                throw new SerializationException("No such node found (" + pathString + ")");
+            }
+        }
+        return node.toString();
     }
 
     /**
@@ -63,7 +82,7 @@ public enum SerializationUtil {
         /**
          * Used as View to blacklist identification
          */
-        public static class Ignore implements State, NonIgnorableView {
+        public static class Ignore implements State {
         }
     }
 
@@ -75,7 +94,14 @@ public enum SerializationUtil {
         /**
          * Used as View to blacklist state data
          */
-        public static class Ignore implements ID, NonIgnorableView {
+        public static class Ignore implements ID {
+        }
+    }
+
+    public static class SerializationException extends Exception {
+
+        public SerializationException(String message) {
+            super(message);
         }
     }
 }

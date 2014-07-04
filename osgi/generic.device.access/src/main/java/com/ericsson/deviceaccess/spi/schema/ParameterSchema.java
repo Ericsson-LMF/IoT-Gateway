@@ -42,7 +42,6 @@ import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Arrays;
 
 /**
@@ -180,19 +179,11 @@ public class ParameterSchema implements GDPropertyMetadata {
      */
     @Override
     public String getSerializedNode(String path, Format format) throws GDException {
-        if (path == null) {
-            throw new GDException(405, "Path cannot be null");
+        try {
+            return SerializationUtil.serializeAccordingPath(format, path, Constants.PATH_DELIMITER, this);
+        } catch (SerializationUtil.SerializationException ex) {
+            throw new GDException(404, ex.getMessage(), ex);
         }
-        JsonNode node = SerializationUtil.get(format).valueToTree(this);
-        int n = 1;
-        for (String pathPiece : path.split(Constants.PATH_DELIMITER)) {
-            node = node.findPath(pathPiece);
-            if (node.isMissingNode()) {
-                throw new GDException(404, "No such node found (" + path + " " + n + ")");
-            }
-            n++;
-        }
-        return node.toString();
     }
 
     /**
