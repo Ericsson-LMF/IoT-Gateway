@@ -1,0 +1,5 @@
+include ':common:common.util', ':common:common.osgi.log.util', 
+':common:common.test.util', ':common:common.server.util', 
+':osgi:generic.device.spi' , ':osgi:generic.device.access', 
+':osgi:adaptor.ruleengine', ':osgi:adaptor.upnp', ':osgi:generic.device.spi', ':osgi:generic.device.api',
+':osgi:serviceschema.codegenerator'
