@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
 import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
@@ -193,8 +194,8 @@ public class GDServiceImpl extends GDService.Stub
     public String serialize(Format format) throws GDException {
         checkPermission(getClass(), Type.GET);
         try {
-            return SerializationUtil.get(format).writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this);
-        } catch (JsonProcessingException ex) {
+            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this));
+        } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
     }
@@ -211,8 +212,8 @@ public class GDServiceImpl extends GDService.Stub
     public String getSerializedNode(String path, Format format) throws GDException {
         checkPermission(getClass(), Type.GET);
         try {
-            return SerializationUtil.serializeAccordingpath(format, path, Constants.PATH_DELIMITER, this);
-        } catch (SerializationUtil.SerializationException ex) {
+            return SerializationUtil.serializeAccordingPath(format, path, Constants.PATH_DELIMITER, this);
+        } catch (SerializationException ex) {
             throw new GDException(404, ex.getMessage(), ex);
         }
     }

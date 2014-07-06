@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
 import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
@@ -97,8 +98,8 @@ public class GDActionResultImpl implements GDActionResult {
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
         try {
-            return SerializationUtil.get(format).writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this);
-        } catch (JsonProcessingException ex) {
+            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this));
+        } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
     }

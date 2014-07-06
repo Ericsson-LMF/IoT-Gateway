@@ -1,6 +1,7 @@
 package com.ericsson.commonutil.serialization;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,8 @@ import com.fasterxml.jackson.datatype.jdk7.Jdk7Module;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -50,11 +53,19 @@ public enum SerializationUtil {
         return XML_MAPPER;
     }
 
+    public static String execute(Format format, Doer function) throws SerializationException {
+        try {
+            return function.apply(get(format));
+        } catch (JsonProcessingException ex) {
+            throw new SerializationException(ex.getMessage(), ex);
+        }
+    }
+
     public static <T> String serializeAccordingPath(Format format, String path, String delimiter, T object) throws SerializationException {
         if (path == null) {
             throw new SerializationException("Path cannot be null");
         }
-        JsonNode node = SerializationUtil.get(format).valueToTree(object);
+        JsonNode node = get(format).valueToTree(object);
         String[] split = path.split(Pattern.quote(delimiter));
         for (String pathPiece : split) {
             if (pathPiece.isEmpty()) {
@@ -103,5 +114,14 @@ public enum SerializationUtil {
         public SerializationException(String message) {
             super(message);
         }
+
+        public SerializationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    public interface Doer {
+
+        String apply(ObjectMapper mapper) throws JsonProcessingException;
     }
 }

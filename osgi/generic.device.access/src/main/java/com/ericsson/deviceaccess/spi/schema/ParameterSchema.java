@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.spi.schema;
 
 import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
@@ -168,8 +169,8 @@ public class ParameterSchema implements GDPropertyMetadata {
     @Override
     public String serialize(Format format) throws GDException {
         try {
-            return SerializationUtil.get(format).writeValueAsString(this);
-        } catch (JsonProcessingException ex) {
+            return SerializationUtil.execute(format, mapper -> mapper.writeValueAsString(this));
+        } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
     }
@@ -181,7 +182,7 @@ public class ParameterSchema implements GDPropertyMetadata {
     public String getSerializedNode(String path, Format format) throws GDException {
         try {
             return SerializationUtil.serializeAccordingPath(format, path, Constants.PATH_DELIMITER, this);
-        } catch (SerializationUtil.SerializationException ex) {
+        } catch (SerializationException ex) {
             throw new GDException(404, ex.getMessage(), ex);
         }
     }

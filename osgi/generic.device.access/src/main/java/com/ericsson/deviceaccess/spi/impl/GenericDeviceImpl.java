@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
@@ -420,7 +421,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         checkPermission(GenericDevice.class, Type.GET);
         try {
             return SerializationUtil.serializeAccordingPath(format, path, Constants.PATH_DELIMITER, this);
-        } catch (SerializationUtil.SerializationException ex) {
+        } catch (SerializationException ex) {
             throw new GDException(404, ex.getMessage(), ex);
         }
     }
@@ -451,8 +452,8 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     private String toJsonString(Format format, int indent, boolean stateOnly) throws GDException {
         try {
-            return SerializationUtil.get(format).writeValueAsString(this);
-        } catch (JsonProcessingException ex) {
+            return SerializationUtil.execute(format, mapper -> mapper.writeValueAsString(this));
+        } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
     }
