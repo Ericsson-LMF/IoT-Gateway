@@ -191,7 +191,7 @@ Target: This is the machine where the compiled Java bytecode executes
 6. SETTING UP RASPBERRY PI FOR GATEWAY
 --------------------------------------
 
-This instruction is for Ubuntu 14.04. It can work on other linux distributions and OS X Maverics with minor changes.
+This instruction is for Ubuntu 14.04. It can work on other linux distributions and OS X Mavericks with minor changes.
 
 1.
 On host machine download Raspbian image from: http://downloads.raspberrypi.org/raspbian_latest 
