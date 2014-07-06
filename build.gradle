@@ -1,0 +1,68 @@
+allprojects {
+    apply plugin: 'java'
+}
+
+subprojects {
+    repositories{
+        mavenCentral()
+    }
+
+dependencies {
+    compile "org.osgi:org.osgi.compendium:+"
+    compile "org.osgi:org.osgi.core:+"
+    compile "org.json:json:+"
+    compile "javax.servlet:servlet-api:+"
+    compile "javax.ws.rs:jsr311-api:+"
+    compile "org.slf4j:slf4j-api:+"
+    compile "junit:junit:+"
+    compile "org.jmock:jmock:+"
+    compile "org.jmock:jmock-legacy:+"
+    compile "org.jmock:jmock-junit4:+"
+    compile "com.fasterxml.jackson.core:jackson-core:+"
+    compile "com.fasterxml.jackson.core:jackson-annotations:+"
+    compile "com.fasterxml.jackson.core:jackson-databind:+"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk7:+"
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:+"
+    compile "com.fasterxml.jackson.module:jackson-module-mrbean:+"
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:+"
+    compile "com.sun.jersey:jersey-client:+"
+    compile "commons-codec:commons-codec:+"
+    compile "commons-logging:commons-logging:+"
+    compile "org.springframework:spring-core:+"
+    compile "org.springframework:spring-test:+"
+    compile "net.sf.kxml:kxml2:+"
+    compile "org.apache.xmlbeans:xmlbeans:+"
+    compile "org.codehaus.woodstox:woodstox-core-asl:+"
+        
+    }
+}
+
+project(':osgi:adaptor.ruleengine') {
+    dependencies {
+        compile project (':osgi:generic.device.access')
+    }
+}
+
+project(':osgi:adaptor.upnp') {
+    dependencies {
+        compile project (':common:common.util'), 
+        project (':common:common.osgi.log.util'),
+        project (':osgi:generic.device.access')
+        compile fileTree(dir: "$rootProject.projectDir/osgi/generic.device.spi/target/generic.device.spi-1.42-SNAPSHOT.jar")
+    }
+}
+
+project(':osgi:generic.device.access') {
+    dependencies {
+        compile project (':common:common.util'), 
+        project (':common:common.osgi.log.util'), 
+        project (':common:common.test.util')
+    }
+}
+
+project(':osgi:serviceschema.codegenerator') {
+    dependencies {
+        compile project (':common:common.util') 
+        compile fileTree(dir: "$rootProject.projectDir/osgi/serviceschema.xmlparser/target/serviceschema.xmlparser-1.42-SNAPSHOT.jar")
+    }
+}
