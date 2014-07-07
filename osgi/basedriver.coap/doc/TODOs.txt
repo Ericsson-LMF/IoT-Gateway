@@ -1,0 +1,22 @@
+Todos
+- udp message queue -> DONE for sending, but not for incoming messages (not sure if such would be needed?)!
+- package ordering not handled
+- RST message
+- database to cache messages?
+- stack is no way finished/tested yet, basic functionality towards jcoap working
+- matching request is not really tested yet, needs more testing towards jcoap & unit tests..
+
+- caching of "normal" requests - OK. Use max-age option default value or max-age option value in the message to cache e.g. responses. 
+
+Functionality from different drafts
+- block-wise transfer: basic block2 ok against californium stack. support for block1 is not implemented yet. 
+
+Observe: The gateway keeps the observation relationship active until all the listeners have stopped listening. - OK
+
+Congestion control: One active interaction towards a CoAP server (defined in the core draft 08) - OK (server replies server busy)
+
+Configuration: configuration from a properties file  - OK
+
+Link format: resource discovery done using the DISCOVERY_INTERVAL, DISCOVERY_ADDRESS and DISCOVERY_PORT properties in coap.properties. 
+A basic string tokenizer is used for parsing, good enough for now. Needs improvements (a fast fix done for CDC 1.1.2) - OK
+
