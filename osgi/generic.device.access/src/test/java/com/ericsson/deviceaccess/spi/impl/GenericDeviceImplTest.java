@@ -38,6 +38,7 @@ import com.ericsson.commonutil.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties.Data;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.event.EventManager;
 import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
@@ -70,12 +71,14 @@ public class GenericDeviceImplTest {
     private GenericDeviceImpl device;
     private GDService dummyService;
     private GDProperties dummyProperties;
+    private GDPropertyMetadata dummyMeta;
 
     @Before
     public void setUp() throws Exception {
         dummyService = context.mock(GDService.class);
         eventManager = context.mock(EventManager.class);
         dummyProperties = context.mock(GDProperties.class);
+        dummyMeta = context.mock(GDPropertyMetadata.class);
         ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         device = new GenericDeviceImpl() {
         };
@@ -87,15 +90,28 @@ public class GenericDeviceImplTest {
                 allowing(dummyService).updatePath(with(any(String.class)));
                 allowing(dummyService).setParentDevice(device);
                 allowing(dummyService).getActions();
-                will(returnValue(new String[0]));
-                allowing(dummyService).getPropertiesMetadata();
-                will(returnValue(new GDPropertyMetadata[0]));
+                will(returnValue(new HashMap<>()));
                 allowing(dummyService).getProperties();
                 will(returnValue(dummyProperties));
                 allowing(dummyService).getPath();
                 will(returnValue(""));
                 allowing(dummyProperties).getProperties();
-                will(returnValue(new HashMap<>()));
+                will(returnValue(new HashMap<String, Data>() {
+                    {
+                        put("prop", new Data(dummyMeta).set(10));
+                    }
+                }
+                ));
+                allowing(dummyMeta).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(dummyMeta).getMaxValue();
+                will(returnValue(null));
+                allowing(dummyMeta).getMinValue();
+                will(returnValue(null));
+                allowing(dummyMeta).getTypeName();
+                will(returnValue(null));
+                allowing(dummyMeta).getValidValues();
+                will(returnValue(new String[0]));
             }
         });
 
@@ -139,12 +155,10 @@ public class GenericDeviceImplTest {
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Test
     public void testSerialize() throws GDException, JSONException {
         context.checking(new Expectations() {
             {
-                oneOf(dummyService).serialize(Format.JSON);
-                will(returnValue("{\"name\":\"serv\"}"));
             }
         });
         String json = device.serialize(Format.JSON);
@@ -160,12 +174,10 @@ public class GenericDeviceImplTest {
         }
     }
 
-//    @Test
+    @Test
     public void testSerializeState() throws GDException {
         context.checking(new Expectations() {
             {
-                oneOf(dummyService).serializeState();
-                will(returnValue("{\"name\":\"serv\"}"));
             }
         });
         String json = device.serializeState();

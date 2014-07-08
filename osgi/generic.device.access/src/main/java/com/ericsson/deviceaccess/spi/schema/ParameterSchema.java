@@ -35,14 +35,13 @@
 package com.ericsson.deviceaccess.spi.schema;
 
 import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationException;
 import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 
 /**

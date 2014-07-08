@@ -34,10 +34,10 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import com.ericsson.commonutil.StringUtil;
 import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationException;
 import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
@@ -45,9 +45,7 @@ import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -231,7 +229,6 @@ public class GDPropertiesImpl extends GDProperties.Stub
      * {@inheritDoc}
      */
     @Override
-    @JsonAnyGetter
     public Map<String, Data> getProperties() {
         return Collections.unmodifiableMap(properties);
     }
@@ -240,7 +237,7 @@ public class GDPropertiesImpl extends GDProperties.Stub
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
         try {
-            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this));
+            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(this));
         } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
@@ -248,18 +245,11 @@ public class GDPropertiesImpl extends GDProperties.Stub
 
     @Override
     public String serializeState() {
-        StringBuilder sb = new StringBuilder("{");
-        properties.keySet().forEach(name -> {
-            sb.append("\"").append(name).append("\":\"").append(StringUtil.escapeJSON(getStringValue(name))).append("\",");
-        });
-
-        // remove last ','
-        if (sb.length() > 1) {
-            sb.setLength(sb.length() - 1);
+        try {
+            return SerializationUtil.execute(Format.JSON, mapper -> mapper.writerWithView(View.StatelessID.Ignore.class).writeValueAsString(this));
+        } catch (SerializationException ex) {
+            return "{}";
         }
-        sb.append("}");
-
-        return sb.toString();
     }
 
     /**

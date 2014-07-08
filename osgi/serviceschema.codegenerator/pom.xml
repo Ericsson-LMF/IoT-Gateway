@@ -59,8 +59,8 @@
         <dependency>
             <groupId>com.ericsson.deviceaccess</groupId>
             <artifactId>serviceschema.xmlparser</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <version>1.42-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>

@@ -12,8 +12,6 @@ import com.fasterxml.jackson.datatype.jdk7.Jdk7Module;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -53,7 +51,7 @@ public enum SerializationUtil {
         return XML_MAPPER;
     }
 
-    public static String execute(Format format, Doer function) throws SerializationException {
+    public static String execute(Format format, Serializer function) throws SerializationException {
         try {
             return function.apply(get(format));
         } catch (JsonProcessingException ex) {
@@ -83,45 +81,5 @@ public enum SerializationUtil {
             }
         }
         return node.toString();
-    }
-
-    /**
-     * Used as View to whitelist identification
-     */
-    public static interface ID {
-
-        /**
-         * Used as View to blacklist identification
-         */
-        public static class Ignore implements State {
-        }
-    }
-
-    /**
-     * Used as View to whitelist state data
-     */
-    public static interface State {
-
-        /**
-         * Used as View to blacklist state data
-         */
-        public static class Ignore implements ID {
-        }
-    }
-
-    public static class SerializationException extends Exception {
-
-        public SerializationException(String message) {
-            super(message);
-        }
-
-        public SerializationException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
-
-    public interface Doer {
-
-        String apply(ObjectMapper mapper) throws JsonProcessingException;
     }
 }

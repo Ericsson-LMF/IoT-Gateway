@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.commonutil.serialization.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -55,7 +55,7 @@ public interface GDPropertyMetadata extends GDContextNode {
      *
      * @return the name of the property
      */
-    @JsonView(SerializationUtil.ID.class)
+    @JsonView(View.ID.class)
     String getName();
 
     /**

@@ -81,7 +81,7 @@ public class SchemaBasedGenericDeviceTest {
                 oneOf(service).validateSchema();
                 oneOf(service).getName();
                 will(returnValue("myService"));
-                oneOf(service).updatePath("undefined/undefined");
+                oneOf(service).updatePath("/");
             }
         });
 
@@ -107,7 +107,7 @@ public class SchemaBasedGenericDeviceTest {
                 oneOf(service).validateSchema();
                 oneOf(service).getName();
                 will(returnValue("alreadyExistingService"));
-                oneOf(service).updatePath("undefined/undefined");
+                oneOf(service).updatePath("/");
                 oneOf(service).getName();
                 will(returnValue("alreadyExistingService"));
             }

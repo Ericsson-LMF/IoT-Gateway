@@ -34,7 +34,10 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.Serializable;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.util.Map;
 
 /**
@@ -150,6 +153,7 @@ public interface GDProperties extends Serializable {
      *
      * @return map from name to value
      */
+    @JsonAnyGetter
     public Map<String, Data> getProperties();
 
     /**
@@ -179,6 +183,7 @@ public interface GDProperties extends Serializable {
     public static class Data {
 
         public Object currentValue;
+        @JsonView(View.Stateless.class)
         public GDPropertyMetadata metadata;
 
         public Data(GDPropertyMetadata metadata) {
@@ -193,6 +198,10 @@ public interface GDProperties extends Serializable {
             }
             return this;
         }
-    }
 
+        public Data set(Object object) {
+            currentValue = object;
+            return this;
+        }
+    }
 }

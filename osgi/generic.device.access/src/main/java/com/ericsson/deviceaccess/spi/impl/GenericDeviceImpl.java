@@ -35,8 +35,9 @@
 package com.ericsson.deviceaccess.spi.impl;
 
 import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationException;
 import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
@@ -47,7 +48,6 @@ import static com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity.check
 import static com.ericsson.deviceaccess.spi.genericdevice.GDActivator.getEventManager;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,21 +79,21 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         return props;
     }
 
-    private String id = "undefined";
-    private String urn = "undefined";
-    private String name = "undefined";
-    private String type = "undefined";
-    private String protocol = "undefined";
-    private String location = "undefined";
+    private String id = "";
+    private String urn = "";
+    private String name = "";
+    private String type = "";
+    private String protocol = "";
+    private String location = "";
     private boolean online;
-    private String icon = "undefined";
-    private String path = "undefined";
-    private String contact = "undefined";
-    private String manufacturer = "undefined";
-    private String modelName = "undefined";
-    private String description = "undefined";
-    private String serialNumber = "undefined";
-    private String productClass = "undefined";
+    private String icon = "";
+    private String path = "";
+    private String contact = "";
+    private String manufacturer = "";
+    private String modelName = "";
+    private String description = "";
+    private String serialNumber = "";
+    private String productClass = "";
     private State state = State.READY;
 
     private Map<String, GDService> service = new HashMap<>();
@@ -403,17 +403,20 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
     @Override
     public String serialize(Format format) throws GDException {
         checkPermission(GenericDevice.class, Type.GET);
-        if (format.isJson()) {
-            int indent = 0;
-            return toJsonString(format, indent, false);
-        } else {
-            throw new GDException(405, "No such format supported");
+        try {
+            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(this));
+        } catch (SerializationException ex) {
+            throw new GDException(ex.getMessage(), ex);
         }
     }
 
     @Override
     public String serializeState() throws GDException {
-        return toJsonString(Format.JSON, 0, true);
+        try {
+            return SerializationUtil.execute(Format.JSON, mapper -> mapper.writerWithView(View.StatelessID.Ignore.class).writeValueAsString(this));
+        } catch (SerializationException ex) {
+            throw new GDException(ex.getMessage(), ex);
+        }
     }
 
     @Override
@@ -448,14 +451,6 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
 
     public void notifyEventAdded(String serviceId, String propertyId) {
         getEventManager().addStateEvent(id, serviceId, propertyId, GDEventListener.Type.ADDED);
-    }
-
-    private String toJsonString(Format format, int indent, boolean stateOnly) throws GDException {
-        try {
-            return SerializationUtil.execute(format, mapper -> mapper.writeValueAsString(this));
-        } catch (SerializationException ex) {
-            throw new GDException(ex.getMessage(), ex);
-        }
     }
 
 }

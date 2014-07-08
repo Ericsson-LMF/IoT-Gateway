@@ -35,8 +35,9 @@
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
 import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationException;
 import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
@@ -49,7 +50,6 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.impl.GenericDeviceImpl;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -194,7 +194,7 @@ public class GDServiceImpl extends GDService.Stub
     public String serialize(Format format) throws GDException {
         checkPermission(getClass(), Type.GET);
         try {
-            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this));
+            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(this));
         } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }

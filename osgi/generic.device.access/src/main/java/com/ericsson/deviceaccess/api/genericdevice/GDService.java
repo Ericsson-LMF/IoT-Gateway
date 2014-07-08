@@ -34,7 +34,9 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
+import com.ericsson.commonutil.serialization.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +69,7 @@ public interface GDService extends GDContextNode {
      *
      * @return Name of the service.
      */
+    @JsonView(View.ID.class)
     public String getName();
 
     /**
@@ -90,6 +93,7 @@ public interface GDService extends GDContextNode {
      *
      * @return map from name to action
      */
+    @JsonView(View.Stateless.class)
     public Map<String, GDAction> getActions();
 
     /**

@@ -36,8 +36,9 @@
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
 import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationException;
 import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.SerializationUtil.SerializationException;
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
@@ -48,7 +49,6 @@ import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.genericdevice.GDAccessSecurity;
 import com.ericsson.deviceaccess.spi.impl.MetadataUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -209,7 +209,7 @@ public class GDActionImpl extends GDAction.Stub implements GDAction {
     public String serialize(Format format) throws GDException {
         GDAccessSecurity.checkPermission(getClass(), Type.GET);
         try {
-            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(SerializationUtil.ID.Ignore.class).writeValueAsString(this));
+            return SerializationUtil.execute(format, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(this));
         } catch (SerializationException ex) {
             throw new GDException(ex.getMessage(), ex);
         }
