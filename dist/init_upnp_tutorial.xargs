@@ -47,7 +47,6 @@
 
 -install common.util-1.20-SNAPSHOT.jar
 -install common.osgi.log.util-1.20-SNAPSHOT.jar
--install common.packages-1.42-SNAPSHOT.jar
 -install generic.device.access-1.42-SNAPSHOT.jar
 -install generic.device.access.services-1.42-SNAPSHOT.jar
 -install generic.device.spi-1.42-SNAPSHOT.jar
@@ -78,7 +77,6 @@
 
 -start common.util-1.20-SNAPSHOT.jar
 -start common.osgi.log.util-1.20-SNAPSHOT.jar
--start common.packages-1.42-SNAPSHOT.jar
 -start generic.device.access-1.42-SNAPSHOT.jar
 -start generic.device.access.services-1.42-SNAPSHOT.jar
 -start generic.device.spi-1.42-SNAPSHOT.jar

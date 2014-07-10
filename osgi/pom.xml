@@ -146,8 +146,6 @@
         </dependencies>
     </dependencyManagement>
     <modules>
-        <!-- nrjmata added the common.packages module including json, -->
-        
         <module>serviceschema.xmlparser</module>
         <module>serviceschema.codegenerator</module>
 
