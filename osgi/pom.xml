@@ -143,7 +143,6 @@
                 <artifactId>common.osgi.log.util</artifactId>
                 <version>${connectedhome.version}</version>
             </dependency>
-                
         </dependencies>
     </dependencyManagement>
     <modules>

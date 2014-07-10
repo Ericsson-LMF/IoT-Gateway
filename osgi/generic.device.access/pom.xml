@@ -23,11 +23,6 @@
         </dependency>
 
         <!-- Test -->
-        <dependency>
-            <groupId>com.ericsson.deviceaccess</groupId>
-            <artifactId>common.packages</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
         
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
@@ -62,6 +57,12 @@
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.util</artifactId>
             <version>1.20-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
