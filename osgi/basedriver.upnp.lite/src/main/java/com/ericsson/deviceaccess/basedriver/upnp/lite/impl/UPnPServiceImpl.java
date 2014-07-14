@@ -35,6 +35,7 @@
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -141,6 +142,9 @@ public class UPnPServiceImpl implements UPnPService {
             }
 
             m_eventHandler.registerService(this);
+        } catch (FileNotFoundException e1) {
+            log.error("Given url not found (Error 404): " + m_scpdUrl);
+
         } catch (Exception ee) {
             ee.printStackTrace();
         }
