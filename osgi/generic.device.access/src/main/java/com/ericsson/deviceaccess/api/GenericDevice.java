@@ -34,10 +34,12 @@
  */
 package com.ericsson.deviceaccess.api;
 
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.genericdevice.GDContextNode;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.util.Map;
 
 public interface GenericDevice extends GDContextNode {
@@ -81,6 +83,7 @@ public interface GenericDevice extends GDContextNode {
      * @return Device id.
      */
     @JsonProperty("ID")
+    @JsonView(View.ID.class)
     public String getId();
 
     /**

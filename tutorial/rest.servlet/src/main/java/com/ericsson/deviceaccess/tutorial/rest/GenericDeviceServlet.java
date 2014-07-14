@@ -34,7 +34,11 @@
  */
 package com.ericsson.deviceaccess.tutorial.rest;
 
+import com.ericsson.commonutil.LegacyUtil;
 import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.commonutil.serialization.SerializationException;
+import com.ericsson.commonutil.serialization.SerializationUtil;
+import com.ericsson.commonutil.serialization.View;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
@@ -45,17 +49,14 @@ import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -114,7 +115,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             } else {
                 return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "No servlet registered for " + uri);
             }
-        } catch (GDException | IOException | JSONException e) {
+        } catch (GDException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             return new NanoHTTPD.Response(HTTP_INTERNALERROR, "text/plain", "Failed to get resource " + uri + " due to " + sw.toString());
@@ -181,8 +182,8 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             ServiceReference[] refs = context.getAllServiceReferences(GenericDevice.class.getName(), idFilter);
             if (refs != null) {
                 logger.debug(refs.length + " device found");
-                for (int i = 0; i < refs.length; i++) {
-                    GenericDevice dev = (GenericDevice) context.getService(refs[i]);
+                for (ServiceReference ref : refs) {
+                    GenericDevice dev = (GenericDevice) context.getService(ref);
                     if (deviceId.equals(dev.getId())) {
                         return dev;
                     }
@@ -195,41 +196,31 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
         return null;
     }
 
-    private String getAllDevices() throws JSONException {
-        ServiceReference[] refs;
-        JSONObject devices = new JSONObject();
+    private String getAllDevices() {
         try {
-            refs = context.getServiceReferences(GenericDevice.class.getName(), null);
-            if (refs != null) {
-                for (int i = 0; i < refs.length; i++) {
-                    GenericDevice dev = (GenericDevice) context.getService(refs[i]);
-                    try {
-                        String json = dev.getSerializedNode("", Format.JSON);
-                        devices.put(dev.getId(), new JSONObject(json));
-                    } catch (GDException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (InvalidSyntaxException e) {
+            Map<String, GenericDevice> devices = context
+                    .getServiceReferences(GenericDevice.class, null)
+                    .stream()
+                    .map(ref -> context.getService(ref))
+                    .collect(Collectors.toMap(dev -> dev.getId(), dev -> dev));
+            return SerializationUtil.execute(Format.JSON, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(devices));
+        } catch (InvalidSyntaxException | SerializationException e) {
             logger.error(e);
         }
-        return devices.toString(3);
+        return "{}";
     }
 
     @Override
     public void start(BundleContext bc) throws Exception {
         context = bc;
-//		logger = new LogTracker(context);
-//		logger.open();
-        Dictionary<String, Object> props = new Hashtable<>();
+        Map<String, Object> props = new HashMap<>();
         props.put(GDEventListener.GENERICDEVICE_FILTER, "(device.id=*)");
-        sr = bc.registerService(GDEventListener.class, this, props);
+        sr = bc.registerService(GDEventListener.class, this, LegacyUtil.toDictionary(props));
 
         try {
             bc.addServiceListener(this, "(" + org.osgi.framework.Constants.OBJECTCLASS + "=" + GenericDevice.class.getName() + ")");
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
