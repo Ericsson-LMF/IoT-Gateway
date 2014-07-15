@@ -251,7 +251,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             /*
              * Update properties of each service
              */
-            FunctionalUtil.doIfCan(UpdatePropertyInterface.class, idToService.get(serviceId), service -> {
+            FunctionalUtil.acceptIfCan(UpdatePropertyInterface.class, idToService.get(serviceId), service -> {
                 logger.debug("Found UpdatePropertyInterface instance");
                 events.forEach((name, value) -> {
                     service.updateProperty(name, value);

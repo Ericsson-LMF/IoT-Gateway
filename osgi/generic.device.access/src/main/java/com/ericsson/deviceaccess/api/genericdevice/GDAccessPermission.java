@@ -43,7 +43,6 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class GDAccessPermission extends BasicPermission {
 
@@ -95,11 +94,7 @@ public final class GDAccessPermission extends BasicPermission {
 
     @Override
     public boolean implies(Permission permission) {
-        AtomicBoolean flag = new AtomicBoolean(false);
-        FunctionalUtil.doIfCan(GDAccessPermission.class, permission, target -> {
-            flag.set(actionMask.containsAll(target.actionMask) && super.implies(target));
-        });
-        return flag.get();
+        return FunctionalUtil.applyIfCan(GDAccessPermission.class, permission, target -> actionMask.containsAll(target.actionMask) && super.implies(target)).orElse(false);
     }
 
     @Override
@@ -132,13 +127,7 @@ public final class GDAccessPermission extends BasicPermission {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AtomicBoolean flag = new AtomicBoolean(false);
-        FunctionalUtil.doIfCan(GDAccessPermission.class, obj, target -> {
-            if (getName().equals(target.getName())) {
-                flag.set(getMask().equals(target.getMask()));
-            }
-        });
-        return flag.get();
+        return FunctionalUtil.applyIfCan(GDAccessPermission.class, obj, target -> getName().equals(target.getName()) && getMask().equals(target.getMask())).orElse(false);
     }
 
     class GenericDeviceAccessPermissionCollection extends PermissionCollection {
@@ -159,7 +148,7 @@ public final class GDAccessPermission extends BasicPermission {
             if (isReadOnly()) {
                 throw new SecurityException("readonly PermissionCollection");
             }
-            if (!FunctionalUtil.doIfCan(GDAccessPermission.class, perm, gdaPerm -> {
+            FunctionalUtil.applyIfCan(GDAccessPermission.class, perm, gdaPerm -> {
                 String name = gdaPerm.getName();
                 permissions.compute(name, (key, value) -> {
                     if (value == null) {
@@ -168,14 +157,11 @@ public final class GDAccessPermission extends BasicPermission {
                     value.getMask().addAll(gdaPerm.getMask());
                     return value;
                 });
-                if (!allAllowed) {
-                    if (name.equals("*")) {
-                        allAllowed = true;
-                    }
+                if (!allAllowed && name.equals("*")) {
+                    allAllowed = true;
                 }
-            })) {
-                throw new IllegalArgumentException("invalid permission: " + perm);
-            }
+                return "";
+            }).orElseThrow(() -> new IllegalArgumentException("invalid permission: " + perm));
         }
 
         @Override
@@ -185,8 +171,7 @@ public final class GDAccessPermission extends BasicPermission {
 
         @Override
         public boolean implies(Permission perm) {
-            AtomicBoolean flag = new AtomicBoolean(false);
-            FunctionalUtil.doIfCan(GDAccessPermission.class, perm, gdaPerm -> {
+            return FunctionalUtil.applyIfCan(GDAccessPermission.class, perm, gdaPerm -> {
                 EnumSet<Type> desired = gdaPerm.getMask();
                 EnumSet<Type> effective = EnumSet.noneOf(Type.class);
 
@@ -195,21 +180,15 @@ public final class GDAccessPermission extends BasicPermission {
                     GDAccessPermission temp = permissions.get("*");
                     if (temp != null) {
                         effective.addAll(temp.getMask());
-                        if (effective.containsAll(desired)) {
-                            flag.set(true);
-                            return;
-                        }
                     }
                 }
 
                 permissions.computeIfPresent(gdaPerm.getName(), (key, value) -> {
                     // we have a direct hit!
                     effective.addAll(value.getMask());
-                    if (effective.containsAll(desired)) {
-                        flag.set(true);
-                    }
                     return value;
                 });
+
                 /*
                  * We only care direct match for now since all concerned classes
                  * are under com.ericsson.deviceaccess.api. We may need to
@@ -217,8 +196,8 @@ public final class GDAccessPermission extends BasicPermission {
                  * See BundlePermision implementation in Knopflerfish, for example.
                  * -- Kenta
                  */
-            });
-            return flag.get();
+                return effective.containsAll(desired);
+            }).orElse(false);
         }
 
     }

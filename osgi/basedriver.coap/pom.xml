@@ -1,0 +1,100 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.ericsson.deviceaccess</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.42-SNAPSHOT</version>
+	</parent>
+
+ 	<groupId>com.ericsson.deviceaccess</groupId>
+	<artifactId>basedriver.coap</artifactId>
+	<packaging>bundle</packaging>
+	<version>1.42-SNAPSHOT</version>
+	<name>GDA CoAP Base Driver</name>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.6</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>commons-collections;scope=compile|runtime</Embed-Dependency>
+						<Private-Package>
+							org.apache.commons.collections.*,
+							org.apache.commons.collections.map.*,
+						</Private-Package>
+						<Import-Package>
+							com.ericsson.deviceaccess.*,
+							,
+							org.osgi.*;version="[1.0,4.0)"
+						</Import-Package>
+						
+						<Export-Package>
+							com.ericsson.deviceaccess.coap.basedriver.*,
+							com.ericsson.deviceaccess.coap.basedriver.api.*,
+							com.ericsson.deviceaccess.coap.basedriver.api.resources.*,
+							com.ericsson.deviceaccess.coap.basedriver.api.message.*,
+							com.ericsson.deviceaccess.coap.basedriver.api.ext.*
+						</Export-Package>
+						
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Activator>com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator</Bundle-Activator>
+						<Bundle-Version>${project.version}</Bundle-Version>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ericsson.deviceaccess</groupId>
+			<artifactId>generic.device.access</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<!--scope>test</scope>-->
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-junit3</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+	</dependencies>
+</project>
+
