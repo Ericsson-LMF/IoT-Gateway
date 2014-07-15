@@ -34,11 +34,11 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.commonutil.LegacyUtil;
 import com.ericsson.commonutil.function.FunctionalUtil;
 import java.security.BasicPermission;
 import java.security.Permission;
 import java.security.PermissionCollection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -180,7 +180,7 @@ public final class GDAccessPermission extends BasicPermission {
 
         @Override
         public Enumeration elements() {
-            return LegacyUtil.toEnumeration(permissions.values().iterator());
+            return Collections.enumeration(permissions.values());
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.ericsson.commonutil;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -19,22 +20,6 @@ public enum LegacyUtil {
      */
     INSTANCE;
 
-    public static <T> Enumeration<T> toEnumeration(Iterator<T> iterator) {
-        return new Enumeration<T>() {
-
-            @Override
-            public boolean hasMoreElements() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public T nextElement() {
-                return iterator.next();
-            }
-
-        };
-    }
-
     public static <K, V> Dictionary<K, V> toDictionary(Map<K, V> map) {
         return new Dictionary<K, V>() {
 
@@ -50,12 +35,12 @@ public enum LegacyUtil {
 
             @Override
             public Enumeration<K> keys() {
-                return toEnumeration(map.keySet().iterator());
+                return Collections.enumeration(map.keySet());
             }
 
             @Override
             public Enumeration<V> elements() {
-                return toEnumeration(map.values().iterator());
+                return Collections.enumeration(map.values());
             }
 
             @Override
