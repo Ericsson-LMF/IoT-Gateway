@@ -1,0 +1,150 @@
+/*
+ * Copyright Ericsson AB 2011-2014. All Rights Reserved.
+ * 
+ * The contents of this file are subject to the Lesser GNU Public License,
+ *  (the "License"), either version 2.1 of the License, or
+ * (at your option) any later version.; you may not use this file except in
+ * compliance with the License. You should have received a copy of the
+ * License along with this software. If not, it can be
+ * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
+ * it could also be requested from Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * 
+ * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
+ * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+ * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+ * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
+ 
+ * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+ * LIBRARY IS WITH YOU. SHOULD THE LIBRARY PROVE DEFECTIVE,
+ * YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+ *
+ * IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+ * WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+ * REDISTRIBUTE THE LIBRARY AS PERMITTED ABOVE, BE LIABLE TO YOU FOR
+ * DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
+ * DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE LIBRARY
+ * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
+ * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
+ * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+ * 
+ */
+package com.ericsson.deviceaccess.coap.basedriver.api.message;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+
+/**
+ * Class representing a CoAP response.
+ */
+public class CoAPResponse extends CoAPMessage {
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param version
+	 *            CoAP version of the response
+	 * @param messageType
+	 *            type of the message
+	 * @param responseCode
+	 *            code of the message
+	 * @param messageId
+	 *            message ID
+	 */
+	public CoAPResponse(int version, CoAPMessageType messageType,
+			int responseCode, int messageId) {
+		super(version, messageType, responseCode, messageId);
+	}
+
+	/**
+	 * Constructor that will use draft-core-07 version by default
+	 * 
+	 * @param messageType
+	 * @param responseCode
+	 * @param messageId
+	 */
+	public CoAPResponse(CoAPMessageType messageType, int responseCode,
+			int messageId) {
+		super(messageType, responseCode, messageId);
+	}
+
+	/**
+	 * Create an empty ack for a response (empty ACKs are handled as a response)
+	 * 
+	 * @return empty ACK for this response
+	 */
+	public CoAPResponse createAcknowledgement() {
+
+		CoAPResponse resp = new CoAPResponse(1,
+				CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
+
+		LinkedList headers = this.getOptionHeaders();
+		Iterator it = headers.iterator();
+
+		while (it.hasNext()) {
+			CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+
+			if (header.getOptionName() == CoAPOptionName.TOKEN.getName()) {
+				resp.addOptionHeader(header);
+				break;
+			}
+		}
+
+		resp.setSocketAddress(getSocketAddress());
+		return resp;
+	}
+
+	/**
+	 * Create an empty reset message based on the received response. A reset
+	 * message needs to be sent back if the received response cannot be handled
+	 * by the endpoint.
+	 * 
+	 * @return a CoAP RST response for this CoAP response
+	 */
+	public CoAPResponse createReset() {
+
+		CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0,
+				this.getMessageId());
+
+		LinkedList headers = this.getOptionHeaders();
+		Iterator it = headers.iterator();
+
+		while (it.hasNext()) {
+			CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+
+			if (header.getOptionName() == CoAPOptionName.TOKEN.getName()) {
+				resp.addOptionHeader(header);
+				break;
+			}
+		}
+
+		resp.setSocketAddress(getSocketAddress());
+		return resp;
+	}
+
+	public boolean isCacheable() {
+		// Draft 07
+
+		// 2.03 valid
+		if (this.getCode() == 67) {
+			return true;
+		}
+		// 2.05 content
+		if (this.getCode() == 69) {
+			return true;
+		}
+		// 4.xx
+		if (this.getCode() >= 128 && this.getCode() <= 143) {
+			return true;
+		}
+		// 5.xx
+		if (this.getCode() >= 160 && this.getCode() <= 165) {
+			return true;
+		}
+
+		return false;
+	}
+}
