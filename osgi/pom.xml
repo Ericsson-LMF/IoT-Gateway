@@ -154,8 +154,10 @@
         <module>generic.device.api</module>
         <module>generic.device.spi</module>
         <module>basedriver.upnp.lite</module>
+        <module>basedriver.coap</module>
         <module>adaptor.ruleengine</module>
         <module>adaptor.upnp</module>
+        <module>adaptor.coap</module>
     </modules>
     
     <build>
