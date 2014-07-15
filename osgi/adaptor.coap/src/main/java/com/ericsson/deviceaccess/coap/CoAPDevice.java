@@ -34,6 +34,14 @@
  */
 package com.ericsson.deviceaccess.coap;
 
+import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.deviceaccess.api.Constants;
+import com.ericsson.deviceaccess.api.genericdevice.GDService;
+import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
+import java.net.URI;
+import java.util.Map;
+import org.osgi.framework.ServiceRegistration;
+
 /**
  * CoAPDevice
  *
@@ -45,20 +53,16 @@ package com.ericsson.deviceaccess.coap;
  * parameter updates are handled. Service parameter updates are when new data is
  * received from the device and passed on to the GDA.
  */
-import com.ericsson.commonutil.LegacyUtil;
-import com.ericsson.deviceaccess.api.Constants;
-import com.ericsson.deviceaccess.api.genericdevice.GDService;
-import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
-import java.net.URI;
-import java.util.Map;
-import org.osgi.framework.ServiceRegistration;
-
 public class CoAPDevice extends SBGenericDevice {
 
     private ServiceRegistration serviceRegistration;
 
+    /**
+     * Set up the details of the CoAP Device
+     *
+     * @param uri
+     */
     public CoAPDevice(URI uri) {
-        // Set up the details of the CoAP Device
         this.setId(uri.getHost());
 
         setOnline(true);
@@ -72,8 +76,13 @@ public class CoAPDevice extends SBGenericDevice {
         //System.out.println("[CoAPDevice]: getServiceNames: " + java.util.Arrays.toString(getServiceNames()));
     }
 
+    /**
+     * An service parameter update has been processed from a resource on a
+     * device, pass it on to the GDA
+     *
+     * @param path
+     */
     private void notifyUpdate(String path) {
-        // An service parameter update has been processed from a resource on a device, pass it on to the GDA
         System.out.println("[CoAPDevice]: " + "in notifyUpdate()");
         if (serviceRegistration != null) {
             System.out.println("[CoAPDevice]: " + "about to set property");
@@ -92,10 +101,13 @@ public class CoAPDevice extends SBGenericDevice {
         this.serviceRegistration = serviceRegistration;
     }
 
+    /**
+     * An update has been received from a resource on a device, extract the
+     * service name and key to enable the service parameter update
+     *
+     * @param data
+     */
     public void deviceUpdate(String data) {
-        // An update has been received from a resource on a device, extract the service name and key to enable
-        // the service parameter update
-
         System.out.println("[CoAPDevice]: in deviceUpdate()");
         // this code assumes that the stuff we want is in the first element of the array
         //System.out.println("[CoAPDevice]: " + " getServiceNames() " + java.util.Arrays.toString(getServiceNames()));

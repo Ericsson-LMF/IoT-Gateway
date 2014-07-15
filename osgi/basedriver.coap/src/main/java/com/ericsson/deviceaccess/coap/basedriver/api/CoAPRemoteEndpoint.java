@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api;
 
@@ -42,50 +42,51 @@ import java.net.URI;
  * enpoint can have several CoAP resources.
  */
 public class CoAPRemoteEndpoint extends CoAPEndpoint {
-	public static class CoAPRemoteEndpointType {
-		private final String name;
 
-		public static final CoAPRemoteEndpointType CALIFORNIUM = new CoAPRemoteEndpointType(
-				"CALIFORNIUM");
-		public static final CoAPRemoteEndpointType TMOTE = new CoAPRemoteEndpointType(
-				"TMOTE");
-		public static final CoAPRemoteEndpointType OTHER = new CoAPRemoteEndpointType(
-				"OTHER");
+    public static class CoAPRemoteEndpointType {
 
-		private CoAPRemoteEndpointType(String name) {
-			this.name = name;
-		}
+        private final String name;
 
-		public String toString() {
-			return name;
-		}
-	};
+        public static final CoAPRemoteEndpointType CALIFORNIUM = new CoAPRemoteEndpointType(
+                "CALIFORNIUM");
+        public static final CoAPRemoteEndpointType TMOTE = new CoAPRemoteEndpointType(
+                "TMOTE");
+        public static final CoAPRemoteEndpointType OTHER = new CoAPRemoteEndpointType(
+                "OTHER");
 
-	private CoAPRemoteEndpointType type;
+        private CoAPRemoteEndpointType(String name) {
+            this.name = name;
+        }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param uri
-	 *            CoAP URI of the endpoint
-	 * @param type
-	 *            enumerated type of the device
-	 */
-	public CoAPRemoteEndpoint(URI uri, CoAPRemoteEndpointType type) {
-		super(uri);
-		this.type = type;
-	}
+        @Override
+        public String toString() {
+            return name;
+        }
+    };
 
-	/**
-	 * Returns the enumerated type of the endpoint
-	 * 
-	 * @return enumerated type of the endpoint
-	 */
-	public CoAPRemoteEndpointType getEndpointType() {
-		return this.type;
-	}
+    private CoAPRemoteEndpointType type;
 
-	public void setEndpointType(CoAPRemoteEndpointType type) {
-		this.type = type;
-	}
+    /**
+     * Constructor
+     *
+     * @param uri CoAP URI of the endpoint
+     * @param type enumerated type of the device
+     */
+    public CoAPRemoteEndpoint(URI uri, CoAPRemoteEndpointType type) {
+        super(uri);
+        this.type = type;
+    }
+
+    /**
+     * Returns the enumerated type of the endpoint
+     *
+     * @return enumerated type of the endpoint
+     */
+    public CoAPRemoteEndpointType getEndpointType() {
+        return this.type;
+    }
+
+    public void setEndpointType(CoAPRemoteEndpointType type) {
+        this.type = type;
+    }
 }

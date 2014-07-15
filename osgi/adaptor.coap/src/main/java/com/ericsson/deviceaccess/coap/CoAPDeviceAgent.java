@@ -138,7 +138,7 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
         // Create Observation relationship between device and the GDA adaptor/basedriver
         path = "helloWorld";
         System.out.println("***** SEND OBSERVE REQUEST *****");
-        coapService.createObservationRelationship(resource.getUri().getHost().toString(), resource.getUri().getPort(), path, this);
+        coapService.createObservationRelationship(resource.getUri().getHost(), resource.getUri().getPort(), path, this);
     }
 
     public void observeTerminationReceived(CoAPResource resource) {

@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
@@ -38,65 +38,67 @@ import java.util.Vector;
 
 /**
  * This class is to represent the CoAP content types as defined in the coap core
- * draft media type registry (http://tools.ietf.org/html/draft-ietf-core-coap-08#page-65).
- * 
+ * draft media type registry
+ * (http://tools.ietf.org/html/draft-ietf-core-coap-08#page-65).
+ *
  */
 public class CoAPContentType {
 
-	private int no;
-	private String contentType;
-	private static final Vector values = new Vector();
+    private final int no;
+    private final String contentType;
+    private static final Vector values = new Vector();
 
-	public static final CoAPContentType TEXT_PLAIN = new CoAPContentType(0,
-			"text/plain; charset=utf-8");
-	public static final CoAPContentType LINK_FORMAT = new CoAPContentType(40,
-			"application/link-format");
-	public static final CoAPContentType APPLICATION_XML = new CoAPContentType(
-			41, "application/xml");
-	public static final CoAPContentType OCTET_STREAM = new CoAPContentType(42,
-			"application/octet-stream");
-	public static final CoAPContentType EXI = new CoAPContentType(47,
-			"application/exi");
-	public static final CoAPContentType JSON = new CoAPContentType(50,
-			"application/json");
+    public static final CoAPContentType TEXT_PLAIN = new CoAPContentType(0,
+            "text/plain; charset=utf-8");
+    public static final CoAPContentType LINK_FORMAT = new CoAPContentType(40,
+            "application/link-format");
+    public static final CoAPContentType APPLICATION_XML = new CoAPContentType(
+            41, "application/xml");
+    public static final CoAPContentType OCTET_STREAM = new CoAPContentType(42,
+            "application/octet-stream");
+    public static final CoAPContentType EXI = new CoAPContentType(47,
+            "application/exi");
+    public static final CoAPContentType JSON = new CoAPContentType(50,
+            "application/json");
 
-	/**
-	 * Constructor
-	 * @param no number of the content type
-	 * @param contentType string representing the media type 
-	 */
-	public CoAPContentType(int no, String contentType) {
-		this.no = no;
-		this.contentType = contentType;
-		values.add(this);
-	}
+    /**
+     * Constructor
+     *
+     * @param no number of the content type
+     * @param contentType string representing the media type
+     */
+    public CoAPContentType(int no, String contentType) {
+        this.no = no;
+        this.contentType = contentType;
+        values.add(this);
+    }
 
-	public int getNo() {
-		return this.no;
-	}
+    public int getNo() {
+        return this.no;
+    }
 
-	public String getContentType() {
-		return this.contentType;
-	}
+    public String getContentType() {
+        return this.contentType;
+    }
 
-	public static CoAPContentType getContentTypeNumber(String name) {
-		for (int i = 0; i < values.size(); i++) {
-			CoAPContentType c = (CoAPContentType) values.get(i);
-			if (c.getContentType() == name) {
-				return c;
-			}
-		}
-		return null;
-	}
+    public static CoAPContentType getContentTypeNumber(String name) {
+        for (Object value : values) {
+            CoAPContentType c = (CoAPContentType) value;
+            if (c.getContentType() == null ? name == null : c.getContentType().equals(name)) {
+                return c;
+            }
+        }
+        return null;
+    }
 
-	public static CoAPContentType getContentTypeName(int no) {
-		for (int i = 0; i < values.size(); i++) {
-			CoAPContentType c = (CoAPContentType) values.get(i);
-			if (c.getNo() == no) {
-				return c;
-			}
-		}
-		return null;
-	}
+    public static CoAPContentType getContentTypeName(int no) {
+        for (Object value : values) {
+            CoAPContentType c = (CoAPContentType) value;
+            if (c.getNo() == no) {
+                return c;
+            }
+        }
+        return null;
+    }
 
 }
