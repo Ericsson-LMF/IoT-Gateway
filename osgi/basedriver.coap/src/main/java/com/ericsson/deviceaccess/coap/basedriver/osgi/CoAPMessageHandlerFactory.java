@@ -78,11 +78,9 @@ public class CoAPMessageHandlerFactory {
      * @return an instance of IncomingMessageHandler
      */
     public IncomingMessageHandler getIncomingCoAPMessageHandler() {
-        if (incomingMessageHandler == null) {
-            synchronized (this) {
-                if (incomingMessageHandler == null) {
-                    incomingMessageHandler = new IncomingMessageHandler();
-                }
+        synchronized (this) {
+            if (incomingMessageHandler == null) {
+                incomingMessageHandler = new IncomingMessageHandler();
             }
         }
         return incomingMessageHandler;
@@ -98,11 +96,9 @@ public class CoAPMessageHandlerFactory {
      */
     public OutgoingMessageHandler getOutgoingCoAPMessageHandler(
             TransportLayerSender sender) {
-        if (outgoingMessageHandler == null) {
-            synchronized (this) {
-                if (outgoingMessageHandler == null) {
-                    outgoingMessageHandler = new OutgoingMessageHandler(sender);
-                }
+        synchronized (this) {
+            if (outgoingMessageHandler == null) {
+                outgoingMessageHandler = new OutgoingMessageHandler(sender);
             }
         }
         return outgoingMessageHandler;

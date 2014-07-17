@@ -49,7 +49,6 @@ import com.ericsson.deviceaccess.coap.basedriver.osgi.CoAPMessageHandlerFactory;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageHandler;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.LinkFormatDirectory;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.OutgoingMessageHandler;
-import com.ericsson.deviceaccess.coap.basedriver.util.Compat;
 import com.ericsson.deviceaccess.coap.basedriver.util.LinkFormatReader;
 import java.io.IOException;
 import java.net.BindException;
@@ -67,7 +66,7 @@ import java.util.Timer;
 
 public class CoAPExtBasedriver {
 
-    static final private String THIS_CLASS_NAME = Compat.getSimpleName(CoAPExtBasedriver.class);
+    static final private String THIS_CLASS_NAME = CoAPExtBasedriver.class.getSimpleName();
 
     private TransportLayerReceiver transportLayerReceiver;
     private TransportLayerSender transportLayerSender;
@@ -220,7 +219,6 @@ public class CoAPExtBasedriver {
 
         URI uri = null;
         try {
-
             if (port > 0 && port < 65536) {
                 uri = new URI("coap", null, host, port, path, null, null);
             } else {
@@ -234,8 +232,7 @@ public class CoAPExtBasedriver {
         InetSocketAddress sockaddr = null;
         try {
             String socketAddress = host;
-            InetAddress addr = null;
-            addr = InetAddress.getByName(socketAddress);
+            InetAddress addr = InetAddress.getByName(socketAddress);
 
             sockaddr = new InetSocketAddress(addr, uri.getPort());
 

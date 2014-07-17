@@ -47,263 +47,258 @@ import java.io.ByteArrayOutputStream;
  */
 public class BlockOptionHeader extends CoAPOptionHeader {
 
-	private int blockNumber;
+    private int blockNumber;
 
-	private int szx;
+    private int szx;
 
-	private boolean mFlag;
+    private boolean mFlag;
 
-	private int length;
+    private int length;
 
-	// TODO there's no error handling for valid input here..
-	/**
-	 * Constructor.
-	 * 
-	 * @param name
-	 *            name of the header
-	 * @param blockNumber
-	 *            number of the block. Maximum 20 bits can be used for
-	 *            representing the block number
-	 * @param mFlag
-	 *            m flag indicating if there are more blocks. when set to true,
-	 *            indicates there are more blocks.
-	 * @param szx
-	 *            size exponent (not the size of the block!!). The szx should be
-	 *            between values 0 and 6.
-	 * @param length
-	 *            length of the block (in bytes), 1-3
-	 * 
-	 */
-	public BlockOptionHeader(CoAPOptionName name, int blockNumber,
-			boolean mFlag, int szx) {
-		super(name);
-		this.mFlag = mFlag;
-		this.blockNumber = blockNumber;
+    // TODO there's no error handling for valid input here..
+    /**
+     * Constructor.
+     *
+     * @param name name of the header
+     * @param blockNumber number of the block. Maximum 20 bits can be used for
+     * representing the block number
+     * @param mFlag m flag indicating if there are more blocks. when set to
+     * true, indicates there are more blocks.
+     * @param szx size exponent (not the size of the block!!). The szx should be
+     * between values 0 and 6.
+     * @param length length of the block (in bytes), 1-3
+     *
+     */
+    public BlockOptionHeader(CoAPOptionName name, int blockNumber,
+            boolean mFlag, int szx) {
+        super(name);
+        this.mFlag = mFlag;
+        this.blockNumber = blockNumber;
 
-		this.szx = szx;
+        this.szx = szx;
 
-		int value = blockNumber;
-		int bitsNeeded = 0;
-		while (value > 0) {
-			bitsNeeded++;
-			value = (int) (value >> 1);
-		}
+        int value = blockNumber;
+        int bitsNeeded = 0;
+        while (value > 0) {
+            bitsNeeded++;
+            value = (int) (value >> 1);
+        }
 
-		if (bitsNeeded <= 4) {
-			this.length = 1;
-		} else if (4 < bitsNeeded && bitsNeeded <= 12) {
-			this.length = 2;
-		} else {
-			this.length = 3;
-		}
+        if (bitsNeeded <= 4) {
+            this.length = 1;
+        } else if (4 < bitsNeeded && bitsNeeded <= 12) {
+            this.length = 2;
+        } else {
+            this.length = 3;
+        }
 
-		super.setValue(this.encode());
-	}
+        super.setValue(this.encode());
+    }
 
-	/**
-	 * Generate a BlockOptionHeader from the CoAPOptionHeader of type Block1 or
-	 * Block2
-	 * 
-	 * @param name
-	 * @param header
-	 * @throws CoAPException
-	 *             if a header that is not either Block1 or Block2 is given as
-	 *             input
-	 */
-	public BlockOptionHeader(CoAPOptionHeader header)
-			throws CoAPException {
-		super(CoAPOptionName.getOptionName(header.getOptionNumber()));
-		decode(header);
-	}
+    /**
+     * Generate a BlockOptionHeader from the CoAPOptionHeader of type Block1 or
+     * Block2
+     *
+     * @param name
+     * @param header
+     * @throws CoAPException if a header that is not either Block1 or Block2 is
+     * given as input
+     */
+    public BlockOptionHeader(CoAPOptionHeader header)
+            throws CoAPException {
+        super(CoAPOptionName.getOptionName(header.getOptionNumber()));
+        decode(header);
+    }
 
-	private void decode(CoAPOptionHeader blockOptionHeader)
-			throws CoAPException {
+    private void decode(CoAPOptionHeader blockOptionHeader)
+            throws CoAPException {
 
-		if (blockOptionHeader.getOptionNumber() != CoAPOptionName.BLOCK1
-				.getNo()
-				&& blockOptionHeader.getOptionNumber() != CoAPOptionName.BLOCK2
-						.getNo()) {
-			throw new CoAPException(
-					"Only option header Block1 and Block2 can be decoded into BlockOptionHeaders");
-		}
-		byte[] blockValue = blockOptionHeader.getValue();
-		int optionNumber = blockOptionHeader.getOptionNumber();
+        if (blockOptionHeader.getOptionNumber() != CoAPOptionName.BLOCK1
+                .getNo()
+                && blockOptionHeader.getOptionNumber() != CoAPOptionName.BLOCK2
+                .getNo()) {
+            throw new CoAPException(
+                    "Only option header Block1 and Block2 can be decoded into BlockOptionHeaders");
+        }
+        byte[] blockValue = blockOptionHeader.getValue();
+        int optionNumber = blockOptionHeader.getOptionNumber();
 
-		// shift three to the right to get the M bit
-		byte lastBlock = blockValue[blockValue.length - 1];
-		int decodedMFlag = lastBlock >> 3 & 0x1;
+        // shift three to the right to get the M bit
+        byte lastBlock = blockValue[blockValue.length - 1];
+        int decodedMFlag = lastBlock >> 3 & 0x1;
 
-		byte szxByte = BitOperations.getBitsInByteAsByte(
-				blockValue[blockValue.length - 1], 0, 3);
+        byte szxByte = BitOperations.getBitsInByteAsByte(
+                blockValue[blockValue.length - 1], 0, 3);
 
-		int decodedBlockNumber = -1;
-		byte blockNumberByte;
+        int decodedBlockNumber = -1;
+        byte blockNumberByte;
 
-		// Length of the block is 1-3 bytes, get the block number
-		if (blockValue.length == 1) {
-			blockNumberByte = BitOperations.getBitsInByteAsByte(blockValue[0],
-					4, 4);
-			decodedBlockNumber = blockNumberByte & 0xFF;
-		} else if (blockValue.length == 2) {
+        // Length of the block is 1-3 bytes, get the block number
+        if (blockValue.length == 1) {
+            blockNumberByte = BitOperations.getBitsInByteAsByte(blockValue[0],
+                    4, 4);
+            decodedBlockNumber = blockNumberByte & 0xFF;
+        } else if (blockValue.length == 2) {
 
-			byte[] testArray = new byte[2];
-			byte newByte = BitOperations.setBitsInByte(testArray[0], 0, 4,
-					BitOperations.getBitsInIntAsInt(blockValue[0], 4, 4));
-			byte secondByte = BitOperations.setBitsInByte(testArray[1], 4, 4,
-					BitOperations.getBitsInIntAsInt(blockValue[0], 0, 4));
+            byte[] testArray = new byte[2];
+            byte newByte = BitOperations.setBitsInByte(testArray[0], 0, 4,
+                    BitOperations.getBitsInIntAsInt(blockValue[0], 4, 4));
+            byte secondByte = BitOperations.setBitsInByte(testArray[1], 4, 4,
+                    BitOperations.getBitsInIntAsInt(blockValue[0], 0, 4));
 
-			secondByte = BitOperations.setBitsInByte(secondByte, 0, 4,
-					BitOperations.getBitsInIntAsInt(blockValue[1], 4, 4));
+            secondByte = BitOperations.setBitsInByte(secondByte, 0, 4,
+                    BitOperations.getBitsInIntAsInt(blockValue[1], 4, 4));
 
-			short blockNumberShort = BitOperations.mergeBytesToShort(newByte,
-					secondByte);
+            short blockNumberShort = BitOperations.mergeBytesToShort(newByte,
+                    secondByte);
 
-			decodedBlockNumber = blockNumberShort;
+            decodedBlockNumber = blockNumberShort;
 
-		} else if (blockValue.length == 3) {
+        } else if (blockValue.length == 3) {
 
-			byte[] testArray = new byte[4];
-			byte newByte = BitOperations.setBitsInByte(testArray[0], 0, 4,
-					BitOperations.getBitsInIntAsInt(blockValue[0], 4, 4));
-			byte secondByte = BitOperations.setBitsInByte(testArray[1], 4, 4,
-					BitOperations.getBitsInIntAsInt(blockValue[0], 0, 4));
+            byte[] testArray = new byte[4];
+            byte newByte = BitOperations.setBitsInByte(testArray[0], 0, 4,
+                    BitOperations.getBitsInIntAsInt(blockValue[0], 4, 4));
+            byte secondByte = BitOperations.setBitsInByte(testArray[1], 4, 4,
+                    BitOperations.getBitsInIntAsInt(blockValue[0], 0, 4));
 
-			secondByte = BitOperations.setBitsInByte(secondByte, 0, 4,
-					BitOperations.getBitsInIntAsInt(blockValue[1], 4, 4));
+            secondByte = BitOperations.setBitsInByte(secondByte, 0, 4,
+                    BitOperations.getBitsInIntAsInt(blockValue[1], 4, 4));
 
-			byte thirdByte = BitOperations.setBitsInByte(testArray[2], 0, 4,
-					BitOperations.getBitsInByteAsByte(blockValue[2], 4, 4));
-			thirdByte = BitOperations.setBitsInByte(thirdByte, 4, 4,
-					BitOperations.getBitsInByteAsByte(blockValue[1], 0, 4));
+            byte thirdByte = BitOperations.setBitsInByte(testArray[2], 0, 4,
+                    BitOperations.getBitsInByteAsByte(blockValue[2], 4, 4));
+            thirdByte = BitOperations.setBitsInByte(thirdByte, 4, 4,
+                    BitOperations.getBitsInByteAsByte(blockValue[1], 0, 4));
 
-			byte[] bytes = new byte[1];
-			byte tmpByte = bytes[0];
-			decodedBlockNumber = BitOperations.mergeBytesToInt(tmpByte,
-					newByte, secondByte, thirdByte);
-		}
+            byte[] bytes = new byte[1];
+            byte tmpByte = bytes[0];
+            decodedBlockNumber = BitOperations.mergeBytesToInt(tmpByte,
+                    newByte, secondByte, thirdByte);
+        }
 
-		this.blockNumber = decodedBlockNumber;
-		this.mFlag = (decodedMFlag != 0);
-		this.szx = szxByte;
+        this.blockNumber = decodedBlockNumber;
+        this.mFlag = (decodedMFlag != 0);
+        this.szx = szxByte;
 
-		int value = blockNumber;
-		int bitsNeeded = 0;
-		while (value > 0) {
-			bitsNeeded++;
-			value = (int) (value >> 1);
-		}
+        int value = blockNumber;
+        int bitsNeeded = 0;
+        while (value > 0) {
+            bitsNeeded++;
+            value = (int) (value >> 1);
+        }
 
-		if (bitsNeeded <= 4) {
-			this.length = 1;
-		} else if (4 < bitsNeeded && bitsNeeded <= 12) {
-			this.length = 2;
-		} else {
-			this.length = 3;
-		}
+        if (bitsNeeded <= 4) {
+            this.length = 1;
+        } else if (4 < bitsNeeded && bitsNeeded <= 12) {
+            this.length = 2;
+        } else {
+            this.length = 3;
+        }
 
 		// super.setValue(this.encode());
 
-		/*
-		 * BlockOptionHeader option = new BlockOptionHeader(
-		 * CoAPOptionName.getOptionName(optionNumber), decodedBlockNumber,
-		 * (mFlag != 0), szx);
-		 * 
-		 * return option;
-		 */
-	}
+        /*
+         * BlockOptionHeader option = new BlockOptionHeader(
+         * CoAPOptionName.getOptionName(optionNumber), decodedBlockNumber,
+         * (mFlag != 0), szx);
+         * 
+         * return option;
+         */
+    }
 
-	/**
-	 * Get the number of the block
-	 * 
-	 * @return number of the block
-	 */
-	public int getBlockNumber() {
-		return this.blockNumber;
-	}
+    /**
+     * Get the number of the block
+     *
+     * @return number of the block
+     */
+    public int getBlockNumber() {
+        return this.blockNumber;
+    }
 
-	/**
-	 * Get the size exponent "szx" of the option header
-	 * 
-	 * @return "szx" of the option header
-	 */
-	public int getSzx() {
-		return this.szx;
-	}
+    /**
+     * Get the size exponent "szx" of the option header
+     *
+     * @return "szx" of the option header
+     */
+    public int getSzx() {
+        return this.szx;
+    }
 
-	/**
-	 * Get the m flag of the block option header
-	 * 
-	 * @return m flag of the header
-	 */
-	public boolean getMFlag() {
-		return this.mFlag;
-	}
+    /**
+     * Get the m flag of the block option header
+     *
+     * @return m flag of the header
+     */
+    public boolean getMFlag() {
+        return this.mFlag;
+    }
 
-	/**
-	 * Get the length of the block option header
-	 * 
-	 * @return length of the block option header
-	 */
-	public int getLength() {
-		return this.length;
-	}
+    /**
+     * Get the length of the block option header
+     *
+     * @return length of the block option header
+     */
+    @Override
+    public int getLength() {
+        return this.length;
+    }
 
-	/**
-	 * Get the block option header as byte array
-	 * 
-	 * @return block option header as byte array
-	 */
-	public byte[] encode() {
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		byte firstByte;
-		if (length == 1) {
-			byte[] bytes = new byte[1];
-			byte tmpByte = bytes[0];
-			firstByte = BitOperations.setBitsInByte(tmpByte, 4, 4,
-					BitOperations.getBitsInIntAsInt(blockNumber, 0, 4));
+    /**
+     * Get the block option header as byte array
+     *
+     * @return block option header as byte array
+     */
+    public byte[] encode() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        byte firstByte;
+        if (length == 1) {
+            byte[] bytes = new byte[1];
+            byte tmpByte = bytes[0];
+            firstByte = BitOperations.setBitsInByte(tmpByte, 4, 4,
+                    BitOperations.getBitsInIntAsInt(blockNumber, 0, 4));
 
-			int flagVal = (mFlag) ? 1 : 0;
-			firstByte = BitOperations.setBitInByte(firstByte, 3, flagVal);
+            int flagVal = (mFlag) ? 1 : 0;
+            firstByte = BitOperations.setBitInByte(firstByte, 3, flagVal);
 
-			firstByte = BitOperations.setBitsInByte(firstByte, 0, 3,
-					BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
-			stream.write(firstByte);
-		} else if (length == 2) {
+            firstByte = BitOperations.setBitsInByte(firstByte, 0, 3,
+                    BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
+            stream.write(firstByte);
+        } else if (length == 2) {
 
-			byte[] split = BitOperations.splitIntToBytes(blockNumber);
-			int blockNumberShifted = (int) (blockNumber << 4);
-			split = BitOperations.splitIntToBytes(blockNumberShifted);
-			stream.write(split[2]);
+            byte[] split = BitOperations.splitIntToBytes(blockNumber);
+            int blockNumberShifted = (int) (blockNumber << 4);
+            split = BitOperations.splitIntToBytes(blockNumberShifted);
+            stream.write(split[2]);
 
-			byte[] testArray = new byte[1];
-			byte newByte = BitOperations.setBitsInByte(testArray[0], 4, 4,
-					BitOperations.getBitsInIntAsInt(split[3], 4, 4));
+            byte[] testArray = new byte[1];
+            byte newByte = BitOperations.setBitsInByte(testArray[0], 4, 4,
+                    BitOperations.getBitsInIntAsInt(split[3], 4, 4));
 
-			int flagVal = (mFlag) ? 1 : 0;
-			newByte = BitOperations.setBitInByte(newByte, 3, flagVal);
-			newByte = BitOperations.setBitsInByte(newByte, 0, 3,
-					BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
+            int flagVal = (mFlag) ? 1 : 0;
+            newByte = BitOperations.setBitInByte(newByte, 3, flagVal);
+            newByte = BitOperations.setBitsInByte(newByte, 0, 3,
+                    BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
 
-			stream.write(newByte);
-		} else if (length == 3) {
+            stream.write(newByte);
+        } else if (length == 3) {
 
-			byte[] split = BitOperations.splitIntToBytes(blockNumber);
+            byte[] split = BitOperations.splitIntToBytes(blockNumber);
 
-			int blockNumberShifted = (int) (blockNumber << 4);
-			split = BitOperations.splitIntToBytes(blockNumberShifted);
-			stream.write(split[1]);
-			stream.write(split[2]);
+            int blockNumberShifted = (int) (blockNumber << 4);
+            split = BitOperations.splitIntToBytes(blockNumberShifted);
+            stream.write(split[1]);
+            stream.write(split[2]);
 
-			byte thirdByte = (byte) (BitOperations.getBitsInByteAsByte(
-					split[3], 4, 4) << 4);
+            byte thirdByte = (byte) (BitOperations.getBitsInByteAsByte(
+                    split[3], 4, 4) << 4);
 
-			int flagVal = (mFlag) ? 1 : 0;
-			thirdByte = BitOperations.setBitInByte(thirdByte, 3, flagVal);
-			thirdByte = BitOperations.setBitsInByte(thirdByte, 0, 3,
-					BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
+            int flagVal = (mFlag) ? 1 : 0;
+            thirdByte = BitOperations.setBitInByte(thirdByte, 3, flagVal);
+            thirdByte = BitOperations.setBitsInByte(thirdByte, 0, 3,
+                    BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
 
-			stream.write(thirdByte);
-		}
-		return stream.toByteArray();
-	}
+            stream.write(thirdByte);
+        }
+        return stream.toByteArray();
+    }
 }

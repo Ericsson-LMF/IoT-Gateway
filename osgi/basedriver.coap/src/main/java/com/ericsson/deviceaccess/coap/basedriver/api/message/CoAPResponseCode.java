@@ -34,9 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import java.util.Vector;
-
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * response codes defined in core draft 11 (including obsoleted codes)
@@ -51,7 +51,7 @@ public class CoAPResponseCode {
 	private int responseClass;
 	private final String description;
 	private final int no;
-	private static final Vector values = new Vector(20);
+	private static final List values = new ArrayList<>(20);
 
 	public static final CoAPResponseCode CREATED = new CoAPResponseCode(65,
 			"2.01 Created");
@@ -137,16 +137,17 @@ public class CoAPResponseCode {
 
 	public static CoAPResponseCode getResponseName(int no) {
 
-		for (int i = 0; i < values.size(); i++) {
-			CoAPResponseCode c = (CoAPResponseCode) values.get(i);
-			if (c.getNo() == no) {
-				return c;
-			}
-		}
+            for (Object value : values) {
+                CoAPResponseCode c = (CoAPResponseCode) value;
+                if (c.getNo() == no) {
+                    return c;
+                }
+            }
 
 		return null;
 	}
 
+        @Override
 	public String toString() {
 		return no + ", " + description;
 	}

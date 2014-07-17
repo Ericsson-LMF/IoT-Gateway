@@ -34,14 +34,11 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.*;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
 
-import java.io.IOException;
 import java.util.*;
-
 
 /**
  * Sends the message using the transport layer. Takes care of retransmissions
@@ -49,277 +46,268 @@ import java.util.*;
  */
 public class OutgoingMessageHandler {
 
-	/**
-	 * Inner class for running the retransmission timers for outgoing,
-	 * confirmable messages
-	 */
-	private class RetransmissionTask extends TimerTask {
+    /**
+     * Inner class for running the retransmission timers for outgoing,
+     * confirmable messages
+     */
+    private class RetransmissionTask extends TimerTask {
 
-		private CoAPMessage message;
+        private CoAPMessage message;
 
-		protected RetransmissionTask(CoAPMessage message) {
-			this.message = message;
-		}
+        protected RetransmissionTask(CoAPMessage message) {
+            this.message = message;
+        }
 
-		public void run() {
-			/*
-				CoAPActivator.logger.debug("Retransmit message with ID: "
-						+ message.getIdentifier());
-			*/
-			send(this.message, true);
-		}
+        @Override
+        public void run() {
+            /*
+             CoAPActivator.logger.debug("Retransmit message with ID: "
+             + message.getIdentifier());
+             */
+            send(this.message, true);
+        }
 
-		public CoAPMessage getMessage() {
-			return this.message;
-		}
-	}
+        public CoAPMessage getMessage() {
+            return this.message;
+        }
+    }
 
-	private static final int MAX_RETRANSMIT = 4;
+    private static final int MAX_RETRANSMIT = 4;
 
 	// TODO outgoing message cache should be cleaned up!!!
-	// note that in case of transmission, the current state should be sent out
-	// (rather than an old snapshot)
-	// All sent messages with token as key
-	private HashMap outgoingReplies;
+    // note that in case of transmission, the current state should be sent out
+    // (rather than an old snapshot)
+    // All sent messages with token as key
+    private HashMap outgoingReplies;
 
-	private HashMap outgoingRequests;
+    private HashMap outgoingRequests;
 
-	// message id 16 bits, so values between 0 and 65535
-	public final static int MESSAGE_ID_MAX = 65535;
+    // message id 16 bits, so values between 0 and 65535
+    public final static int MESSAGE_ID_MAX = 65535;
 
-	public final static int MESSAGE_ID_MIN = 0;
+    public final static int MESSAGE_ID_MIN = 0;
 
-	// lower layer transport sender
-	private TransportLayerSender sender;
+    // lower layer transport sender
+    private TransportLayerSender sender;
 
-	// this variable keeps track
-	private int messageId;
+    // this variable keeps track
+    private int messageId;
 
-	private Timer timer;
+    private Timer timer;
 
-	private HashMap retransmissionTasks;
+    private HashMap retransmissionTasks;
 
-	/**
-	 * Constructor is protected, an instance of this handler should be fetched
-	 * using the MessageHandlerFactory
-	 * 
-	 * @param sender
-	 *            an instance implementing TransportLayerSender interface
-	 */
-	protected OutgoingMessageHandler(TransportLayerSender sender) {
-		this.messageId = -1;
-		this.outgoingReplies = new HashMap();
-		this.outgoingRequests = new HashMap();
-		this.timer = new Timer();
-		this.sender = sender;
-		this.retransmissionTasks = new HashMap();
-	}
+    /**
+     * Constructor is protected, an instance of this handler should be fetched
+     * using the MessageHandlerFactory
+     *
+     * @param sender an instance implementing TransportLayerSender interface
+     */
+    protected OutgoingMessageHandler(TransportLayerSender sender) {
+        this.messageId = -1;
+        this.outgoingReplies = new HashMap();
+        this.outgoingRequests = new HashMap();
+        this.timer = new Timer();
+        this.sender = sender;
+        this.retransmissionTasks = new HashMap();
+    }
 
-	/**
-	 * This method is responsible for actually sending the messages
-	 * 
-	 * @param msg
-	 *            message to be sent
-	 * @param retransmission
-	 *            set to true if the message is resent
-	 */
-	protected void send(CoAPMessage msg, boolean retransmission) {
+    /**
+     * This method is responsible for actually sending the messages
+     *
+     * @param msg message to be sent
+     * @param retransmission set to true if the message is resent
+     */
+    protected void send(CoAPMessage msg, boolean retransmission) {
 		// System.out.println("SEND REQUEST: " + msg.getMessageType().toString()
-		// + " and id: " + msg.getIdentifier());
-		// Can send a new request to the same host, if no messages are in the
-		// retransmission queue
-		if (!retransmission
-				&& retransmissionTasks.containsKey(msg.getSocketAddress())
-				&& msg.getClass() == CoAPRequest.class) {
-			CoAPRequest req = (CoAPRequest) msg;
+        // + " and id: " + msg.getIdentifier());
+        // Can send a new request to the same host, if no messages are in the
+        // retransmission queue
+        if (!retransmission
+                && retransmissionTasks.containsKey(msg.getSocketAddress())
+                && msg.getClass() == CoAPRequest.class) {
+            CoAPRequest req = (CoAPRequest) msg;
 
-			if (req.getListener() != null) {
-				req.getListener().serviceBusy(req);
-			}
-			return;
-		}
+            if (req.getListener() != null) {
+                req.getListener().serviceBusy(req);
+            }
+            return;
+        }
 
-		// messages are only retransmitted if they're of type confirmable
-		if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE) {
+        // messages are only retransmitted if they're of type confirmable
+        if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE) {
 
-			int timeoutValue = msg.getTimeout();
+            int timeoutValue = msg.getTimeout();
 
-			/*
-				CoAPActivator.logger
-						.info("Transmit, nof retransmissions this far : ["
-								+ msg.getRetransmissions()
-								+ "] , max 4 (re)transmissions allowed");
+            /*
+             CoAPActivator.logger
+             .info("Transmit, nof retransmissions this far : ["
+             + msg.getRetransmissions()
+             + "] , max 4 (re)transmissions allowed");
 
-				CoAPActivator.logger.debug("Timeout value in milliseconds: ["
-						+ timeoutValue + "]");
-			*/
-
-			// start timer
-			if (msg.getRetransmissions() < MAX_RETRANSMIT) {
-				/*
-					CoAPActivator.logger.debug("Schedule retransmission");
-				*/
+             CoAPActivator.logger.debug("Timeout value in milliseconds: ["
+             + timeoutValue + "]");
+             */
+            // start timer
+            if (msg.getRetransmissions() < MAX_RETRANSMIT) {
+                /*
+                 CoAPActivator.logger.debug("Schedule retransmission");
+                 */
 
 				// Create retransmission only if this is not multicast message
+                RetransmissionTask task = new RetransmissionTask(msg);
+                this.retransmissionTasks.put(msg.getSocketAddress(), task);
 
-				RetransmissionTask task = new RetransmissionTask(msg);
-				this.retransmissionTasks.put(msg.getSocketAddress(), task);
+                timer.schedule(task, timeoutValue);
+                // Increase timeout and number of retransmission
+                msg.messageRetransmitted();
+            } else {
+                /*
+                 CoAPActivator.logger
+                 .info("Maximum number of retransmissions reached, cancel this message");
+                 */
+                this.removeRetransmissionTask(msg);
+                msg.setMessageCanceled(true);
 
-				timer.schedule(task, timeoutValue);
-				// Increase timeout and number of retransmission
-				msg.messageRetransmitted();
-			} else {
-				/*
-					CoAPActivator.logger
-							.info("Maximum number of retransmissions reached, cancel this message");
-				*/
-				this.removeRetransmissionTask(msg);
-				msg.setMessageCanceled(true);
+                // Remove message from the memory
+                if (msg.getClass() == CoAPRequest.class) {
+                    this.outgoingRequests.remove(msg);
 
-				// Remove message from the memory
-				if (msg.getClass() == CoAPRequest.class) {
-					this.outgoingRequests.remove(msg);
+                    CoAPRequestListener listener = ((CoAPRequest) msg)
+                            .getListener();
+                    if (listener != null) {
+                        listener.maximumRetransmissionsReached((CoAPRequest) msg);
+                    }
 
-					CoAPRequestListener listener = ((CoAPRequest) msg)
-							.getListener();
-					if (listener != null) {
-						listener.maximumRetransmissionsReached((CoAPRequest) msg);
-					}
+                } else if (msg.getClass() == CoAPResponse.class) {
+                    this.outgoingReplies.remove(msg);
+                }
+            }
+        }
 
-				} else if (msg.getClass() == CoAPResponse.class) {
-					this.outgoingReplies.remove(msg);
-				}
-			}
-		}
-
-		if (!retransmission) {
+        if (!retransmission) {
 			// cache outgoing confirmable and non-confirm and ack if it has
-			// content
-			if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE
-					|| msg.getMessageType() == CoAPMessageType.NON_CONFIRMABLE) {
-				this.cacheMessage(msg);
-			} else if (msg.getMessageType() == CoAPMessageType.ACKNOWLEDGEMENT
-					&& msg.getCode() != 0) {
-				this.cacheMessage(msg);
-			}
-		}
+            // content
+            if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE
+                    || msg.getMessageType() == CoAPMessageType.NON_CONFIRMABLE) {
+                this.cacheMessage(msg);
+            } else if (msg.getMessageType() == CoAPMessageType.ACKNOWLEDGEMENT
+                    && msg.getCode() != 0) {
+                this.cacheMessage(msg);
+            }
+        }
 
-		/*
-			try {
-				String msgStr = "*** Outgoing CoAP message **\n"
-						+ msg.logMessage();
-				CoAPActivator.logger.info(msgStr);
-				try {
-					// Write to a file too (interop tests)
-					CoAPActivator.out.write(msgStr);
-					CoAPActivator.out.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} catch (Exception e) {
-				CoAPActivator.logger.debug("Problem to log the outgoing message");
-				e.printStackTrace();
-			}
-		*/
+        /*
+         try {
+         String msgStr = "*** Outgoing CoAP message **\n"
+         + msg.logMessage();
+         CoAPActivator.logger.info(msgStr);
+         try {
+         // Write to a file too (interop tests)
+         CoAPActivator.out.write(msgStr);
+         CoAPActivator.out.flush();
+         } catch (IOException e) {
+         e.printStackTrace();
+         }
+         } catch (Exception e) {
+         CoAPActivator.logger.debug("Problem to log the outgoing message");
+         e.printStackTrace();
+         }
+         */
+        // TODO How to handle non-confirmable messages??
+        this.sender.sendMessage(msg);
+    }
 
-		// TODO How to handle non-confirmable messages??
-		this.sender.sendMessage(msg);
-	}
+    /**
+     * Private method to cache the outoing messages.
+     *
+     * @param msg message to cache
+     */
+    private synchronized void cacheMessage(CoAPMessage msg) {
+        if (msg.getClass() == CoAPRequest.class) {
+            this.outgoingRequests.put(msg.getIdentifier(), (CoAPRequest) msg);
+        } else if (msg.getClass() == CoAPResponse.class) {
+            this.outgoingReplies.put(msg.getIdentifier(), (CoAPResponse) msg);
+        }
+    }
 
-	/**
-	 * Private method to cache the outoing messages.
-	 * 
-	 * @param msg
-	 *            message to cache
-	 */
-	private synchronized void cacheMessage(CoAPMessage msg) {
-		if (msg.getClass() == CoAPRequest.class) {
-			this.outgoingRequests.put(msg.getIdentifier(), (CoAPRequest) msg);
-		} else if (msg.getClass() == CoAPResponse.class) {
-			this.outgoingReplies.put(msg.getIdentifier(), (CoAPResponse) msg);
-		}
-	}
+    /**
+     * Generate a message ID between 0 and 655535 (those included). In this
+     * implementation, the message ID is always increased by one (acc. to draft
+     * it should be totally random so this can be changed later if needed).
+     * Synchronized for thread safety.
+     *
+     * @return next message ID
+     */
+    public synchronized int generateMessageId() {
+        // create message ID and return
+        if (this.messageId == -1) {
+            Random random = new Random();
+            this.messageId = random.nextInt(MESSAGE_ID_MAX + 1);
+            return this.messageId;
+        }
+        if (this.messageId < MESSAGE_ID_MAX) {
+            this.messageId++;
+        } else { // start from 0
+            this.messageId = MESSAGE_ID_MIN;
+        }
+        return this.messageId;
+    }
 
-	/**
-	 * Generate a message ID between 0 and 655535 (those included). In this
-	 * implementation, the message ID is always increased by one (acc. to draft
-	 * it should be totally random so this can be changed later if needed).
-	 * Synchronized for thread safety.
-	 * 
-	 * @return next message ID
-	 */
-	public synchronized int generateMessageId() {
-		// create message ID and return
-		if (this.messageId == -1) {
-			Random random = new Random();
-			this.messageId = random.nextInt(MESSAGE_ID_MAX + 1);
-			return this.messageId;
-		}
-		if (this.messageId < MESSAGE_ID_MAX) {
-			this.messageId++;
-		} else { // start from 0
-			this.messageId = MESSAGE_ID_MIN;
-		}
-		return this.messageId;
-	}
+    /**
+     * Return a list of responses that have been sent (for detecting duplicate
+     * messages for example)
+     *
+     * @return list of responses
+     */
+    public synchronized HashMap getOutgoingResponses() {
+        return this.outgoingReplies;
+    }
 
-	/**
-	 * Return a list of responses that have been sent (for detecting duplicate
-	 * messages for example)
-	 * 
-	 * @return list of responses
-	 */
-	public synchronized HashMap getOutgoingResponses() {
-		return this.outgoingReplies;
-	}
+    /**
+     * Return a list of requests that have been sent
+     *
+     * @return list of requests
+     */
+    public synchronized HashMap getOutgoingRequests() {
+        return this.outgoingRequests;
+    }
 
-	/**
-	 * Return a list of requests that have been sent
-	 * 
-	 * @return list of requests
-	 */
-	public synchronized HashMap getOutgoingRequests() {
-		return this.outgoingRequests;
-	}
-
-	/**
-	 * This method is called when a response for the request is received at the
-	 * endpoint. Calling this method will cancel the retransmissions.
-	 * 
-	 * @param message
-	 *            message for which a confirmation was received
-	 */
-	protected synchronized void removeRetransmissionTask(CoAPMessage message) {
-		RetransmissionTask task = null;
-		boolean taskFound = false;
+    /**
+     * This method is called when a response for the request is received at the
+     * endpoint. Calling this method will cancel the retransmissions.
+     *
+     * @param message message for which a confirmation was received
+     */
+    protected synchronized void removeRetransmissionTask(CoAPMessage message) {
+        RetransmissionTask task = null;
 
 		// Iterate first to find the task to remove, then remove to avoid
-		// concurrentmodificationexception
-		for (Iterator i = this.retransmissionTasks.values().iterator(); i
-				.hasNext();) {
+        // concurrentmodificationexception
+        for (Iterator i = this.retransmissionTasks.values().iterator(); i
+                .hasNext();) {
 
-			RetransmissionTask t = (RetransmissionTask) i.next();
-			if (t.getMessage().getIdentifier().equals(message.getIdentifier())) {
-				taskFound = true;
-				task = t;
-				break;
-			}
-		}
+            RetransmissionTask t = (RetransmissionTask) i.next();
+            if (t.getMessage().getIdentifier().equals(message.getIdentifier())) {
+                task = t;
+                break;
+            }
+        }
 
-		if (taskFound) {
-			task.cancel();
-			RetransmissionTask t = (RetransmissionTask) this.retransmissionTasks
-					.remove(message.getSocketAddress());
-		}
-	}
+        if (task != null) {
+            task.cancel();
+            RetransmissionTask t = (RetransmissionTask) this.retransmissionTasks
+                    .remove(message.getSocketAddress());
+        }
+    }
 
-	/**
-	 * This method is used when the bundle is stopped. It will cancel the timer
-	 * and the scheduled tasks.
-	 */
-	public void stopService() {
-		if (timer != null) {
-			timer.cancel();
-		}
-	}
+    /**
+     * This method is used when the bundle is stopped. It will cancel the timer
+     * and the scheduled tasks.
+     */
+    public void stopService() {
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
 }

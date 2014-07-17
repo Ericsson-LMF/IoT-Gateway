@@ -43,242 +43,230 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 public class NetUtil {
 
-	private static class ClassifiedAddresses {
-		
-		final public LinkedList globalIPv4 = new LinkedList();
-		final public LinkedList globalIPv6 = new LinkedList();
-		final public LinkedList siteLocalIPv4 = new LinkedList();
-		final public LinkedList siteLocalIPv6 = new LinkedList();
-		final public LinkedList linkLocalIPv4 = new LinkedList();
-		final public LinkedList linkLocalIPv6 = new LinkedList();
-		
-		private ClassifiedAddresses() {}
-		
-		static ClassifiedAddresses getClassifiedAddresses () {
-			
-			ClassifiedAddresses result = new ClassifiedAddresses();
-			
-			Enumeration eNetIf = null;
-			try {
-				eNetIf = NetworkInterface.getNetworkInterfaces();
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-			if (eNetIf == null) {
-				return result;
-			}
-			while (eNetIf.hasMoreElements()) {
-				NetworkInterface netIf = (NetworkInterface)eNetIf.nextElement();
-				Enumeration eInetAddr = netIf.getInetAddresses();
-				while (eInetAddr.hasMoreElements()) {					
-					InetAddress inetAddr = (InetAddress)eInetAddr.nextElement();
-					
-					if (inetAddr instanceof Inet4Address) {
-						if (inetAddr.isLinkLocalAddress()) {
-							result.linkLocalIPv4.add(inetAddr);
-						} else if (inetAddr.isSiteLocalAddress()) {
-							result.siteLocalIPv4.add(inetAddr);
-						} else if ((!inetAddr.isAnyLocalAddress()) && (!inetAddr.isMulticastAddress())) {
-							result.globalIPv4.add(inetAddr);
-						} else {
-							continue;
-						}
-					} else if (inetAddr instanceof Inet6Address) {
-						if (inetAddr.isLinkLocalAddress()) {
-							result.linkLocalIPv6.add(inetAddr);
-						} else if (inetAddr.isSiteLocalAddress()) {
-							result.siteLocalIPv6.add(inetAddr);
-						} else if ((!inetAddr.isAnyLocalAddress()) && (!inetAddr.isMulticastAddress())) {
-							result.globalIPv6.add(inetAddr);
-						} else {
-							continue;
-						}
-					}
-				}
-			}
-			return result;
-		}
-	}
-	
-	static private InetAddress[] getGlobalI() throws SocketException {
-		final ArrayList inetAddrList = new ArrayList();
-		
-		Enumeration eNetIf = NetworkInterface.getNetworkInterfaces();
-		while (eNetIf.hasMoreElements()) {
-			NetworkInterface netIf = (NetworkInterface)eNetIf.nextElement();
-			Enumeration eInetAddr = netIf.getInetAddresses();
-			while (eInetAddr.hasMoreElements()) {
-				InetAddress inetAddr = (InetAddress)eInetAddr.nextElement();
-				if (!inetAddr.isAnyLocalAddress() &&
-					!inetAddr.isLinkLocalAddress() &&
-					!inetAddr.isLoopbackAddress() &&
-					!inetAddr.isMulticastAddress()) {
-					inetAddrList.add(inetAddr);
-				}
-			}
-		}		
-		return (InetAddress[])inetAddrList.toArray(new InetAddress[inetAddrList.size()]);
-	}
-	
-	static public InetAddress[] getGlobalInetAddress() throws SocketException {
-		final ArrayList inetAddrList = new ArrayList();
-		
-		Enumeration eNetIf = NetworkInterface.getNetworkInterfaces();
-		while (eNetIf.hasMoreElements()) {
-			NetworkInterface netIf = (NetworkInterface)eNetIf.nextElement();
-			Enumeration eInetAddr = netIf.getInetAddresses();
-			while (eInetAddr.hasMoreElements()) {
-				InetAddress inetAddr = (InetAddress)eInetAddr.nextElement();
-				if (!inetAddr.isAnyLocalAddress() &&
-					!inetAddr.isLinkLocalAddress() &&
-					!inetAddr.isLoopbackAddress() &&
-					!inetAddr.isMulticastAddress()) {
-					inetAddrList.add(inetAddr);
-				}
-			}
-		}		
-		return (InetAddress[])inetAddrList.toArray(new InetAddress[inetAddrList.size()]);
-	}
-	
-	static public final int IPV4_ONLY = 1;
-	static public final int IPV6_ONLY = 2;
-	static public final int ADDR_FAMILY_PRIORITISED_IPV4 = 3;
-	static public final int ADDR_FAMILY_PRIORITISED_IPV6 = 4;
-	static public final int ADDR_SCOPE_PRIORITISED_IPV4 = 5;
-	static public final int ADDR_SCOPE_PRIORITISED_IPV6 = 6;
-	
-	static public InetAddress getMyInetAddress(int mode) {
-		List listOfAddrs = new Vector();
-		ClassifiedAddresses classifiedAddrs = null;
+    private static class ClassifiedAddresses {
 
-		classifiedAddrs = new ClassifiedAddresses();
-	
-		if (classifiedAddrs != null) {
-			switch (mode) {
-			case IPV4_ONLY:
-				listOfAddrs.add(classifiedAddrs.globalIPv4);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
-				break;
-			case IPV6_ONLY:
-				listOfAddrs.add(classifiedAddrs.globalIPv6);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
-				break;
-			case ADDR_FAMILY_PRIORITISED_IPV4:
-				listOfAddrs.add(classifiedAddrs.globalIPv4);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.globalIPv6);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
-				break;
-			case ADDR_FAMILY_PRIORITISED_IPV6:
-				listOfAddrs.add(classifiedAddrs.globalIPv6);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.globalIPv4);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
-				break;
-			case ADDR_SCOPE_PRIORITISED_IPV4:
-				listOfAddrs.add(classifiedAddrs.globalIPv4);
-				listOfAddrs.add(classifiedAddrs.globalIPv6);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
-				break;
-			case ADDR_SCOPE_PRIORITISED_IPV6:
-			default:
-				listOfAddrs.add(classifiedAddrs.globalIPv6);
-				listOfAddrs.add(classifiedAddrs.globalIPv4);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
-				listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
-				break;
-			}
-		}
-		
-		for (Iterator it = listOfAddrs.iterator(); it.hasNext();) {
-			LinkedList addrs = (LinkedList)it.next();
-			if (!addrs.isEmpty()) {
-				return (InetAddress)addrs.getFirst();
-			}
-		}
-		try {
-			if ((mode == IPV4_ONLY) || (mode == ADDR_FAMILY_PRIORITISED_IPV4) || (mode == ADDR_SCOPE_PRIORITISED_IPV4)) {
-				return Inet4Address.getLocalHost();
-			} else {
-				return Inet6Address.getLocalHost();
-			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		return null; // XXX: What can we do here??
-	}
-	
-	
-	/**
-	 * Get an InetSocketAddress from the String format "<Address>:<Port>", or "<Address>".
-	 * 
-	 * @param addressPortStr String for Address and Port. Enclose with "[" and "]" for IPv6 addresses. 
-	 * @param defautlPort 	defaultPort when port is not specified in addressPortStr
-	 * @return InetSocketAddress
-	 * @throws UnknownHostException 
-	 */
-	static public InetSocketAddress getInetSocketAddress(String addressPortStr, int defaultPort) throws UnknownHostException {		
-		if ((addressPortStr == null) || (addressPortStr.length() == 0)) {
-			return null;
-		}
-		String addressStr = null;
-		int port = -1;
-		
-		if (addressPortStr.charAt(0) == '[') {
-			// [2001:1::1]:1234 or [2001:1::1]
-			int i = addressPortStr.indexOf("]");
-			if (i <= 0) {
-				return null;
-			}
-			addressStr = addressPortStr.substring(1, i);
-			if ((addressPortStr.length() > (i+2)) && (addressPortStr.charAt(i+1) == ':')) {
-				// [2001:1::1]:1234
-				port = Integer.parseInt(addressPortStr.substring(i+2));
-			} else if (addressPortStr.length() == (i+1)) {
-				// [2001:1::1] (is it legitimate??)
-				port = defaultPort;
-			} else {
-				return null;
-			}
-		} else if (addressPortStr.indexOf(":") >= 0) {
-			int i = addressPortStr.lastIndexOf(":");
-			if (addressPortStr.indexOf(":") == i) {
-				// www.fqdn.com:1234 or 192.168.1.1:1234
-				addressStr = addressPortStr.substring(0, i);
-				port = Integer.parseInt(addressPortStr.substring(i+1));
-			} else {
-				// IPv6 Address 2001:1::1 (at least including two ':')
-				addressStr = addressPortStr;
-				port = defaultPort;				
-			}
-		} else {
-			// www.fqdn.com or 192.168.1.1
-			addressStr = addressPortStr;
-			port = defaultPort;
-		}
-		
-		if ((addressStr == null) || (port < 0)) {
-			return null;
-		}
-		
-		return new InetSocketAddress(addressStr, port);
-	}
+        final public LinkedList<InetAddress> globalIPv4 = new LinkedList();
+        final public LinkedList<InetAddress> globalIPv6 = new LinkedList();
+        final public LinkedList<InetAddress> siteLocalIPv4 = new LinkedList();
+        final public LinkedList<InetAddress> siteLocalIPv6 = new LinkedList();
+        final public LinkedList<InetAddress> linkLocalIPv4 = new LinkedList();
+        final public LinkedList<InetAddress> linkLocalIPv6 = new LinkedList();
+
+        private ClassifiedAddresses() {
+        }
+
+        static ClassifiedAddresses getClassifiedAddresses() {
+
+            ClassifiedAddresses result = new ClassifiedAddresses();
+
+            Enumeration eNetIf = null;
+            try {
+                eNetIf = NetworkInterface.getNetworkInterfaces();
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            if (eNetIf == null) {
+                return result;
+            }
+            while (eNetIf.hasMoreElements()) {
+                NetworkInterface netIf = (NetworkInterface) eNetIf.nextElement();
+                Enumeration eInetAddr = netIf.getInetAddresses();
+                while (eInetAddr.hasMoreElements()) {
+                    InetAddress inetAddr = (InetAddress) eInetAddr.nextElement();
+
+                    if (inetAddr instanceof Inet4Address) {
+                        if (inetAddr.isLinkLocalAddress()) {
+                            result.linkLocalIPv4.add(inetAddr);
+                        } else if (inetAddr.isSiteLocalAddress()) {
+                            result.siteLocalIPv4.add(inetAddr);
+                        } else if ((!inetAddr.isAnyLocalAddress()) && (!inetAddr.isMulticastAddress())) {
+                            result.globalIPv4.add(inetAddr);
+                        }
+                    } else if (inetAddr instanceof Inet6Address) {
+                        if (inetAddr.isLinkLocalAddress()) {
+                            result.linkLocalIPv6.add(inetAddr);
+                        } else if (inetAddr.isSiteLocalAddress()) {
+                            result.siteLocalIPv6.add(inetAddr);
+                        } else if ((!inetAddr.isAnyLocalAddress()) && (!inetAddr.isMulticastAddress())) {
+                            result.globalIPv6.add(inetAddr);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+    }
+
+    static private InetAddress[] getGlobalI() throws SocketException {
+        final ArrayList<InetAddress> inetAddrList = new ArrayList();
+
+        Enumeration<NetworkInterface> eNetIf = NetworkInterface.getNetworkInterfaces();
+        while (eNetIf.hasMoreElements()) {
+            Enumeration<InetAddress> eInetAddr = eNetIf.nextElement().getInetAddresses();
+            while (eInetAddr.hasMoreElements()) {
+                InetAddress inetAddr = eInetAddr.nextElement();
+                if (!inetAddr.isAnyLocalAddress()
+                        && !inetAddr.isLinkLocalAddress()
+                        && !inetAddr.isLoopbackAddress()
+                        && !inetAddr.isMulticastAddress()) {
+                    inetAddrList.add(inetAddr);
+                }
+            }
+        }
+        return inetAddrList.toArray(new InetAddress[inetAddrList.size()]);
+    }
+
+    static public InetAddress[] getGlobalInetAddress() throws SocketException {
+        final ArrayList<InetAddress> inetAddrList = new ArrayList();
+
+        Enumeration<NetworkInterface> eNetIf = NetworkInterface.getNetworkInterfaces();
+        while (eNetIf.hasMoreElements()) {
+            Enumeration<InetAddress> eInetAddr = eNetIf.nextElement().getInetAddresses();
+            while (eInetAddr.hasMoreElements()) {
+                InetAddress inetAddr = eInetAddr.nextElement();
+                if (!inetAddr.isAnyLocalAddress()
+                        && !inetAddr.isLinkLocalAddress()
+                        && !inetAddr.isLoopbackAddress()
+                        && !inetAddr.isMulticastAddress()) {
+                    inetAddrList.add(inetAddr);
+                }
+            }
+        }
+        return inetAddrList.toArray(new InetAddress[inetAddrList.size()]);
+    }
+
+    static public final int IPV4_ONLY = 1;
+    static public final int IPV6_ONLY = 2;
+    static public final int ADDR_FAMILY_PRIORITISED_IPV4 = 3;
+    static public final int ADDR_FAMILY_PRIORITISED_IPV6 = 4;
+    static public final int ADDR_SCOPE_PRIORITISED_IPV4 = 5;
+    static public final int ADDR_SCOPE_PRIORITISED_IPV6 = 6;
+
+    static public InetAddress getMyInetAddress(int mode) {
+        List<List<InetAddress>> listOfAddrs = new ArrayList();
+        ClassifiedAddresses classifiedAddrs = new ClassifiedAddresses();
+        switch (mode) {
+            case IPV4_ONLY:
+                listOfAddrs.add(classifiedAddrs.globalIPv4);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
+                break;
+            case IPV6_ONLY:
+                listOfAddrs.add(classifiedAddrs.globalIPv6);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
+                break;
+            case ADDR_FAMILY_PRIORITISED_IPV4:
+                listOfAddrs.add(classifiedAddrs.globalIPv4);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.globalIPv6);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
+                break;
+            case ADDR_FAMILY_PRIORITISED_IPV6:
+                listOfAddrs.add(classifiedAddrs.globalIPv6);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.globalIPv4);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
+                break;
+            case ADDR_SCOPE_PRIORITISED_IPV4:
+                listOfAddrs.add(classifiedAddrs.globalIPv4);
+                listOfAddrs.add(classifiedAddrs.globalIPv6);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
+                break;
+            case ADDR_SCOPE_PRIORITISED_IPV6:
+            default:
+                listOfAddrs.add(classifiedAddrs.globalIPv6);
+                listOfAddrs.add(classifiedAddrs.globalIPv4);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.siteLocalIPv4);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv6);
+                listOfAddrs.add(classifiedAddrs.linkLocalIPv4);
+                break;
+        }
+        for (List<InetAddress> addrs : listOfAddrs) {
+            if (!addrs.isEmpty()) {
+                return addrs.get(0);
+            }
+        }
+        try {
+            if ((mode == IPV4_ONLY) || (mode == ADDR_FAMILY_PRIORITISED_IPV4) || (mode == ADDR_SCOPE_PRIORITISED_IPV4)) {
+                return Inet4Address.getLocalHost();
+            } else {
+                return Inet6Address.getLocalHost();
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return null; // XXX: What can we do here??
+    }
+
+    /**
+     * Get an InetSocketAddress from the String format "<Address>:<Port>", or
+     * "<Address>".
+     *
+     * @param addressPortStr String for Address and Port. Enclose with "[" and
+     * "]" for IPv6 addresses.
+     * @param defautlPort defaultPort when port is not specified in
+     * addressPortStr
+     * @return InetSocketAddress
+     * @throws UnknownHostException
+     */
+    static public InetSocketAddress getInetSocketAddress(String addressPortStr, int defaultPort) throws UnknownHostException {
+        if (addressPortStr == null || addressPortStr.isEmpty()) {
+            return null;
+        }
+        String addressStr;
+        int port;
+
+        if (addressPortStr.charAt(0) == '[') {
+            // [2001:1::1]:1234 or [2001:1::1]
+            int i = addressPortStr.indexOf("]");
+            if (i <= 0) {
+                return null;
+            }
+            addressStr = addressPortStr.substring(1, i);
+            if ((addressPortStr.length() > (i + 2)) && (addressPortStr.charAt(i + 1) == ':')) {
+                // [2001:1::1]:1234
+                port = Integer.parseInt(addressPortStr.substring(i + 2));
+            } else if (addressPortStr.length() == (i + 1)) {
+                // [2001:1::1] (is it legitimate??)
+                port = defaultPort;
+            } else {
+                return null;
+            }
+        } else if (addressPortStr.contains(":")) {
+            int i = addressPortStr.lastIndexOf(":");
+            if (addressPortStr.indexOf(":") == i) {
+                // www.fqdn.com:1234 or 192.168.1.1:1234
+                addressStr = addressPortStr.substring(0, i);
+                port = Integer.parseInt(addressPortStr.substring(i + 1));
+            } else {
+                // IPv6 Address 2001:1::1 (at least including two ':')
+                addressStr = addressPortStr;
+                port = defaultPort;
+            }
+        } else {
+            // www.fqdn.com or 192.168.1.1
+            addressStr = addressPortStr;
+            port = defaultPort;
+        }
+
+        if (addressStr == null || port < 0) {
+            return null;
+        }
+
+        return new InetSocketAddress(addressStr, port);
+    }
 }

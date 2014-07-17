@@ -34,15 +34,6 @@
  */
 package com.ericsson.deviceaccess.coap;
 
-/**
- * CoAPDeviceFactory
- *
- * Here we listen to the basedriver via the DeviceInterface interface for the
- * detection of new devices. This class implements the DeviceInterface interface
- * and provides the implementation of the deviceAdded() method. Currently the
- * class simply creates a new CoAPDeviceAgent object which subsequently handles
- * the registration of the object to the OSGi framework.
- */
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPRemoteEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPService;
 import com.ericsson.deviceaccess.coap.basedriver.api.DeviceInterface;
@@ -52,6 +43,15 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+/**
+ * CoAPDeviceFactory
+ *
+ * Here we listen to the basedriver via the DeviceInterface interface for the
+ * detection of new devices. This class implements the DeviceInterface interface
+ * and provides the implementation of the deviceAdded() method. Currently the
+ * class simply creates a new CoAPDeviceAgent object which subsequently handles
+ * the registration of the object to the OSGi framework.
+ */
 public class CoAPDeviceFactory implements BundleActivator, DeviceInterface {
 
     private HashMap agents;
@@ -78,6 +78,7 @@ public class CoAPDeviceFactory implements BundleActivator, DeviceInterface {
         }
     }
 
+    @Override
     public void stop(BundleContext context) {
     }
 

@@ -34,94 +34,95 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
  * This class represents the enums for different CoAP option headers.
- * 
+ *
  * The options in this class are from draft-ieft-core-coap-08,
  * draft-ietf-core-observe-03 and draft-ietf-core-block-03
- * 
+ *
  */
 public class CoAPOptionName {
-	private final String name;
-	private final int number;
-	private static final Vector options = new Vector(21);
 
-	public static final CoAPOptionName CONTENT_TYPE = new CoAPOptionName(1,
-			"Content-Type");
-	public static final CoAPOptionName MAX_AGE = new CoAPOptionName(2,
-			"Max-Age");
-	public static final CoAPOptionName PROXY_URI = new CoAPOptionName(3,
-			"Proxy-Uri");
-	public static final CoAPOptionName ETAG = new CoAPOptionName(4, "ETag");
-	public static final CoAPOptionName URI_HOST = new CoAPOptionName(5,
-			"Uri-Host");
-	public static final CoAPOptionName LOCATION_PATH = new CoAPOptionName(6,
-			"Location-Path");
-	public static final CoAPOptionName URI_PORT = new CoAPOptionName(7,
-			"Uri-Port");
-	public static final CoAPOptionName LOCATION_QUERY = new CoAPOptionName(8,
-			"Location-Query");
-	public static final CoAPOptionName URI_PATH = new CoAPOptionName(9,
-			"Uri-Path");
-	public static final CoAPOptionName OBSERVE = new CoAPOptionName(10,
-			"Observe");
-	public static final CoAPOptionName TOKEN = new CoAPOptionName(11, "Token");
-	public static final CoAPOptionName ACCEPT = new CoAPOptionName(12, "Accept");
+    private final String name;
+    private final int number;
+    private static final List<CoAPOptionName> options = new ArrayList<>(21);
+
+    public static final CoAPOptionName CONTENT_TYPE = new CoAPOptionName(1,
+            "Content-Type");
+    public static final CoAPOptionName MAX_AGE = new CoAPOptionName(2,
+            "Max-Age");
+    public static final CoAPOptionName PROXY_URI = new CoAPOptionName(3,
+            "Proxy-Uri");
+    public static final CoAPOptionName ETAG = new CoAPOptionName(4, "ETag");
+    public static final CoAPOptionName URI_HOST = new CoAPOptionName(5,
+            "Uri-Host");
+    public static final CoAPOptionName LOCATION_PATH = new CoAPOptionName(6,
+            "Location-Path");
+    public static final CoAPOptionName URI_PORT = new CoAPOptionName(7,
+            "Uri-Port");
+    public static final CoAPOptionName LOCATION_QUERY = new CoAPOptionName(8,
+            "Location-Query");
+    public static final CoAPOptionName URI_PATH = new CoAPOptionName(9,
+            "Uri-Path");
+    public static final CoAPOptionName OBSERVE = new CoAPOptionName(10,
+            "Observe");
+    public static final CoAPOptionName TOKEN = new CoAPOptionName(11, "Token");
+    public static final CoAPOptionName ACCEPT = new CoAPOptionName(12, "Accept");
 	// The functionality by the If-Match header is not really handled by the
-	// gateway
-	public static final CoAPOptionName IF_MATCH = new CoAPOptionName(13,
-			"If-Match");
-	// New option header from draft-ietf-core-observe-03
-	public static final CoAPOptionName MAX_OFE = new CoAPOptionName(14,
-			"Max-OFE");
-	public static final CoAPOptionName URI_QUERY = new CoAPOptionName(15,
-			"Uri-Query");
-	public static final CoAPOptionName BLOCK2 = new CoAPOptionName(17, "Block2");
-	public static final CoAPOptionName BLOCK1 = new CoAPOptionName(19, "Block1");
-	// Added from draft-ietf-core-coap-08
-	public static final CoAPOptionName IF_NONE_MATCH = new CoAPOptionName(21,
-			"If-None-Match");
+    // gateway
+    public static final CoAPOptionName IF_MATCH = new CoAPOptionName(13,
+            "If-Match");
+    // New option header from draft-ietf-core-observe-03
+    public static final CoAPOptionName MAX_OFE = new CoAPOptionName(14,
+            "Max-OFE");
+    public static final CoAPOptionName URI_QUERY = new CoAPOptionName(15,
+            "Uri-Query");
+    public static final CoAPOptionName BLOCK2 = new CoAPOptionName(17, "Block2");
+    public static final CoAPOptionName BLOCK1 = new CoAPOptionName(19, "Block1");
+    // Added from draft-ietf-core-coap-08
+    public static final CoAPOptionName IF_NONE_MATCH = new CoAPOptionName(21,
+            "If-None-Match");
 
-	private CoAPOptionName(int number, String name) {
-		this.number = number;
-		this.name = name;
-		options.add(this);
-	}
+    private CoAPOptionName(int number, String name) {
+        this.number = number;
+        this.name = name;
+        options.add(this);
+    }
 
-	public String getName() {
-		return this.name;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public int getNo() {
-		return this.number;
-	}
+    public int getNo() {
+        return this.number;
+    }
 
-	public static CoAPOptionName getOptionName(int no) {
-		for (int i = 0; i < options.size(); i++) {
-			CoAPOptionName n = (CoAPOptionName) options.get(i);
-			if (n.getNo() == no) {
-				return n;
-			}
-		}
+    public static CoAPOptionName getOptionName(int no) {
+        for (CoAPOptionName option : options) {
+            if (option.getNo() == no) {
+                return option;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public static CoAPOptionName getOptionNo(String name) {
-		
-		for (int i = 0; i < options.size(); i++) {
-			CoAPOptionName n = (CoAPOptionName) options.get(i);
-			if (n.getName().equals(name)) {
-				return n;
-			}
-		}
+    public static CoAPOptionName getOptionNo(String name) {
+        for (CoAPOptionName option : options) {
+            if (option.getName().equals(name)) {
+                return option;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public String toString() {
-		return number + ", " + name;
-	}
+    @Override
+    public String toString() {
+        return number + ", " + name;
+    }
 }

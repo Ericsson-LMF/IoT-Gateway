@@ -47,76 +47,74 @@ import com.ericsson.deviceaccess.coap.basedriver.util.NetUtil;
  */
 public class CoAPEndpointFactory {
 
-	private static CoAPEndpointFactory coapEndpointFactory;
-	private LocalCoAPEndpoint localEndpoint;
+    private static CoAPEndpointFactory coapEndpointFactory;
+    private LocalCoAPEndpoint localEndpoint;
 
-	/**
-	 * Constructor is private, use getInstance method to get an instance of the
-	 * factory.
-	 */
-	private CoAPEndpointFactory() {
-		localEndpoint = null;
-	}
+    /**
+     * Constructor is private, use getInstance method to get an instance of the
+     * factory.
+     */
+    private CoAPEndpointFactory() {
+        localEndpoint = null;
+    }
 
-	/**
-	 * Returns a singleton instance of this factory. Creates a new one if one
-	 * doesn't exist, or if one already exists, returns that one.
-	 * 
-	 * @return a singleton instance of the CoAPEndpointFactory
-	 */
-	public static synchronized CoAPEndpointFactory getInstance() {
-		if (coapEndpointFactory == null) {
-			coapEndpointFactory = new CoAPEndpointFactory();
-		}
-		return coapEndpointFactory;
-	}
+    /**
+     * Returns a singleton instance of this factory. Creates a new one if one
+     * doesn't exist, or if one already exists, returns that one.
+     *
+     * @return a singleton instance of the CoAPEndpointFactory
+     */
+    public static synchronized CoAPEndpointFactory getInstance() {
+        if (coapEndpointFactory == null) {
+            coapEndpointFactory = new CoAPEndpointFactory();
+        }
+        return coapEndpointFactory;
+    }
 
-	/**
-	 * Returns a singleton instance of the LocalCoAPEndpoint
-	 * 
-	 * @return singleton instance of the LocalCoAPEndpoint
-	 */
-	public LocalCoAPEndpoint createLocalCoAPEndpoint(
-			OutgoingMessageHandler outgoingHandler,
-			IncomingMessageHandler incomingHandler, InetAddress address,
-			int port) throws CoAPException {
-		if (address == null) {
-			address = NetUtil.getMyInetAddress(NetUtil.ADDR_SCOPE_PRIORITISED_IPV6);
-		}
-		if (localEndpoint == null) {
-			synchronized (this) {
-				if (this.localEndpoint == null) {
-					String hostAddress = address.getHostAddress();
-					try {
-						URI uri = new URI(null, null, hostAddress, port, null,
-								null, null);
-						localEndpoint = new LocalCoAPEndpoint(outgoingHandler,
-								incomingHandler, uri);
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
-						throw new CoAPException(e);
-					}
-				}
-			}
-		}
-		return localEndpoint;
-	}
+    /**
+     * Returns a singleton instance of the LocalCoAPEndpoint
+     *
+     * @return singleton instance of the LocalCoAPEndpoint
+     */
+    public LocalCoAPEndpoint createLocalCoAPEndpoint(
+            OutgoingMessageHandler outgoingHandler,
+            IncomingMessageHandler incomingHandler, InetAddress address,
+            int port) throws CoAPException {
+        if (address == null) {
+            address = NetUtil.getMyInetAddress(NetUtil.ADDR_SCOPE_PRIORITISED_IPV6);
+        }
+        synchronized (this) {
+            if (this.localEndpoint == null) {
+                String hostAddress = address.getHostAddress();
+                try {
+                    URI uri = new URI(null, null, hostAddress, port, null,
+                            null, null);
+                    localEndpoint = new LocalCoAPEndpoint(outgoingHandler,
+                            incomingHandler, uri);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                    throw new CoAPException(e);
+                }
+            }
+        }
+        return localEndpoint;
+    }
 
-	/**
-	 * Get the local endpoint. Returns null, if no endpoint has been created
-	 * yet.
-	 * 
-	 * @return local endpoint or null if no endpoint has been created
-	 */
-	public LocalCoAPEndpoint getLocalCoAPEndpoint() {
-		return localEndpoint;
-	}
+    /**
+     * Get the local endpoint. Returns null, if no endpoint has been created
+     * yet.
+     *
+     * @return local endpoint or null if no endpoint has been created
+     */
+    public LocalCoAPEndpoint getLocalCoAPEndpoint() {
+        return localEndpoint;
+    }
 
-	/**
-	 * This method is called when the bundle is stopped. The local endpoint will
-	 * be set to null.
-	 */
-	public static synchronized void stopService() {
-		coapEndpointFactory.localEndpoint = null;
-	}
+    /**
+     * This method is called when the bundle is stopped. The local endpoint will
+     * be set to null.
+     */
+    public static synchronized void stopService() {
+        coapEndpointFactory.localEndpoint = null;
+    }
 }

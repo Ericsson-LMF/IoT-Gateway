@@ -37,7 +37,7 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 public class CoAPUtil {
 	
 	public static long getBlockSize(long szx) {
-		Double blockSizeDouble = new Double(Math.pow(2, (szx + 4)));
+		Double blockSizeDouble = Math.pow(2, (szx + 4));
 		return blockSizeDouble.longValue();
 	}
 }

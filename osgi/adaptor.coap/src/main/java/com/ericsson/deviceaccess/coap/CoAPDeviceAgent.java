@@ -40,6 +40,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPRemoteEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPService;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
@@ -49,6 +50,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObser
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -69,7 +71,6 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
     private ServiceRegistration devReg;
     private CoAPService coapService;
     private CoAPDevice coap;
-    private CoAPResource resource;
     private String path = "";
 
     public CoAPDeviceAgent(BundleContext bc, CoAPRemoteEndpoint endpoint) {
@@ -77,15 +78,11 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
         //this.log = log;
 
         // Create an iterator to iterate through the resources a device might have attached to it
-        Iterator<Entry<URI, CoAPResource>> it = endpoint.getResources().entrySet().iterator();
-        it.forEachRemaining(entry -> {
-            URI uri = entry.getKey();
-            CoAPResource rsc = entry.getValue();
-
+        endpoint.getResources().keySet().forEach(uri -> {
             // Check for known resources. This is one of the attributes of the GDA:
             // The matching between the device's resources and the service schemas
             // is currently statically defined.
-            switch (rsc.getUri().getPath()) {
+            switch (uri.getPath()) {
                 case "/weatherResource":
                     System.out.println("[CoAPDeviceAgent]: FOUND WEATHER RESOURCE!");
                     // When a known resource is detected, create a CoAPDevice and attach the resource
@@ -98,15 +95,12 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
                         if (reference != null) {
                             coapService = context.getService(reference);
                         } else {
-                            //this.log
-                            //      .warn("Could still not fetch a reference to CoAPService");
+                            //this.log.warn("Could still not fetch a reference to CoAPService");
                         }
 
                         // Extract the details of the resource from the CoAPResource object
-                        path = rsc.getUri().getPath();
-                        CoAPRequest req = coapService.createGetRequest(rsc.getUri()
-                                .getHost(), rsc.getUri().getPort(),
-                                path, CoAPMessage.CoAPMessageType.CONFIRMABLE);
+                        path = uri.getPath();
+                        CoAPRequest req = getRequest(uri, CoAPMessageType.CONFIRMABLE);
                         // Create inner classes to handle possible responses to CoAP request
                         req.setListener(new CoAPAgentListener());
                         // Below commented out as CoAP can only handle one request at a time
@@ -125,7 +119,7 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
                     coap = new CoAPDevice(uri);
                     coap.putService(new HelloWorldImpl(coap));
                     try {
-                        createObservationRelationShip();
+                        createObservationRelationShip(uri);
                     } catch (CoAPException e) {
                         System.out.println("an exception has occurred");
                     }
@@ -134,11 +128,11 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
         });
     }
 
-    private void createObservationRelationShip() throws CoAPException {
+    private void createObservationRelationShip(URI uri) throws CoAPException {
         // Create Observation relationship between device and the GDA adaptor/basedriver
         path = "helloWorld";
         System.out.println("***** SEND OBSERVE REQUEST *****");
-        coapService.createObservationRelationship(resource.getUri().getHost(), resource.getUri().getPort(), path, this);
+        coapService.createObservationRelationship(uri.getHost(), uri.getPort(), path, this);
     }
 
     public void observeTerminationReceived(CoAPResource resource) {
@@ -210,6 +204,10 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
 
     public void resetResponseReceived(CoAPResponse resp, CoAPRequest req) {
         //TODO
+    }
+
+    private CoAPRequest getRequest(URI uri, CoAPMessageType type) throws CoAPException {
+        return coapService.createGetRequest(uri.getHost(), uri.getPort(), uri.getPath(), type);
     }
 
     private class CoAPAgentListener implements CoAPRequestListener {

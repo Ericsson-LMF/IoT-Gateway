@@ -82,10 +82,7 @@ public class TokenGenerator {
 				// shift every round 8 to left
 				hash = hash << 8 | md5hash[i] & 0x00000000000000FFL;
 			}
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			throw new CoAPException(e.getMessage());
-		} catch (UnsupportedEncodingException e) {
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 			throw new CoAPException(e.getMessage());
 		}

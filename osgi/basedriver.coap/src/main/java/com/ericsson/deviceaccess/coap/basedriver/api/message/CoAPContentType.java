@@ -34,7 +34,8 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is to represent the CoAP content types as defined in the coap core
@@ -46,7 +47,7 @@ public class CoAPContentType {
 
     private final int no;
     private final String contentType;
-    private static final Vector values = new Vector();
+    private static final List<CoAPContentType> values = new ArrayList<>();
 
     public static final CoAPContentType TEXT_PLAIN = new CoAPContentType(0,
             "text/plain; charset=utf-8");
@@ -82,20 +83,18 @@ public class CoAPContentType {
     }
 
     public static CoAPContentType getContentTypeNumber(String name) {
-        for (Object value : values) {
-            CoAPContentType c = (CoAPContentType) value;
-            if (c.getContentType() == null ? name == null : c.getContentType().equals(name)) {
-                return c;
+        for (CoAPContentType value : values) {
+            if (value.getContentType() == null ? name == null : value.getContentType().equals(name)) {
+                return value;
             }
         }
         return null;
     }
 
     public static CoAPContentType getContentTypeName(int no) {
-        for (Object value : values) {
-            CoAPContentType c = (CoAPContentType) value;
-            if (c.getNo() == no) {
-                return c;
+        for (CoAPContentType value : values) {
+            if (value.getNo() == no) {
+                return value;
             }
         }
         return null;

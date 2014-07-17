@@ -39,7 +39,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageHandler;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.LocalCoAPEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.OutgoingMessageHandler;
-import com.ericsson.deviceaccess.coap.basedriver.util.Compat;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,7 +46,7 @@ import java.util.Set;
 
 public class CoAPExtEndpoint extends LocalCoAPEndpoint {
 
-    static final private String THIS_CLASS_NAME = Compat.getSimpleName(CoAPExtEndpoint.class);
+    static final private String THIS_CLASS_NAME = CoAPExtEndpoint.class.getSimpleName();
 
     //final private LogTracker logger;
     final private Set reqListenerSet;

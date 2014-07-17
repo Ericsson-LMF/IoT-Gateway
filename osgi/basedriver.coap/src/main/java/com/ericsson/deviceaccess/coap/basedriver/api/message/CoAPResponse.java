@@ -42,109 +42,101 @@ import java.util.LinkedList;
  */
 public class CoAPResponse extends CoAPMessage {
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param version
-	 *            CoAP version of the response
-	 * @param messageType
-	 *            type of the message
-	 * @param responseCode
-	 *            code of the message
-	 * @param messageId
-	 *            message ID
-	 */
-	public CoAPResponse(int version, CoAPMessageType messageType,
-			int responseCode, int messageId) {
-		super(version, messageType, responseCode, messageId);
-	}
+    /**
+     * Constructor.
+     *
+     * @param version CoAP version of the response
+     * @param messageType type of the message
+     * @param responseCode code of the message
+     * @param messageId message ID
+     */
+    public CoAPResponse(int version, CoAPMessageType messageType,
+            int responseCode, int messageId) {
+        super(version, messageType, responseCode, messageId);
+    }
 
-	/**
-	 * Constructor that will use draft-core-07 version by default
-	 * 
-	 * @param messageType
-	 * @param responseCode
-	 * @param messageId
-	 */
-	public CoAPResponse(CoAPMessageType messageType, int responseCode,
-			int messageId) {
-		super(messageType, responseCode, messageId);
-	}
+    /**
+     * Constructor that will use draft-core-07 version by default
+     *
+     * @param messageType
+     * @param responseCode
+     * @param messageId
+     */
+    public CoAPResponse(CoAPMessageType messageType, int responseCode,
+            int messageId) {
+        super(messageType, responseCode, messageId);
+    }
 
-	/**
-	 * Create an empty ack for a response (empty ACKs are handled as a response)
-	 * 
-	 * @return empty ACK for this response
-	 */
-	public CoAPResponse createAcknowledgement() {
+    /**
+     * Create an empty ack for a response (empty ACKs are handled as a response)
+     *
+     * @return empty ACK for this response
+     */
+    public CoAPResponse createAcknowledgement() {
 
-		CoAPResponse resp = new CoAPResponse(1,
-				CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
+        CoAPResponse resp = new CoAPResponse(1,
+                CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
 
-		LinkedList headers = this.getOptionHeaders();
-		Iterator it = headers.iterator();
+        LinkedList headers = this.getOptionHeaders();
+        Iterator it = headers.iterator();
 
-		while (it.hasNext()) {
-			CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+        while (it.hasNext()) {
+            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
 
-			if (header.getOptionName() == CoAPOptionName.TOKEN.getName()) {
-				resp.addOptionHeader(header);
-				break;
-			}
-		}
+            if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
+                resp.addOptionHeader(header);
+                break;
+            }
+        }
 
-		resp.setSocketAddress(getSocketAddress());
-		return resp;
-	}
+        resp.setSocketAddress(getSocketAddress());
+        return resp;
+    }
 
-	/**
-	 * Create an empty reset message based on the received response. A reset
-	 * message needs to be sent back if the received response cannot be handled
-	 * by the endpoint.
-	 * 
-	 * @return a CoAP RST response for this CoAP response
-	 */
-	public CoAPResponse createReset() {
+    /**
+     * Create an empty reset message based on the received response. A reset
+     * message needs to be sent back if the received response cannot be handled
+     * by the endpoint.
+     *
+     * @return a CoAP RST response for this CoAP response
+     */
+    public CoAPResponse createReset() {
 
-		CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0,
-				this.getMessageId());
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0,
+                this.getMessageId());
 
-		LinkedList headers = this.getOptionHeaders();
-		Iterator it = headers.iterator();
+        LinkedList headers = this.getOptionHeaders();
+        Iterator it = headers.iterator();
 
-		while (it.hasNext()) {
-			CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+        while (it.hasNext()) {
+            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
 
-			if (header.getOptionName() == CoAPOptionName.TOKEN.getName()) {
-				resp.addOptionHeader(header);
-				break;
-			}
-		}
+            if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
+                resp.addOptionHeader(header);
+                break;
+            }
+        }
 
-		resp.setSocketAddress(getSocketAddress());
-		return resp;
-	}
+        resp.setSocketAddress(getSocketAddress());
+        return resp;
+    }
 
-	public boolean isCacheable() {
+    public boolean isCacheable() {
 		// Draft 07
 
-		// 2.03 valid
-		if (this.getCode() == 67) {
-			return true;
-		}
-		// 2.05 content
-		if (this.getCode() == 69) {
-			return true;
-		}
-		// 4.xx
-		if (this.getCode() >= 128 && this.getCode() <= 143) {
-			return true;
-		}
-		// 5.xx
-		if (this.getCode() >= 160 && this.getCode() <= 165) {
-			return true;
-		}
-
-		return false;
-	}
+        // 2.03 valid
+        if (this.getCode() == 67) {
+            return true;
+        }
+        // 2.05 content
+        if (this.getCode() == 69) {
+            return true;
+        }
+        // 4.xx
+        if (this.getCode() >= 128 && this.getCode() <= 143) {
+            return true;
+        }
+        // 5.xx
+        return this.getCode() >= 160 && this.getCode() <= 165;
+    }
 }

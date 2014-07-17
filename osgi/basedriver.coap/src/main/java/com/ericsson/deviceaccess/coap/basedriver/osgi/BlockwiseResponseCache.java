@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -55,198 +54,192 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 
 public class BlockwiseResponseCache {
 
-	final private Map cache = new HashMap();
-	final private long cacheTime;
-	final private Timer timer;
-	
-	class SessionKey {
+    final private Map<SessionKey, SessionData> cache = new HashMap<>();
+    final private long cacheTime;
+    final private Timer timer;
 
-		final private InetSocketAddress clientAddress;
-		final private URI resourceUri;
-		final private List queryStrings; // List<String>
+    class SessionKey {
 
-		SessionKey(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-			this.clientAddress = clientAddress;
-			this.resourceUri = resourceUri;
-			this.queryStrings = queryHeaders;
-			Collections.sort(this.queryStrings);
-		}
+        final private InetSocketAddress clientAddress;
+        final private URI resourceUri;
+        final private List queryStrings; // List<String>
+
+        SessionKey(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
+            this.clientAddress = clientAddress;
+            this.resourceUri = resourceUri;
+            this.queryStrings = queryHeaders;
+            Collections.sort(this.queryStrings);
+        }
 
 		// XXX: Should we check both address and port, or only address?
-		// If source port always change packet by packet, this cache doesn't work at all.
-		
-		//@Override
-		public boolean equals(Object obj) {
-			if (obj == null) {
-				return false;
-			}
-			if (this == obj) {
-				return true;
-			}
-			if (!(obj instanceof SessionKey)) {
-				return false;
-			}
-			SessionKey target = (SessionKey)obj;
-				
-			return
-					(((this.clientAddress == null) && (target.clientAddress == null)) ||
-					 ((this.clientAddress != null) && (this.clientAddress.equals(target.clientAddress)))) &&
-					(((this.resourceUri == null) && (target.resourceUri == null)) ||
-					 ((this.resourceUri != null) && (this.resourceUri.equals(target.resourceUri)))) &&
-					(((this.queryStrings == null) && (target.queryStrings == null)) ||
-					 ((this.queryStrings != null) && (this.queryStrings.equals(target.queryStrings))));
-		}
+        // If source port always change packet by packet, this cache doesn't work at all.
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof SessionKey)) {
+                return false;
+            }
+            SessionKey target = (SessionKey) obj;
 
-		//@Override
-		public int hashCode()
-		{
-			int value = 1;
-			
-			value += value * 31 + ((clientAddress != null) ? clientAddress.hashCode() : Void.class.hashCode());
-			value += value * 31 + ((resourceUri != null) ? resourceUri.hashCode() : Void.class.hashCode());
-			value += value * 31 + ((queryStrings != null) ? queryStrings.hashCode() : Void.class.hashCode());
-			
-			return value;
-		}
-	}
+            return (((this.clientAddress == null) && (target.clientAddress == null))
+                    || ((this.clientAddress != null) && (this.clientAddress.equals(target.clientAddress))))
+                    && (((this.resourceUri == null) && (target.resourceUri == null))
+                    || ((this.resourceUri != null) && (this.resourceUri.equals(target.resourceUri))))
+                    && (((this.queryStrings == null) && (target.queryStrings == null))
+                    || ((this.queryStrings != null) && (this.queryStrings.equals(target.queryStrings))));
+        }
 
-	class SessionData {
-		
-		final private SessionKey key;
-		final private byte[] payload;
-		final private int responseCode;
-		
-		private TimerTask timerTask = null;
-		
-		public SessionData(SessionKey key, byte[] payload, int responseCode) {
-			this.key = key;
-			this.payload = payload;
-			this.responseCode = responseCode;
-		}
-		
-		public SessionKey getSessionKey() {
-			return this.key;
-		}
-		
-		// Never change payload !!
-		public byte[] getPayload() {
-			return this.payload;
-			// return (byte[])this.payload.clone();
-		}
-		
-		public int getResponseCode() {
-			return this.responseCode;
-		}
+        @Override
+        public int hashCode() {
+            int value = 1;
 
-		synchronized public void startTimer() {
-			this.stopTimer();
-			
-			this.timerTask = new TimerTask() {
-				public void run() {
-					synchronized (cache) {
-						cache.remove(key);
-					}
-				}				
-			};
-			timer.schedule(this.timerTask, cacheTime);
-		}
-		
-		synchronized public void stopTimer() {
-			if (this.timerTask != null) {
-				this.timerTask.cancel();
-				this.timerTask = null;
-			}
-		}		
-	}
-	
-	public BlockwiseResponseCache(long cacheTime) {
-		this.cacheTime = cacheTime;
-		this.timer = new Timer();
-	}
-	
-	public void cleanup() {
-		synchronized (cache) {
-			Collection sessions = cache.values();
-			for (Iterator it = sessions.iterator(); it.hasNext(); ) {
-				SessionData session = (SessionData)it.next();
-				session.stopTimer();
-			}
-			cache.clear();
-		}
-	}
+            value += value * 31 + ((clientAddress != null) ? clientAddress.hashCode() : Void.class.hashCode());
+            value += value * 31 + ((resourceUri != null) ? resourceUri.hashCode() : Void.class.hashCode());
+            value += value * 31 + ((queryStrings != null) ? queryStrings.hashCode() : Void.class.hashCode());
 
-	public void put(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders, byte[] payload, int responseCode) {
-		synchronized (cache) {
-			SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
-			SessionData data = new SessionData(key, payload, responseCode);
-			
-			SessionData oldData = (SessionData)cache.get(key);
-			if (oldData != null) {
-				oldData.stopTimer();
-			}
-			
-			this.cache.put(key, data);
-		}
-	}
+            return value;
+        }
+    }
 
-	public void put(CoAPRequest request, CoAPResponse response) throws CoAPException {
-		this.put(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request), response.getPayload(), response.getCode());
-	}
+    class SessionData {
 
-	public SessionData get(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-		synchronized (cache) {
-			return (SessionData)cache.get(new SessionKey(clientAddress, resourceUri, queryHeaders));
-		}
-	}
+        final private SessionKey key;
+        final private byte[] payload;
+        final private int responseCode;
 
-	public SessionData get(CoAPRequest request) throws CoAPException {
-		return this.get(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
-	}
-	
-	public void remove(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-		synchronized (cache) {
-			SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
-			SessionData data = (SessionData)cache.get(key);
-			if (data != null) {
-				data.stopTimer();
-			}
-			cache.remove(key);
-		}
-	}
-	
-	public void remove(CoAPRequest request) throws CoAPException {
-		this.remove(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
-	}
+        private TimerTask timerTask = null;
 
-	public void updateTimer(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-		synchronized (cache) {
-			SessionData data = this.get(clientAddress, resourceUri, queryHeaders);
-			if (data != null) {
-				data.startTimer();
-			}
-		}
-	}
+        public SessionData(SessionKey key, byte[] payload, int responseCode) {
+            this.key = key;
+            this.payload = payload;
+            this.responseCode = responseCode;
+        }
 
-	public void updateTimer(CoAPRequest request) throws CoAPException {
-		this.updateTimer(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
-	}
+        public SessionKey getSessionKey() {
+            return this.key;
+        }
 
-	static private List getQueryStrings(CoAPRequest request) {
-		List queryStrings = new Vector();
-		
-		List queryHeaders = request.getOptionHeaders(CoAPOptionName.URI_QUERY);
-		if (queryHeaders == null) {
-			return queryStrings;
-		}
-		for (Iterator it = queryHeaders.iterator(); it.hasNext(); ) {
-			CoAPOptionHeader header = (CoAPOptionHeader)it.next();
-			byte[] value = header.getValue();
-			if (value != null) {
-				queryStrings.add(new String(value));
-			}
-		}
-		
-		return queryStrings;
-		
-	}
+        // Never change payload !!
+        public byte[] getPayload() {
+            return this.payload;
+            // return (byte[])this.payload.clone();
+        }
+
+        public int getResponseCode() {
+            return this.responseCode;
+        }
+
+        synchronized public void startTimer() {
+            this.stopTimer();
+
+            this.timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (cache) {
+                        cache.remove(key);
+                    }
+                }
+            };
+            timer.schedule(this.timerTask, cacheTime);
+        }
+
+        synchronized public void stopTimer() {
+            if (this.timerTask != null) {
+                this.timerTask.cancel();
+                this.timerTask = null;
+            }
+        }
+    }
+
+    public BlockwiseResponseCache(long cacheTime) {
+        this.cacheTime = cacheTime;
+        this.timer = new Timer();
+    }
+
+    public void cleanup() {
+        synchronized (cache) {
+            cache.values().forEach(session -> session.stopTimer());
+            cache.clear();
+        }
+    }
+
+    public void put(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders, byte[] payload, int responseCode) {
+        synchronized (cache) {
+            SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
+            SessionData data = new SessionData(key, payload, responseCode);
+
+            SessionData oldData = cache.get(key);
+            if (oldData != null) {
+                oldData.stopTimer();
+            }
+
+            this.cache.put(key, data);
+        }
+    }
+
+    public void put(CoAPRequest request, CoAPResponse response) throws CoAPException {
+        this.put(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request), response.getPayload(), response.getCode());
+    }
+
+    public SessionData get(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
+        synchronized (cache) {
+            return cache.get(new SessionKey(clientAddress, resourceUri, queryHeaders));
+        }
+    }
+
+    public SessionData get(CoAPRequest request) throws CoAPException {
+        return this.get(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
+    }
+
+    public void remove(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
+        synchronized (cache) {
+            SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
+            SessionData data = cache.get(key);
+            if (data != null) {
+                data.stopTimer();
+            }
+            cache.remove(key);
+        }
+    }
+
+    public void remove(CoAPRequest request) throws CoAPException {
+        this.remove(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
+    }
+
+    public void updateTimer(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
+        synchronized (cache) {
+            SessionData data = this.get(clientAddress, resourceUri, queryHeaders);
+            if (data != null) {
+                data.startTimer();
+            }
+        }
+    }
+
+    public void updateTimer(CoAPRequest request) throws CoAPException {
+        this.updateTimer(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
+    }
+
+    static private List getQueryStrings(CoAPRequest request) {
+        List queryStrings = new Vector();
+
+        List queryHeaders = request.getOptionHeaders(CoAPOptionName.URI_QUERY);
+        if (queryHeaders == null) {
+            return queryStrings;
+        }
+        for (Iterator it = queryHeaders.iterator(); it.hasNext();) {
+            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+            byte[] value = header.getValue();
+            if (value != null) {
+                queryStrings.add(new String(value));
+            }
+        }
+
+        return queryStrings;
+
+    }
 }

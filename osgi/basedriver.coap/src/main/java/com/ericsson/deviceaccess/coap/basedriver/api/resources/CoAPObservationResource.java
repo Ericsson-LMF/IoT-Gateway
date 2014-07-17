@@ -37,7 +37,6 @@ package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 import java.net.URI;
 import java.util.Date;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 
 /**
  * This is class for representing the resources related to observation
