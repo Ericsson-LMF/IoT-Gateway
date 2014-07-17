@@ -61,7 +61,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
 
     private IncomingCoAPListener incomingCoAPListener;
 
-	// Keep track of incoming messages with socket address (toString) + message
+    // Keep track of incoming messages with socket address (toString) + message
     // ID as key, these are used for detecting duplicate incoming messages
     final private HashMap incomingRequests;
     final private HashMap incomingResponses;
@@ -97,7 +97,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
 
         CoAPMessageReader handler = new CoAPMessageReader(datagram);
         CoAPMessage msg = handler.decode();
-		// log each message
+        // log each message
 
         /*
          String msgStr = "*** Incoming CoAP message ***\n"
@@ -112,7 +112,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
          }
          */
         if (datagram.getLength() == 1281) {
-			// response with a 4.13 entity too large
+            // response with a 4.13 entity too large
 			/*CoAPActivator.logger
              .debug("Too large datagram received, reply with a 4.13 response");
              */
@@ -138,7 +138,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
             return;
         }
 
-		// If there are unrecognized options, reply with a reset message for
+        // If there are unrecognized options, reply with a reset message for
         // confirmable response and 4.02 response to a confirmable request
         // (fraft-ietf-core-coap-08)
         if ((msg.getMessageType() == CoAPMessageType.CONFIRMABLE)
@@ -192,7 +192,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
      * @param resp
      */
     private void handleResponse(CoAPResponse resp) throws CoAPException {
-		// On messaging level, check for duplicates based on message ID + IP
+        // On messaging level, check for duplicates based on message ID + IP
         // check the received responses
 
         /*
@@ -230,7 +230,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
             return;
         }
 
-		// No duplicate was found so this is a new incoming response. Stop
+        // No duplicate was found so this is a new incoming response. Stop
         // retransmission task.
         OutgoingMessageHandler outgoingMessageHandler = this.incomingCoAPListener
                 .getOutgoingMessageHandler();
@@ -240,7 +240,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         CoAPRequest sentRequest = (CoAPRequest) outgoingRequests.get(resp
                 .getIdentifier());
 
-		// Message ID will be different if this is a separate response (tokens
+        // Message ID will be different if this is a separate response (tokens
         // will match with the request)
         // If a match for the incoming response was found
         if (sentRequest != null) {

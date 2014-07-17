@@ -56,7 +56,7 @@ public interface TransportLayerReceiver {
      *
      * @param listener
      * @return true, if the given listener was successfully removed, false
-     *         otherwise
+     * otherwise
      */
     public boolean removeListener(IncomingMessageListener listener);
 

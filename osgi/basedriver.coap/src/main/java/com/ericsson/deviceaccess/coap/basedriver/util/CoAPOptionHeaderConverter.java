@@ -101,7 +101,7 @@ public class CoAPOptionHeaderConverter {
                 BlockOptionHeader b = new BlockOptionHeader(header);
 
                 long longValue = this.convertIntToUnsignedLong(header);
-				// More details for debug (Ryoji)
+                // More details for debug (Ryoji)
                 //value = Long.toString(longValue);
                 long num = (longValue >> 4);
                 long m = (longValue >> 3) & 0x1L;

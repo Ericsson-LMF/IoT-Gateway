@@ -34,9 +34,14 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,12 +50,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 
 public class BlockwiseResponseCache {
 
@@ -62,16 +61,16 @@ public class BlockwiseResponseCache {
 
         final private InetSocketAddress clientAddress;
         final private URI resourceUri;
-        final private List queryStrings; // List<String>
+        final private List<String> queryStrings;
 
-        SessionKey(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
+        SessionKey(InetSocketAddress clientAddress, URI resourceUri, List<String> queryHeaders) {
             this.clientAddress = clientAddress;
             this.resourceUri = resourceUri;
             this.queryStrings = queryHeaders;
             Collections.sort(this.queryStrings);
         }
 
-		// XXX: Should we check both address and port, or only address?
+        // XXX: Should we check both address and port, or only address?
         // If source port always change packet by packet, this cache doesn't work at all.
         @Override
         public boolean equals(Object obj) {
@@ -225,7 +224,7 @@ public class BlockwiseResponseCache {
     }
 
     static private List getQueryStrings(CoAPRequest request) {
-        List queryStrings = new Vector();
+        List<String> queryStrings = new ArrayList<>();
 
         List queryHeaders = request.getOptionHeaders(CoAPOptionName.URI_QUERY);
         if (queryHeaders == null) {

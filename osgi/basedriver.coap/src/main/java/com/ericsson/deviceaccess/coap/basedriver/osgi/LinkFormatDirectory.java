@@ -42,11 +42,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.DeviceInterface;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAPResourceType;
-
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class reads the resources received in the payload. It will notify the
@@ -58,7 +58,7 @@ import java.util.*;
 public class LinkFormatDirectory {
 
     // This keeps the already known endpoints
-    private HashMap refreshTasks;
+    private HashMap<URI, RemoteEndpointRefreshTask> refreshTasks;
     private Timer timer;
     private int resourceDiscoveryInterval;
 
@@ -94,7 +94,7 @@ public class LinkFormatDirectory {
      * Constructor.
      */
     public LinkFormatDirectory() {
-        this.refreshTasks = new HashMap();
+        this.refreshTasks = new HashMap<>();
         this.timer = new Timer();
     }
 
@@ -112,20 +112,12 @@ public class LinkFormatDirectory {
      *
      * @return return the list of remote end points (devices) known
      */
-    public List getKnownDevices() {
-
-        Iterator it = this.refreshTasks.keySet().iterator();
-
-        List endpoints = new LinkedList();
-
-        while (it.hasNext()) {
-            URI uri = (URI) it.next();
-            RemoteEndpointRefreshTask task = (RemoteEndpointRefreshTask) this.refreshTasks.get(uri);
-            CoAPRemoteEndpoint endpoint = task.getCoAPRemoteEndpoint();
-            endpoints.add(endpoint);
-        }
-
-        return endpoints;
+    public List<CoAPRemoteEndpoint> getKnownDevices() {
+        return refreshTasks
+                .values()
+                .stream()
+                .map(task -> task.getCoAPRemoteEndpoint())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -136,36 +128,31 @@ public class LinkFormatDirectory {
      * @throws CoAPException
      */
     public void handleResourceDiscoveryResponse(
-            List updatedResources, CoAPResponse resp)
+            List<CoAPResource> updatedResources, CoAPResponse resp)
             throws CoAPException {
 
         // Check first if this device is known
-        String serverHost = resp.getSocketAddress().getAddress()
-                .getCanonicalHostName();
+        String serverHost = resp.getSocketAddress().getAddress().getCanonicalHostName();
         int port = resp.getSocketAddress().getPort();
         CoAPRemoteEndpoint endpoint = null;
         try {
-            URI serverURI = new URI("coap", null, serverHost, port, null, null,
-                    null);
+            URI serverURI = new URI("coap", null, serverHost, port, null, null, null);
             Object[] services = CoAPActivator.tracker.getServices();
 
             // Notify about new devices
-            if (!this.refreshTasks.containsKey(serverURI)) {
+            if (!refreshTasks.containsKey(serverURI)) {
 
                 // This is a hack to figure out the type of the server
                 CoAPRemoteEndpointType type = CoAPRemoteEndpointType.OTHER;
-                if (updatedResources.size() > 0) {
-
-                    if (((CoAPResource) updatedResources.get(1)).getResourceType()
-                            .equals("\"SepararateResponseTester\"")) {
+                if (!updatedResources.isEmpty()) {
+                    if (updatedResources.get(1).getResourceType().equals("\"SepararateResponseTester\"")) {
                         type = CoAPRemoteEndpointType.CALIFORNIUM;
                     }
                 }
                 endpoint = new CoAPRemoteEndpoint(serverURI, type);
 
                 // Start a "freshness" timer for the endpoint:
-                RemoteEndpointRefreshTask task = new RemoteEndpointRefreshTask(
-                        serverURI, endpoint);
+                RemoteEndpointRefreshTask task = new RemoteEndpointRefreshTask(serverURI, endpoint);
                 this.refreshTasks.put(serverURI, task);
 
                 // Schedule tasks to remove the endpoint if no new information
@@ -173,13 +160,8 @@ public class LinkFormatDirectory {
                 int scheduled = (30 + this.resourceDiscoveryInterval) * 1000;
 
                 timer.schedule(task, scheduled);
-
-                Iterator it = updatedResources.iterator();
-
                 // New endpoint, all new resources
-                while (it.hasNext()) {
-
-                    CoAPResource res = (CoAPResource) it.next();
+                for (CoAPResource res : updatedResources) {
                     URI resourcePath = res.getUri();
 
                     InetSocketAddress address = resp.getSocketAddress();
@@ -192,8 +174,7 @@ public class LinkFormatDirectory {
 
                     // by default set the type to other
                     res.setCoAPResourceType(CoAPResourceType.OTHER);
-                    for (Iterator i = CoAPResourceType.getValues().iterator(); i.hasNext();) {
-                        CoAPResourceType resourceType = (CoAPResourceType) i.next();
+                    for (CoAPResourceType resourceType : CoAPResourceType.values()) {
                         if (resourceString.equals(resourceType.getPath())) {
                             res.setCoAPResourceType(resourceType);
                             break;
@@ -231,9 +212,8 @@ public class LinkFormatDirectory {
                 // cancel the refresh task and update the scheduled time for
                 // expiration
                 try {
-                    this.refreshTasks.remove(task);
+                    refreshTasks.remove(task.uri);
                     task.cancel();
-
                 } catch (IllegalStateException e) {
                     /*
                      CoAPActivator.logger
@@ -264,9 +244,9 @@ public class LinkFormatDirectory {
          + uri.toString()
          + "] for a discovery request, remove from cache");
          */
-        RemoteEndpointRefreshTask task = (RemoteEndpointRefreshTask) refreshTasks.get(uri);
+        RemoteEndpointRefreshTask task = refreshTasks.get(uri);
         task.cancel();
-        this.refreshTasks.remove(uri);
+        refreshTasks.remove(uri);
 
         // TODO call on the services that a server is removed!!
         if (services != null) {

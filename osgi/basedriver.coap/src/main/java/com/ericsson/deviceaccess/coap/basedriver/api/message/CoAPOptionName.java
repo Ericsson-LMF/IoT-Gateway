@@ -36,7 +36,6 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * This class represents the enums for different CoAP option headers.
@@ -45,52 +44,37 @@ import java.util.Vector;
  * draft-ietf-core-observe-03 and draft-ietf-core-block-03
  *
  */
-public class CoAPOptionName {
+public enum CoAPOptionName {
+
+    UNKNOWN(0, "unknown"),
+    CONTENT_TYPE(1, "Content-Type"),
+    MAX_AGE(2, "Max-Age"),
+    PROXY_URI(3, "Proxy-Uri"),
+    ETAG(4, "ETag"),
+    URI_HOST(5, "Uri-Host"),
+    LOCATION_PATH(6, "Location-Path"),
+    URI_PORT(7, "Uri-Port"),
+    LOCATION_QUERY(8, "Location-Query"),
+    URI_PATH(9, "Uri-Path"),
+    OBSERVE(10, "Observe"),
+    TOKEN(11, "Token"),
+    ACCEPT(12, "Accept"),
+    // The functionality by the If-Match header is not really handled by the gateway
+    IF_MATCH(13, "If-Match"),
+    // New option header from draft-ietf-core-observe-03
+    MAX_OFE(14, "Max-OFE"),
+    URI_QUERY(15, "Uri-Query"),
+    BLOCK2(17, "Block2"),
+    BLOCK1(19, "Block1"),
+    // Added from draft-ietf-core-coap-08
+    IF_NONE_MATCH(21, "If-None-Match");
 
     private final String name;
     private final int number;
-    private static final List<CoAPOptionName> options = new ArrayList<>(21);
-
-    public static final CoAPOptionName CONTENT_TYPE = new CoAPOptionName(1,
-            "Content-Type");
-    public static final CoAPOptionName MAX_AGE = new CoAPOptionName(2,
-            "Max-Age");
-    public static final CoAPOptionName PROXY_URI = new CoAPOptionName(3,
-            "Proxy-Uri");
-    public static final CoAPOptionName ETAG = new CoAPOptionName(4, "ETag");
-    public static final CoAPOptionName URI_HOST = new CoAPOptionName(5,
-            "Uri-Host");
-    public static final CoAPOptionName LOCATION_PATH = new CoAPOptionName(6,
-            "Location-Path");
-    public static final CoAPOptionName URI_PORT = new CoAPOptionName(7,
-            "Uri-Port");
-    public static final CoAPOptionName LOCATION_QUERY = new CoAPOptionName(8,
-            "Location-Query");
-    public static final CoAPOptionName URI_PATH = new CoAPOptionName(9,
-            "Uri-Path");
-    public static final CoAPOptionName OBSERVE = new CoAPOptionName(10,
-            "Observe");
-    public static final CoAPOptionName TOKEN = new CoAPOptionName(11, "Token");
-    public static final CoAPOptionName ACCEPT = new CoAPOptionName(12, "Accept");
-	// The functionality by the If-Match header is not really handled by the
-    // gateway
-    public static final CoAPOptionName IF_MATCH = new CoAPOptionName(13,
-            "If-Match");
-    // New option header from draft-ietf-core-observe-03
-    public static final CoAPOptionName MAX_OFE = new CoAPOptionName(14,
-            "Max-OFE");
-    public static final CoAPOptionName URI_QUERY = new CoAPOptionName(15,
-            "Uri-Query");
-    public static final CoAPOptionName BLOCK2 = new CoAPOptionName(17, "Block2");
-    public static final CoAPOptionName BLOCK1 = new CoAPOptionName(19, "Block1");
-    // Added from draft-ietf-core-coap-08
-    public static final CoAPOptionName IF_NONE_MATCH = new CoAPOptionName(21,
-            "If-None-Match");
 
     private CoAPOptionName(int number, String name) {
         this.number = number;
         this.name = name;
-        options.add(this);
     }
 
     public String getName() {
@@ -102,22 +86,20 @@ public class CoAPOptionName {
     }
 
     public static CoAPOptionName getOptionName(int no) {
-        for (CoAPOptionName option : options) {
+        for (CoAPOptionName option : CoAPOptionName.values()) {
             if (option.getNo() == no) {
                 return option;
             }
         }
-
         return null;
     }
 
     public static CoAPOptionName getOptionNo(String name) {
-        for (CoAPOptionName option : options) {
+        for (CoAPOptionName option : CoAPOptionName.values()) {
             if (option.getName().equals(name)) {
                 return option;
             }
         }
-
         return null;
     }
 

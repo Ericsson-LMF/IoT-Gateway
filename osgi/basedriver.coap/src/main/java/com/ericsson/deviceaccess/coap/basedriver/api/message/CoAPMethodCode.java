@@ -37,35 +37,18 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 /**
  * Method Codes defined in draft-ietf-core-coap-11
  */
-public class CoAPMethodCode {
-	
+public enum CoAPMethodCode {
 
-	final public int code;
-	final public String name;
-	
-	private CoAPMethodCode(int code, String name) {
-		this.code = code;
-		this.name = name;
-		
-		values[code] = this;
-	}
+    UNKNOWN,
+    GET,
+    POST,
+    PUT,
+    DELETE;
 
-	// 'values' must be initialized before creating instances of GET, POST...
-	static final private CoAPMethodCode[] values = new CoAPMethodCode[32];
-	
-	static final public CoAPMethodCode GET = new CoAPMethodCode(1, "GET");
-	static final public CoAPMethodCode POST = new CoAPMethodCode(2, "POST");
-	static final public CoAPMethodCode PUT = new CoAPMethodCode(3, "PUT");
-	static final public CoAPMethodCode DELETE = new CoAPMethodCode(4, "DELETE");
-	
-
-	static public String getName(int code) {
-		if ((code < 0) || (code >= values.length)) {
-			return null;
-		}
-		if (values[code] == null) {
-			return null;
-		}
-		return values[code].name;
-	}	
+    static public String getName(int code) {
+        if ((code <= 0) || (code >= CoAPMethodCode.values().length)) {
+            return null;
+        }
+        return CoAPMethodCode.values()[code].toString();
+    }
 }

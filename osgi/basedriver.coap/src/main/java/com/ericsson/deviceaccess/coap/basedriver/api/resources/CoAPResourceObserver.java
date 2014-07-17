@@ -44,31 +44,29 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
  */
 public interface CoAPResourceObserver {
 
-	/**
-	 * Callback method that is called when an observe response is received from
-	 * the server. Note that the CoAPRequest is going to be the original request
-	 * that the observation relationship was started with, and if there are
-	 * several observers, it will be the first request that was sent out.
-	 * 
-	 * @param response
-	 *            response from the CoAP network
-	 * @param resource
-	 *            resource to which the response is related to
-	 * @param request
-	 *            original request that triggered the observation relationship.
-	 */
-	public void observeResponseReceived(CoAPResponse response,
-			CoAPResource resource, CoAPRequest req);
+    /**
+     * Callback method that is called when an observe response is received from
+     * the server. Note that the CoAPRequest is going to be the original request
+     * that the observation relationship was started with, and if there are
+     * several observers, it will be the first request that was sent out.
+     *
+     * @param response response from the CoAP network
+     * @param resource resource to which the response is related to
+     * @param request original request that triggered the observation
+     * relationship.
+     */
+    public void observeResponseReceived(CoAPResponse response,
+            CoAPResource resource, CoAPRequest req);
 
-	/**
-	 * Callback method that is called when a response without observe header is
-	 * received from the server (e.g. server wants to handle it as normal GET
-	 * request)
-	 * 
-	 * @param response
-	 * @param resource
-	 */
-	public void observationRelationshipTerminated(CoAPResponse response,
-			CoAPObservationResource resource, CoAPRequest request);
+    /**
+     * Callback method that is called when a response without observe header is
+     * received from the server (e.g. server wants to handle it as normal GET
+     * request)
+     *
+     * @param response
+     * @param resource
+     */
+    public void observationRelationshipTerminated(CoAPResponse response,
+            CoAPObservationResource resource, CoAPRequest request);
 
 }

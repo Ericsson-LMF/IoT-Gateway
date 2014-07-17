@@ -50,33 +50,33 @@ import junit.framework.TestCase;
 
 public class BlockwiseResponseCacheTest extends TestCase {
 
-	public void testSessionInfo() {
-		BlockwiseResponseCache cache = new BlockwiseResponseCache(10000);
-		
-		List qs1 = new Vector();
-		List qs2 = new Vector();
-		
-		qs1.add("if=hehe");
-		qs1.add("rt=hoho");
-		
-		qs2.add("rt=hoho");
-		qs2.add("if=hehe");
-		
-		try {
-			InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 8080);
-			URI uri = new URI("coap://12.34.56.78:9999/");
-			cache.put(addr, uri, qs1, "Hello, world!".getBytes(), 32);
-			assertTrue(cache.get(addr, uri, qs2) != null);
-			
-			qs2.add("fbvjoisdj");
-			assertTrue(cache.get(addr, uri, qs2) == null);
-			
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    public void testSessionInfo() {
+        BlockwiseResponseCache cache = new BlockwiseResponseCache(10000);
+
+        List qs1 = new Vector();
+        List qs2 = new Vector();
+
+        qs1.add("if=hehe");
+        qs1.add("rt=hoho");
+
+        qs2.add("rt=hoho");
+        qs2.add("if=hehe");
+
+        try {
+            InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 8080);
+            URI uri = new URI("coap://12.34.56.78:9999/");
+            cache.put(addr, uri, qs1, "Hello, world!".getBytes(), 32);
+            assertTrue(cache.get(addr, uri, qs2) != null);
+
+            qs2.add("fbvjoisdj");
+            assertTrue(cache.get(addr, uri, qs2) == null);
+
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

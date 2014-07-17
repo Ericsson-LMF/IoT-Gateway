@@ -37,14 +37,15 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import com.ericsson.deviceaccess.coap.basedriver.util.TokenGenerator;
-
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class represents a CoAP request. A request is carried in a Confirmable
@@ -123,41 +124,32 @@ public class CoAPRequest extends CoAPMessage {
     public void createUriFromRequest(SocketAddress socketAddress)
             throws CoAPException {
         // Get URI path of the message
-        Iterator it = this.getOptionHeaders().iterator();
+
         String path = "";
         String host = "";
 
-        String pathParts = "";
+        StringBuilder pathParts = new StringBuilder();
         int port = 0;
-
-        while (it.hasNext()) {
-            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-
-            if (header.getOptionName().equals(CoAPOptionName.URI_PATH.getName())) {
+        for (CoAPOptionHeader header : this.getOptionHeaders()) {
+            String name = header.getOptionName();
+            if (name.equals(CoAPOptionName.URI_PATH.getName())) {
                 try {
                     String pathPart = new String(header.getValue(), "UTF8");
                     if (!pathPart.startsWith("/")) {
                         pathPart = "/" + pathPart;
                     }
-
-                    pathParts += pathPart;
-
+                    pathParts.append(pathPart);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
-            } else if (header.getOptionName().equals(CoAPOptionName.URI_HOST.getName())) {
+            } else if (name.equals(CoAPOptionName.URI_HOST.getName())) {
                 try {
                     host = new String(header.getValue(), "UTF8");
-
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-            } else if (header.getOptionName().equals(CoAPOptionName.URI_PORT
-                    .getName())) {
-
-                short shortInt = 0;
-                shortInt = BitOperations.mergeBytesToShort(header.getValue()[0],
+            } else if (name.equals(CoAPOptionName.URI_PORT.getName())) {
+                short shortInt = BitOperations.mergeBytesToShort(header.getValue()[0],
                         header.getValue()[1]);
                 port = shortInt & 0xFFFF;
             }
@@ -170,7 +162,6 @@ public class CoAPRequest extends CoAPMessage {
                 InetSocketAddress inetSocketAddr = (InetSocketAddress) socketAddress;
                 if (host.isEmpty()) {
                     host = inetSocketAddr.getAddress().toString();
-
                     if (host.startsWith("/")) {
                         host = host.substring(1);
                     }
@@ -185,8 +176,7 @@ public class CoAPRequest extends CoAPMessage {
             if (host == null || host.equals("")) {
                 throw new CoAPException("Host not defined");
             }
-
-            this.uri = new URI("coap", null, host, port, pathParts, null, null);
+            this.uri = new URI("coap", null, host, port, pathParts.toString(), null, null);
         } catch (URISyntaxException e) {
             e.printStackTrace();
             throw new CoAPException(e);
@@ -203,7 +193,7 @@ public class CoAPRequest extends CoAPMessage {
         // re-generate the URI always when the URI is tried to be accessed
         try {
             this.createUriFromRequest(this.getSocketAddress());
-			// If creating the uri throws an CoAPException, the host is not
+            // If creating the uri throws an CoAPException, the host is not
             // defined
         } catch (CoAPException e) {
             return null;
@@ -238,24 +228,21 @@ public class CoAPRequest extends CoAPMessage {
      *
      * @return
      */
-    public LinkedList optionsForMatching() {
-
-        LinkedList modified = (LinkedList) (getOptionHeaders().clone());
+    public List<CoAPOptionHeader> optionsForMatching() {
+        List<CoAPOptionHeader> modified = new ArrayList<>(getOptionHeaders());
 
         CoAPOptionHeader tokenHeader = null;
         CoAPOptionHeader maxAgeHeader = null;
 
-        LinkedList etagHeaders = new LinkedList();
+        List<CoAPOptionHeader> etagHeaders = new LinkedList();
 
-        for (Object modified1 : modified) {
-            CoAPOptionHeader header = (CoAPOptionHeader) modified1;
-            if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
+        for (CoAPOptionHeader header : modified) {
+            String name = header.getOptionName();
+            if (name.equals(CoAPOptionName.TOKEN.getName())) {
                 tokenHeader = header;
-            } else if (header.getOptionName().equals(
-                    CoAPOptionName.MAX_AGE.getName())) {
+            } else if (name.equals(CoAPOptionName.MAX_AGE.getName())) {
                 maxAgeHeader = header;
-            } else if (header.getOptionName().equals(
-                    CoAPOptionName.ETAG.getName())) {
+            } else if (name.equals(CoAPOptionName.ETAG.getName())) {
                 etagHeaders.add(header);
             }
         }
@@ -265,7 +252,7 @@ public class CoAPRequest extends CoAPMessage {
         if (maxAgeHeader != null) {
             modified.remove(maxAgeHeader);
         }
-        if (etagHeaders.size() > 0) {
+        if (!etagHeaders.isEmpty()) {
             modified.removeAll(etagHeaders);
         }
         return modified;

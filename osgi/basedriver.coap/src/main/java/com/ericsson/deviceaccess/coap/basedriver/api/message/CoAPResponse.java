@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class representing a CoAP response.
@@ -76,13 +77,7 @@ public class CoAPResponse extends CoAPMessage {
 
         CoAPResponse resp = new CoAPResponse(1,
                 CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
-
-        LinkedList headers = this.getOptionHeaders();
-        Iterator it = headers.iterator();
-
-        while (it.hasNext()) {
-            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-
+        for (CoAPOptionHeader header : this.getOptionHeaders()) {
             if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
                 resp.addOptionHeader(header);
                 break;
@@ -104,13 +99,7 @@ public class CoAPResponse extends CoAPMessage {
 
         CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0,
                 this.getMessageId());
-
-        LinkedList headers = this.getOptionHeaders();
-        Iterator it = headers.iterator();
-
-        while (it.hasNext()) {
-            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-
+        for (CoAPOptionHeader header : this.getOptionHeaders()) {
             if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
                 resp.addOptionHeader(header);
                 break;

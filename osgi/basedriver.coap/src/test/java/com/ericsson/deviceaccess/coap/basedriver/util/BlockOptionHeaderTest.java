@@ -48,205 +48,204 @@ import junit.framework.TestCase;
 
 public class BlockOptionHeaderTest extends TestCase {
 
-	private BlockwiseTransferHandler handler;
+    private BlockwiseTransferHandler handler;
 
-	public BlockOptionHeaderTest() {
-		super("BlockOptionHeaderTest");
+    public BlockOptionHeaderTest() {
+        super("BlockOptionHeaderTest");
 
-		/*Mockery context = new Mockery() {
-			{
-				setImposteriser(ClassImposteriser.INSTANCE);
-			}
-		};
+        /*Mockery context = new Mockery() {
+         {
+         setImposteriser(ClassImposteriser.INSTANCE);
+         }
+         };
 
-		final LocalCoAPEndpoint ep = context.mock(LocalCoAPEndpoint.class);
+         final LocalCoAPEndpoint ep = context.mock(LocalCoAPEndpoint.class);
 
-		handler = new BlockwiseTransferHandler(ep);*/
-	}
+         handler = new BlockwiseTransferHandler(ep);*/
+    }
 
-	public void test1ByteBlockOptionHeader() {
-		BlockOptionHeader blockOption = new BlockOptionHeader(
-				CoAPOptionName.BLOCK2, 0, false, 2);
-		assertEquals(blockOption.getBlockNumber(), 0);
-		assertEquals(blockOption.getSzx(), 2);
+    public void test1ByteBlockOptionHeader() {
+        BlockOptionHeader blockOption = new BlockOptionHeader(
+                CoAPOptionName.BLOCK2, 0, false, 2);
+        assertEquals(blockOption.getBlockNumber(), 0);
+        assertEquals(blockOption.getSzx(), 2);
 
-		assertFalse(blockOption.getMFlag());
-		assertEquals(1, blockOption.getLength());
-		blockOption = new BlockOptionHeader(CoAPOptionName.BLOCK1, 1, true, 2);
-		assertEquals(blockOption.getBlockNumber(), 1);
-		assertEquals(blockOption.getSzx(), 2);
+        assertFalse(blockOption.getMFlag());
+        assertEquals(1, blockOption.getLength());
+        blockOption = new BlockOptionHeader(CoAPOptionName.BLOCK1, 1, true, 2);
+        assertEquals(blockOption.getBlockNumber(), 1);
+        assertEquals(blockOption.getSzx(), 2);
 
-		assertTrue(blockOption.getMFlag());
-		assertEquals(1, blockOption.encode().length);
+        assertTrue(blockOption.getMFlag());
+        assertEquals(1, blockOption.encode().length);
 
-		CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.BLOCK1,
-				blockOption.encode());
-		BlockOptionHeader blockOpt = null;
-		try {
-			blockOpt = new BlockOptionHeader(h);
-			assertEquals(1, blockOpt.getBlockNumber());
-			assertTrue(blockOpt.getMFlag());
-			assertEquals(blockOpt.getSzx(), 2);
-		} catch (CoAPException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.BLOCK1,
+                blockOption.encode());
+        BlockOptionHeader blockOpt = null;
+        try {
+            blockOpt = new BlockOptionHeader(h);
+            assertEquals(1, blockOpt.getBlockNumber());
+            assertTrue(blockOpt.getMFlag());
+            assertEquals(blockOpt.getSzx(), 2);
+        } catch (CoAPException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
 
-		double largeDouble = 0;
-		for (int i = 0; i < 4; i++) {
-			largeDouble += Math.pow(2, i);
-		}
+        double largeDouble = 0;
+        for (int i = 0; i < 4; i++) {
+            largeDouble += Math.pow(2, i);
+        }
 
-		Double largeNum = new Double(largeDouble);
-		int maxBlockNumber = largeNum.intValue();
+        Double largeNum = new Double(largeDouble);
+        int maxBlockNumber = largeNum.intValue();
 
-		int szx = 4;
+        int szx = 4;
 
-		blockOption = new BlockOptionHeader(CoAPOptionName.BLOCK1,
-				maxBlockNumber, true, szx);
+        blockOption = new BlockOptionHeader(CoAPOptionName.BLOCK1,
+                maxBlockNumber, true, szx);
 
-		assertEquals(blockOption.getBlockNumber(), maxBlockNumber);
-		assertEquals(blockOption.getSzx(), szx);
-		assertTrue(blockOption.getMFlag());
-		assertEquals(1, blockOption.encode().length);
+        assertEquals(blockOption.getBlockNumber(), maxBlockNumber);
+        assertEquals(blockOption.getSzx(), szx);
+        assertTrue(blockOption.getMFlag());
+        assertEquals(1, blockOption.encode().length);
 
-		h = new CoAPOptionHeader(CoAPOptionName.BLOCK1, blockOption.encode());
+        h = new CoAPOptionHeader(CoAPOptionName.BLOCK1, blockOption.encode());
 
-		try {
-			blockOpt = new BlockOptionHeader(h);// handler.decodeBlockOption(h);
-			assertEquals(maxBlockNumber, blockOpt.getBlockNumber());
-			assertTrue(blockOpt.getMFlag());
-			assertEquals(blockOpt.getSzx(), szx);
-		} catch (CoAPException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
+        try {
+            blockOpt = new BlockOptionHeader(h);// handler.decodeBlockOption(h);
+            assertEquals(maxBlockNumber, blockOpt.getBlockNumber());
+            assertTrue(blockOpt.getMFlag());
+            assertEquals(blockOpt.getSzx(), szx);
+        } catch (CoAPException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
 
-	public void test2ByteBlockOptionHeader() {
+    public void test2ByteBlockOptionHeader() {
 
-		// Set the block number the maximum
-		double largeDouble = 0;
-		for (int i = 0; i < 12; i++) {
-			largeDouble += Math.pow(2, i);
-		}
+        // Set the block number the maximum
+        double largeDouble = 0;
+        for (int i = 0; i < 12; i++) {
+            largeDouble += Math.pow(2, i);
+        }
 
-		Double largeNum = new Double(largeDouble);
-		int blockNumber = largeNum.intValue();
-		boolean mFlag = true;
+        Double largeNum = new Double(largeDouble);
+        int blockNumber = largeNum.intValue();
+        boolean mFlag = true;
 
-		BlockOptionHeader blockOption = new BlockOptionHeader(
-				CoAPOptionName.BLOCK2, blockNumber, mFlag, 2);
+        BlockOptionHeader blockOption = new BlockOptionHeader(
+                CoAPOptionName.BLOCK2, blockNumber, mFlag, 2);
 
-		assertEquals(2, blockOption.getLength());
-		byte[] headerBytes = blockOption.encode();
+        assertEquals(2, blockOption.getLength());
+        byte[] headerBytes = blockOption.encode();
 
-		largeDouble = 0;
-		for (int i = 0; i < 8; i++) {
-			largeDouble += Math.pow(2, i);
-		}
+        largeDouble = 0;
+        for (int i = 0; i < 8; i++) {
+            largeDouble += Math.pow(2, i);
+        }
 
-		largeNum = new Double(largeDouble);
-		int testBlock = largeNum.intValue();
+        largeNum = new Double(largeDouble);
+        int testBlock = largeNum.intValue();
 
-		// Compare the first byte with the
-		int headerByte = (int) headerBytes[0] & 0xFF;
-		assertEquals(testBlock, headerByte);
+        // Compare the first byte with the
+        int headerByte = (int) headerBytes[0] & 0xFF;
+        assertEquals(testBlock, headerByte);
 
-		assertEquals(blockOption.getBlockNumber(), blockNumber);
+        assertEquals(blockOption.getBlockNumber(), blockNumber);
 
-		byte[] bytes = new byte[1];
-		short test = BitOperations.mergeBytesToShort(bytes[0], headerBytes[1]);
+        byte[] bytes = new byte[1];
+        short test = BitOperations.mergeBytesToShort(bytes[0], headerBytes[1]);
 
-		largeDouble = Math.pow(2, 1) + Math.pow(2, 3) + Math.pow(2, 4)
-				+ Math.pow(2, 5) + Math.pow(2, 6) + Math.pow(2, 7);
-		largeNum = new Double(largeDouble);
-		int headerValue = largeNum.intValue();
+        largeDouble = Math.pow(2, 1) + Math.pow(2, 3) + Math.pow(2, 4)
+                + Math.pow(2, 5) + Math.pow(2, 6) + Math.pow(2, 7);
+        largeNum = new Double(largeDouble);
+        int headerValue = largeNum.intValue();
 
-		assertEquals(headerValue, test);
-		assertEquals(2, blockOption.encode().length);
+        assertEquals(headerValue, test);
+        assertEquals(2, blockOption.encode().length);
 
-		CoAPOptionHeader optionHeader = new CoAPOptionHeader(
-				CoAPOptionName.BLOCK2, blockOption.encode());
-		try {
-			BlockOptionHeader decoded = new BlockOptionHeader(optionHeader);// handler.decodeBlockOption(optionHeader);
+        CoAPOptionHeader optionHeader = new CoAPOptionHeader(
+                CoAPOptionName.BLOCK2, blockOption.encode());
+        try {
+            BlockOptionHeader decoded = new BlockOptionHeader(optionHeader);// handler.decodeBlockOption(optionHeader);
 
-			assertEquals(blockNumber, decoded.getBlockNumber());
+            assertEquals(blockNumber, decoded.getBlockNumber());
 
-			assertEquals(mFlag, decoded.getMFlag());
-		} catch (CoAPException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
+            assertEquals(mFlag, decoded.getMFlag());
+        } catch (CoAPException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
 
-	public void test3ByteBlockOptionHeader() {
-		int szx = 2;
-		boolean mFlag = true;
+    public void test3ByteBlockOptionHeader() {
+        int szx = 2;
+        boolean mFlag = true;
 
-		Double largeNum = new Double(Math.pow(2, 18));
-		int testBlock = largeNum.intValue();
+        Double largeNum = new Double(Math.pow(2, 18));
+        int testBlock = largeNum.intValue();
 
-		// System.out.println("block number for 3 block header: " + testBlock);
+        // System.out.println("block number for 3 block header: " + testBlock);
+        BlockOptionHeader blockOpt = new BlockOptionHeader(
+                CoAPOptionName.BLOCK2, testBlock, mFlag, szx);
 
-		BlockOptionHeader blockOpt = new BlockOptionHeader(
-				CoAPOptionName.BLOCK2, testBlock, mFlag, szx);
+        assertEquals(3, blockOpt.getLength());
+        byte[] headerBytes = blockOpt.encode();
 
-		assertEquals(3, blockOpt.getLength());
-		byte[] headerBytes = blockOpt.encode();
+        assertEquals(3, headerBytes.length);
 
-		assertEquals(3, headerBytes.length);
+        CoAPOptionHeader optionHeader = new CoAPOptionHeader(
+                CoAPOptionName.BLOCK2, blockOpt.encode());
+        BlockOptionHeader decoded;
+        try {
+            decoded = new BlockOptionHeader(optionHeader);
+            assertEquals(testBlock, decoded.getBlockNumber());
 
-		CoAPOptionHeader optionHeader = new CoAPOptionHeader(
-				CoAPOptionName.BLOCK2, blockOpt.encode());
-		BlockOptionHeader decoded;
-		try {
-			decoded = new BlockOptionHeader(optionHeader);
-			assertEquals(testBlock, decoded.getBlockNumber());
+            assertEquals(szx, decoded.getSzx());
+            assertEquals(mFlag, decoded.getMFlag());
+        } catch (CoAPException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
 
-			assertEquals(szx, decoded.getSzx());
-			assertEquals(mFlag, decoded.getMFlag());
-		} catch (CoAPException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+        szx = 2;
+        mFlag = false;
 
-		szx = 2;
-		mFlag = false;
+        double largeDouble = 0;
+        for (int i = 0; i < 20; i++) {
+            largeDouble += Math.pow(2, i);
+        }
 
-		double largeDouble = 0;
-		for (int i = 0; i < 20; i++) {
-			largeDouble += Math.pow(2, i);
-		}
+        largeNum = new Double(largeDouble);
+        testBlock = largeNum.intValue();
 
-		largeNum = new Double(largeDouble);
-		testBlock = largeNum.intValue();
+        int value = testBlock;
+        int bitsNeeded = 0;
+        while (value > 0) {
+            bitsNeeded++;
+            value = (int) (value >> 1);
+        }
+        assertEquals(bitsNeeded, 20);
 
-		int value = testBlock;
-		int bitsNeeded = 0;
-		while (value > 0) {
-			bitsNeeded++;
-			value = (int) (value >> 1);
-		}
-		assertEquals(bitsNeeded, 20);
+        blockOpt = new BlockOptionHeader(CoAPOptionName.BLOCK2, testBlock,
+                mFlag, szx);
 
-		blockOpt = new BlockOptionHeader(CoAPOptionName.BLOCK2, testBlock,
-				mFlag, szx);
+        assertEquals(testBlock, blockOpt.getBlockNumber());
+        assertEquals(3, blockOpt.getLength());
 
-		assertEquals(testBlock, blockOpt.getBlockNumber());
-		assertEquals(3, blockOpt.getLength());
+        optionHeader = new CoAPOptionHeader(CoAPOptionName.BLOCK2,
+                blockOpt.encode());
+        try {
+            decoded = new BlockOptionHeader(optionHeader);
+            assertEquals(blockOpt.getBlockNumber(), decoded.getBlockNumber());
 
-		optionHeader = new CoAPOptionHeader(CoAPOptionName.BLOCK2,
-				blockOpt.encode());
-		try {
-			decoded = new BlockOptionHeader(optionHeader);
-			assertEquals(blockOpt.getBlockNumber(), decoded.getBlockNumber());
-
-			assertEquals(szx, decoded.getSzx());
-			assertEquals(mFlag, decoded.getMFlag());
-		} catch (CoAPException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
+            assertEquals(szx, decoded.getSzx());
+            assertEquals(mFlag, decoded.getMFlag());
+        } catch (CoAPException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
 }

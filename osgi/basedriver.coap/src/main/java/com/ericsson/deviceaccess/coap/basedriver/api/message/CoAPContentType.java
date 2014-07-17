@@ -34,33 +34,23 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class is to represent the CoAP content types as defined in the coap core
  * draft media type registry
  * (http://tools.ietf.org/html/draft-ietf-core-coap-08#page-65).
  *
  */
-public class CoAPContentType {
+public enum CoAPContentType {
+
+    TEXT_PLAIN(0, "text/plain; charset=utf-8"),
+    LINK_FORMAT(40, "application/link-format"),
+    APPLICATION_XML(41, "application/xml"),
+    OCTET_STREAM(42, "application/octet-stream"),
+    EXI(47, "application/exi"),
+    JSON(50, "application/json");
 
     private final int no;
     private final String contentType;
-    private static final List<CoAPContentType> values = new ArrayList<>();
-
-    public static final CoAPContentType TEXT_PLAIN = new CoAPContentType(0,
-            "text/plain; charset=utf-8");
-    public static final CoAPContentType LINK_FORMAT = new CoAPContentType(40,
-            "application/link-format");
-    public static final CoAPContentType APPLICATION_XML = new CoAPContentType(
-            41, "application/xml");
-    public static final CoAPContentType OCTET_STREAM = new CoAPContentType(42,
-            "application/octet-stream");
-    public static final CoAPContentType EXI = new CoAPContentType(47,
-            "application/exi");
-    public static final CoAPContentType JSON = new CoAPContentType(50,
-            "application/json");
 
     /**
      * Constructor
@@ -68,10 +58,9 @@ public class CoAPContentType {
      * @param no number of the content type
      * @param contentType string representing the media type
      */
-    public CoAPContentType(int no, String contentType) {
+    private CoAPContentType(int no, String contentType) {
         this.no = no;
         this.contentType = contentType;
-        values.add(this);
     }
 
     public int getNo() {
@@ -83,8 +72,8 @@ public class CoAPContentType {
     }
 
     public static CoAPContentType getContentTypeNumber(String name) {
-        for (CoAPContentType value : values) {
-            if (value.getContentType() == null ? name == null : value.getContentType().equals(name)) {
+        for (CoAPContentType value : CoAPContentType.values()) {
+            if (value.getContentType().equals(name)) {
                 return value;
             }
         }
@@ -92,7 +81,7 @@ public class CoAPContentType {
     }
 
     public static CoAPContentType getContentTypeName(int no) {
-        for (CoAPContentType value : values) {
+        for (CoAPContentType value : CoAPContentType.values()) {
             if (value.getNo() == no) {
                 return value;
             }

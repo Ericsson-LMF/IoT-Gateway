@@ -40,97 +40,97 @@ import junit.framework.TestCase;
 
 public class CoAPResponseCodeTest extends TestCase {
 
-	public CoAPResponseCodeTest() {
-		super("CoAPResponseCodeTest");
-	}
+    public CoAPResponseCodeTest() {
+        super("CoAPResponseCodeTest");
+    }
 
-	public void testResponseCodes() throws URISyntaxException {
-		
-		System.out.println("code to string:" + CoAPResponseCode.CREATED.toString());
-		
-		CoAPResponseCode code = CoAPResponseCode.getResponseName(65);
-		
-		System.out.println("code to string:" + code.toString());
-		
-		 code = CoAPResponseCode.getResponseName(65);
-		
-		String responseText = code.toString();
-		System.out.println("response text: " + responseText);
+    public void testResponseCodes() throws URISyntaxException {
 
-		assertEquals(CoAPResponseCode.CREATED.getNo(), 65);
-		assertEquals(CoAPResponseCode.CREATED.getDescription(), "2.01 Created");
+        System.out.println("code to string:" + CoAPResponseCode.CREATED.toString());
 
-		assertEquals(CoAPResponseCode.DELETED.getNo(), 66);
-		assertEquals(CoAPResponseCode.DELETED.getDescription(), "2.02 Deleted");
+        CoAPResponseCode code = CoAPResponseCode.getResponseName(65);
 
-		assertEquals(CoAPResponseCode.VALID.getNo(), 67);
-		assertEquals(CoAPResponseCode.VALID.getDescription(), "2.03 Valid");
+        System.out.println("code to string:" + code.toString());
 
-		assertEquals(CoAPResponseCode.CHANGED.getNo(), 68);
-		assertEquals(CoAPResponseCode.CHANGED.getDescription(), "2.04 Changed");
+        code = CoAPResponseCode.getResponseName(65);
 
-		assertEquals(CoAPResponseCode.CONTENT.getNo(), 69);
-		assertEquals(CoAPResponseCode.CONTENT.getDescription(), "2.05 Content");
+        String responseText = code.toString();
+        System.out.println("response text: " + responseText);
 
-		assertEquals(CoAPResponseCode.BAD_REQUEST.getNo(), 128);
-		assertEquals(CoAPResponseCode.BAD_REQUEST.getDescription(),
-				"4.00 Bad Request");
+        assertEquals(CoAPResponseCode.CREATED.getNo(), 65);
+        assertEquals(CoAPResponseCode.CREATED.getDescription(), "2.01 Created");
 
-		assertEquals(CoAPResponseCode.UNAUTHORIZED.getNo(), 129);
-		assertEquals(CoAPResponseCode.UNAUTHORIZED.getDescription(),
-				"4.01 Unauthorized");
+        assertEquals(CoAPResponseCode.DELETED.getNo(), 66);
+        assertEquals(CoAPResponseCode.DELETED.getDescription(), "2.02 Deleted");
 
-		assertEquals(CoAPResponseCode.BAD_OPTION.getNo(), 130);
-		assertEquals(CoAPResponseCode.BAD_OPTION.getDescription(),
-				"4.02 Bad Option");
+        assertEquals(CoAPResponseCode.VALID.getNo(), 67);
+        assertEquals(CoAPResponseCode.VALID.getDescription(), "2.03 Valid");
 
-		assertEquals(CoAPResponseCode.FORBIDDEN.getNo(), 131);
-		assertEquals(CoAPResponseCode.FORBIDDEN.getDescription(),
-				"4.03 Forbidden");
+        assertEquals(CoAPResponseCode.CHANGED.getNo(), 68);
+        assertEquals(CoAPResponseCode.CHANGED.getDescription(), "2.04 Changed");
 
-		assertEquals(CoAPResponseCode.NOT_FOUND.getNo(), 132);
-		assertEquals(CoAPResponseCode.NOT_FOUND.getDescription(),
-				"4.04 Not Found");
+        assertEquals(CoAPResponseCode.CONTENT.getNo(), 69);
+        assertEquals(CoAPResponseCode.CONTENT.getDescription(), "2.05 Content");
 
-		assertEquals(CoAPResponseCode.METHOD_NOT_ALLOWED.getNo(), 133);
-		assertEquals(CoAPResponseCode.METHOD_NOT_ALLOWED.getDescription(),
-				"4.05 Method Not Allowed");
-		
-		assertEquals(CoAPResponseCode.NOT_ACCEPTABLE.getNo(), 134);
-		assertEquals(CoAPResponseCode.NOT_ACCEPTABLE.getDescription(),
-				"4.06 Not Acceptable");
+        assertEquals(CoAPResponseCode.BAD_REQUEST.getNo(), 128);
+        assertEquals(CoAPResponseCode.BAD_REQUEST.getDescription(),
+                "4.00 Bad Request");
 
-		assertEquals(CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE.getNo(), 141);
-		assertEquals(
-				CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE.getDescription(),
-				"4.13 Request Entity Too Large");
+        assertEquals(CoAPResponseCode.UNAUTHORIZED.getNo(), 129);
+        assertEquals(CoAPResponseCode.UNAUTHORIZED.getDescription(),
+                "4.01 Unauthorized");
 
-		assertEquals(CoAPResponseCode.UNSUPPORTED_MEDIA_TYPE.getNo(), 143);
-		assertEquals(CoAPResponseCode.UNSUPPORTED_MEDIA_TYPE.getDescription(),
-				"4.15 Unsupported Media Type");
+        assertEquals(CoAPResponseCode.BAD_OPTION.getNo(), 130);
+        assertEquals(CoAPResponseCode.BAD_OPTION.getDescription(),
+                "4.02 Bad Option");
 
-		assertEquals(CoAPResponseCode.INTERNAL_SERVER_ERROR.getNo(), 160);
-		assertEquals(CoAPResponseCode.INTERNAL_SERVER_ERROR.getDescription(),
-				"5.00 Internal Server Error");
+        assertEquals(CoAPResponseCode.FORBIDDEN.getNo(), 131);
+        assertEquals(CoAPResponseCode.FORBIDDEN.getDescription(),
+                "4.03 Forbidden");
 
-		assertEquals(CoAPResponseCode.NOT_IMPLEMENTED.getNo(), 161);
-		assertEquals(CoAPResponseCode.NOT_IMPLEMENTED.getDescription(),
-				"5.01 Not Implemented");
+        assertEquals(CoAPResponseCode.NOT_FOUND.getNo(), 132);
+        assertEquals(CoAPResponseCode.NOT_FOUND.getDescription(),
+                "4.04 Not Found");
 
-		assertEquals(CoAPResponseCode.BAD_GATEWAY.getNo(), 162);
-		assertEquals(CoAPResponseCode.BAD_GATEWAY.getDescription(),
-				"5.02 Bad Gateway");
+        assertEquals(CoAPResponseCode.METHOD_NOT_ALLOWED.getNo(), 133);
+        assertEquals(CoAPResponseCode.METHOD_NOT_ALLOWED.getDescription(),
+                "4.05 Method Not Allowed");
 
-		assertEquals(CoAPResponseCode.SERVICE_UNAVAILABLE.getNo(), 163);
-		assertEquals(CoAPResponseCode.SERVICE_UNAVAILABLE.getDescription(),
-				"5.03 Service Unavailable");
+        assertEquals(CoAPResponseCode.NOT_ACCEPTABLE.getNo(), 134);
+        assertEquals(CoAPResponseCode.NOT_ACCEPTABLE.getDescription(),
+                "4.06 Not Acceptable");
 
-		assertEquals(CoAPResponseCode.GATEWAY_TIMEOUT.getNo(), 164);
-		assertEquals(CoAPResponseCode.GATEWAY_TIMEOUT.getDescription(),
-				"5.04 Gateway Timeout");
+        assertEquals(CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE.getNo(), 141);
+        assertEquals(
+                CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE.getDescription(),
+                "4.13 Request Entity Too Large");
 
-		assertEquals(CoAPResponseCode.PROXYING_NOT_SUPPORTED.getNo(), 165);
-		assertEquals(CoAPResponseCode.PROXYING_NOT_SUPPORTED.getDescription(),
-				"5.05 Proxying Not Supported");
-	}
+        assertEquals(CoAPResponseCode.UNSUPPORTED_MEDIA_TYPE.getNo(), 143);
+        assertEquals(CoAPResponseCode.UNSUPPORTED_MEDIA_TYPE.getDescription(),
+                "4.15 Unsupported Media Type");
+
+        assertEquals(CoAPResponseCode.INTERNAL_SERVER_ERROR.getNo(), 160);
+        assertEquals(CoAPResponseCode.INTERNAL_SERVER_ERROR.getDescription(),
+                "5.00 Internal Server Error");
+
+        assertEquals(CoAPResponseCode.NOT_IMPLEMENTED.getNo(), 161);
+        assertEquals(CoAPResponseCode.NOT_IMPLEMENTED.getDescription(),
+                "5.01 Not Implemented");
+
+        assertEquals(CoAPResponseCode.BAD_GATEWAY.getNo(), 162);
+        assertEquals(CoAPResponseCode.BAD_GATEWAY.getDescription(),
+                "5.02 Bad Gateway");
+
+        assertEquals(CoAPResponseCode.SERVICE_UNAVAILABLE.getNo(), 163);
+        assertEquals(CoAPResponseCode.SERVICE_UNAVAILABLE.getDescription(),
+                "5.03 Service Unavailable");
+
+        assertEquals(CoAPResponseCode.GATEWAY_TIMEOUT.getNo(), 164);
+        assertEquals(CoAPResponseCode.GATEWAY_TIMEOUT.getDescription(),
+                "5.04 Gateway Timeout");
+
+        assertEquals(CoAPResponseCode.PROXYING_NOT_SUPPORTED.getNo(), 165);
+        assertEquals(CoAPResponseCode.PROXYING_NOT_SUPPORTED.getDescription(),
+                "5.05 Proxying Not Supported");
+    }
 }

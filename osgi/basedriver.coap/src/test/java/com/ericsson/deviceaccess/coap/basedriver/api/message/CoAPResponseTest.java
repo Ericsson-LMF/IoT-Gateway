@@ -40,60 +40,60 @@ import junit.framework.TestCase;
 
 public class CoAPResponseTest extends TestCase {
 
-	private CoAPResponse resp;
+    private CoAPResponse resp;
 
-	public CoAPResponseTest() {
-		super("CoAPResponseTest");
-		resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-				CoAPResponseCode.CREATED.getNo(), 1234);
-	}
+    public CoAPResponseTest() {
+        super("CoAPResponseTest");
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
+                CoAPResponseCode.CREATED.getNo(), 1234);
+    }
 
-	/*
-	 * This method tests creating an empty acknowledgement for a response
-	 */
-	public void testCreateAcknowledgement() {
-		CoAPResponse ack = resp.createAcknowledgement();
-		assertEquals(ack.getMessageId(), resp.getMessageId());
-		// Token header should match with the original response
-		assertEquals(ack.getTokenHeader(), resp.getTokenHeader());
-		// Message type should be acknowledgement
-		assertEquals(ack.getMessageType(), CoAPMessageType.ACKNOWLEDGEMENT);
-		assertEquals(ack.getSocketAddress(), resp.getSocketAddress());
-	}
+    /*
+     * This method tests creating an empty acknowledgement for a response
+     */
+    public void testCreateAcknowledgement() {
+        CoAPResponse ack = resp.createAcknowledgement();
+        assertEquals(ack.getMessageId(), resp.getMessageId());
+        // Token header should match with the original response
+        assertEquals(ack.getTokenHeader(), resp.getTokenHeader());
+        // Message type should be acknowledgement
+        assertEquals(ack.getMessageType(), CoAPMessageType.ACKNOWLEDGEMENT);
+        assertEquals(ack.getSocketAddress(), resp.getSocketAddress());
+    }
 
-	/*
-	 * Reset message should contain the same token header as the received
-	 * response, and it should have the same message id
-	 */
-	public void testCreateReset() {
-		CoAPResponse reset = resp.createReset();
+    /*
+     * Reset message should contain the same token header as the received
+     * response, and it should have the same message id
+     */
+    public void testCreateReset() {
+        CoAPResponse reset = resp.createReset();
 
-		assertEquals(reset.getTokenHeader(), resp.getTokenHeader());
-		assertEquals(reset.getSocketAddress(), resp.getSocketAddress());
-		assertEquals(reset.getMessageId(), resp.getMessageId());
-		assertEquals(reset.getMessageType(), CoAPMessageType.RESET);
-	}
-	
-	/*
-	 * Test the different CoAP response codes
-	 */
-	public void testIsCachable() {
-		CoAPResponse reset = resp.createReset();
-		assertFalse(reset.isCacheable());
-		resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-				CoAPResponseCode.VALID.getNo(), 1234);
-		
-		assertTrue(resp.isCacheable());
-		resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-				CoAPResponseCode.CONTENT.getNo(), 1234);
-		assertTrue(resp.isCacheable());
-		
-		resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-				CoAPResponseCode.NOT_FOUND.getNo(), 1234);
-		assertTrue(resp.isCacheable());
-		
-		resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-				CoAPResponseCode.INTERNAL_SERVER_ERROR.getNo(), 1234);
-		assertTrue(resp.isCacheable());
-	}
+        assertEquals(reset.getTokenHeader(), resp.getTokenHeader());
+        assertEquals(reset.getSocketAddress(), resp.getSocketAddress());
+        assertEquals(reset.getMessageId(), resp.getMessageId());
+        assertEquals(reset.getMessageType(), CoAPMessageType.RESET);
+    }
+
+    /*
+     * Test the different CoAP response codes
+     */
+    public void testIsCachable() {
+        CoAPResponse reset = resp.createReset();
+        assertFalse(reset.isCacheable());
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
+                CoAPResponseCode.VALID.getNo(), 1234);
+
+        assertTrue(resp.isCacheable());
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
+                CoAPResponseCode.CONTENT.getNo(), 1234);
+        assertTrue(resp.isCacheable());
+
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
+                CoAPResponseCode.NOT_FOUND.getNo(), 1234);
+        assertTrue(resp.isCacheable());
+
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
+                CoAPResponseCode.INTERNAL_SERVER_ERROR.getNo(), 1234);
+        assertTrue(resp.isCacheable());
+    }
 }

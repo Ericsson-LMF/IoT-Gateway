@@ -42,83 +42,82 @@ import java.util.List;
 
 public class LinkFormatReaderTest extends TestCase {
 
-	public LinkFormatReaderTest() {
-		super("LinkFormatReaderTest");
-	}
+    public LinkFormatReaderTest() {
+        super("LinkFormatReaderTest");
+    }
 
-	public void testParseLinkFormatData() {
-		LinkFormatReader reader = new LinkFormatReader();
+    public void testParseLinkFormatData() {
+        LinkFormatReader reader = new LinkFormatReader();
 
-		String test1 = "</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\",</sensors/light>;rt=\"LightLux\";if=\"sensor\"";
+        String test1 = "</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\",</sensors/light>;rt=\"LightLux\";if=\"sensor\"";
 
-		String test2 = "<http://www.example.com/sensors/temp123>;"
-				+ "anchor=\"/sensors/temp\";rel=\"describedby\","
-				+ "</t>;anchor=\"/sensors/temp\";rel=\"alternate\"";
+        String test2 = "<http://www.example.com/sensors/temp123>;"
+                + "anchor=\"/sensors/temp\";rel=\"describedby\","
+                + "</t>;anchor=\"/sensors/temp\";rel=\"alternate\"";
 
-		try {
-			List<CoAPResource> resources = reader.parseLinkFormatData(test1);
-			assertEquals(resources.size(), 2);
-			CoAPResource res = resources.get(0);
+        try {
+            List<CoAPResource> resources = reader.parseLinkFormatData(test1);
+            assertEquals(resources.size(), 2);
+            CoAPResource res = resources.get(0);
 
-			assertEquals(res.getResourceType(), "\"TemperatureC\"");
-			assertEquals(res.getInterfaceDescription(), "\"sensor\"");
+            assertEquals(res.getResourceType(), "\"TemperatureC\"");
+            assertEquals(res.getInterfaceDescription(), "\"sensor\"");
 
-			resources = reader.parseLinkFormatData(test2);
-			res = resources.get(0);
-			System.out.println("Resource name: " + res.getUri().toString());
+            resources = reader.parseLinkFormatData(test2);
+            res = resources.get(0);
+            System.out.println("Resource name: " + res.getUri().toString());
 
-			assertEquals(res.getUri().toString(),
-					"http://www.example.com/sensors/temp123");
-			assertEquals(res.getAnchor(), "\"/sensors/temp\"");
-			assertEquals(res.getRelationType(), "\"describedby\"");
+            assertEquals(res.getUri().toString(),
+                    "http://www.example.com/sensors/temp123");
+            assertEquals(res.getAnchor(), "\"/sensors/temp\"");
+            assertEquals(res.getRelationType(), "\"describedby\"");
 
-			res = resources.get(1);
-			assertEquals(res.getUri().toString(), "t");
-			assertEquals(res.getAnchor(), "\"/sensors/temp\"");
-			assertEquals(res.getRelationType(), "\"alternate\"");
+            res = resources.get(1);
+            assertEquals(res.getUri().toString(), "t");
+            assertEquals(res.getAnchor(), "\"/sensors/temp\"");
+            assertEquals(res.getRelationType(), "\"alternate\"");
 
-			String test3 = "</sensors>;rt=\"index\";title=\"Sensor Index\",</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\","
-					+ "</sensors/light>;rt=\"LightLux\";if=\"sensor\",<http://www.example.com/sensors/t123>;"
-					+ "anchor=\"/sensors/temp\";rel=\"describedby\",</t>;anchor=\"/sensors/temp\";rel=\"alternate\";key={\"jwk\":[{\"alg\":\"EC\",\"crv\":\"P-256\",\"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\"use\":\"sig\",\"kid\":\"1\"},]}\"";
+            String test3 = "</sensors>;rt=\"index\";title=\"Sensor Index\",</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\","
+                    + "</sensors/light>;rt=\"LightLux\";if=\"sensor\",<http://www.example.com/sensors/t123>;"
+                    + "anchor=\"/sensors/temp\";rel=\"describedby\",</t>;anchor=\"/sensors/temp\";rel=\"alternate\";key={\"jwk\":[{\"alg\":\"EC\",\"crv\":\"P-256\",\"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\"use\":\"sig\",\"kid\":\"1\"},]}\"";
 
-			resources = reader.parseLinkFormatData(test3);
+            resources = reader.parseLinkFormatData(test3);
 
-			assertEquals(resources.size(), 5);
-			assertEquals(resources.get(0).getUri().toString(), "sensors");
-			assertEquals(resources.get(0).getResourceType(), "\"index\"");
-			assertEquals(resources.get(0).getTitle(), "\"Sensor Index\"");
+            assertEquals(resources.size(), 5);
+            assertEquals(resources.get(0).getUri().toString(), "sensors");
+            assertEquals(resources.get(0).getResourceType(), "\"index\"");
+            assertEquals(resources.get(0).getTitle(), "\"Sensor Index\"");
 
-			assertEquals(resources.get(1).getUri().toString(), "sensors/temp");
-			assertEquals(resources.get(1).getResourceType(), "\"TemperatureC\"");
-			assertEquals(resources.get(1).getInterfaceDescription(),
-					"\"sensor\"");
-			
-			// Test parsing
-			String test4 = "</.well-known/core>;ct=40,</careless>;rt=\"SepararateResponseTester\";"
-					+ "title=\"This resource will ACK anything, but never send a separate response\","
-					+ "</feedback>;rt=\"FeedbackMailSender\";title=\"POST feedback using mail\"";
+            assertEquals(resources.get(1).getUri().toString(), "sensors/temp");
+            assertEquals(resources.get(1).getResourceType(), "\"TemperatureC\"");
+            assertEquals(resources.get(1).getInterfaceDescription(),
+                    "\"sensor\"");
 
-			resources = reader.parseLinkFormatData(test4);
+            // Test parsing
+            String test4 = "</.well-known/core>;ct=40,</careless>;rt=\"SepararateResponseTester\";"
+                    + "title=\"This resource will ACK anything, but never send a separate response\","
+                    + "</feedback>;rt=\"FeedbackMailSender\";title=\"POST feedback using mail\"";
 
-			assertEquals(resources.get(1).getUri().toString(), "careless");
-			assertEquals(resources.get(1).getResourceType().toString(),
-					"\"SepararateResponseTester\"");
-			assertEquals(resources.get(1).getTitle(),
-					"\"This resource will ACK anything, but never send a separate response\"");
+            resources = reader.parseLinkFormatData(test4);
 
-			System.out.println("link format presentation: "
-					+ res.getLinkFormatPresentation(false));
-			
+            assertEquals(resources.get(1).getUri().toString(), "careless");
+            assertEquals(resources.get(1).getResourceType().toString(),
+                    "\"SepararateResponseTester\"");
+            assertEquals(resources.get(1).getTitle(),
+                    "\"This resource will ACK anything, but never send a separate response\"");
 
-			String payload = "</sensors>;rt=\"index\";title=\"Sensor Index\",</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\","
-					+ "</sensors/light>;rt=\"LightLux\";if=\"sensor\",<http://www.example.com/sensors/t123>;"
-					+ "anchor=\"/sensors/temp\";rel=\"describedby\",</t>;anchor=\"/sensors/temp\";rel=\"alternate\";key=\"{\"jwk\":[{\"alg\":\"EC\",\"crv\":\"P-256\",\"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\"use\":\"sig\",\"kid\":\"1\"},]}\"";
-			resources = reader.parseLinkFormatData(payload);
-			assertEquals(resources.size(), 5);
+            System.out.println("link format presentation: "
+                    + res.getLinkFormatPresentation(false));
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            String payload = "</sensors>;rt=\"index\";title=\"Sensor Index\",</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\","
+                    + "</sensors/light>;rt=\"LightLux\";if=\"sensor\",<http://www.example.com/sensors/t123>;"
+                    + "anchor=\"/sensors/temp\";rel=\"describedby\",</t>;anchor=\"/sensors/temp\";rel=\"alternate\";key=\"{\"jwk\":[{\"alg\":\"EC\",\"crv\":\"P-256\",\"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\"use\":\"sig\",\"kid\":\"1\"},]}\"";
+            resources = reader.parseLinkFormatData(payload);
+            assertEquals(resources.size(), 5);
 
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

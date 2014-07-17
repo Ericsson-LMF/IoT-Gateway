@@ -41,8 +41,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class is responsible for encoding a CoAPMessage (either request or
@@ -77,7 +76,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
          */
         // These are the header that all messages should have
         int version = message.getVersion();
-        int messageType = message.getMessageType().getNo();
+        int messageType = message.getMessageType().ordinal();
         int optionCount = message.getOptionCount();
         int messageCode = message.getCode();
 
@@ -143,21 +142,17 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
      */
     private void encodeOptionHeaders() {
 
-		// Sort options
+        // Sort options
         // TODO is there better to handle this??
-        LinkedList options = message.getOptionHeaders();
+        List<CoAPOptionHeader> options = message.getOptionHeaders();
         Collections.sort(options);
 
-		// MultiMap options = message.getOptionHeaders();
+        // MultiMap options = message.getOptionHeaders();
         int previousOption = 0;
         int optionDelta = 0;
 
-        Iterator it = options.iterator();
-
         // Go through different option numbers
-        while (it.hasNext()) {
-            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-
+        for (CoAPOptionHeader header : options) {
             int optionNumber = header.getOptionNumber();
 
             if ((previousOption % 14) == 0) {
@@ -166,7 +161,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
                 optionDelta = optionNumber - previousOption;
             }
 
-			// cache the previous option number so it can be used to detect
+            // cache the previous option number so it can be used to detect
             // fenceposts
             previousOption = optionNumber;
             int optionLength = header.getLength();

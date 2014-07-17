@@ -41,68 +41,62 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
  */
 public interface CoAPRequestListener {
 
-	/**
-	 * Callback method that is called when a reset message is received for a
-	 * message sent out towards the CoAP network. Receiving a reset indicates a
-	 * failure at the receiver (e.g. receiver rebooted and missing state).
-	 * 
-	 * @param response
-	 *            CoAP response received from the network
-	 * @param request
-	 *            original request that was sent out to CoAP network
-	 */
-	public void resetResponseReceived(CoAPResponse response, CoAPRequest request);
+    /**
+     * Callback method that is called when a reset message is received for a
+     * message sent out towards the CoAP network. Receiving a reset indicates a
+     * failure at the receiver (e.g. receiver rebooted and missing state).
+     *
+     * @param response CoAP response received from the network
+     * @param request original request that was sent out to CoAP network
+     */
+    public void resetResponseReceived(CoAPResponse response, CoAPRequest request);
 
-	/**
-	 * Callback method that is called when a separate response related to the
-	 * sent out request is received. This callback is used also for replies to
-	 * non-confirmable requests.
-	 * 
-	 * @param response
-	 * @param request
-	 *            request that the response relates to
-	 */
-	public void separateResponseReceived(CoAPResponse response,
-			CoAPRequest request);
+    /**
+     * Callback method that is called when a separate response related to the
+     * sent out request is received. This callback is used also for replies to
+     * non-confirmable requests.
+     *
+     * @param response
+     * @param request request that the response relates to
+     */
+    public void separateResponseReceived(CoAPResponse response,
+            CoAPRequest request);
 
-	/**
-	 * Callback method that is called when a piggypacked response is received
-	 * 
-	 * @param response
-	 * @param request
-	 *            request that the response relates to
-	 */
-	public void piggyPackedResponseReceived(CoAPResponse response,
-			CoAPRequest request);
+    /**
+     * Callback method that is called when a piggypacked response is received
+     *
+     * @param response
+     * @param request request that the response relates to
+     */
+    public void piggyPackedResponseReceived(CoAPResponse response,
+            CoAPRequest request);
 
-	/**
-	 * Callback method that is called when an empty ack is received from the
-	 * remote host. This means that the actual payload will arrive in a separate
-	 * response.
-	 * 
-	 * @param response
-	 *            received response
-	 * @param request
-	 *            request that the response relates to
-	 */
-	public void emptyAckReceived(CoAPResponse response, CoAPRequest request);
+    /**
+     * Callback method that is called when an empty ack is received from the
+     * remote host. This means that the actual payload will arrive in a separate
+     * response.
+     *
+     * @param response received response
+     * @param request request that the response relates to
+     */
+    public void emptyAckReceived(CoAPResponse response, CoAPRequest request);
 
-	/**
-	 * This method will be called when a maximum 4 retransmissions for the
-	 * request is reached. The retransmission timer is used as defined in the
-	 * draft-ietf-core-coap-07
-	 * 
-	 * @param request
-	 */
-	public void maximumRetransmissionsReached(CoAPRequest request);
+    /**
+     * This method will be called when a maximum 4 retransmissions for the
+     * request is reached. The retransmission timer is used as defined in the
+     * draft-ietf-core-coap-07
+     *
+     * @param request
+     */
+    public void maximumRetransmissionsReached(CoAPRequest request);
 
-	/**
-	 * This method will be called in case the request was not sent towards the
-	 * CoAP network because of congestion control. According to core draft 07,
-	 * one active interaction per server is allowed at time.
-	 * 
-	 * @param request
-	 */
-	public void serviceBusy(CoAPRequest request);
+    /**
+     * This method will be called in case the request was not sent towards the
+     * CoAP network because of congestion control. According to core draft 07,
+     * one active interaction per server is allowed at time.
+     *
+     * @param request
+     */
+    public void serviceBusy(CoAPRequest request);
 
 }

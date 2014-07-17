@@ -35,120 +35,91 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * response codes defined in core draft 11 (including obsoleted codes)
  */
-public class CoAPResponseCode {
+public enum CoAPResponseCode {
 
-	/**
-	 * response class is either 2 (success),4 (client error) or 5 (server
-	 * error). empty message will return a response class 0 (even though it's
-	 * not a real response)
-	 */
-	private int responseClass;
-	private final String description;
-	private final int no;
-	private static final List values = new ArrayList<>(20);
+    CREATED(65, "2.01 Created"),
+    DELETED(66, "2.02 Deleted"),
+    VALID(67, "2.03 Valid"),
+    CHANGED(68, "2.04 Changed"),
+    CONTENT(69, "2.05 Content"),
+    BAD_REQUEST(128, "4.00 Bad Request"),
+    UNAUTHORIZED(129, "4.01 Unauthorized"),
+    BAD_OPTION(130, "4.02 Bad Option"),
+    FORBIDDEN(131, "4.03 Forbidden"),
+    NOT_FOUND(132, "4.04 Not Found"),
+    METHOD_NOT_ALLOWED(133, "4.05 Method Not Allowed"),
+    NOT_ACCEPTABLE(134, "4.06 Not Acceptable"), // draft-ietf-core-coap-08
+    REQUEST_ENTITY_INCOMPLETE(136, "4.08 Request Entity Incomplete"), // draft-ietf-core-block-07
+    PRECONDITION_FAILED(140, "4.12 Precondition Failed"), // draft-ietf-core-block-11
+    REQUEST_ENTITY_TOO_LARGE(141, "4.13 Request Entity Too Large"),
+    UNSUPPORTED_MEDIA_TYPE(143, "4.15 Unsupported Media Type"),
+    INTERNAL_SERVER_ERROR(160, "5.00 Internal Server Error"),
+    NOT_IMPLEMENTED(161, "5.01 Not Implemented"),
+    BAD_GATEWAY(162, "5.02 Bad Gateway"),
+    SERVICE_UNAVAILABLE(163, "5.03 Service Unavailable"),
+    GATEWAY_TIMEOUT(164, "5.04 Gateway Timeout"),
+    PROXYING_NOT_SUPPORTED(165, "5.05 Proxying Not Supported");
 
-	public static final CoAPResponseCode CREATED = new CoAPResponseCode(65,
-			"2.01 Created");
-	public static final CoAPResponseCode DELETED = new CoAPResponseCode(66,
-			"2.02 Deleted");
-	public static final CoAPResponseCode VALID = new CoAPResponseCode(67,
-			"2.03 Valid");
-	public static final CoAPResponseCode CHANGED = new CoAPResponseCode(68,
-			"2.04 Changed");
-	public static final CoAPResponseCode CONTENT = new CoAPResponseCode(69,
-			"2.05 Content");
-	public static final CoAPResponseCode BAD_REQUEST = new CoAPResponseCode(
-			128, "4.00 Bad Request");
-	public static final CoAPResponseCode UNAUTHORIZED = new CoAPResponseCode(
-			129, "4.01 Unauthorized");
-	public static final CoAPResponseCode BAD_OPTION = new CoAPResponseCode(130,
-			"4.02 Bad Option");
-	public static final CoAPResponseCode FORBIDDEN = new CoAPResponseCode(131,
-			"4.03 Forbidden");
-	public static final CoAPResponseCode NOT_FOUND = new CoAPResponseCode(132,
-			"4.04 Not Found");
-	public static final CoAPResponseCode METHOD_NOT_ALLOWED = new CoAPResponseCode(
-			133, "4.05 Method Not Allowed");
-	public static final CoAPResponseCode NOT_ACCEPTABLE = new CoAPResponseCode(
-			134, "4.06 Not Acceptable"); // draft-ietf-core-coap-08
-	public static final CoAPResponseCode REQUEST_ENTITY_INCOMPLETE = new CoAPResponseCode(
-			136, "4.08 Request Entity Incomplete"); // draft-ietf-core-block-07
-	public static final CoAPResponseCode PRECONDITION_FAILED = new CoAPResponseCode(
-			140, "4.12 Precondition Failed"); // draft-ietf-core-block-11
-	public static final CoAPResponseCode REQUEST_ENTITY_TOO_LARGE = new CoAPResponseCode(
-			141, "4.13 Request Entity Too Large");
-	public static final CoAPResponseCode UNSUPPORTED_MEDIA_TYPE = new CoAPResponseCode(
-			143, "4.15 Unsupported Media Type");
-	public static final CoAPResponseCode INTERNAL_SERVER_ERROR = new CoAPResponseCode(
-			160, "5.00 Internal Server Error");
-	public static final CoAPResponseCode NOT_IMPLEMENTED = new CoAPResponseCode(
-			161, "5.01 Not Implemented");
-	public static final CoAPResponseCode BAD_GATEWAY = new CoAPResponseCode(
-			162, "5.02 Bad Gateway");
-	public static final CoAPResponseCode SERVICE_UNAVAILABLE = new CoAPResponseCode(
-			163, "5.03 Service Unavailable");
-	public static final CoAPResponseCode GATEWAY_TIMEOUT = new CoAPResponseCode(
-			164, "5.04 Gateway Timeout");
-	public static final CoAPResponseCode PROXYING_NOT_SUPPORTED = new CoAPResponseCode(
-			165, "5.05 Proxying Not Supported");
+    /**
+     * response class is either 2 (success),4 (client error) or 5 (server
+     * error). empty message will return a response class 0 (even though it's
+     * not a real response)
+     */
+    private int responseClass;
+    private final String description;
+    private final int no;
 
-	private CoAPResponseCode(int no, String description) {
-		this.description = description;
-		this.no = no;
+    private CoAPResponseCode(int no, String description) {
+        this.description = description;
+        this.no = no;
 
-		responseClass = BitOperations.getBitsInIntAsInt(this.no, 5, 3);
-		values.add(this);
-	}
+        responseClass = BitOperations.getBitsInIntAsInt(this.no, 5, 3);
+    }
 
-	/**
-	 * Textual description of the code as defined in draft-ietf-core-coap-08
-	 * 
-	 * @return Textual description of the code
-	 */
-	public String getDescription() {
-		return this.description;
-	}
+    /**
+     * Textual description of the code as defined in draft-ietf-core-coap-08
+     *
+     * @return Textual description of the code
+     */
+    public String getDescription() {
+        return this.description;
+    }
 
-	/**
-	 * Return the number of the response
-	 * 
-	 * @return integer representing the code of the response
-	 */
-	public int getNo() {
-		return this.no;
-	}
+    /**
+     * Return the number of the response
+     *
+     * @return integer representing the code of the response
+     */
+    public int getNo() {
+        return this.no;
+    }
 
-	/**
-	 * Returns the response class. 2 for success, 4 client error and 5 for
-	 * server error. If the response is empty, the returned response class will
-	 * be 0.
-	 * 
-	 * @return
-	 */
-	public int getResponseClass() {
-		return this.responseClass;
-	}
+    /**
+     * Returns the response class. 2 for success, 4 client error and 5 for
+     * server error. If the response is empty, the returned response class will
+     * be 0.
+     *
+     * @return
+     */
+    public int getResponseClass() {
+        return this.responseClass;
+    }
 
-	public static CoAPResponseCode getResponseName(int no) {
-
-            for (Object value : values) {
-                CoAPResponseCode c = (CoAPResponseCode) value;
-                if (c.getNo() == no) {
-                    return c;
-                }
+    public static CoAPResponseCode getResponseName(int no) {
+        for (CoAPResponseCode value : CoAPResponseCode.values()) {
+            if (value.getNo() == no) {
+                return value;
             }
+        }
+        return null;
+    }
 
-		return null;
-	}
-
-        @Override
-	public String toString() {
-		return no + ", " + description;
-	}
+    @Override
+    public String toString() {
+        return no + ", " + description;
+    }
 }

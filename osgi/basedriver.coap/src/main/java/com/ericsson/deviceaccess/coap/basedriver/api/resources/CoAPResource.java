@@ -118,7 +118,7 @@ public class CoAPResource {
      */
     private URI resourceIdentifier;
 
-    private List observers;
+    private List<CoAPResourceObserver> observers;
 
     private byte[] content;
 
@@ -143,46 +143,30 @@ public class CoAPResource {
      * The following enum is to represent the resources that are received from
      * californium server
      */
-    public static class CoAPResourceType {
+    public static enum CoAPResourceType {
+
+        CARELESS("/careless"),
+        FEEDBACK("/feedback"),
+        HELLO_WORLD("/helloWorld"),
+        LARGE("/large"),
+        MIRROR("/mirror"),
+        SEPARATE("/separate"),
+        STORAGE("/storage"),
+        TIME_RESOURCE("/timeResource"),
+        TO_UPPER("/toUpper"),
+        WEATHER_RESOURCE("/weatherResource"),
+        OTHER("/other");
 
         private final String path;
-        private static final List values = new ArrayList<>();
-
-        public static final CoAPResourceType CARELESS = new CoAPResourceType(
-                "/careless");
-        public static final CoAPResourceType FEEDBACK = new CoAPResourceType(
-                "/feedback");
-        public static final CoAPResourceType HELLO_WORLD = new CoAPResourceType(
-                "/helloWorld");
-        public static final CoAPResourceType LARGE = new CoAPResourceType(
-                "/large");
-        public static final CoAPResourceType MIRROR = new CoAPResourceType(
-                "/mirror");
-        public static final CoAPResourceType SEPARATE = new CoAPResourceType(
-                "/separate");
-        public static final CoAPResourceType STORAGE = new CoAPResourceType(
-                "/storage");
-        public static final CoAPResourceType TIME_RESOURCE = new CoAPResourceType(
-                "/timeResource");
-        public static final CoAPResourceType TO_UPPER = new CoAPResourceType(
-                "/toUpper");
-        public static final CoAPResourceType WEATHER_RESOURCE = new CoAPResourceType(
-                "/weatherResource");
-        public static final CoAPResourceType OTHER = new CoAPResourceType(
-                "/other");
 
         private CoAPResourceType(String path) {
             this.path = path;
         }
 
-        public static List getValues() {
-            return values;
-        }
-
         public String getPath() {
             return this.path;
         }
-    };
+    }
 
     /**
      * Constructor. A CoAP resource is identified using the URI
@@ -197,12 +181,12 @@ public class CoAPResource {
         this.interfaceDescription = "";
         this.resourceType = "";
         this.maxAge = 2; // default value by core 08
-        this.observers = new LinkedList();
+        this.observers = new LinkedList<>();
         this.title = "";
         this.titleAsterisk = "";
         this.relationType = "";
         this.type = CoAPResourceType.OTHER;
-        this.values = new HashMap();
+        this.values = new HashMap<>();
         this.host = "";
     }
 
@@ -243,43 +227,35 @@ public class CoAPResource {
      */
     public String getLinkFormatPresentation(boolean absolute)
             throws CoAPException {
-        String linkformat = "";
+        StringBuilder linkformat = new StringBuilder();
 
-        if (absolute && this.resourceIdentifier.getHost() == null
-                && this.host.equals("")) {
+        if (absolute && this.resourceIdentifier.getHost() == null && host.equals("")) {
             throw new CoAPException("No host defined for the resource");
         }
 
         if (!absolute) {
-            linkformat = "<" + this.resourceIdentifier.getPath() + ">";
+            linkformat.append("<").append(resourceIdentifier.getPath()).append(">");
         } else {
-
-            String path = this.resourceIdentifier.toString();
+            String path = resourceIdentifier.toString();
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
             String h = "";
-            if (this.resourceIdentifier.getHost() != null) {
-                h = this.resourceIdentifier.getHost();
-            } else if (!this.host.equals("")) {
-                h = this.host;
+            if (resourceIdentifier.getHost() != null) {
+                h = resourceIdentifier.getHost();
+            } else if (!host.equals("")) {
+                h = host;
             }
 
-            linkformat = "<coap://" + h + path + ">";
+            linkformat.append("<coap://").append(h).append(path).append(">");
 
         }
 
-        Set set = values.keySet();
-        Iterator it = set.iterator();
-
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            linkformat += ";";
-            String value = (String) values.get(key);
-            linkformat += key + "=" + value;
-        }
-        linkformat = linkformat.trim();
-        return linkformat;
+        values.forEach((k, v) -> {
+            linkformat.append(";");
+            linkformat.append(k).append("=").append(v);
+        });
+        return linkformat.toString().trim();
     }
 
     /**
@@ -521,11 +497,11 @@ public class CoAPResource {
      *
      * @return list of observers
      */
-    public List getObservers() {
+    public List<CoAPResourceObserver> getObservers() {
         return this.observers;
     }
 
-    public HashMap getAttributes() {
+    public HashMap<String, String> getAttributes() {
         return this.values;
     }
 
@@ -537,7 +513,7 @@ public class CoAPResource {
      * @return attribute value or null if not found
      */
     public String getAttribute(String attributeName) {
-        return (String) this.values.get(attributeName);
+        return values.get(attributeName);
     }
 
     /**
@@ -548,7 +524,7 @@ public class CoAPResource {
      */
     public void setKey(String key) {
         this.key = key;
-        this.values.put(KEY, this.key);
+        values.put(KEY, this.key);
     }
 
     public String getKey() {
@@ -564,29 +540,19 @@ public class CoAPResource {
      * @return boolean value indicating whether or not this resource matches the
      * given parameters
      */
-    public boolean matchWithQueryParams(HashMap params) {
-
-        // TODO google collections would provide better means for this but as no
-        // java 6 supported by the basedriver.coap, this hack for now..
-        Set queryKeys = params.keySet();
-        Iterator it = queryKeys.iterator();
-        int nofMatches = 0;
-
-        while (it.hasNext()) {
-            String queryKey = (String) it.next();
-            if (this.values.get(queryKey) != null) {
-
-                String queryValue = (String) params.get(queryKey);
-                if (!queryValue.startsWith("\"") && !queryValue.endsWith("\"")) {
-                    queryValue = "\"" + queryValue + "\"";
-                }
-                if (this.values.get(queryKey).equals(queryValue)) {
-                    nofMatches++;
-                }
-            }
-        }
-
-        return nofMatches == params.size();
+    public boolean matchWithQueryParams(HashMap<String, String> params) {
+        return params.entrySet().stream()
+                .filter(e -> values.containsKey(e.getKey()))
+                .map(e -> {
+                    String v = e.getValue();
+                    if (!v.startsWith("\"") && !v.endsWith("\"")) {
+                        v = "\"" + v + "\"";
+                    }
+                    e.setValue(v);
+                    return e;
+                })
+                .filter(e -> values.get(e.getKey()).equals(e.getValue()))
+                .count() == params.size();
     }
 
 }

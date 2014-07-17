@@ -65,11 +65,11 @@ import java.util.*;
  */
 public class ObservationHandler {
 
-    private HashMap observedResources;
+    private HashMap<URI, CoAPObservationResource> observedResources;
 
-    private HashMap originalRequests;
+    private HashMap<URI, CoAPRequest> originalRequests;
 
-    private HashMap cachedResponses;
+    private HashMap<URI, RefreshTask> cachedResponses;
 
     private Timer timer;
 
@@ -143,40 +143,34 @@ public class ObservationHandler {
      */
     public void handleObserveResponse(CoAPRequest originalRequest,
             CoAPResponse resp) throws CoAPException {
-		// Handle responses related to observe relationships
+        // Handle responses related to observe relationships
 		/*
          CoAPActivator.logger
          .debug("Response is related to an observation relationship");
          */
 
         URI uri = originalRequest.getUriFromRequest();
-        CoAPObservationResource res = (CoAPObservationResource) this.observedResources
-                .get(uri);
+        CoAPObservationResource res = this.observedResources.get(uri);
 
         if (resp.getOptionHeaders(CoAPOptionName.OBSERVE) == null
                 || resp.getOptionHeaders(CoAPOptionName.OBSERVE).isEmpty()) {
 
-			// this means the response is terminating an observation
+            // this means the response is terminating an observation
             // relationship
             this.observedResources.remove(res.getUri());
-            List observers = res.getObservers();
-            Iterator it = observers.iterator();
-            while (it.hasNext()) {
-                CoAPResourceObserver obs = (CoAPResourceObserver) it.next();
+            List<CoAPResourceObserver> observers = res.getObservers();
+            observers.forEach(obs -> {
+                obs.observationRelationshipTerminated(resp, res, originalRequests.get(res.getUri()));
+            });
 
-                obs.observationRelationshipTerminated(resp, res,
-                        (CoAPRequest) originalRequests.get(res.getUri()));
-            }
-
-            RefreshTask oldTask = (RefreshTask) this.cachedResponses.get(uri);
+            RefreshTask oldTask = this.cachedResponses.get(uri);
             if (oldTask != null) {
                 oldTask.cancel();
             }
             return;
         }
 
-        CoAPOptionHeader h = (CoAPOptionHeader) resp.getOptionHeaders(
-                CoAPOptionName.OBSERVE).get(0);
+        CoAPOptionHeader h = resp.getOptionHeaders(CoAPOptionName.OBSERVE).get(0);
 
         byte[] bytes = h.getValue();
 
@@ -199,15 +193,14 @@ public class ObservationHandler {
                     return;
                 }
             } else {
-                System.out
-                        .println("TODO handling of freshness of blockwise observe responses");
+                System.out.println("TODO handling of freshness of blockwise observe responses");
             }
         }
 
         // Put in the cached responses, replacing the old task if
         RefreshTask task = new RefreshTask(resp, uri);
 
-        RefreshTask oldTask = (RefreshTask) this.cachedResponses.get(uri);
+        RefreshTask oldTask = this.cachedResponses.get(uri);
         if (oldTask != null) {
             oldTask.cancel();
         }
@@ -218,11 +211,11 @@ public class ObservationHandler {
         long maxAge = resp.getMaxAge();
 
         // from draft-ietf-core-observe-03, read the max-ofe header too
-        List l = resp.getOptionHeaders(CoAPOptionName.MAX_OFE);
+        List<CoAPOptionHeader> l = resp.getOptionHeaders(CoAPOptionName.MAX_OFE);
         // by default the maxOfe is 0
         int maxOfe = 0;
         if (l.size() > 0) {
-            h = (CoAPOptionHeader) l.get(0);
+            h = l.get(0);
             bytes = h.getValue();
 
             // make the header 4 bytes long
@@ -262,14 +255,11 @@ public class ObservationHandler {
             byte[] content = resp.getPayload();
             res.setContent(content);
 
-            List observers = res.getObservers();
-            Iterator i = observers.iterator();
-            while (i.hasNext()) {
-                CoAPResourceObserver observer = (CoAPResourceObserver) i.next();
-                CoAPRequest req = (CoAPRequest) this.originalRequests.get(res
-                        .getUri());
+            List<CoAPResourceObserver> observers = res.getObservers();
+            observers.forEach((observer) -> {
+                CoAPRequest req = originalRequests.get(res.getUri());
                 observer.observeResponseReceived(resp, res, req);
-            }
+            });
         }
     }
 
@@ -285,15 +275,15 @@ public class ObservationHandler {
             CoAPResourceObserver observer) throws CoAPException {
 
         boolean removed = resource.removeObserver(observer);
-        List observers = resource.getObservers();
+        List<CoAPResourceObserver> observers = resource.getObservers();
 
         if (removed) {
-			// If no more observers are left, finish the observation
+            // If no more observers are left, finish the observation
             // relationship by
             // sending a request without observe option
             if (observers.isEmpty()) {
 
-				// TODO should the termination request be confirmable or
+                // TODO should the termination request be confirmable or
                 // non-confirmable
                 InetSocketAddress sockaddr = null;
                 try {
@@ -323,7 +313,7 @@ public class ObservationHandler {
     }
 
     public CoAPResource getResource(URI uri) {
-        return (CoAPResource) this.observedResources.get(uri);
+        return observedResources.get(uri);
     }
 
     /**
@@ -360,22 +350,19 @@ public class ObservationHandler {
         CoAPObservationResource resource;
 
         // Check if there already exist observation for this resource
-        if (this.observedResources.containsKey(uri)) {
+        if (observedResources.containsKey(uri)) {
             // get the resource based on key
-            resource = (CoAPObservationResource) this.observedResources
-                    .get(uri);
+            resource = observedResources.get(uri);
             resource.addObserver(observer);
 
             // Notify with a cached response
-            if (this.cachedResponses.containsKey(uri)) {
+            if (cachedResponses.containsKey(uri)) {
                 /*
                  CoAPActivator.logger
                  .debug("A fresh response still found in cache");
                  */
-                observer.observeResponseReceived(
-                        ((RefreshTask) this.cachedResponses.get(uri))
-                        .getResponse(), resource,
-                        (CoAPRequest) this.originalRequests.get(uri));
+                observer.observeResponseReceived(cachedResponses.get(uri).getResponse(),
+                        resource, originalRequests.get(uri));
             } // If the response in the cache is older than max-age + max-ofe,
             // send a further observation request
             else {

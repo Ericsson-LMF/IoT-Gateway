@@ -75,5 +75,4 @@ public interface IncomingCoAPListener {
      */
     public IncomingMessageHandler getIncomingMessageHandler();
 
-
 }

@@ -195,7 +195,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
             this.length = 3;
         }
 
-		// super.setValue(this.encode());
+        // super.setValue(this.encode());
 
         /*
          * BlockOptionHeader option = new BlockOptionHeader(

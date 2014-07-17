@@ -71,10 +71,9 @@ public class LinkFormatReader {
 
         // multiple link descriptions are separated by commas
         // TODO fix me: if resource description contains a comma!!
-
         List<String> lines = new LinkedList();
         int index = 0;
-        
+
         for (String token : linkFormatString.split(",")) {
             if (tokenValid(token)) {
                 lines.add(token);

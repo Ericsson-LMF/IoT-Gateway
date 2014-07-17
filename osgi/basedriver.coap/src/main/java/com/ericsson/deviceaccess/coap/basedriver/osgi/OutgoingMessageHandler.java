@@ -37,6 +37,7 @@ package com.ericsson.deviceaccess.coap.basedriver.osgi;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.*;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
+import java.net.InetSocketAddress;
 
 import java.util.*;
 
@@ -74,13 +75,13 @@ public class OutgoingMessageHandler {
 
     private static final int MAX_RETRANSMIT = 4;
 
-	// TODO outgoing message cache should be cleaned up!!!
+    // TODO outgoing message cache should be cleaned up!!!
     // note that in case of transmission, the current state should be sent out
     // (rather than an old snapshot)
     // All sent messages with token as key
-    private HashMap outgoingReplies;
+    private HashMap<String, CoAPResponse> outgoingReplies;
 
-    private HashMap outgoingRequests;
+    private HashMap<String, CoAPRequest> outgoingRequests;
 
     // message id 16 bits, so values between 0 and 65535
     public final static int MESSAGE_ID_MAX = 65535;
@@ -95,7 +96,7 @@ public class OutgoingMessageHandler {
 
     private Timer timer;
 
-    private HashMap retransmissionTasks;
+    private HashMap<InetSocketAddress, RetransmissionTask> retransmissionTasks;
 
     /**
      * Constructor is protected, an instance of this handler should be fetched
@@ -105,11 +106,11 @@ public class OutgoingMessageHandler {
      */
     protected OutgoingMessageHandler(TransportLayerSender sender) {
         this.messageId = -1;
-        this.outgoingReplies = new HashMap();
-        this.outgoingRequests = new HashMap();
+        this.outgoingReplies = new HashMap<>();
+        this.outgoingRequests = new HashMap<>();
         this.timer = new Timer();
         this.sender = sender;
-        this.retransmissionTasks = new HashMap();
+        this.retransmissionTasks = new HashMap<>();
     }
 
     /**
@@ -119,13 +120,13 @@ public class OutgoingMessageHandler {
      * @param retransmission set to true if the message is resent
      */
     protected void send(CoAPMessage msg, boolean retransmission) {
-		// System.out.println("SEND REQUEST: " + msg.getMessageType().toString()
+        // System.out.println("SEND REQUEST: " + msg.getMessageType().toString()
         // + " and id: " + msg.getIdentifier());
         // Can send a new request to the same host, if no messages are in the
         // retransmission queue
         if (!retransmission
                 && retransmissionTasks.containsKey(msg.getSocketAddress())
-                && msg.getClass() == CoAPRequest.class) {
+                && msg instanceof CoAPRequest) {
             CoAPRequest req = (CoAPRequest) msg;
 
             if (req.getListener() != null) {
@@ -154,7 +155,7 @@ public class OutgoingMessageHandler {
                  CoAPActivator.logger.debug("Schedule retransmission");
                  */
 
-				// Create retransmission only if this is not multicast message
+                // Create retransmission only if this is not multicast message
                 RetransmissionTask task = new RetransmissionTask(msg);
                 this.retransmissionTasks.put(msg.getSocketAddress(), task);
 
@@ -170,23 +171,20 @@ public class OutgoingMessageHandler {
                 msg.setMessageCanceled(true);
 
                 // Remove message from the memory
-                if (msg.getClass() == CoAPRequest.class) {
-                    this.outgoingRequests.remove(msg);
-
-                    CoAPRequestListener listener = ((CoAPRequest) msg)
-                            .getListener();
+                if (msg instanceof CoAPRequest) {
+                    outgoingRequests.remove(msg.getIdentifier());
+                    CoAPRequestListener listener = ((CoAPRequest) msg).getListener();
                     if (listener != null) {
                         listener.maximumRetransmissionsReached((CoAPRequest) msg);
                     }
-
-                } else if (msg.getClass() == CoAPResponse.class) {
-                    this.outgoingReplies.remove(msg);
+                } else if (msg instanceof CoAPResponse) {
+                    outgoingReplies.remove(msg.getIdentifier());
                 }
             }
         }
 
         if (!retransmission) {
-			// cache outgoing confirmable and non-confirm and ack if it has
+            // cache outgoing confirmable and non-confirm and ack if it has
             // content
             if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE
                     || msg.getMessageType() == CoAPMessageType.NON_CONFIRMABLE) {
@@ -224,10 +222,10 @@ public class OutgoingMessageHandler {
      * @param msg message to cache
      */
     private synchronized void cacheMessage(CoAPMessage msg) {
-        if (msg.getClass() == CoAPRequest.class) {
-            this.outgoingRequests.put(msg.getIdentifier(), (CoAPRequest) msg);
-        } else if (msg.getClass() == CoAPResponse.class) {
-            this.outgoingReplies.put(msg.getIdentifier(), (CoAPResponse) msg);
+        if (msg instanceof CoAPRequest) {
+            outgoingRequests.put(msg.getIdentifier(), (CoAPRequest) msg);
+        } else if (msg instanceof CoAPResponse) {
+            outgoingReplies.put(msg.getIdentifier(), (CoAPResponse) msg);
         }
     }
 
@@ -260,7 +258,7 @@ public class OutgoingMessageHandler {
      *
      * @return list of responses
      */
-    public synchronized HashMap getOutgoingResponses() {
+    public synchronized HashMap<String, CoAPResponse> getOutgoingResponses() {
         return this.outgoingReplies;
     }
 
@@ -269,7 +267,7 @@ public class OutgoingMessageHandler {
      *
      * @return list of requests
      */
-    public synchronized HashMap getOutgoingRequests() {
+    public synchronized HashMap<String, CoAPRequest> getOutgoingRequests() {
         return this.outgoingRequests;
     }
 
@@ -282,12 +280,9 @@ public class OutgoingMessageHandler {
     protected synchronized void removeRetransmissionTask(CoAPMessage message) {
         RetransmissionTask task = null;
 
-		// Iterate first to find the task to remove, then remove to avoid
+        // Iterate first to find the task to remove, then remove to avoid
         // concurrentmodificationexception
-        for (Iterator i = this.retransmissionTasks.values().iterator(); i
-                .hasNext();) {
-
-            RetransmissionTask t = (RetransmissionTask) i.next();
+        for (RetransmissionTask t : retransmissionTasks.values()) {
             if (t.getMessage().getIdentifier().equals(message.getIdentifier())) {
                 task = t;
                 break;
@@ -296,8 +291,7 @@ public class OutgoingMessageHandler {
 
         if (task != null) {
             task.cancel();
-            RetransmissionTask t = (RetransmissionTask) this.retransmissionTasks
-                    .remove(message.getSocketAddress());
+            RetransmissionTask t = retransmissionTasks.remove(message.getSocketAddress());
         }
     }
 

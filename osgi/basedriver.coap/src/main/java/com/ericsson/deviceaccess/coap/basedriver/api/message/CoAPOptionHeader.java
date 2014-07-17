@@ -45,9 +45,9 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
     /**
      * Enum for option names
      */
-	// Core draft 07 options + observe option (draft 02) + block options
+    // Core draft 07 options + observe option (draft 02) + block options
     // (draft 04)
-	// Odd numbers indicate a
+    // Odd numbers indicate a
     // critical option, while even numbers indicate an elective option.
     // Add more options if needed
 
@@ -147,7 +147,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         this.value = value;
     }
 
-	// TODO other constructores needed?
+    // TODO other constructores needed?
     /**
      * Return the name of the option
      *
@@ -166,7 +166,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         return this.optionNumber;
     }
 
-	// TODO add setters if needed
+    // TODO add setters if needed
     /**
      * This method can be used to check if the option is critical. Odd number
      * means a critical option.

@@ -91,7 +91,8 @@ public class CoAPMessageHandlerFactory {
      * if no instance has been created yet. If one has been created already,
      * return that one.
      *
-     * @param sender instance of a TransportLayerSender needed for sending messages
+     * @param sender instance of a TransportLayerSender needed for sending
+     * messages
      * @return an instance of OutgoingMessageHandler
      */
     public OutgoingMessageHandler getOutgoingCoAPMessageHandler(

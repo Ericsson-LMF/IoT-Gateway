@@ -63,7 +63,7 @@ public class CoAPException extends Exception {
      * Constructor
      *
      * @param message error message
-     * @param cause   throwable
+     * @param cause throwable
      */
     public CoAPException(String message, Throwable cause) {
         super(message, cause);

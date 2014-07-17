@@ -58,47 +58,29 @@ public abstract class CoAPMessage {
     /**
      * Enum representing the type of the message (as defined in coap core 07)
      */
-    public static class CoAPMessageType {
+    public static enum CoAPMessageType {
+
+        CONFIRMABLE("Confirmable"),
+        NON_CONFIRMABLE("Non-Confirmable"),
+        ACKNOWLEDGEMENT("Acknowledgement"),
+        RESET("Reset");
 
         private final String name;
-        private final int no;
-        private static final List<CoAPMessageType> types = new ArrayList<>();
 
-        public static final CoAPMessageType CONFIRMABLE = new CoAPMessageType(
-                0, "Confirmable");
-        public static final CoAPMessageType NON_CONFIRMABLE = new CoAPMessageType(
-                1, "Non-Confirmable");
-        public static final CoAPMessageType ACKNOWLEDGEMENT = new CoAPMessageType(
-                2, "Acknowledgement");
-        public static final CoAPMessageType RESET = new CoAPMessageType(3,
-                "Reset");
-
-        private CoAPMessageType(int no, String name) {
+        private CoAPMessageType(String name) {
             this.name = name;
-            this.no = no;
-            types.add(this);
         }
 
         public String getName() {
             return this.name;
         }
 
-        public int getNo() {
-            return this.no;
-        }
-
         public static CoAPMessageType getType(int no) {
-            for (CoAPMessageType type : types) {
-                if (type.getNo() == no) {
-                    return type;
-                }
+            try {
+                return CoAPMessageType.values()[no];
+            } catch (Exception e) {
+                return null;
             }
-            return null;
-        }
-
-        @Override
-        public String toString() {
-            return no + ", " + name;
         }
     }
 
@@ -161,7 +143,7 @@ public abstract class CoAPMessage {
     /**
      * List of options. Options MUST appear in order of their Option Number.
      */
-    private LinkedList<CoAPOptionHeader> headers;
+    private List<CoAPOptionHeader> headers;
 
     /**
      * Constructor.
@@ -558,7 +540,7 @@ public abstract class CoAPMessage {
      *
      * @return option headers in this message
      */
-    public LinkedList getOptionHeaders() {
+    public List<CoAPOptionHeader> getOptionHeaders() {
         return this.headers;
     }
 
@@ -569,7 +551,7 @@ public abstract class CoAPMessage {
      * @param optionName option to be found
      * @return list of options with the given option name.
      */
-    public List getOptionHeaders(CoAPOptionName optionName) {
+    public List<CoAPOptionHeader> getOptionHeaders(CoAPOptionName optionName) {
         return headers.stream().filter(header -> header.getOptionName().equals(optionName.getName())).collect(Collectors.toList());
     }
 
@@ -578,7 +560,7 @@ public abstract class CoAPMessage {
      *
      * @param headers list of option headers
      */
-    public void setOptionHeaders(LinkedList headers) {
+    public void setOptionHeaders(List<CoAPOptionHeader> headers) {
         this.headers.clear();
         this.headers = headers;
     }
@@ -747,10 +729,10 @@ public abstract class CoAPMessage {
      */
     public long getMaxAge() throws CoAPException {
         int maxAge = 60;
-        List maxAgeOption = this.getOptionHeaders(CoAPOptionName.MAX_AGE);
+        List<CoAPOptionHeader> maxAgeOption = this.getOptionHeaders(CoAPOptionName.MAX_AGE);
         // If max-age is in the message, it should be there only once
         if (maxAgeOption.size() == 1) {
-            byte[] bytes = ((CoAPOptionHeader) maxAgeOption.get(0)).getValue();
+            byte[] bytes = maxAgeOption.get(0).getValue();
 
             if (bytes.length < 4) {
                 ByteArrayOutputStream s = new ByteArrayOutputStream();
@@ -777,9 +759,7 @@ public abstract class CoAPMessage {
         }
 
         // Make signed int to unsigned int -> becomes long
-        long unsignedLong = 0xffffffffL & maxAge;
-
-        return unsignedLong;
+        return 0xffffffffL & maxAge;
     }
 
     /**
@@ -843,10 +823,7 @@ public abstract class CoAPMessage {
                         + "]\n";
             }
 
-            Iterator it = this.getOptionHeaders().iterator();
-            while (it.hasNext()) {
-                CoAPOptionHeader h = (CoAPOptionHeader) it.next();
-
+            this.getOptionHeaders().forEach(item -> {
                 CoAPOptionHeaderConverter converter = new CoAPOptionHeaderConverter();
                 /*
                  String headerValue = "";
@@ -854,7 +831,7 @@ public abstract class CoAPMessage {
                  logMessage += "Option [" + h.getOptionName() + "] value ["
                  + headerValue + "]\n";
                  */
-            }
+            });
             // payload
             if (this.getPayload() != null) {
                 try {

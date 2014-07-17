@@ -33,7 +33,6 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
  * 
  */
-
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
 /**
@@ -48,7 +47,6 @@ public class BitOperations {
     private BitOperations() {
     }
 
-
     /**
      * Get value of bit n in an integer (32 bits)
      *
@@ -59,7 +57,6 @@ public class BitOperations {
         return (byte) ((i >> n) & 1);
     }
 
-
     /**
      * Get value of bit n in a long (64 bits)
      *
@@ -69,7 +66,6 @@ public class BitOperations {
     public static byte getBitInLong(long l, int n) {
         return (byte) ((l >> (long) n) & 1L);
     }
-
 
     /**
      * Get value of bit n in a byte (8 bits)
@@ -119,7 +115,6 @@ public class BitOperations {
 
     }
 
-
     /**
      * Set bit n of a 32-bit sequence i to v (0 or 1)
      *
@@ -137,7 +132,6 @@ public class BitOperations {
         }
 
     }
-
 
     /**
      * Set bit n of a 64-bit sequence i to v (0 or 1)
@@ -157,11 +151,10 @@ public class BitOperations {
 
     }
 
-
     /**
-     * Set k bits starting from bit n in a 32-bit sequence according to v,
-     * i.e., bits from n to n+k of 'i' are set according to 'v'.
-     * So if v=1010 and k=4, bits from n to n+4 of 'i' are set to 1010.
+     * Set k bits starting from bit n in a 32-bit sequence according to v, i.e.,
+     * bits from n to n+k of 'i' are set according to 'v'. So if v=1010 and k=4,
+     * bits from n to n+4 of 'i' are set to 1010.
      *
      * @param i is a 32-bit sequence
      * @param n is the starting position
@@ -173,13 +166,12 @@ public class BitOperations {
         return ((i & ~(~(~0 << k) << n)) | (v << n));
     }
 
-
     /**
-     * Return a 'long' value with k bits starting at bit n assigned according to v
-     * I.e. bits from n to n+k of 'i' are set according to 'v'.
-     * So if v=1010 and k=4, bits from n to n+4 of 'i' are set to 1010.
-     * Note that the argument 'v' must be a long, since it is shifted by 'n',
-     * the maximum value for which is 63.
+     * Return a 'long' value with k bits starting at bit n assigned according to
+     * v I.e. bits from n to n+k of 'i' are set according to 'v'. So if v=1010
+     * and k=4, bits from n to n+4 of 'i' are set to 1010. Note that the
+     * argument 'v' must be a long, since it is shifted by 'n', the maximum
+     * value for which is 63.
      *
      * @param l is the long value to be manipulated
      * @param n is the starting position
@@ -194,11 +186,10 @@ public class BitOperations {
         return ((temp3) | (v << n));
     }
 
-
     /**
-     * Set k bits starting from bit n in the value i to v.
-     * I.e. bits from n to n+k of 'i' are set according to 'v'.
-     * So if v=1010 and k=4, bits from n to n+4 of 'i' are set to 1010.
+     * Set k bits starting from bit n in the value i to v. I.e. bits from n to
+     * n+k of 'i' are set according to 'v'. So if v=1010 and k=4, bits from n to
+     * n+4 of 'i' are set to 1010.
      *
      * @param i is the value in which bits should be set
      * @param n is the starting position
@@ -210,11 +201,10 @@ public class BitOperations {
         return (byte) ((i & ~(~(~0 << k) << n)) | (v << n));
     }
 
-
     /**
-     * Set k bits starting from bit n in value s according to v.
-     * I.e., bits from n to n+k of 'i' are set according to 'v'.
-     * So if v=1010 and k=4, bits from n to n+4 of 'i' are set to 1010.
+     * Set k bits starting from bit n in value s according to v. I.e., bits from
+     * n to n+k of 'i' are set according to 'v'. So if v=1010 and k=4, bits from
+     * n to n+4 of 'i' are set to 1010.
      *
      * @param s is the value in which bits should be set
      * @param n is the starting position
@@ -225,7 +215,6 @@ public class BitOperations {
     public static short setBitsInShort(short s, int n, int k, int v) {
         return (short) ((s & ~(~(~0 << k) << n)) | (v << n));
     }
-
 
     /**
      * Get the value of k bits starting from position n in an integer i.
@@ -239,7 +228,6 @@ public class BitOperations {
         return (byte) ((i & (~(~0 << k) << n)) >> n);
     }
 
-
     /**
      * Get the value of k bits at position n in an integer i
      *
@@ -251,7 +239,6 @@ public class BitOperations {
     public static short getBitsInIntAsShort(int i, int n, int k) {
         return (short) ((i & (~(~0 << k) << n)) >> n);
     }
-
 
     /**
      * Get value of k bits at position n in a long. Return a byte.
@@ -275,7 +262,6 @@ public class BitOperations {
         return (int) (temp3 >> n);
     }
 
-
     /**
      * Get value of k bits at position n in a long. Return a byte.
      *
@@ -298,7 +284,6 @@ public class BitOperations {
         return (byte) (temp3 >> n);
     }
 
-
     /**
      * Get value of k bits at position n in an integer. Return a short.
      *
@@ -310,7 +295,6 @@ public class BitOperations {
     public static short getBitsInLongAsShort(long i, int n, int k) {
         return (short) ((i & (~(~0 << k) << n)) >> n);
     }
-
 
     /**
      * Get value of k bits at position n in byte i. Return a byte.
@@ -324,7 +308,6 @@ public class BitOperations {
         return (byte) ((i & (~(~0 << k) << n)) >> n);
     }
 
-
     /**
      * Get value of k bits at position n in a short. Return a byte.
      *
@@ -337,7 +320,6 @@ public class BitOperations {
         return (byte) ((i & (~(~0 << k) << n)) >> n);
     }
 
-
     /**
      * Get value of k bits at position n in an integer. Return an integer.
      *
@@ -349,7 +331,6 @@ public class BitOperations {
     public static int getBitsInIntAsInt(int i, int n, int k) {
         return ((i & (~(~0 << k) << n)) >> n);
     }
-
 
     /**
      * Splits an integer (32 bits) into four bytes (8 bits each)
@@ -369,7 +350,6 @@ public class BitOperations {
         return bytes;
 
     }
-
 
     /**
      * Splits a long (64 bits) into eight bytes (8 bits each)
@@ -394,7 +374,6 @@ public class BitOperations {
 
     }
 
-
     /**
      * Splits a short (16 bits) into two bytes (8 bits each)
      *
@@ -411,7 +390,6 @@ public class BitOperations {
         return bytes;
 
     }
-
 
     /**
      * Merge eight bytes into a long
@@ -443,7 +421,6 @@ public class BitOperations {
 
     }
 
-
     /**
      * Merge four bytes in to an integer
      *
@@ -466,7 +443,6 @@ public class BitOperations {
 
     }
 
-
     /**
      * Merge two bytes into a short
      *
@@ -484,7 +460,6 @@ public class BitOperations {
         return result;
 
     }
-
 
     /**
      * Get a string presentation of the 64 bits in a long
@@ -518,7 +493,6 @@ public class BitOperations {
 
     }
 
-
     /**
      * Get a string presentation of the 32 bits in the integer
      *
@@ -550,7 +524,6 @@ public class BitOperations {
         return result;
 
     }
-
 
     /**
      * Get a string presentation of the 8 bits in a byte

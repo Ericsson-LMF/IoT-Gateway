@@ -44,7 +44,8 @@ import java.net.DatagramPacket;
 public interface IncomingMessageListener {
 
     /**
-     * This listener method will be called when a new datagram packet is received
+     * This listener method will be called when a new datagram packet is
+     * received
      *
      * @param datagram received packet
      * @throws CoAPException

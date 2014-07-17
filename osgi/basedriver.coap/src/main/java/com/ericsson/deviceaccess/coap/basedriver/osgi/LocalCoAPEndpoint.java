@@ -88,7 +88,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     private int maxBlockSize;
     private int maxSzx;
 
-    private final HashMap incomingResponseCache;
+    private final HashMap<URI, CachedResponse> incomingResponseCache;
     private final BlockwiseResponseCache ongoingBlockwiseResponses;
 
     /**
@@ -136,7 +136,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         this.outgoingMessageHandler = outgoingMessageHandler;
         this.incomingMessageHandler = incomingMessageHandler;
         this.observationHandler = new ObservationHandler(this);
-        this.incomingResponseCache = new HashMap();
+        this.incomingResponseCache = new HashMap<>();
         this.timer = new Timer();
 
         this.maxBlockSize = 1024;
@@ -174,7 +174,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         // check if a matching cached response could be found
         try {
             URI destination = request.getUriFromRequest();
-            CachedResponse resp = (CachedResponse) this.incomingResponseCache.get(destination);
+            CachedResponse resp = this.incomingResponseCache.get(destination);
 
             // If no match, move on
             if (resp == null) {
@@ -222,9 +222,9 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             } else {
                 // If the response included a block2 option, do not use cached
                 // response (blockwise transfer)
-                List block2Headers = resp.getCachedResponse().getOptionHeaders(
+                List<CoAPOptionHeader> block2Headers = resp.getCachedResponse().getOptionHeaders(
                         CoAPOptionName.BLOCK2);
-                if (block2Headers.size() > 0) {
+                if (!block2Headers.isEmpty()) {
                     this.outgoingMessageHandler.send(request, false);
                     return;
                 }
@@ -254,9 +254,9 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                     return;
                 }
 
-                LinkedList headers = request.optionsForMatching();
+                List<CoAPOptionHeader> headers = request.optionsForMatching();
                 Collections.sort(headers);
-                LinkedList originalHeaders = originalReq.optionsForMatching();
+                List<CoAPOptionHeader> originalHeaders = originalReq.optionsForMatching();
                 Collections.sort(originalHeaders);
 
                 int toRemove = 0;
@@ -297,7 +297,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 // Replace token header with the token from the request
                 CoAPOptionHeader tokenHeader = request.getTokenHeader();
                 CoAPOptionHeader oldTokenHeader = response.getTokenHeader();
-                LinkedList options = response.getOptionHeaders();
+                List<CoAPOptionHeader> options = response.getOptionHeaders();
 
                 // Replace max-age option header
                 List maxAgeHeader = response
@@ -400,8 +400,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
         boolean hasEtagOption = false;
         boolean hasTokenOption = false;
-        for (Iterator i = response.getOptionHeaders().iterator(); i.hasNext();) {
-            CoAPOptionHeader optionHeader = (CoAPOptionHeader) i.next();
+        for (CoAPOptionHeader optionHeader : response.getOptionHeaders()) {
             String optionName = optionHeader.getOptionName();
             if (CoAPOptionName.ETAG.getName().equals(optionName)) {
                 hasEtagOption = true;
@@ -431,8 +430,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
         CoAPRequest request = this.incomingMessageHandler.getIncomingRequest(response);
         if (request != null) {
-            for (Iterator i = request.getOptionHeaders().iterator(); i.hasNext();) {
-                CoAPOptionHeader optionHeader = (CoAPOptionHeader) i.next();
+            for (CoAPOptionHeader optionHeader : request.getOptionHeaders()) {
                 String optionName = optionHeader.getOptionName();
                 if (CoAPOptionName.BLOCK2.getName().equals(optionName)) {
                     hasBlock2Option = true;
@@ -491,7 +489,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         // look up blockwise response cache if Request is GET and has Block2 option
         int code = request.getCode();
         boolean hasBlock2Option = (request.getOptionHeaders(CoAPOptionName.BLOCK2).size() > 0);
-        if ((code == CoAPMethodCode.GET.code) && (hasBlock2Option)) {
+        if ((code == CoAPMethodCode.GET.ordinal()) && (hasBlock2Option)) {
             try {
                 SessionData sessionData = this.ongoingBlockwiseResponses.get(request);
                 if (sessionData != null) {
@@ -572,12 +570,9 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
          + resp.getMessageType().toString() + "] received");
          */
 
-        LinkedList headers = resp.getOptionHeaders();
+        List<CoAPOptionHeader> headers = resp.getOptionHeaders();
 
-        Iterator it = headers.iterator();
-        while (it.hasNext()) {
-            CoAPOptionHeader h = (CoAPOptionHeader) it.next();
-
+        headers.stream().forEach(h -> {
             CoAPOptionHeaderConverter converter = new CoAPOptionHeaderConverter();
             /*
              String headerValue = "";
@@ -586,7 +581,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
              + h.getOptionName() + "] in the response with value ["
              + headerValue + "]");
              */
-        }
+        });
 
         if (resp.getMessageType() == CoAPMessageType.RESET) {
             this.handleReset(resp);
@@ -1096,16 +1091,11 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     }
 
     private void replyWithNotImplemented(CoAPRequest request) {
-        LinkedList options = request.getOptionHeaders();
-        Iterator it = options.iterator();
         int messageId = request.getMessageId();
         CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
                 CoAPResponseCode.NOT_IMPLEMENTED.getNo(), messageId);
 
-        // Go through different option numbers
-        while (it.hasNext()) {
-            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-
+        for (CoAPOptionHeader header : request.getOptionHeaders()) {
             if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
                 CoAPOptionHeader respHeader = new CoAPOptionHeader(
                         CoAPOptionName.TOKEN, header.getValue());

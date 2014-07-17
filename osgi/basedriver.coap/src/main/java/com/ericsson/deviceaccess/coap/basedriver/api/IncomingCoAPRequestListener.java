@@ -41,17 +41,16 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
  * incoming CoAP requests. As soon as there are incoming CoAP requests, the
  * basedriver.coap will notify all the services registered as
  * IncomingCoAPRequestListeners into the OSGi context.
- * 
+ *
  * It's up to the local services how they will handle/response the requests.
- * 
+ *
  */
 public interface IncomingCoAPRequestListener {
 
-	/**
-	 * Callback method for incoming CoAP request.
-	 * 
-	 * @param req
-	 *            incoming CoAP request
-	 */
-	public void incomingRequestReceived(CoAPRequest req);
+    /**
+     * Callback method for incoming CoAP request.
+     *
+     * @param req incoming CoAP request
+     */
+    public void incomingRequestReceived(CoAPRequest req);
 }

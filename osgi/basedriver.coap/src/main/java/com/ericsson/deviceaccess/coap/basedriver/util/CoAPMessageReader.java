@@ -222,11 +222,11 @@ public class CoAPMessageReader implements CoAPMessageFormat {
                 optionNumber = previousOption;
             } else {
 
-				// sum the option delta of this and
+                // sum the option delta of this and
                 // previous options before it
                 optionNumber += optionDelta;
 
-				// If this option is fence post, it should not be added in the
+                // If this option is fence post, it should not be added in the
                 // headers
                 if ((optionNumber % 14) == 0) {
                     fencePost = true;
@@ -237,7 +237,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             byte optionLengthByte = BitOperations.getBitsInByteAsByte(
                     bytes[bytePosition], OPTION_LENGTH_START,
                     OPTION_LENGTH_LENGTH);
-			// first byte now handled, increase the index of byte being
+            // first byte now handled, increase the index of byte being
             // progressed
             bytePosition++;
 
@@ -247,7 +247,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             // ByteBuffer buf;
             CoAPOptionHeader header;
 
-			// If option length is set to 15, there is another byte=> read
+            // If option length is set to 15, there is another byte=> read
             // that
             // to get length!
             if (optionLength == 15) {
@@ -257,7 +257,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
                 bytePosition++;
                 optionLength = (int) optionLengthByte & 0xff;
 
-				// FIXME in draft core 06 in the message format figure:
+                // FIXME in draft core 06 in the message format figure:
                 // Length
                 // - 15
                 // (but I guess should be Length + 15 (acc to text)
@@ -275,8 +275,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
                 buf.write(optionValue);
             }
 
-			// Create new CoAPOptionHeader object and add it to the message
-			// if the option is fence post, ignore value
+            // Create new CoAPOptionHeader object and add it to the message
+            // if the option is fence post, ignore value
             // if (!fencePost) {
             String optionName = "unknown";
             if (CoAPOptionName.getOptionName(optionNumber) != null) {
@@ -293,14 +293,14 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             }
 
             boolean okToAdd = message.addOptionHeader(header);
-			// TODO draft-ietf-core-coap-08 specifies behaviour when
+            // TODO draft-ietf-core-coap-08 specifies behaviour when
             // unrecognized options are received in confirmable req/resp.
             // So apply to CON messages only
             if (!okToAdd
                     && header.isCritical()
                     && (message.getMessageType() == CoAPMessageType.CONFIRMABLE)) {
                 this.okOptions = false;
-				//CoAPActivator.logger
+                //CoAPActivator.logger
                 //		.debug("Unrecognized options in a confirmable message");
             }
 

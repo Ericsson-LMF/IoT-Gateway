@@ -46,55 +46,55 @@ import junit.framework.TestCase;
 
 public class CoAPResourceTest extends TestCase {
 
-	private CoAPResource resource;
+    private CoAPResource resource;
 
-	public CoAPResourceTest() {
-		super("CoAPResourceTest");
-		try {
-			URI uri = new URI("coap://localhost:5683/test");
-			
-			resource = new CoAPResource(uri);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-	}
+    public CoAPResourceTest() {
+        super("CoAPResourceTest");
+        try {
+            URI uri = new URI("coap://localhost:5683/test");
 
-	public void testSetUri() {
-		try {
-			URI uri = new URI("coap://localhost:5683/test2");
-			resource.setUri(uri);
-			assertEquals(resource.getUri(), uri);
-			
-			uri = new URI("coap://localhost/test2");
-			resource.setUri(uri);
-			assertEquals(resource.getUri(), uri);
-			
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-	}
+            resource = new CoAPResource(uri);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void testSetCoAPResourceType() {
-		resource.setCoAPResourceType(CoAPResourceType.HELLO_WORLD);
-		assertEquals(resource.getCoAPResourceType(),
-				CoAPResourceType.HELLO_WORLD);
-		assertFalse(resource.getCoAPResourceType() ==  CoAPResourceType.CARELESS);
-	}
+    public void testSetUri() {
+        try {
+            URI uri = new URI("coap://localhost:5683/test2");
+            resource.setUri(uri);
+            assertEquals(resource.getUri(), uri);
 
-	/*
-	public void testAddObserver() {
-		Mockery context = new Mockery() {
-			{
-				setImposteriser(ClassImposteriser.INSTANCE);
-			}
-		};
+            uri = new URI("coap://localhost/test2");
+            resource.setUri(uri);
+            assertEquals(resource.getUri(), uri);
 
-		final CoAPResourceObserver observer = context
-				.mock(CoAPResourceObserver.class);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
-		resource.addObserver(observer);
-		assertEquals(1, resource.getObservers().size());
-		assertTrue(resource.removeObserver(observer));
+    public void testSetCoAPResourceType() {
+        resource.setCoAPResourceType(CoAPResourceType.HELLO_WORLD);
+        assertEquals(resource.getCoAPResourceType(),
+                CoAPResourceType.HELLO_WORLD);
+        assertFalse(resource.getCoAPResourceType() == CoAPResourceType.CARELESS);
+    }
 
-	}*/
+    /*
+     public void testAddObserver() {
+     Mockery context = new Mockery() {
+     {
+     setImposteriser(ClassImposteriser.INSTANCE);
+     }
+     };
+
+     final CoAPResourceObserver observer = context
+     .mock(CoAPResourceObserver.class);
+
+     resource.addObserver(observer);
+     assertEquals(1, resource.getObservers().size());
+     assertTrue(resource.removeObserver(observer));
+
+     }*/
 }

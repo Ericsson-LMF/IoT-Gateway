@@ -41,7 +41,6 @@ import com.ericsson.deviceaccess.coap.basedriver.osgi.LocalCoAPEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.OutgoingMessageHandler;
 import java.net.URI;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class CoAPExtEndpoint extends LocalCoAPEndpoint {
@@ -49,7 +48,7 @@ public class CoAPExtEndpoint extends LocalCoAPEndpoint {
     static final private String THIS_CLASS_NAME = CoAPExtEndpoint.class.getSimpleName();
 
     //final private LogTracker logger;
-    final private Set reqListenerSet;
+    final private Set<IncomingCoAPRequestListener> reqListenerSet;
 
     public CoAPExtEndpoint(OutgoingMessageHandler outgoingMessageHandler,
             IncomingMessageHandler incomingMessageHandler, URI uri) {
@@ -57,20 +56,15 @@ public class CoAPExtEndpoint extends LocalCoAPEndpoint {
 
         //logger.debug(THIS_CLASS_NAME + "()");
         //this.logger = logger;
-        this.reqListenerSet = new HashSet();
+        this.reqListenerSet = new HashSet<>();
     }
 
-    //@Override
+    @Override
     public void handleRequest(CoAPRequest request) {
         //this.logger.debug(THIS_CLASS_NAME + "::handleRequest()");
 
         synchronized (this.reqListenerSet) {
-            Iterator it = this.reqListenerSet.iterator();
-            while (it.hasNext()) {
-                //this.logger.debug("Call Listener");
-                IncomingCoAPRequestListener listener = (IncomingCoAPRequestListener) it.next();
-                listener.incomingRequestReceived(request);
-            }
+            this.reqListenerSet.stream().forEach(listener -> listener.incomingRequestReceived(request));
         }
     }
 
