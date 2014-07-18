@@ -80,7 +80,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = (int) (value >> 1);
+            value = (value >> 1);
         }
 
         if (bitsNeeded <= 4) {
@@ -178,7 +178,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = (int) (value >> 1);
+            value = (value >> 1);
         }
 
         if (bitsNeeded <= 4) {
@@ -260,7 +260,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         } else if (length == 2) {
 
             byte[] split = BitOperations.splitIntToBytes(blockNumber);
-            int blockNumberShifted = (int) (blockNumber << 4);
+            int blockNumberShifted = (blockNumber << 4);
             split = BitOperations.splitIntToBytes(blockNumberShifted);
             stream.write(split[2]);
 
@@ -278,7 +278,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
 
             byte[] split = BitOperations.splitIntToBytes(blockNumber);
 
-            int blockNumberShifted = (int) (blockNumber << 4);
+            int blockNumberShifted = (blockNumber << 4);
             split = BitOperations.splitIntToBytes(blockNumberShifted);
             stream.write(split[1]);
             stream.write(split[2]);

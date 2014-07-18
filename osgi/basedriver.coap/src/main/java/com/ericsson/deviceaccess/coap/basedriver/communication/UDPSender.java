@@ -36,7 +36,10 @@ package com.ericsson.deviceaccess.coap.basedriver.communication;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.MulticastSocket;
+import java.net.SocketAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,35 +51,6 @@ public class UDPSender implements TransportLayerSender, Runnable {
 
     private final UDPTask POISON = new UDPTask();
 
-    //TODO: What in the world this is supposed to do?
-    protected class UDPTask implements Runnable {
-
-        private CoAPMessage message;
-        private Thread thread;
-
-        protected UDPTask(CoAPMessage message) {
-            this.message = message;
-        }
-
-        private UDPTask() {
-        }
-
-        @Override
-        public void run() {
-            byte[] encoded = message.encoded();
-            send(encoded, encoded.length, message.getSocketAddress());
-        }
-
-        public void stop() {
-            Thread t = this.thread;
-            this.thread = null;
-
-            // XXX: Quick & Dirty, otherwise it will end up with NullPointerException
-            if (t != null) {
-                t.interrupt();
-            }
-        }
-    }
 
     private MulticastSocket multicastSocket;
 
@@ -174,5 +148,35 @@ public class UDPSender implements TransportLayerSender, Runnable {
     public void stopService() {
         running.set(false);
         queue.add(POISON);
+    }
+
+    //TODO: What in the world this is supposed to do?
+    protected class UDPTask implements Runnable {
+
+        private CoAPMessage message;
+        private Thread thread;
+
+        protected UDPTask(CoAPMessage message) {
+            this.message = message;
+        }
+
+        private UDPTask() {
+        }
+
+        @Override
+        public void run() {
+            byte[] encoded = message.encoded();
+            send(encoded, encoded.length, message.getSocketAddress());
+        }
+
+        public void stop() {
+            Thread t = this.thread;
+            this.thread = null;
+            
+            // XXX: Quick & Dirty, otherwise it will end up with NullPointerException
+            if (t != null) {
+                t.interrupt();
+            }
+        }
     }
 }

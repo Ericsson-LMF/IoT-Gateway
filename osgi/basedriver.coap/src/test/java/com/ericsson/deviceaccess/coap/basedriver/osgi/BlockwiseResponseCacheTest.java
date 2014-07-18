@@ -38,13 +38,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
 
-import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseResponseCache.SessionData;
-import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseResponseCache.SessionKey;
 
 import junit.framework.TestCase;
 
@@ -71,10 +68,7 @@ public class BlockwiseResponseCacheTest extends TestCase {
             qs2.add("fbvjoisdj");
             assertTrue(cache.get(addr, uri, qs2) == null);
 
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (UnknownHostException | URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

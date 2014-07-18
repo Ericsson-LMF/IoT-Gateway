@@ -58,38 +58,6 @@ public abstract class CoAPMessage {
     public static final String TOKEN = "token";
     public static final String URI = "uri";
 
-    /**
-     * Enum representing the type of the message (as defined in coap core 07)
-     */
-    public static enum CoAPMessageType {
-
-        CONFIRMABLE("Confirmable"),
-        NON_CONFIRMABLE("Non-Confirmable"),
-        ACKNOWLEDGEMENT("Acknowledgement"),
-        RESET("Reset");
-
-        private final String name;
-
-        private CoAPMessageType(String name) {
-            this.name = name;
-        }
-
-        public int getNo() {
-            return ordinal();
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public static CoAPMessageType getType(int no) {
-            try {
-                return CoAPMessageType.values()[no];
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 
     // Core CoAP 07 draft
     /**
@@ -98,6 +66,9 @@ public abstract class CoAPMessage {
      * values are reserved for future versions (see also Section 7.3.1).
      */
     private static final int VERSION_07 = 1;
+    // constants as defined in core draft 07
+    private static final int RESPONSE_TIMEOUT = 2000;
+    private static final double RESPONSE_RANDOM_FACTOR = 1.5;
 
     /**
      * Type (T): 2-bit unsigned integer.
@@ -140,10 +111,6 @@ public abstract class CoAPMessage {
     // boolean indicating if this message has been canceled
     private boolean canceled;
 
-    // constants as defined in core draft 07
-    private static final int RESPONSE_TIMEOUT = 2000;
-
-    private static final double RESPONSE_RANDOM_FACTOR = 1.5;
 
     private InetSocketAddress remoteSocketAddress;
 
@@ -613,7 +580,7 @@ public abstract class CoAPMessage {
     public void messageRetransmitted() {
         if (retransmissions < 4) {
             this.retransmissions++;
-            this.timeout = this.timeout * 2;
+            this.timeout *= 2;
         } else if (retransmissions == 4) {
             /*
              CoAPActivator.logger
@@ -823,7 +790,7 @@ public abstract class CoAPMessage {
             }
 
             logMessage += "Message code [" + this.getCode() + "]\n";
-            if (!codeDescription.equals("")) {
+            if (!codeDescription.isEmpty()) {
                 logMessage += type + " description [" + codeDescription
                         + "]\n";
             }
@@ -847,5 +814,34 @@ public abstract class CoAPMessage {
             e.printStackTrace();
         }
         return logMessage;
+    }
+
+    /**
+     * Enum representing the type of the message (as defined in coap core 07)
+     */
+    public static enum CoAPMessageType {
+
+        CONFIRMABLE("Confirmable"), NON_CONFIRMABLE("Non-Confirmable"), ACKNOWLEDGEMENT("Acknowledgement"), RESET("Reset")
+        private final String name;
+
+        private CoAPMessageType(String name) {
+            this.name = name;
+        }
+
+        public int getNo() {
+            return ordinal();
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public static CoAPMessageType getType(int no) {
+            try {
+                return CoAPMessageType.values()[no];
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

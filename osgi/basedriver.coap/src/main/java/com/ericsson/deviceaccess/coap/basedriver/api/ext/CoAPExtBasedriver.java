@@ -211,7 +211,7 @@ public class CoAPExtBasedriver {
             int messageCode, String host, int port, String path)
             throws CoAPException {
 
-        if (path != null && !path.equals("")) {
+        if (path != null && !path.isEmpty()) {
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
@@ -318,19 +318,6 @@ public class CoAPExtBasedriver {
         return this.directory.getKnownDevices();
     }
 
-    class MyIncomingMessageHandler extends IncomingMessageHandler {
-
-        public MyIncomingMessageHandler() {
-            super();
-        }
-    }
-
-    class MyOutgoingMessageHandler extends OutgoingMessageHandler {
-
-        public MyOutgoingMessageHandler(TransportLayerSender sender) {
-            super(sender);
-        }
-    }
 
     /**
      * Init needed message handlers for this CoAP service and add then as
@@ -494,5 +481,19 @@ public class CoAPExtBasedriver {
 
     public void unsetIncomingCoAPRequestListener(IncomingCoAPRequestListener reqListener) {
         this.endpoint.unsetIncomingCoAPRequestListener(reqListener);
+    }
+
+    class MyIncomingMessageHandler extends IncomingMessageHandler {
+
+        MyIncomingMessageHandler() {
+            super();
+        }
+    }
+
+    class MyOutgoingMessageHandler extends OutgoingMessageHandler {
+
+        MyOutgoingMessageHandler(TransportLayerSender sender) {
+            super(sender);
+        }
     }
 }

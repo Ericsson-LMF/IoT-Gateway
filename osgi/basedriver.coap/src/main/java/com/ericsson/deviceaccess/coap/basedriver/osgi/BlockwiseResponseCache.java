@@ -51,107 +51,20 @@ import java.util.stream.Collectors;
 
 public class BlockwiseResponseCache {
 
+    private static List<String> getQueryStrings(CoAPRequest request) {
+        return request
+                .getOptionHeaders(CoAPOptionName.URI_QUERY)
+                .stream()
+                .map(header -> header.getValue())
+                .filter(value -> value != null)
+                .map(value -> new String(value, StandardCharsets.UTF_8))
+                .collect(Collectors.toList());
+    }
+
     final private Map<SessionKey, SessionData> cache = new HashMap<>();
     final private long cacheTime;
     final private Timer timer;
 
-    public class SessionKey {
-
-        final private InetSocketAddress clientAddress;
-        final private URI resourceUri;
-        final private List<String> queryStrings;
-
-        private SessionKey(InetSocketAddress clientAddress, URI resourceUri, List<String> queryHeaders) {
-            this.clientAddress = clientAddress;
-            this.resourceUri = resourceUri;
-            this.queryStrings = queryHeaders;
-            Collections.sort(this.queryStrings);
-        }
-
-        // XXX: Should we check both address and port, or only address?
-        // If source port always change packet by packet, this cache doesn't work at all.
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof SessionKey)) {
-                return false;
-            }
-            SessionKey target = (SessionKey) obj;
-
-            return (((this.clientAddress == null) && (target.clientAddress == null))
-                    || ((this.clientAddress != null) && (this.clientAddress.equals(target.clientAddress))))
-                    && (((this.resourceUri == null) && (target.resourceUri == null))
-                    || ((this.resourceUri != null) && (this.resourceUri.equals(target.resourceUri))))
-                    && (((this.queryStrings == null) && (target.queryStrings == null))
-                    || ((this.queryStrings != null) && (this.queryStrings.equals(target.queryStrings))));
-        }
-
-        @Override
-        public int hashCode() {
-            int value = 1;
-
-            value += value * 31 + ((clientAddress != null) ? clientAddress.hashCode() : Void.class.hashCode());
-            value += value * 31 + ((resourceUri != null) ? resourceUri.hashCode() : Void.class.hashCode());
-            value += value * 31 + ((queryStrings != null) ? queryStrings.hashCode() : Void.class.hashCode());
-
-            return value;
-        }
-    }
-
-    public class SessionData {
-
-        final private SessionKey key;
-        final private byte[] payload;
-        final private int responseCode;
-
-        private TimerTask timerTask = null;
-
-        private SessionData(SessionKey key, byte[] payload, int responseCode) {
-            this.key = key;
-            this.payload = payload;
-            this.responseCode = responseCode;
-        }
-
-        public SessionKey getSessionKey() {
-            return this.key;
-        }
-
-        // Never change payload !!
-        public byte[] getPayload() {
-            return this.payload;
-            // return (byte[])this.payload.clone();
-        }
-
-        public int getResponseCode() {
-            return this.responseCode;
-        }
-
-        synchronized public void startTimer() {
-            this.stopTimer();
-
-            this.timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    synchronized (cache) {
-                        cache.remove(key);
-                    }
-                }
-            };
-            timer.schedule(this.timerTask, cacheTime);
-        }
-
-        synchronized public void stopTimer() {
-            if (this.timerTask != null) {
-                this.timerTask.cancel();
-                this.timerTask = null;
-            }
-        }
-    }
 
     public BlockwiseResponseCache(long cacheTime) {
         this.cacheTime = cacheTime;
@@ -221,13 +134,100 @@ public class BlockwiseResponseCache {
         this.updateTimer(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
     }
 
-    static private List<String> getQueryStrings(CoAPRequest request) {
-        return request
-                .getOptionHeaders(CoAPOptionName.URI_QUERY)
-                .stream()
-                .map(header -> header.getValue())
-                .filter(value -> value != null)
-                .map(value -> new String(value, StandardCharsets.UTF_8))
-                .collect(Collectors.toList());
+    public class SessionKey {
+
+        final private InetSocketAddress clientAddress;
+        final private URI resourceUri;
+        final private List<String> queryStrings;
+
+        private SessionKey(InetSocketAddress clientAddress, URI resourceUri, List<String> queryHeaders) {
+            this.clientAddress = clientAddress;
+            this.resourceUri = resourceUri;
+            this.queryStrings = queryHeaders;
+            Collections.sort(this.queryStrings);
+        }
+
+        // XXX: Should we check both address and port, or only address?
+        // If source port always change packet by packet, this cache doesn't work at all.
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof SessionKey)) {
+                return false;
+            }
+            SessionKey target = (SessionKey) obj;
+
+            return (((this.clientAddress == null) && (target.clientAddress == null))
+                    || ((this.clientAddress != null) && (this.clientAddress.equals(target.clientAddress))))
+                    && (((this.resourceUri == null) && (target.resourceUri == null))
+                    || ((this.resourceUri != null) && (this.resourceUri.equals(target.resourceUri))))
+                    && (((this.queryStrings == null) && (target.queryStrings == null))
+                    || ((this.queryStrings != null) && (this.queryStrings.equals(target.queryStrings))));
+        }
+
+        @Override
+        public int hashCode() {
+            int value = 1;
+
+            value += value * 31 + ((clientAddress != null) ? clientAddress.hashCode() : Void.class.hashCode());
+            value += value * 31 + ((resourceUri != null) ? resourceUri.hashCode() : Void.class.hashCode());
+            value += value * 31 + ((queryStrings != null) ? queryStrings.hashCode() : Void.class.hashCode());
+
+            return value;
+        }
+    }
+
+    public class SessionData {
+
+        final private SessionKey key;
+        final private byte[] payload;
+        final private int responseCode;
+        private TimerTask timerTask = null;
+
+        private SessionData(SessionKey key, byte[] payload, int responseCode) {
+            this.key = key;
+            this.payload = payload;
+            this.responseCode = responseCode;
+        }
+
+        public SessionKey getSessionKey() {
+            return this.key;
+        }
+
+        // Never change payload !!
+        public byte[] getPayload() {
+            return this.payload;
+            // return (byte[])this.payload.clone();
+        }
+
+        public int getResponseCode() {
+            return this.responseCode;
+        }
+
+        synchronized public void startTimer() {
+            this.stopTimer();
+
+            this.timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (cache) {
+                        cache.remove(key);
+                    }
+                }
+            };
+            timer.schedule(this.timerTask, cacheTime);
+        }
+
+        synchronized public void stopTimer() {
+            if (this.timerTask != null) {
+                this.timerTask.cancel();
+                this.timerTask = null;
+            }
+        }
     }
 }

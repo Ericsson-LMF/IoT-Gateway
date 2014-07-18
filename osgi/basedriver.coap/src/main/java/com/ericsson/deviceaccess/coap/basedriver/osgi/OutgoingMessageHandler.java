@@ -52,46 +52,20 @@ import java.util.TimerTask;
  */
 public class OutgoingMessageHandler {
 
-    /**
-     * Inner class for running the retransmission timers for outgoing,
-     * confirmable messages
-     */
-    private class RetransmissionTask extends TimerTask {
-
-        private CoAPMessage message;
-
-        protected RetransmissionTask(CoAPMessage message) {
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            /*
-             CoAPActivator.logger.debug("Retransmit message with ID: "
-             + message.getIdentifier());
-             */
-            send(this.message, true);
-        }
-
-        public CoAPMessage getMessage() {
-            return this.message;
-        }
-    }
 
     private static final int MAX_RETRANSMIT = 4;
 
-    // TODO outgoing message cache should be cleaned up!!!
-    // note that in case of transmission, the current state should be sent out
-    // (rather than an old snapshot)
-    // All sent messages with token as key
-    private final HashMap<String, CoAPResponse> outgoingReplies;
-
-    private final HashMap<String, CoAPRequest> outgoingRequests;
 
     // message id 16 bits, so values between 0 and 65535
     public final static int MESSAGE_ID_MAX = 65535;
 
     public final static int MESSAGE_ID_MIN = 0;
+    // TODO outgoing message cache should be cleaned up!!!
+    // note that in case of transmission, the current state should be sent out
+    // (rather than an old snapshot)
+    // All sent messages with token as key
+    private final HashMap<String, CoAPResponse> outgoingReplies;
+    private final HashMap<String, CoAPRequest> outgoingRequests;
 
     // lower layer transport sender
     private final TransportLayerSender sender;
@@ -307,6 +281,32 @@ public class OutgoingMessageHandler {
     public void stopService() {
         if (timer != null) {
             timer.cancel();
+        }
+    }
+
+    /**
+     * Inner class for running the retransmission timers for outgoing,
+     * confirmable messages
+     */
+    private class RetransmissionTask extends TimerTask {
+
+        private CoAPMessage message;
+
+        protected RetransmissionTask(CoAPMessage message) {
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            /*
+            CoAPActivator.logger.debug("Retransmit message with ID: "
+            + message.getIdentifier());
+            */
+            send(this.message, true);
+        }
+
+        public CoAPMessage getMessage() {
+            return this.message;
         }
     }
 }

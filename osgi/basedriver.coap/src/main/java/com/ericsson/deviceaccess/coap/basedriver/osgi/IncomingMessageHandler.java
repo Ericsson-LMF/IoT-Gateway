@@ -55,6 +55,7 @@ import java.util.TimerTask;
  * req/resp matching)
  */
 public class IncomingMessageHandler implements IncomingMessageListener {
+    static final long incomingRequestsExpirationTime = 60000; //msec
 
     private IncomingCoAPListener incomingCoAPListener;
 
@@ -65,7 +66,6 @@ public class IncomingMessageHandler implements IncomingMessageListener {
 
     // Remove the entry of incomingRequests when expired
     final private Timer incomingRequestsTimer = new Timer();
-    final static long incomingRequestsExpirationTime = 60000; //msec
 
     /**
      * Constructor is protected, this is a singleton class. Instance can be

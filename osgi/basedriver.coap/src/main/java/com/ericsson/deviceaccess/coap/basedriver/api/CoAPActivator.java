@@ -61,18 +61,18 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class CoAPActivator implements BundleActivator {
 
-    private BundleContext context;
 
     //public static LogTracker logger;
     public static ServiceTracker tracker;
     public static ServiceTracker incomingCoAPTracker;
 
     private static final String COAP_ADDRESS = "COAP_ADDRESS";
+    public static BufferedWriter out;
+    private BundleContext context;
 
     private CoAPService service;
 
     private ServiceRegistration serviceRegistration;
-    public static BufferedWriter out;
 
     /**
      * This will be run when the bundle is started. It will start the UDP thread
@@ -185,7 +185,7 @@ public class CoAPActivator implements BundleActivator {
             }
 
             String interval = p.getProperty("DISCOVERY_INTERVAL");
-            if (interval != null && !interval.equals("")) {
+            if (interval != null && !interval.isEmpty()) {
                 discoveryInterval = Integer.parseInt(interval);
             }
 
@@ -193,7 +193,7 @@ public class CoAPActivator implements BundleActivator {
             // the properties file, set it to 6. Also, if the value is set
             // smaller than 0 in the properties file, use 0 instead.
             String maximumBlockSzxStr = p.getProperty("MAXIMUM_BLOCK_SZX");
-            if (maximumBlockSzxStr != null && !maximumBlockSzxStr.equals("")) {
+            if (maximumBlockSzxStr != null && !maximumBlockSzxStr.isEmpty()) {
                 maximumBlockSzx = Integer.parseInt(maximumBlockSzxStr);
                 if (maximumBlockSzx > 6) {
                     maximumBlockSzx = 6;

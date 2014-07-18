@@ -115,7 +115,7 @@ public class CoAPResource {
      */
     private URI resourceIdentifier;
 
-    private List<CoAPResourceObserver> observers;
+    private final List<CoAPResourceObserver> observers;
 
     private byte[] content;
 
@@ -131,39 +131,8 @@ public class CoAPResource {
      * This map keeps the different link-format attribute values so that they
      * can be easily written into string
      */
-    private HashMap<String, String> values;
+    private final HashMap<String, String> values;
 
-    // TODO add subresources/information about the parent (maybe not needed in
-    // the first phase)
-
-    /*
-     * The following enum is to represent the resources that are received from
-     * californium server
-     */
-    public static enum CoAPResourceType {
-
-        CARELESS("/careless"),
-        FEEDBACK("/feedback"),
-        HELLO_WORLD("/helloWorld"),
-        LARGE("/large"),
-        MIRROR("/mirror"),
-        SEPARATE("/separate"),
-        STORAGE("/storage"),
-        TIME_RESOURCE("/timeResource"),
-        TO_UPPER("/toUpper"),
-        WEATHER_RESOURCE("/weatherResource"),
-        OTHER("/other");
-
-        private final String path;
-
-        private CoAPResourceType(String path) {
-            this.path = path;
-        }
-
-        public String getPath() {
-            return this.path;
-        }
-    }
 
     /**
      * Constructor. A CoAP resource is identified using the URI
@@ -226,7 +195,7 @@ public class CoAPResource {
             throws CoAPException {
         StringBuilder linkformat = new StringBuilder();
 
-        if (absolute && this.resourceIdentifier.getHost() == null && host.equals("")) {
+        if (absolute && this.resourceIdentifier.getHost() == null && host.isEmpty()) {
             throw new CoAPException("No host defined for the resource");
         }
 
@@ -550,6 +519,26 @@ public class CoAPResource {
                 })
                 .filter(e -> values.get(e.getKey()).equals(e.getValue()))
                 .count() == params.size();
+    }
+
+    // TODO add subresources/information about the parent (maybe not needed in
+    // the first phase)
+    /*
+     * The following enum is to represent the resources that are received from
+     * californium server
+     */
+    public static enum CoAPResourceType {
+
+        CARELESS("/careless"), FEEDBACK("/feedback"), HELLO_WORLD("/helloWorld"), LARGE("/large"), MIRROR("/mirror"), SEPARATE("/separate"), STORAGE("/storage"), TIME_RESOURCE("/timeResource"), TO_UPPER("/toUpper"), WEATHER_RESOURCE("/weatherResource"), OTHER("/other")
+        private final String path;
+
+        private CoAPResourceType(String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return this.path;
+        }
     }
 
 }

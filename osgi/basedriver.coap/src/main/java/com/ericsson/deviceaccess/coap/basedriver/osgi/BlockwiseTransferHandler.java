@@ -40,7 +40,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,9 +55,9 @@ import java.util.List;
  */
 public class BlockwiseTransferHandler {
 
-    private HashMap blockwiseMessages;
-    private HashMap ongoingBlockwiseRequests;
-    private LocalCoAPEndpoint endpoint;
+    private final HashMap<String, CoAPMessage> blockwiseMessages;
+    private final HashMap<String, CoAPRequest> ongoingBlockwiseRequests;
+    private final LocalCoAPEndpoint endpoint;
 
     // Max block size from draft-ietf-core-blao
     // private static int maxBlockSize = 1024;
@@ -70,8 +70,8 @@ public class BlockwiseTransferHandler {
      * @param endpoint endpoint sending the messages
      */
     public BlockwiseTransferHandler(LocalCoAPEndpoint endpoint) {
-        this.blockwiseMessages = new HashMap();
-        this.ongoingBlockwiseRequests = new HashMap();
+        this.blockwiseMessages = new HashMap<>();
+        this.ongoingBlockwiseRequests = new HashMap<>();
         this.endpoint = endpoint;
         this.maxSzx = 6;
         this.maxBlockSize = 1024; // blockwise transfer draft 07
@@ -100,12 +100,10 @@ public class BlockwiseTransferHandler {
      */
     public CoAPRequest createBlockwiseRequest(CoAPRequest request,
             int blockNumber, int szx) throws CoAPException {
-        if (request.getOptionHeaders(CoAPOptionName.BLOCK2).size() > 0) {
+        if (!request.getOptionHeaders(CoAPOptionName.BLOCK2).isEmpty()) {
             return request;
         } else {
-            CoAPRequest blockRequest = this.createBlock1Request(request,
-                    blockNumber, szx);
-            return blockRequest;
+            return createBlock1Request(request, blockNumber, szx);
         }
     }
 
@@ -121,7 +119,7 @@ public class BlockwiseTransferHandler {
     public CoAPResponse createBlockwiseResponse(CoAPResponse response, int blockNumber, int szx) {
 
         // Control usage of Block1 option in CoAP response
-        if (response.getOptionHeaders(CoAPOptionName.BLOCK1).size() > 0) {
+        if (!response.getOptionHeaders(CoAPOptionName.BLOCK1).isEmpty()) {
             return response;
         }
 
@@ -141,20 +139,13 @@ public class BlockwiseTransferHandler {
     public CoAPRequest block2OptionReceived(CoAPResponse response,
             CoAPRequest request) throws CoAPException {
 
-        List block2 = response.getOptionHeaders(CoAPOptionName.BLOCK2);
+        List<CoAPOptionHeader> block2 = response.getOptionHeaders(CoAPOptionName.BLOCK2);
         // TODO can there be multiple block options?
-        CoAPOptionHeader blockOption = (CoAPOptionHeader) block2.get(0);
+        CoAPOptionHeader blockOption = block2.get(0);
 
         // Check if there exist a message with the same token
-        String tokenString = "";
-        try {
-            tokenString = new String(response.getTokenHeader().getValue(),
-                    "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        CoAPMessage originalResponse = (CoAPMessage) this.blockwiseMessages
-                .get(tokenString);
+        String tokenString = new String(response.getTokenHeader().getValue(), StandardCharsets.UTF_8);
+        CoAPMessage originalResponse = blockwiseMessages.get(tokenString);
 
         if (originalResponse != null) {
 
@@ -173,8 +164,7 @@ public class BlockwiseTransferHandler {
 
         blockwiseMessages.put(tokenString, response);
 
-        BlockOptionHeader blockOptionHeader = new BlockOptionHeader(
-                blockOption);
+        BlockOptionHeader blockOptionHeader = new BlockOptionHeader(blockOption);
 
         // if the m flag is set, there are still more blocks
         if (blockOptionHeader.getMFlag()) {
@@ -222,29 +212,19 @@ public class BlockwiseTransferHandler {
         // need to check if the size of block should be changed from the request
 
         // read the block size from the sent request
-        CoAPOptionHeader blockOption = (CoAPOptionHeader) response
-                .getOptionHeaders(CoAPOptionName.BLOCK1).get(0);
+        CoAPOptionHeader blockOption = response.getOptionHeaders(CoAPOptionName.BLOCK1).get(0);
         BlockOptionHeader header = new BlockOptionHeader(blockOption);
 
         int szx = 6;
         // read szx from the response
         szx = header.getSzx();
 
-        String tokenString = "";
-        try {
-            tokenString = new String(request.getTokenHeader().getValue(),
-                    "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        CoAPRequest originalRequest = (CoAPRequest) this.ongoingBlockwiseRequests
-                .get(tokenString);
+        String tokenString = new String(request.getTokenHeader().getValue(), StandardCharsets.UTF_8);
+        CoAPRequest originalRequest = ongoingBlockwiseRequests.get(tokenString);
         int diff = 1;
         int payloadHandled = 0;
-        if (originalRequest.getOptionHeaders(CoAPOptionName.BLOCK1).size() > 0) {
-            CoAPOptionHeader coapOption = (CoAPOptionHeader) (originalRequest
-                    .getOptionHeaders(CoAPOptionName.BLOCK1).get(0));
+        if (!originalRequest.getOptionHeaders(CoAPOptionName.BLOCK1).isEmpty()) {
+            CoAPOptionHeader coapOption = originalRequest.getOptionHeaders(CoAPOptionName.BLOCK1).get(0);
             BlockOptionHeader h = new BlockOptionHeader(coapOption);
             int originalSzx = h.getSzx();
 
@@ -340,12 +320,8 @@ public class BlockwiseTransferHandler {
         blockRequest.setListener(request.getListener());
 
         if (blockNumber == 0) {
-            try {
-                String tokenString = new String(request.getTokenHeader().getValue(), "UTF8");
-                this.ongoingBlockwiseRequests.put(tokenString, request);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            String tokenString = new String(request.getTokenHeader().getValue(), StandardCharsets.UTF_8);
+            this.ongoingBlockwiseRequests.put(tokenString, request);
         }
         return blockRequest;
     }
@@ -388,21 +364,18 @@ public class BlockwiseTransferHandler {
             blockSize = payloadLeft;
         }
 
-        // copy the options
-        for (CoAPOptionHeader optionHeader : response.getOptionHeaders()) {
-            if (/*!optionHeader.getOptionName().equals(
-                     CoAPOptionName.URI_HOST.getName())
-                     && !optionHeader.getOptionName().equals(
-                     CoAPOptionName.URI_PATH.getName())
-                     && !optionHeader.getOptionName().equals(
-                     CoAPOptionName.URI_PORT.getName())
-                     && !optionHeader.getOptionName().equals(
-                     CoAPOptionName.TOKEN.getName())
-                     && */optionHeader.getOptionName() != CoAPOptionName.BLOCK1
-                    && optionHeader.getOptionName() != CoAPOptionName.BLOCK2) {
-                blockResponse.addOptionHeader(optionHeader);
-            }
-        }
+        response.getOptionHeaders().stream().filter((optionHeader) -> (/*!optionHeader.getOptionName().equals(
+                CoAPOptionName.URI_HOST.getName())
+                && !optionHeader.getOptionName().equals(
+                CoAPOptionName.URI_PATH.getName())
+                && !optionHeader.getOptionName().equals(
+                CoAPOptionName.URI_PORT.getName())
+                && !optionHeader.getOptionName().equals(
+                CoAPOptionName.TOKEN.getName())
+                && */optionHeader.getOptionName() != CoAPOptionName.BLOCK1
+                        && optionHeader.getOptionName() != CoAPOptionName.BLOCK2)).forEach((optionHeader) -> {
+                        blockResponse.addOptionHeader(optionHeader);
+        });
 
         // Calculate szx from the block size:
         // 2^(4+SZX) = 512 =>

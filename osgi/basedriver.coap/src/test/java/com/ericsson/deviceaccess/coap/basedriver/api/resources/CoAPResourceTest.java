@@ -37,7 +37,6 @@ package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.jmock.Mockery;
 //import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAPResourceType;

@@ -77,50 +77,6 @@ public class ObservationHandler {
 
     private LocalCoAPEndpoint endpoint;
 
-    /**
-     * Inner class to handle timers for cached observe responses
-     */
-    private class RefreshTask extends TimerTask {
-
-        private CoAPResponse cachedResponse;
-        private URI uri;
-
-        /**
-         * Constructor
-         *
-         * @param cachedResponse
-         * @param uri
-         */
-        protected RefreshTask(CoAPResponse cachedResponse, URI uri) {
-            this.cachedResponse = cachedResponse;
-            this.uri = uri;
-        }
-
-        @Override
-        public void run() {
-            /*
-             CoAPActivator.logger.debug("Cached response expired");
-             */
-            // If the cached response expires, remove first the cached stuff
-            removeCachedResponse(uri);
-            // TODO if cached response expires, should send a new GET request!!
-            try {
-                /*
-                 CoAPActivator.logger
-                 .debug("Send a new GET request towards the server to refresh the observation");
-                 */
-                CoAPRequest req = createObservationRequest(uri);
-                // Do no update the hashmap, keep the original request there
-                endpoint.sendRequest(req);
-            } catch (CoAPException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public CoAPResponse getResponse() {
-            return this.cachedResponse;
-        }
-    }
 
     /**
      * Constructor
@@ -425,5 +381,50 @@ public class ObservationHandler {
      */
     public void stopService() {
         timer.cancel();
+    }
+
+    /**
+     * Inner class to handle timers for cached observe responses
+     */
+    private class RefreshTask extends TimerTask {
+
+        private CoAPResponse cachedResponse;
+        private URI uri;
+
+        /**
+         * Constructor
+         *
+         * @param cachedResponse
+         * @param uri
+         */
+        protected RefreshTask(CoAPResponse cachedResponse, URI uri) {
+            this.cachedResponse = cachedResponse;
+            this.uri = uri;
+        }
+
+        @Override
+        public void run() {
+            /*
+            CoAPActivator.logger.debug("Cached response expired");
+            */
+            // If the cached response expires, remove first the cached stuff
+            removeCachedResponse(uri);
+            // TODO if cached response expires, should send a new GET request!!
+            try {
+                /*
+                CoAPActivator.logger
+                .debug("Send a new GET request towards the server to refresh the observation");
+                */
+                CoAPRequest req = createObservationRequest(uri);
+                // Do no update the hashmap, keep the original request there
+                endpoint.sendRequest(req);
+            } catch (CoAPException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public CoAPResponse getResponse() {
+            return this.cachedResponse;
+        }
     }
 }

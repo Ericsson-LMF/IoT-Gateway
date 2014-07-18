@@ -40,4 +40,7 @@ public class CoAPUtil {
         Double blockSizeDouble = Math.pow(2, (szx + 4));
         return blockSizeDouble.longValue();
     }
+
+    private CoAPUtil() {
+    }
 }

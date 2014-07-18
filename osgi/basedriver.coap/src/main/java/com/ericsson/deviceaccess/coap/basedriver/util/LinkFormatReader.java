@@ -36,7 +36,6 @@ package com.ericsson.deviceaccess.coap.basedriver.util;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -197,18 +196,18 @@ public class LinkFormatReader {
                     resource.setMaximumSize(maximumSize);
                     break;
                 case CoAPResource.TITLE:
-                    if (resource.getTitle().equals("")) {
+                    if (resource.getTitle().isEmpty()) {
                         resource.setTitle(attributeValue);
                     } // If title is present, it should be used instead of title
                     break;
                 case CoAPResource.TITLE_ASTERISK:
-                    if (resource.getTitleAsterisk().equals("")) {
+                    if (resource.getTitleAsterisk().isEmpty()) {
                         resource.setTitleAsterisk(attributeValue);
                     }
                     break;
                 case CoAPResource.RELATION_TYPE:
                     // relation type is a low case string or a URI
-                    if (resource.getRelationType().equals("")) {
+                    if (resource.getRelationType().isEmpty()) {
                         resource.setRelationType(attributeValue);
                     }
                     break;

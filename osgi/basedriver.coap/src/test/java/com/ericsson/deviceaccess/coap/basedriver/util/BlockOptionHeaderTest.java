@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
-import org.jmock.Mockery;
 //import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
@@ -42,7 +41,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseTransferHandler;
-import com.ericsson.deviceaccess.coap.basedriver.osgi.LocalCoAPEndpoint;
 
 import junit.framework.TestCase;
 
@@ -97,7 +95,7 @@ public class BlockOptionHeaderTest extends TestCase {
             largeDouble += Math.pow(2, i);
         }
 
-        Double largeNum = new Double(largeDouble);
+        Double largeNum = largeDouble;
         int maxBlockNumber = largeNum.intValue();
 
         int szx = 4;
@@ -131,7 +129,7 @@ public class BlockOptionHeaderTest extends TestCase {
             largeDouble += Math.pow(2, i);
         }
 
-        Double largeNum = new Double(largeDouble);
+        Double largeNum = largeDouble;
         int blockNumber = largeNum.intValue();
         boolean mFlag = true;
 
@@ -146,7 +144,7 @@ public class BlockOptionHeaderTest extends TestCase {
             largeDouble += Math.pow(2, i);
         }
 
-        largeNum = new Double(largeDouble);
+        largeNum = largeDouble;
         int testBlock = largeNum.intValue();
 
         // Compare the first byte with the
@@ -160,7 +158,7 @@ public class BlockOptionHeaderTest extends TestCase {
 
         largeDouble = Math.pow(2, 1) + Math.pow(2, 3) + Math.pow(2, 4)
                 + Math.pow(2, 5) + Math.pow(2, 6) + Math.pow(2, 7);
-        largeNum = new Double(largeDouble);
+        largeNum = largeDouble;
         int headerValue = largeNum.intValue();
 
         assertEquals(headerValue, test);
@@ -184,7 +182,7 @@ public class BlockOptionHeaderTest extends TestCase {
         int szx = 2;
         boolean mFlag = true;
 
-        Double largeNum = new Double(Math.pow(2, 18));
+        Double largeNum = Math.pow(2, 18);
         int testBlock = largeNum.intValue();
 
         // System.out.println("block number for 3 block header: " + testBlock);
@@ -218,14 +216,14 @@ public class BlockOptionHeaderTest extends TestCase {
             largeDouble += Math.pow(2, i);
         }
 
-        largeNum = new Double(largeDouble);
+        largeNum = largeDouble;
         testBlock = largeNum.intValue();
 
         int value = testBlock;
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = (int) (value >> 1);
+            value = (value >> 1);
         }
         assertEquals(bitsNeeded, 20);
 

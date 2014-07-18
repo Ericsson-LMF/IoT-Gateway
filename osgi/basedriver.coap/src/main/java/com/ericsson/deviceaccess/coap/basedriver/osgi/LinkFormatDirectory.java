@@ -65,33 +65,6 @@ public class LinkFormatDirectory {
     private final Timer timer;
     private int resourceDiscoveryInterval;
 
-    /**
-     * This inner class is responsible for removing such remote endpoint entries
-     * from which no reply to the resource discveory requests has been received
-     * anymore
-     */
-    private class RemoteEndpointRefreshTask extends TimerTask {
-
-        private final URI uri;
-        private final CoAPRemoteEndpoint endpoint;
-
-        protected RemoteEndpointRefreshTask(URI uri, CoAPRemoteEndpoint endpoint) {
-            this.uri = uri;
-            this.endpoint = endpoint;
-        }
-
-        @Override
-        public void run() {
-            /*
-             CoAPActivator.logger.debug("Cached remote endpoint expired");
-             */
-            removeCachedRemoteEndpoint(uri);
-        }
-
-        public CoAPRemoteEndpoint getCoAPRemoteEndpoint() {
-            return this.endpoint;
-        }
-    }
 
     /**
      * Constructor.
@@ -260,5 +233,33 @@ public class LinkFormatDirectory {
 
     public void stopService() {
         this.timer.cancel();
+    }
+
+    /**
+     * This inner class is responsible for removing such remote endpoint entries
+     * from which no reply to the resource discveory requests has been received
+     * anymore
+     */
+    private class RemoteEndpointRefreshTask extends TimerTask {
+
+        private final URI uri;
+        private final CoAPRemoteEndpoint endpoint;
+
+        protected RemoteEndpointRefreshTask(URI uri, CoAPRemoteEndpoint endpoint) {
+            this.uri = uri;
+            this.endpoint = endpoint;
+        }
+
+        @Override
+        public void run() {
+            /*
+            CoAPActivator.logger.debug("Cached remote endpoint expired");
+            */
+            removeCachedRemoteEndpoint(uri);
+        }
+
+        public CoAPRemoteEndpoint getCoAPRemoteEndpoint() {
+            return this.endpoint;
+        }
     }
 }

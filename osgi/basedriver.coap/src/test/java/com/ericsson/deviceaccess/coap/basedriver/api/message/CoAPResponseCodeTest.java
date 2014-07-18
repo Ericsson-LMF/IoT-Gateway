@@ -35,7 +35,6 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import java.net.URISyntaxException;
-
 import junit.framework.TestCase;
 
 public class CoAPResponseCodeTest extends TestCase {

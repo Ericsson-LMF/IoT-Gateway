@@ -35,7 +35,6 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import junit.framework.TestCase;
 
 public class CoAPResponseTest extends TestCase {

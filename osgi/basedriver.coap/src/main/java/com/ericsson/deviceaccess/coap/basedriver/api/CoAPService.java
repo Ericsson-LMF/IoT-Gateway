@@ -97,141 +97,6 @@ public class CoAPService {
     protected LinkFormatReader reader;
     protected LinkFormatDirectory directory;
 
-    /**
-     * This is a private class responsible for sending the resource discovery
-     * requests (link format)
-     */
-    private class ResourceDiscoveryTask extends TimerTask implements
-            CoAPRequestListener {
-
-        private final String path;
-
-        /**
-         * Constructor
-         */
-        protected ResourceDiscoveryTask() {
-            path = ".well-known/core";
-        }
-
-        @Override
-        public void run() {
-
-            /*
-             CoAPActivator.logger.debug("Send a discovery request to "
-             + resourceDiscoveryAddress.getCanonicalHostName());
-             */
-            try {
-                CoAPRequest discoveryReq = createGetRequest(
-                        resourceDiscoveryAddress.getCanonicalHostName(),
-                        resourceDiscoveryPort, path,
-                        CoAPMessageType.NON_CONFIRMABLE);
-                discoveryReq.generateTokenHeader();
-
-                short contentType = 40;
-
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                DataOutputStream dos = new DataOutputStream(stream);
-
-                dos.writeShort(contentType);// 2 bytes
-                dos.flush();
-
-                CoAPOptionHeader header = new CoAPOptionHeader(
-                        CoAPOptionName.CONTENT_TYPE, stream.toByteArray());
-                discoveryReq.addOptionHeader(header);
-                discoveryReq.setListener(this);
-
-                endpoint.sendRequest(discoveryReq);
-
-            } catch (CoAPException | IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * Callback implementation when an empty ack is received
-         *
-         * @param response
-         */
-        @Override
-        public void emptyAckReceived(CoAPResponse response, CoAPRequest request) {
-            // TODO Auto-generated method stub
-
-        }
-
-        /**
-         * Callback implementation if the request reaches the maximum number of
-         * retransmissions
-         *
-         * @param request original request
-         */
-        @Override
-        public void maximumRetransmissionsReached(CoAPRequest request) {
-            // TODO Auto-generated method stub
-
-        }
-
-        /**
-         * Callback implementation for piggypacked responses
-         *
-         * @param response received response
-         * @param request original request
-         */
-        @Override
-        public void piggyPackedResponseReceived(CoAPResponse response,
-                CoAPRequest request) {
-            handleResponse(response);
-        }
-
-        /**
-         * Callback implementation for cases where the response for the resource
-         * discovery request is received in a separate message
-         *
-         * @param response received response
-         * @param request original request
-         */
-        @Override
-        public void separateResponseReceived(CoAPResponse response,
-                CoAPRequest request) {
-            handleResponse(response);
-
-        }
-
-        private void handleResponse(CoAPResponse response) {
-            String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
-
-            /*
-             logger.debug("Message payload : [" + payload + "]");
-             */
-            try {
-                // Parse the received message into the list of resources
-                List resources = reader.parseLinkFormatData(payload);
-                // Let the LinkFormatDirectory class determine if there's
-                // anything new in the response
-                directory.handleResourceDiscoveryResponse(resources, response);
-            } catch (CoAPException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * Callback implementation for cases where there are active transactions
-         * towards the same CoAP server, thus new requests cannot be accepted
-         *
-         * @param request original request
-         */
-        @Override
-        public void serviceBusy(CoAPRequest request) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void resetResponseReceived(CoAPResponse response,
-                CoAPRequest request) {
-            // TODO Auto-generated method stub
-            System.out.println("reset message received");
-        }
-    }
 
     /**
      * Create a CoAPService that can be used for sending messages towards the
@@ -382,7 +247,7 @@ public class CoAPService {
             int messageCode, String host, int port, String path)
             throws CoAPException {
 
-        if (path != null && !path.equals("")) {
+        if (path != null && !path.isEmpty()) {
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
@@ -613,5 +478,140 @@ public class CoAPService {
 
         endpoint.stopService();
         endpoint = null;
+    }
+
+    /**
+     * This is a private class responsible for sending the resource discovery
+     * requests (link format)
+     */
+    private class ResourceDiscoveryTask extends TimerTask implements CoAPRequestListener {
+
+        private final String path;
+
+        /**
+         * Constructor
+         */
+        protected ResourceDiscoveryTask() {
+            path = ".well-known/core";
+        }
+
+        @Override
+        public void run() {
+            
+            /*
+            CoAPActivator.logger.debug("Send a discovery request to "
+            + resourceDiscoveryAddress.getCanonicalHostName());
+            */
+            try {
+                CoAPRequest discoveryReq = createGetRequest(
+                        resourceDiscoveryAddress.getCanonicalHostName(),
+                        resourceDiscoveryPort, path,
+                        CoAPMessageType.NON_CONFIRMABLE);
+                discoveryReq.generateTokenHeader();
+                
+                short contentType = 40;
+                
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                DataOutputStream dos = new DataOutputStream(stream);
+                
+                dos.writeShort(contentType);// 2 bytes
+                dos.flush();
+                
+                CoAPOptionHeader header = new CoAPOptionHeader(
+                        CoAPOptionName.CONTENT_TYPE, stream.toByteArray());
+                discoveryReq.addOptionHeader(header);
+                discoveryReq.setListener(this);
+                
+                endpoint.sendRequest(discoveryReq);
+                
+            } catch (CoAPException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * Callback implementation when an empty ack is received
+         *
+         * @param response
+         */
+        @Override
+        public void emptyAckReceived(CoAPResponse response, CoAPRequest request) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        /**
+         * Callback implementation if the request reaches the maximum number of
+         * retransmissions
+         *
+         * @param request original request
+         */
+        @Override
+        public void maximumRetransmissionsReached(CoAPRequest request) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        /**
+         * Callback implementation for piggypacked responses
+         *
+         * @param response received response
+         * @param request original request
+         */
+        @Override
+        public void piggyPackedResponseReceived(CoAPResponse response,
+                CoAPRequest request) {
+            handleResponse(response);
+        }
+
+        /**
+         * Callback implementation for cases where the response for the resource
+         * discovery request is received in a separate message
+         *
+         * @param response received response
+         * @param request original request
+         */
+        @Override
+        public void separateResponseReceived(CoAPResponse response,
+                CoAPRequest request) {
+            handleResponse(response);
+            
+        }
+
+        private void handleResponse(CoAPResponse response) {
+            String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
+            
+            /*
+            logger.debug("Message payload : [" + payload + "]");
+            */
+            try {
+                // Parse the received message into the list of resources
+                List resources = reader.parseLinkFormatData(payload);
+                // Let the LinkFormatDirectory class determine if there's
+                // anything new in the response
+                directory.handleResourceDiscoveryResponse(resources, response);
+            } catch (CoAPException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * Callback implementation for cases where there are active transactions
+         * towards the same CoAP server, thus new requests cannot be accepted
+         *
+         * @param request original request
+         */
+        @Override
+        public void serviceBusy(CoAPRequest request) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void resetResponseReceived(CoAPResponse response,
+                CoAPRequest request) {
+            // TODO Auto-generated method stub
+            System.out.println("reset message received");
+        }
     }
 }

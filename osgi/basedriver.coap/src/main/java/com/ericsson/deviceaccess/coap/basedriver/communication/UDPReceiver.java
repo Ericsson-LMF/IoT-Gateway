@@ -48,6 +48,9 @@ import java.util.List;
  * This class represents the UDP thread for listening to incoming UDP
  */
 public class UDPReceiver implements Runnable, TransportLayerReceiver {
+    // IP MTU is suggested to 1280 bytes in draft-ieft-core-coap-08, 1152 for
+    // the message size, 1024 for the payload size
+    private static int BUFFER_SIZE = 1280;
 
     final private DatagramSocket socket;
     final private MulticastSocket multicastSocket;
@@ -56,9 +59,6 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
 
     private volatile boolean running = true;
 
-    // IP MTU is suggested to 1280 bytes in draft-ieft-core-coap-08, 1152 for
-    // the message size, 1024 for the payload size
-    private static int BUFFER_SIZE = 1280;
 
     /**
      * Constructor using DatagramSocket

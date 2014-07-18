@@ -34,8 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
-import com.ericsson.deviceaccess.coap.basedriver.util.LinkFormatReader;
+import java.net.URISyntaxException;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -101,7 +102,7 @@ public class LinkFormatReaderTest extends TestCase {
             resources = reader.parseLinkFormatData(test4);
 
             assertEquals(resources.get(1).getUri().toString(), "careless");
-            assertEquals(resources.get(1).getResourceType().toString(),
+            assertEquals(resources.get(1).getResourceType(),
                     "\"SepararateResponseTester\"");
             assertEquals(resources.get(1).getTitle(),
                     "\"This resource will ACK anything, but never send a separate response\"");
@@ -115,7 +116,7 @@ public class LinkFormatReaderTest extends TestCase {
             resources = reader.parseLinkFormatData(payload);
             assertEquals(resources.size(), 5);
 
-        } catch (Exception e) {
+        } catch (CoAPException | URISyntaxException e) {
             e.printStackTrace();
         }
 

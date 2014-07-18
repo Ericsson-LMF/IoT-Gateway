@@ -43,12 +43,6 @@ import java.net.URI;
  */
 public class CoAPRemoteEndpoint extends CoAPEndpoint {
 
-    public static enum CoAPRemoteEndpointType {
-
-        CALIFORNIUM,
-        TMOTE,
-        OTHER;
-    };
 
     private CoAPRemoteEndpointType type;
 
@@ -74,5 +68,10 @@ public class CoAPRemoteEndpoint extends CoAPEndpoint {
 
     public void setEndpointType(CoAPRemoteEndpointType type) {
         this.type = type;
+    }
+
+    public static enum CoAPRemoteEndpointType {
+
+        CALIFORNIUM, TMOTE, OTHER
     }
 }

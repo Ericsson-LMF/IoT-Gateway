@@ -44,17 +44,6 @@ import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSen
 public class CoAPMessageHandlerFactory {
 
     private static CoAPMessageHandlerFactory coapMessageHandlerFactory;
-    private IncomingMessageHandler incomingMessageHandler;
-    private OutgoingMessageHandler outgoingMessageHandler;
-
-    /**
-     * Constructor is private, use getInstance method to fetch an instance of
-     * the CoAPMessageHandlerFactory
-     */
-    private CoAPMessageHandlerFactory() {
-        incomingMessageHandler = null;
-        outgoingMessageHandler = null;
-    }
 
     /**
      * Get an instance of the CoAPMessageHandlerFactory. Creates one, if no
@@ -68,6 +57,26 @@ public class CoAPMessageHandlerFactory {
             coapMessageHandlerFactory = new CoAPMessageHandlerFactory();
         }
         return coapMessageHandlerFactory;
+    }
+
+    /**
+     * This method is called when the bundle is stopped. The message handlers
+     * are set to null.
+     */
+    public static synchronized void stopService() {
+        coapMessageHandlerFactory.outgoingMessageHandler = null;
+        coapMessageHandlerFactory.incomingMessageHandler = null;
+    }
+    private IncomingMessageHandler incomingMessageHandler;
+    private OutgoingMessageHandler outgoingMessageHandler;
+
+    /**
+     * Constructor is private, use getInstance method to fetch an instance of
+     * the CoAPMessageHandlerFactory
+     */
+    private CoAPMessageHandlerFactory() {
+        incomingMessageHandler = null;
+        outgoingMessageHandler = null;
     }
 
     /**
@@ -95,8 +104,7 @@ public class CoAPMessageHandlerFactory {
      * messages
      * @return an instance of OutgoingMessageHandler
      */
-    public OutgoingMessageHandler getOutgoingCoAPMessageHandler(
-            TransportLayerSender sender) {
+    public OutgoingMessageHandler getOutgoingCoAPMessageHandler(TransportLayerSender sender) {
         synchronized (this) {
             if (outgoingMessageHandler == null) {
                 outgoingMessageHandler = new OutgoingMessageHandler(sender);
@@ -105,12 +113,4 @@ public class CoAPMessageHandlerFactory {
         return outgoingMessageHandler;
     }
 
-    /**
-     * This method is called when the bundle is stopped. The message handlers
-     * are set to null.
-     */
-    public static synchronized void stopService() {
-        coapMessageHandlerFactory.outgoingMessageHandler = null;
-        coapMessageHandlerFactory.incomingMessageHandler = null;
-    }
 }

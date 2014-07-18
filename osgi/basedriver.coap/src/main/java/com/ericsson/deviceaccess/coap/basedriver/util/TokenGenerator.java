@@ -35,7 +35,6 @@
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.MessageDigest;

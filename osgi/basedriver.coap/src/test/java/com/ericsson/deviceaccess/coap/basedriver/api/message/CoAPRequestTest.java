@@ -36,7 +36,6 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;

@@ -35,7 +35,6 @@
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-
 import java.net.DatagramPacket;
 
 /**

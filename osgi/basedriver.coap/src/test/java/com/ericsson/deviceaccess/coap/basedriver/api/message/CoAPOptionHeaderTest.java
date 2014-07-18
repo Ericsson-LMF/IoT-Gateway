@@ -36,6 +36,7 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import junit.framework.TestCase;
 
 public class CoAPOptionHeaderTest extends TestCase {
@@ -84,7 +85,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE.getName(), outputStream.toByteArray());
         try {
             outputStream.flush();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         headerLength = h.getLength();

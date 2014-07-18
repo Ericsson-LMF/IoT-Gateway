@@ -105,40 +105,6 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     private final HashMap<URI, CachedResponse> incomingResponseCache;
     private final BlockwiseResponseCache ongoingBlockwiseResponses;
 
-    /**
-     * Private class that is responsible for caching the received responses. The
-     * rules for caching are defined in the core draft.
-     */
-    private class CachedResponse extends TimerTask {
-
-        private final CoAPResponse cachedResponse;
-        private final CoAPRequest originalRequest;
-
-        protected CachedResponse(CoAPResponse cachedResponse,
-                CoAPRequest originalRequest) {
-            this.cachedResponse = cachedResponse;
-            this.originalRequest = originalRequest;
-        }
-
-        @Override
-        public void run() {
-            // cached response has expired, remove
-            try {
-                URI uri = originalRequest.getUriFromRequest();
-                removeCachedResponse(uri);
-            } catch (CoAPException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public CoAPResponse getCachedResponse() {
-            return this.cachedResponse;
-        }
-
-        public CoAPRequest getRequest() {
-            return this.originalRequest;
-        }
-    }
 
     /**
      * Constructor is protected. A LocalCoAPEndpoint should be instantiated
@@ -623,7 +589,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             req.addOptionHeader(portOpt);
         }
 
-        if (path != null && !path.equals("")) {
+        if (path != null && !path.isEmpty()) {
             if (path.startsWith("/")) {
                 path = path.substring(1);
             }
@@ -632,12 +598,12 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             // Thus, divide into several headers if contains "/"
             LinkedList pathParts = new LinkedList();
 
-            int index = path.indexOf("/");
+            int index = path.indexOf('/');
             while (index > -1) {
                 String str = path.substring(0, index);
                 pathParts.add(str);
                 path = path.substring(index + 1);
-                index = path.indexOf("/");
+                index = path.indexOf('/');
             }
 
             pathParts.add(path);
@@ -718,7 +684,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @return request that matches the given response
      */
     private CoAPRequest matchBasedOnIdentifier(CoAPResponse resp) {
-        return (CoAPRequest) this.outgoingMessageHandler.getOutgoingRequests()
+        return this.outgoingMessageHandler.getOutgoingRequests()
                 .get(resp.getIdentifier());
     }
 
@@ -1080,5 +1046,39 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, NOT_FOUND, messageId);
         resp.setSocketAddress(request.getSocketAddress());
         this.outgoingMessageHandler.send(resp, false);
+    }
+
+    /**
+     * Private class that is responsible for caching the received responses. The
+     * rules for caching are defined in the core draft.
+     */
+    private class CachedResponse extends TimerTask {
+
+        private final CoAPResponse cachedResponse;
+        private final CoAPRequest originalRequest;
+
+        protected CachedResponse(CoAPResponse cachedResponse, CoAPRequest originalRequest) {
+            this.cachedResponse = cachedResponse;
+            this.originalRequest = originalRequest;
+        }
+
+        @Override
+        public void run() {
+            // cached response has expired, remove
+            try {
+                URI uri = originalRequest.getUriFromRequest();
+                removeCachedResponse(uri);
+            } catch (CoAPException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public CoAPResponse getCachedResponse() {
+            return this.cachedResponse;
+        }
+
+        public CoAPRequest getRequest() {
+            return this.originalRequest;
+        }
     }
 }

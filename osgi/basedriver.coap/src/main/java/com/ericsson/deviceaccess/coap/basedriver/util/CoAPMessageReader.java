@@ -262,7 +262,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
                 // Length
                 // - 15
                 // (but I guess should be Length + 15 (acc to text)
-                optionLength = optionLength + 15;
+                optionLength += 15;
             }
             // allocate a buffer with needed length
 
