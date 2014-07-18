@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,19 +29,19 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.communication;
 
 import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageListener;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,7 +51,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
 
     final private DatagramSocket socket;
     final private MulticastSocket multicastSocket;
-    final private List<IncomingMessageListener> coapListeners = new ArrayList<>();
+    final private List<IncomingMessageListener> coapListeners = Collections.synchronizedList(new ArrayList<>());
     final Thread thread = new Thread(this);
 
     private volatile boolean running = true;
@@ -92,10 +92,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
 
     public void cleanup() {
         running = false;
-
-        synchronized (coapListeners) {
-            coapListeners.clear();
-        }
+        coapListeners.clear();
 
         if (thread.isAlive() && !thread.isInterrupted()) {
             thread.interrupt();
@@ -167,9 +164,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
      * @param datagram received datagram
      */
     private void datagramReceived(DatagramPacket datagram) {
-        synchronized (coapListeners) {
-            coapListeners.forEach(listener -> listener.messageReceived(datagram));
-        }
+        coapListeners.forEach(listener -> listener.messageReceived(datagram));
     }
 
     /**
@@ -179,9 +174,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
      */
     @Override
     public void addListener(IncomingMessageListener listener) {
-        synchronized (coapListeners) {
-            coapListeners.add(listener);
-        }
+        coapListeners.add(listener);
     }
 
     /**
@@ -192,9 +185,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
      */
     @Override
     public boolean removeListener(IncomingMessageListener listener) {
-        synchronized (coapListeners) {
-            return coapListeners.remove(listener);
-        }
+        return coapListeners.remove(listener);
     }
 
     @Override

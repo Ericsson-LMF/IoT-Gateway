@@ -128,8 +128,7 @@ public class CoAPActivator implements BundleActivator {
                 try {
                     address = null;
                     try {
-                        NetworkInterface ni = NetworkInterface
-                                .getByInetAddress(InetAddress.getLocalHost());
+                        NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
                         Enumeration ia = ni.getInetAddresses();
                         while (ia.hasMoreElements()) {
                             InetAddress elem = (InetAddress) ia.nextElement();
@@ -154,15 +153,13 @@ public class CoAPActivator implements BundleActivator {
                         }
 
                     } catch (NullPointerException e) {
-                        System.out
-                                .println("Retrieving Information from NetworkInterface failed");
+                        System.out.println("Retrieving Information from NetworkInterface failed");
                     }
 
                     if (address == null) {
                         address = InetAddress.getByName(socketAddress);
                     }
-                    System.out.println("Local address is now ["
-                            + address + "]");
+                    System.out.println("Local address is now [" + address + "]");
                     //logger.debug("Local address is now [" + address.toString()
                     //		+ "]");
 
@@ -177,7 +174,6 @@ public class CoAPActivator implements BundleActivator {
                 }
             }
             if (port != null) {
-
                 try {
                     if (Integer.parseInt(port) > 0) {
                         coapPort = Integer.parseInt(port);
@@ -244,8 +240,7 @@ public class CoAPActivator implements BundleActivator {
 
         //logger.debug("Service registered");
         // Create a tracker for CoAPRequestListener services.
-        tracker = new ServiceTracker(context, DeviceInterface.class.getName(),
-                null);
+        tracker = new ServiceTracker(context, DeviceInterface.class.getName(), null);
         tracker.open();
 
         incomingCoAPTracker = new ServiceTracker(context,

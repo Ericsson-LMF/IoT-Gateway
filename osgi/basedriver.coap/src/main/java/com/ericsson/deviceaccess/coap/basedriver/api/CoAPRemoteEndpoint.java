@@ -39,29 +39,15 @@ import java.net.URI;
 /**
  * This class is to represent a CoAP remote endpoint (~device). This class used
  * to map the resources received from the responses for resource discovery. An
- * enpoint can have several CoAP resources.
+ * endpoint can have several CoAP resources.
  */
 public class CoAPRemoteEndpoint extends CoAPEndpoint {
 
-    public static class CoAPRemoteEndpointType {
+    public static enum CoAPRemoteEndpointType {
 
-        private final String name;
-
-        public static final CoAPRemoteEndpointType CALIFORNIUM = new CoAPRemoteEndpointType(
-                "CALIFORNIUM");
-        public static final CoAPRemoteEndpointType TMOTE = new CoAPRemoteEndpointType(
-                "TMOTE");
-        public static final CoAPRemoteEndpointType OTHER = new CoAPRemoteEndpointType(
-                "OTHER");
-
-        private CoAPRemoteEndpointType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
+        CALIFORNIUM,
+        TMOTE,
+        OTHER;
     };
 
     private CoAPRemoteEndpointType type;

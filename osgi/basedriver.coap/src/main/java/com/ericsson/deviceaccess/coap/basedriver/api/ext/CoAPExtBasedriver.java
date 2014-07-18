@@ -264,11 +264,9 @@ public class CoAPExtBasedriver {
         // Form the URI
         URI uri = null;
         try {
-
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
-
             uri = new URI("coap", null, host, port, path, null, null);
         } catch (URISyntaxException e) {
             e.printStackTrace();

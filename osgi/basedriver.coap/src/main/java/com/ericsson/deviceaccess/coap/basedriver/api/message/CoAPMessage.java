@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
@@ -40,9 +40,12 @@ import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageWriter;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -69,6 +72,10 @@ public abstract class CoAPMessage {
 
         private CoAPMessageType(String name) {
             this.name = name;
+        }
+
+        public int getNo() {
+            return ordinal();
         }
 
         public String getName() {
@@ -332,11 +339,11 @@ public abstract class CoAPMessage {
         // If contains proxy-uri header(s), it must take precedence over
         // uri-host, uri-port, uri-path & uri-query. thus do not allow these
         // headers to be added if proxy-uri is there
-        String optionName = header.getOptionName();
+        CoAPOptionName optionName = header.getOptionName();
         if (this.getOptionHeaders(CoAPOptionName.PROXY_URI).size() > 0
-                && (optionName.equals(CoAPOptionName.URI_HOST.getName())
-                || optionName.equals(CoAPOptionName.URI_PATH.getName())
-                || optionName.equals(CoAPOptionName.URI_PORT.getName()))) {
+                && (optionName == CoAPOptionName.URI_HOST
+                || optionName == CoAPOptionName.URI_PATH
+                || optionName == CoAPOptionName.URI_PORT)) {
 
             /*
              CoAPActivator.logger
@@ -552,7 +559,7 @@ public abstract class CoAPMessage {
      * @return list of options with the given option name.
      */
     public List<CoAPOptionHeader> getOptionHeaders(CoAPOptionName optionName) {
-        return headers.stream().filter(header -> header.getOptionName().equals(optionName.getName())).collect(Collectors.toList());
+        return headers.stream().filter(header -> header.getOptionName() == optionName).collect(Collectors.toList());
     }
 
     /**
@@ -688,8 +695,8 @@ public abstract class CoAPMessage {
     }
 
     private CoAPOptionHeader findOptionHeader(CoAPOptionName name) {
-        for (CoAPOptionHeader header : this.headers) {
-            if (header.getOptionName().equals(name.getName())) {
+        for (CoAPOptionHeader header : headers) {
+            if (header.getOptionName() == name) {
                 return header;
             }
         }
@@ -702,9 +709,7 @@ public abstract class CoAPMessage {
      * @return encoded message
      */
     public byte[] encoded() {
-        CoAPMessageWriter writer = new CoAPMessageWriter(this);
-        byte[] stream = writer.encode();
-        return stream;
+        return new CoAPMessageWriter(this).encode();
     }
 
     /**
@@ -715,7 +720,7 @@ public abstract class CoAPMessage {
      * @return true if this message contains "observe" option, false otherwise
      */
     public boolean isObserveMessage() {
-        return this.headers.stream().anyMatch(header -> header.getOptionName().equals(CoAPOptionName.OBSERVE.getName()));
+        return headers.stream().anyMatch(header -> header.getOptionName() == CoAPOptionName.OBSERVE);
     }
 
     /**
@@ -793,7 +798,7 @@ public abstract class CoAPMessage {
                                 .toString();
                         logMessage += "Request URI [" + uri + "]\n";
                     }
-                    String name = CoAPMethodCode.getName(this.getCode());
+                    String name = CoAPMethodCode.getName(getCode());
                     if (name != null) {
                         codeDescription = name;
                     }
@@ -834,13 +839,8 @@ public abstract class CoAPMessage {
             });
             // payload
             if (this.getPayload() != null) {
-                try {
-                    String payloadStr = new String(payload, "UTF-8");
-                    logMessage += "Payload \n";
-                    logMessage += "[" + payloadStr + "]\n";
-                } catch (UnsupportedEncodingException ex) {
-                    ex.printStackTrace();
-                }
+                String payloadStr = new String(payload, StandardCharsets.UTF_8);
+                logMessage += "Payload \n";
             }
             logMessage += "*****************************\n";
         } catch (Exception e) {

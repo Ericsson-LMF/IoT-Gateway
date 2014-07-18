@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
@@ -43,7 +43,6 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -130,9 +129,9 @@ public class CoAPRequest extends CoAPMessage {
 
         StringBuilder pathParts = new StringBuilder();
         int port = 0;
-        for (CoAPOptionHeader header : this.getOptionHeaders()) {
-            String name = header.getOptionName();
-            if (name.equals(CoAPOptionName.URI_PATH.getName())) {
+        for (CoAPOptionHeader header : getOptionHeaders()) {
+            CoAPOptionName name = header.getOptionName();
+            if (name == CoAPOptionName.URI_PATH) {
                 try {
                     String pathPart = new String(header.getValue(), "UTF8");
                     if (!pathPart.startsWith("/")) {
@@ -142,13 +141,13 @@ public class CoAPRequest extends CoAPMessage {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-            } else if (name.equals(CoAPOptionName.URI_HOST.getName())) {
+            } else if (name == CoAPOptionName.URI_HOST) {
                 try {
                     host = new String(header.getValue(), "UTF8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-            } else if (name.equals(CoAPOptionName.URI_PORT.getName())) {
+            } else if (name == CoAPOptionName.URI_PORT) {
                 short shortInt = BitOperations.mergeBytesToShort(header.getValue()[0],
                         header.getValue()[1]);
                 port = shortInt & 0xFFFF;
@@ -173,7 +172,7 @@ public class CoAPRequest extends CoAPMessage {
         }
 
         try {
-            if (host == null || host.equals("")) {
+            if (host == null || host.isEmpty()) {
                 throw new CoAPException("Host not defined");
             }
             this.uri = new URI("coap", null, host, port, pathParts.toString(), null, null);
@@ -237,12 +236,12 @@ public class CoAPRequest extends CoAPMessage {
         List<CoAPOptionHeader> etagHeaders = new LinkedList();
 
         for (CoAPOptionHeader header : modified) {
-            String name = header.getOptionName();
-            if (name.equals(CoAPOptionName.TOKEN.getName())) {
+            CoAPOptionName name = header.getOptionName();
+            if (name == CoAPOptionName.TOKEN) {
                 tokenHeader = header;
-            } else if (name.equals(CoAPOptionName.MAX_AGE.getName())) {
+            } else if (name == CoAPOptionName.MAX_AGE) {
                 maxAgeHeader = header;
-            } else if (name.equals(CoAPOptionName.ETAG.getName())) {
+            } else if (name == CoAPOptionName.ETAG) {
                 etagHeaders.add(header);
             }
         }

@@ -1,7 +1,7 @@
 
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -10,12 +10,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -30,8 +30,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
@@ -39,13 +39,15 @@ package com.ericsson.deviceaccess.coap.basedriver.util;
  * A class that contains methods for manipulating binary values
  *
  */
-public class BitOperations {
+public enum BitOperations {
+
+    /**
+     * Singleton.
+     */
+    INSTANCE;
 
     public static final boolean ONE = true;
     public static final boolean ZERO = false;
-
-    private BitOperations() {
-    }
 
     /**
      * Get value of bit n in an integer (32 bits)
@@ -86,15 +88,12 @@ public class BitOperations {
      * @return
      */
     public static byte setBitInByte(byte b, int n, int v) {
-
         int temp = 1 << n;
-
         if (v != 0) {
             return (byte) (b | temp); // turn on the bit
         } else {
             return (byte) (b & ~(temp)); // turn off the bit
         }
-
     }
 
     /**
@@ -106,13 +105,11 @@ public class BitOperations {
      * @return
      */
     public static int setBitInInt(int i, int n, int v) {
-
         if (v != 0) {
             return i | (1 << n); // turn on the bit
         } else {
             return i & ~(1 << n); // turn off the bit
         }
-
     }
 
     /**
@@ -124,13 +121,11 @@ public class BitOperations {
      * @return
      */
     public static int setBitInInt(int i, int n, boolean v) {
-
         if (v == ONE) {
             return i | (1 << n); // turn on the bit
         } else {
             return i & ~(1 << n); // turn off the bit
         }
-
     }
 
     /**
@@ -142,13 +137,11 @@ public class BitOperations {
      * @return
      */
     public static long setBitInLong(long l, long n, int v) {
-
         if (v != 0) {
             return l | (1L << n); // turn on the bit
         } else {
             return l & ~(1L << n); // turn off the bit
         }
-
     }
 
     /**
@@ -339,16 +332,12 @@ public class BitOperations {
      * @return
      */
     public static byte[] splitIntToBytes(int i) {
-
         byte[] bytes = new byte[4];
-
         bytes[3] = getBitsInIntAsByte(i, 0, 8);
         bytes[2] = getBitsInIntAsByte(i, 8, 8);
         bytes[1] = getBitsInIntAsByte(i, 16, 8);
         bytes[0] = getBitsInIntAsByte(i, 24, 8);
-
         return bytes;
-
     }
 
     /**
@@ -358,9 +347,7 @@ public class BitOperations {
      * @return
      */
     public static byte[] splitLongToBytes(long l) {
-
         byte[] bytes = new byte[8];
-
         bytes[7] = getBitsInLongAsByte(l, 0, 8);
         bytes[6] = getBitsInLongAsByte(l, 8, 8);
         bytes[5] = getBitsInLongAsByte(l, 16, 8);
@@ -369,9 +356,7 @@ public class BitOperations {
         bytes[2] = getBitsInLongAsByte(l, 40, 8);
         bytes[1] = getBitsInLongAsByte(l, 48, 8);
         bytes[0] = getBitsInLongAsByte(l, 56, 8);
-
         return bytes;
-
     }
 
     /**
@@ -381,14 +366,10 @@ public class BitOperations {
      * @return
      */
     public static byte[] splitShortToBytes(short i) {
-
         byte[] bytes = new byte[2];
-
         bytes[1] = getBitsInShortAsByte(i, 0, 8);
         bytes[0] = getBitsInShortAsByte(i, 8, 8);
-
         return bytes;
-
     }
 
     /**
@@ -405,9 +386,7 @@ public class BitOperations {
      * @return
      */
     public static long mergeBytesToLong(byte a, byte b, byte c, byte d, byte e, byte f, byte g, byte h) {
-
         long result = 0;
-
         result = setBitsInLong(result, 0, 8, h);
         result = setBitsInLong(result, 8, 8, g);
         result = setBitsInLong(result, 16, 8, f);
@@ -416,9 +395,7 @@ public class BitOperations {
         result = setBitsInLong(result, 40, 8, c);
         result = setBitsInLong(result, 48, 8, b);
         result = setBitsInLong(result, 56, 8, a);
-
         return result;
-
     }
 
     /**
@@ -431,16 +408,12 @@ public class BitOperations {
      * @return
      */
     public static int mergeBytesToInt(byte a, byte b, byte c, byte d) {
-
         int result = 0;
-
         result = setBitsInInt(result, 0, 8, d);
         result = setBitsInInt(result, 8, 8, c);
         result = setBitsInInt(result, 16, 8, b);
         result = setBitsInInt(result, 24, 8, a);
-
         return result;
-
     }
 
     /**
@@ -451,14 +424,10 @@ public class BitOperations {
      * @return
      */
     public static short mergeBytesToShort(byte a, byte b) {
-
         short result = 0;
-
         result = setBitsInShort(result, 0, 8, b);
         result = setBitsInShort(result, 8, 8, a);
-
         return result;
-
     }
 
     /**
@@ -468,28 +437,22 @@ public class BitOperations {
      * @return
      */
     public static String longToString(long longV) {
-
-        String result = new String("{");
+        StringBuilder result = new StringBuilder("{");
         int counter = 0;
-
         for (int ind = 63; ind >= 0; ind--) {
             if (getBitInLong(longV, ind) == 1) {
-                result = result.concat("1");
+                result.append("1");
                 counter++;
             } else {
-                result = result.concat("0");
+                result.append("0");
                 counter++;
             }
-
             if (((counter % 8) == 0) && (counter != 64)) {
-                result = result.concat("|");
+                result.append("|");
             }
-
         }
-
-        result = result.concat("}");
-
-        return result;
+        result.append("}");
+        return result.toString();
 
     }
 
@@ -500,28 +463,22 @@ public class BitOperations {
      * @return
      */
     public static String intToString(int integer) {
-
-        String result = new String("{");
+        StringBuilder result = new StringBuilder("{");
         int counter = 0;
-
         for (int ind = 31; ind >= 0; ind--) {
             if (getBitInInt(integer, ind) == 1) {
-                result = result.concat("1");
+                result.append("1");
                 counter++;
             } else {
-                result = result.concat("0");
+                result.append("0");
                 counter++;
             }
-
             if (((counter % 8) == 0) && (counter != 32)) {
-                result = result.concat("|");
+                result.append("|");
             }
-
         }
-
-        result = result.concat("}");
-
-        return result;
+        result.append("}");
+        return result.toString();
 
     }
 
@@ -532,22 +489,15 @@ public class BitOperations {
      * @return
      */
     public static String byteToString(int b) {
-
-        String result = new String("{");
-
+        StringBuilder result = new StringBuilder("{");
         for (int ind = 7; ind >= 0; ind--) {
             if (getBitInInt(b, ind) == 1) {
-                result = result.concat("1");
+                result.append("1");
             } else {
-                result = result.concat("0");
+                result.append("0");
             }
-
         }
-
-        result = result.concat("}");
-
-        return result;
-
+        result.append("}");
+        return result.toString();
     }
-
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,17 +29,19 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.*;
-
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -123,7 +125,7 @@ public class BlockwiseTransferHandler {
             return response;
         }
 
-        // Descriptive usage of Block2 option		
+        // Descriptive usage of Block2 option
         return this.createBlock2Response(response, blockNumber, szx);
     }
 
@@ -316,21 +318,14 @@ public class BlockwiseTransferHandler {
         }
 
         // copy the options
-        for (Iterator i = request.getOptionHeaders().iterator(); i.hasNext();) {
-            CoAPOptionHeader optionHeader = (CoAPOptionHeader) i.next();
-
-            if (!optionHeader.getOptionName().equals(
-                    CoAPOptionName.URI_HOST.getName())
-                    && !optionHeader.getOptionName().equals(
-                            CoAPOptionName.URI_PATH.getName())
-                    && !optionHeader.getOptionName().equals(
-                            CoAPOptionName.URI_PORT.getName())
-                    && !optionHeader.getOptionName().equals(
-                            CoAPOptionName.TOKEN.getName())
-                    && !optionHeader.getOptionName().equals(
-                            CoAPOptionName.BLOCK1.getName())
-                    && !optionHeader.getOptionName().equals(
-                            CoAPOptionName.BLOCK2.getName())) {
+        for (CoAPOptionHeader optionHeader : request.getOptionHeaders()) {
+            CoAPOptionName optionName = optionHeader.getOptionName();
+            if (optionName != CoAPOptionName.URI_HOST
+                    && optionName != CoAPOptionName.URI_PATH
+                    && optionName != CoAPOptionName.URI_PORT
+                    && optionName != CoAPOptionName.TOKEN
+                    && optionName != CoAPOptionName.BLOCK1
+                    && optionName != CoAPOptionName.BLOCK2) {
                 blockRequest.addOptionHeader(optionHeader);
             }
         }
@@ -345,10 +340,8 @@ public class BlockwiseTransferHandler {
         blockRequest.setListener(request.getListener());
 
         if (blockNumber == 0) {
-            String tokenString = "";
             try {
-                tokenString = new String(request.getTokenHeader().getValue(),
-                        "UTF8");
+                String tokenString = new String(request.getTokenHeader().getValue(), "UTF8");
                 this.ongoingBlockwiseRequests.put(tokenString, request);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -357,7 +350,7 @@ public class BlockwiseTransferHandler {
         return blockRequest;
     }
 
-    // TODO: 
+    // TODO:
     //   This method is almost same as createBlock1Request() method.
     //   So common part should be cut off as an another method and be shared.
     //
@@ -396,21 +389,17 @@ public class BlockwiseTransferHandler {
         }
 
         // copy the options
-        for (Iterator i = response.getOptionHeaders().iterator(); i.hasNext();) {
-            CoAPOptionHeader optionHeader = (CoAPOptionHeader) i.next();
-
+        for (CoAPOptionHeader optionHeader : response.getOptionHeaders()) {
             if (/*!optionHeader.getOptionName().equals(
                      CoAPOptionName.URI_HOST.getName())
                      && !optionHeader.getOptionName().equals(
                      CoAPOptionName.URI_PATH.getName())
                      && !optionHeader.getOptionName().equals(
-                     CoAPOptionName.URI_PORT.getName())							
+                     CoAPOptionName.URI_PORT.getName())
                      && !optionHeader.getOptionName().equals(
-                     CoAPOptionName.TOKEN.getName())							
-                     && */!optionHeader.getOptionName().equals(
-                            CoAPOptionName.BLOCK1.getName())
-                    && !optionHeader.getOptionName().equals(
-                            CoAPOptionName.BLOCK2.getName())) {
+                     CoAPOptionName.TOKEN.getName())
+                     && */optionHeader.getOptionName() != CoAPOptionName.BLOCK1
+                    && optionHeader.getOptionName() != CoAPOptionName.BLOCK2) {
                 blockResponse.addOptionHeader(optionHeader);
             }
         }

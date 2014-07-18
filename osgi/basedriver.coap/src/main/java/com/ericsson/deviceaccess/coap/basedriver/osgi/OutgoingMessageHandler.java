@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,17 +29,22 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.message.*;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
 import java.net.InetSocketAddress;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Sends the message using the transport layer. Takes care of retransmissions
@@ -79,9 +84,9 @@ public class OutgoingMessageHandler {
     // note that in case of transmission, the current state should be sent out
     // (rather than an old snapshot)
     // All sent messages with token as key
-    private HashMap<String, CoAPResponse> outgoingReplies;
+    private final HashMap<String, CoAPResponse> outgoingReplies;
 
-    private HashMap<String, CoAPRequest> outgoingRequests;
+    private final HashMap<String, CoAPRequest> outgoingRequests;
 
     // message id 16 bits, so values between 0 and 65535
     public final static int MESSAGE_ID_MAX = 65535;
@@ -89,14 +94,14 @@ public class OutgoingMessageHandler {
     public final static int MESSAGE_ID_MIN = 0;
 
     // lower layer transport sender
-    private TransportLayerSender sender;
+    private final TransportLayerSender sender;
 
     // this variable keeps track
     private int messageId;
 
-    private Timer timer;
+    private final Timer timer;
 
-    private HashMap<InetSocketAddress, RetransmissionTask> retransmissionTasks;
+    private final HashMap<InetSocketAddress, RetransmissionTask> retransmissionTasks;
 
     /**
      * Constructor is protected, an instance of this handler should be fetched
@@ -157,7 +162,7 @@ public class OutgoingMessageHandler {
 
                 // Create retransmission only if this is not multicast message
                 RetransmissionTask task = new RetransmissionTask(msg);
-                this.retransmissionTasks.put(msg.getSocketAddress(), task);
+                retransmissionTasks.put(msg.getSocketAddress(), task);
 
                 timer.schedule(task, timeoutValue);
                 // Increase timeout and number of retransmission
@@ -167,7 +172,7 @@ public class OutgoingMessageHandler {
                  CoAPActivator.logger
                  .info("Maximum number of retransmissions reached, cancel this message");
                  */
-                this.removeRetransmissionTask(msg);
+                removeRetransmissionTask(msg);
                 msg.setMessageCanceled(true);
 
                 // Remove message from the memory
@@ -259,7 +264,7 @@ public class OutgoingMessageHandler {
      * @return list of responses
      */
     public synchronized HashMap<String, CoAPResponse> getOutgoingResponses() {
-        return this.outgoingReplies;
+        return outgoingReplies;
     }
 
     /**
@@ -268,7 +273,7 @@ public class OutgoingMessageHandler {
      * @return list of requests
      */
     public synchronized HashMap<String, CoAPRequest> getOutgoingRequests() {
-        return this.outgoingRequests;
+        return outgoingRequests;
     }
 
     /**

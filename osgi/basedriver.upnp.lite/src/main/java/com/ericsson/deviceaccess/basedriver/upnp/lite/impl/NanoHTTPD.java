@@ -45,6 +45,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -172,11 +173,7 @@ public class NanoHTTPD {
         public Response(String status, String mimeType, String txt) {
             this.status = status;
             this.mimeType = mimeType;
-            try {
-                this.data = new ByteArrayInputStream(txt.getBytes("UTF-8"));
-            } catch (java.io.UnsupportedEncodingException uee) {
-                log.warn(uee.getMessage(), uee);
-            }
+            this.data = new ByteArrayInputStream(txt.getBytes(StandardCharsets.UTF_8));
         }
 
         public void addHeader(String name, String value) {

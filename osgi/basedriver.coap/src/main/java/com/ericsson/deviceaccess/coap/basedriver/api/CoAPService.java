@@ -35,20 +35,35 @@
 package com.ericsson.deviceaccess.coap.basedriver.api;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.*;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerReceiver;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
 import com.ericsson.deviceaccess.coap.basedriver.communication.UDPReceiver;
 import com.ericsson.deviceaccess.coap.basedriver.communication.UDPSender;
-import com.ericsson.deviceaccess.coap.basedriver.osgi.*;
+import com.ericsson.deviceaccess.coap.basedriver.osgi.CoAPEndpointFactory;
+import com.ericsson.deviceaccess.coap.basedriver.osgi.CoAPMessageHandlerFactory;
+import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageHandler;
+import com.ericsson.deviceaccess.coap.basedriver.osgi.LinkFormatDirectory;
+import com.ericsson.deviceaccess.coap.basedriver.osgi.LocalCoAPEndpoint;
+import com.ericsson.deviceaccess.coap.basedriver.osgi.OutgoingMessageHandler;
 import com.ericsson.deviceaccess.coap.basedriver.util.LinkFormatReader;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -261,8 +276,7 @@ public class CoAPService {
             InetAddress resourceDiscoveryAddress, int resourceDiscoveryPort) {
         // Start the service if the value for the interval is > 0
         if (resourceDiscoveryInterval > 0) {
-            this.directory
-                    .setResourceDiscoveryInterval(resourceDiscoveryInterval);
+            this.directory.setResourceDiscoveryInterval(resourceDiscoveryInterval);
             this.timer = new Timer();
             ResourceDiscoveryTask task = new ResourceDiscoveryTask();
             this.resourceDiscoveryAddress = resourceDiscoveryAddress;
@@ -421,11 +435,9 @@ public class CoAPService {
         // Form the URI
         URI uri = null;
         try {
-
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
-
             uri = new URI("coap", null, host, port, path, null, null);
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -474,7 +486,7 @@ public class CoAPService {
      * @return list of known devices
      */
     public List getKnownDevices() {
-        return this.directory.getKnownDevices();
+        return directory.getKnownDevices();
     }
 
     /**
@@ -529,8 +541,7 @@ public class CoAPService {
                 this.multicastSocket = new MulticastSocket(this.coapPort);
                 this.multicastSocket.joinGroup(address);
 
-                this.transportLayerReceiver = new UDPReceiver(
-                        this.multicastSocket);
+                this.transportLayerReceiver = new UDPReceiver(this.multicastSocket);
 
                 this.transportLayerSender = new UDPSender(this.multicastSocket);
             } catch (IOException e) {
@@ -540,7 +551,6 @@ public class CoAPService {
             // Otherwise use normal UDP datagram socket
         } else {
             try {
-
                 // If the port is set, use the defined port
                 if (this.coapPort != -1 && address != null) {
                     this.socket = new DatagramSocket(this.coapPort, address);
@@ -589,7 +599,6 @@ public class CoAPService {
      * factories etc.
      */
     public void stopService() {
-
         if (this.socket != null) {
             this.socket.close();
         }

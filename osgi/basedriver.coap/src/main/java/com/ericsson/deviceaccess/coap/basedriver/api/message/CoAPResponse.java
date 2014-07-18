@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,14 +29,10 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Class representing a CoAP response.
@@ -68,6 +64,10 @@ public class CoAPResponse extends CoAPMessage {
         super(messageType, responseCode, messageId);
     }
 
+    public CoAPResponse(int version, CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId) {
+        this(version, messageType, responseCode.getNo(), messageId);
+    }
+
     /**
      * Create an empty ack for a response (empty ACKs are handled as a response)
      *
@@ -75,10 +75,9 @@ public class CoAPResponse extends CoAPMessage {
      */
     public CoAPResponse createAcknowledgement() {
 
-        CoAPResponse resp = new CoAPResponse(1,
-                CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
-        for (CoAPOptionHeader header : this.getOptionHeaders()) {
-            if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
+        for (CoAPOptionHeader header : getOptionHeaders()) {
+            if (header.getOptionName() == CoAPOptionName.TOKEN) {
                 resp.addOptionHeader(header);
                 break;
             }
@@ -96,11 +95,9 @@ public class CoAPResponse extends CoAPMessage {
      * @return a CoAP RST response for this CoAP response
      */
     public CoAPResponse createReset() {
-
-        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0,
-                this.getMessageId());
-        for (CoAPOptionHeader header : this.getOptionHeaders()) {
-            if (header.getOptionName().equals(CoAPOptionName.TOKEN.getName())) {
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0, getMessageId());
+        for (CoAPOptionHeader header : getOptionHeaders()) {
+            if (header.getOptionName() == CoAPOptionName.TOKEN) {
                 resp.addOptionHeader(header);
                 break;
             }

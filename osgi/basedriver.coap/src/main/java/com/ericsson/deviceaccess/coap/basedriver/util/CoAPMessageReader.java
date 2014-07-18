@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,15 +29,19 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.*;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -126,18 +130,15 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         // mask to unsigned 16 bit -> int
         messageId = shortInt & 0xFFFF;
 
+        CoAPMessageType messageType = CoAPMessageType.getType(type);
         if (code == 0) {
             // handle empty messages as responses, only acks can be empty?
-
-            this.message = new CoAPResponse(version,
-                    CoAPMessage.CoAPMessageType.getType(type), code, messageId);
+            this.message = new CoAPResponse(version, messageType, code, messageId);
         } // range 1-31 is a request
         else if (code > 0 && code < 32) {
-            this.message = new CoAPRequest(version,
-                    CoAPMessage.CoAPMessageType.getType(type), code, messageId);
+            this.message = new CoAPRequest(version, messageType, code, messageId);
         } else if (code > 63 && code < 192) { // 64-191 response
-            this.message = new CoAPResponse(version,
-                    CoAPMessage.CoAPMessageType.getType(type), code, messageId);
+            this.message = new CoAPResponse(version, messageType, code, messageId);
 
         } else {
             // TODO exception handling
@@ -183,9 +184,9 @@ public class CoAPMessageReader implements CoAPMessageFormat {
 
         /*
          * Options MUST appear in order of their Option Number!
-         * 
+         *
          * The fields in an option are defined as follows:
-         * 
+         *
          * Option Delta: 4-bit unsigned integer. Indicates the difference
          * between the Option Number of this option and the previous option (or
          * zero for the first option). In other words, the Option Number is
@@ -194,13 +195,13 @@ public class CoAPMessageReader implements CoAPMessageFormat {
          * reserved for no-op options when they are sent with an empty value
          * (they are ignored) and can be used as "fenceposts" if deltas larger
          * than 15 would otherwise be required.
-         * 
+         *
          * Length: Indicates the length of the Option Value, in bytes. Normally
          * Length is a 4-bit unsigned integer allowing value lengths of 0-14
          * bytes. When the Length field is set to 15, another byte is added as
          * an 8-bit unsigned integer whose value is added to the 15, allowing
          * option value lengths of 15-270 bytes.
-         * 
+         *
          * The length and format of the Option Value depends on the respective
          * option, which MAY define variable length values. Options defined in
          * this document make use of the following formats for option values:
@@ -278,13 +279,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             // Create new CoAPOptionHeader object and add it to the message
             // if the option is fence post, ignore value
             // if (!fencePost) {
-            String optionName = "unknown";
-            if (CoAPOptionName.getOptionName(optionNumber) != null) {
-                optionName = CoAPOptionName.getOptionName(optionNumber)
-                        .getName();
-            }
-            header = new CoAPOptionHeader(optionNumber, optionName,
-                    buf.toByteArray());
+            header = new CoAPOptionHeader(CoAPOptionName.getFromNo(optionNumber), buf.toByteArray());
             try {
                 buf.flush();
                 buf.close();

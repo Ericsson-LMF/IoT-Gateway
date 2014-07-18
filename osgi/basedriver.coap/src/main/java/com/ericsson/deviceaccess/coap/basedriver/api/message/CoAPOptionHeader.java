@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
@@ -75,7 +75,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      */
 
     /*
-     * 
+     *
      * 0 1 2 3 4 5 6 7 +---+---+---+---+---+---+---+---+ | Option Delta | Length
      * | for 0..14 +---+---+---+---+---+---+---+---+ | Option Value ...
      * +---+---+---+---+---+---+---+---+ for 15..270:
@@ -85,8 +85,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * Option Value ...
      * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
      */
-    private int optionNumber;
-    private String optionName;
+    private final CoAPOptionName optionName;
 
     /**
      * Length: Indicates the length of the Option Value, in bytes. Normally
@@ -95,7 +94,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * unsigned integer whose value is added to the 15, allowing option value
      * lengths of 15-270 bytes.
      */
-    private int length;
+    private final int length;
 
     private byte[] value;
 
@@ -106,8 +105,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @param value value of the option in bytes
      */
     public CoAPOptionHeader(CoAPOptionName name, byte[] value) {
-        this.optionName = name.getName();
-        this.optionNumber = name.getNo();
+        this.optionName = name;
         if (value != null) {
             this.length = value.length;
         } else {
@@ -122,8 +120,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @param name name of the option
      */
     public CoAPOptionHeader(CoAPOptionName name) {
-        this.optionName = name.getName();
-        this.optionNumber = name.getNo();
+        this.optionName = name;
         this.value = null;
         this.length = 0;
     }
@@ -131,14 +128,12 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
     /**
      * Constructor
      *
-     * @param optionNumber number of the option
      * @param optionName name of the option
      * @param value value of the option header in bytes
      */
-    public CoAPOptionHeader(int optionNumber, String optionName,
+    public CoAPOptionHeader(String optionName,
             byte[] value) {
-        this.optionName = optionName;
-        this.optionNumber = optionNumber;
+        this.optionName = CoAPOptionName.getFromName(optionName);
         if (value != null) {
             this.length = value.length;
         } else {
@@ -153,8 +148,8 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      *
      * @return name of the option
      */
-    public String getOptionName() {
-        return this.optionName;
+    public CoAPOptionName getOptionName() {
+        return optionName;
     }
 
     /**
@@ -163,7 +158,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @return number of the option
      */
     public int getOptionNumber() {
-        return this.optionNumber;
+        return optionName.getNo();
     }
 
     // TODO add setters if needed
@@ -174,7 +169,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @return true if this option is critical (odd), false otherwise
      */
     public boolean isCritical() {
-        return this.optionNumber % 2 != 0;
+        return getOptionNumber() % 2 != 0;
     }
 
     /**
@@ -221,7 +216,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * 07)
      */
     public boolean isFencepost() {
-        return (this.optionNumber % 14) == 0;
+        return getOptionNumber() % 14 == 0;
     }
 
     /**
@@ -232,6 +227,6 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      */
     @Override
     public int compareTo(CoAPOptionHeader header) {
-        return this.optionNumber - header.getOptionNumber();
+        return getOptionNumber() - header.getOptionNumber();
     }
 }

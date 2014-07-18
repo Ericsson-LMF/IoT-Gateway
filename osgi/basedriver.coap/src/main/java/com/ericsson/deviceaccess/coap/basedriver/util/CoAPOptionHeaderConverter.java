@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
@@ -38,6 +38,24 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPContentType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.ACCEPT;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK2;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.CONTENT_TYPE;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.ETAG;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.IF_MATCH;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.IF_NONE_MATCH;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.LOCATION_PATH;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.LOCATION_QUERY;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.MAX_AGE;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.MAX_OFE;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.OBSERVE;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.PROXY_URI;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.TOKEN;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_HOST;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_QUERY;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockOptionHeader;
 
@@ -65,54 +83,47 @@ public class CoAPOptionHeaderConverter {
      * @return string representation of the header value
      */
     public String convertOptionHeaderToString(CoAPOptionHeader header) {
-
-        String value = "";
-        if (header.getOptionNumber() == CoAPOptionName.CONTENT_TYPE.getNo()
-                || header.getOptionNumber() == CoAPOptionName.URI_PORT.getNo()
-                || header.getOptionNumber() == CoAPOptionName.ACCEPT.getNo()
-                || header.getOptionNumber() == CoAPOptionName.OBSERVE.getNo()) {
-            value = this.convertShortToString(header);
-        } else if (header.getOptionNumber() == CoAPOptionName.MAX_AGE.getNo()
-                || header.getOptionNumber() == CoAPOptionName.MAX_OFE.getNo()) {
-            value = this.convertIntToString(header);
-        } else if (header.getOptionNumber() == CoAPOptionName.PROXY_URI.getNo()
-                || header.getOptionNumber() == CoAPOptionName.URI_HOST.getNo()
-                || header.getOptionNumber() == CoAPOptionName.URI_QUERY.getNo()
-                || header.getOptionNumber() == CoAPOptionName.URI_PATH.getNo()
-                || header.getOptionNumber() == CoAPOptionName.LOCATION_QUERY
-                .getNo()
-                || header.getOptionNumber() == CoAPOptionName.LOCATION_PATH
-                .getNo()) {
-            value = new String(header.getValue());
-        } // TODO etag, token and if-match
-        else if (header.getOptionNumber() == CoAPOptionName.TOKEN.getNo()
-                || header.getOptionNumber() == CoAPOptionName.ETAG.getNo()
-                || header.getOptionNumber() == CoAPOptionName.IF_MATCH.getNo()) {
-
-            // TODO check if the byte array is hex or string??
-            value = this.convertHexToString(header);
-        } else if (header.getOptionNumber() == CoAPOptionName.IF_NONE_MATCH
-                .getNo()) {
-            value = "";
-        } else if (header.getOptionNumber() == CoAPOptionName.BLOCK1.getNo()
-                || (header.getOptionNumber() == CoAPOptionName.BLOCK2.getNo())) {
-            // show the value as unsigned int
-            try {
-                BlockOptionHeader b = new BlockOptionHeader(header);
-
-                long longValue = this.convertIntToUnsignedLong(header);
-                // More details for debug (Ryoji)
-                //value = Long.toString(longValue);
-                long num = (longValue >> 4);
-                long m = (longValue >> 3) & 0x1L;
-                long szx = longValue & 7L;
-                value = Long.toString(longValue) + " (Num=" + Long.toString(num) + "/M=" + Long.toString(m)
-                        + "/Sz=" + Long.toString(CoAPUtil.getBlockSize(szx)) + ")";
-            } catch (CoAPException e) {
-                e.printStackTrace();
-            }
+        switch (header.getOptionName()) {
+            case CONTENT_TYPE:
+            case URI_PORT:
+            case ACCEPT:
+            case OBSERVE:
+                return convertShortToString(header);
+            case MAX_AGE:
+            case MAX_OFE:
+                return convertIntToString(header);
+            case PROXY_URI:
+            case URI_HOST:
+            case URI_QUERY:
+            case URI_PATH:
+            case LOCATION_QUERY:
+            case LOCATION_PATH:
+                return new String(header.getValue());
+            case TOKEN:
+            case ETAG:
+            case IF_MATCH: // TODO etag, token and if-match
+                // TODO check if the byte array is hex or string??
+                return this.convertHexToString(header);
+            case BLOCK1:
+            case BLOCK2:
+                // show the value as unsigned int
+                try {
+                    BlockOptionHeader b = new BlockOptionHeader(header);
+                    long longValue = this.convertIntToUnsignedLong(header);
+                    // More details for debug (Ryoji)
+                    //value = Long.toString(longValue);
+                    long num = (longValue >> 4);
+                    long m = (longValue >> 3) & 0x1L;
+                    long szx = longValue & 7L;
+                    return Long.toString(longValue) + " (Num=" + Long.toString(num) + "/M=" + Long.toString(m)
+                            + "/Sz=" + Long.toString(CoAPUtil.getBlockSize(szx)) + ")";
+                } catch (CoAPException e) {
+                    e.printStackTrace();
+                }
+            case IF_NONE_MATCH:
+            default:
+                return "";
         }
-        return value;
     }
 
     public boolean isHex(String in) {
@@ -160,12 +171,12 @@ public class CoAPOptionHeaderConverter {
         // content type, uri-port and accept headers' length 0-2 bytes
         String value = "";
         int unsignedShort = this.shortToUnsignedInt(header);
-        if (header.getOptionNumber() == CoAPOptionName.CONTENT_TYPE.getNo()) {
+        if (header.getOptionName() == CONTENT_TYPE) {
             value = CoAPContentType.getContentTypeName(unsignedShort)
                     .getContentType();
-        } else if (header.getOptionNumber() == CoAPOptionName.OBSERVE.getNo()
-                || header.getOptionNumber() == CoAPOptionName.ACCEPT.getNo()
-                || header.getOptionNumber() == CoAPOptionName.URI_PORT.getNo()) {
+        } else if (header.getOptionName() == OBSERVE
+                || header.getOptionName() == ACCEPT
+                || header.getOptionName() == URI_PORT) {
             value = Integer.toString(unsignedShort);
         }
         return value;
@@ -181,10 +192,10 @@ public class CoAPOptionHeaderConverter {
     public int shortToUnsignedInt(CoAPOptionHeader h) {
         int unsignedShort = -1;
 
-        if (h.getOptionNumber() == CoAPOptionName.CONTENT_TYPE.getNo()
-                || h.getOptionNumber() == CoAPOptionName.URI_PORT.getNo()
-                || h.getOptionNumber() == CoAPOptionName.ACCEPT.getNo()
-                || h.getOptionNumber() == CoAPOptionName.OBSERVE.getNo()) {
+        if (h.getOptionNumber() == CONTENT_TYPE.getNo()
+                || h.getOptionNumber() == URI_PORT.getNo()
+                || h.getOptionNumber() == ACCEPT.getNo()
+                || h.getOptionNumber() == OBSERVE.getNo()) {
 
             byte[] headerBytes = h.getValue();
             short shortInt = 0;
@@ -225,7 +236,7 @@ public class CoAPOptionHeaderConverter {
      */
     public long convertIntToUnsignedLong(CoAPOptionHeader h) {
         long unsignedLong = -1;
-        if (h.getOptionNumber() == CoAPOptionName.MAX_AGE.getNo()
+        if (h.getOptionNumber() == MAX_AGE.getNo()
                 || h.getOptionNumber() == CoAPOptionName.MAX_OFE.getNo()
                 || h.getOptionNumber() == CoAPOptionName.BLOCK1.getNo()
                 || h.getOptionNumber() == CoAPOptionName.BLOCK2.getNo()) {

@@ -44,6 +44,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -152,10 +153,10 @@ public class UPnPActionImpl implements UPnPAction {
             Socket sock = new Socket();
             sock.connect(sockaddr, 10000);
 
-            byte[] data = actionDataTransport.getBytes("UTF8");
+            byte[] data = actionDataTransport.getBytes(StandardCharsets.UTF_8);
             OutputStream os = sock.getOutputStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(os, "UTF8"));
+            BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
             wr.write("POST " + url.getFile() + " HTTP/1.1\r\n");
             wr.write("HOST: " + host + ":" + port + "\r\n");
             wr.write("SOAPACTION: " + "\"" + m_service.m_serviceType + "#" + name + "\"\r\n");

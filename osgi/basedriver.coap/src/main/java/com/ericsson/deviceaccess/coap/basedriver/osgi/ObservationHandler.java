@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
@@ -44,14 +44,16 @@ import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPObservationRe
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class is responsible for handling the observation relationships. It
@@ -126,9 +128,9 @@ public class ObservationHandler {
      * @param endpoint the local endpoint
      */
     public ObservationHandler(LocalCoAPEndpoint endpoint) {
-        this.observedResources = new HashMap();
-        this.cachedResponses = new HashMap();
-        this.originalRequests = new HashMap();
+        this.observedResources = new HashMap<>();
+        this.cachedResponses = new HashMap<>();
+        this.originalRequests = new HashMap<>();
         this.endpoint = endpoint;
         this.timer = new Timer();
     }
@@ -150,20 +152,19 @@ public class ObservationHandler {
          */
 
         URI uri = originalRequest.getUriFromRequest();
-        CoAPObservationResource res = this.observedResources.get(uri);
+        CoAPObservationResource res = observedResources.get(uri);
 
         if (resp.getOptionHeaders(CoAPOptionName.OBSERVE) == null
                 || resp.getOptionHeaders(CoAPOptionName.OBSERVE).isEmpty()) {
 
             // this means the response is terminating an observation
             // relationship
-            this.observedResources.remove(res.getUri());
-            List<CoAPResourceObserver> observers = res.getObservers();
-            observers.forEach(obs -> {
-                obs.observationRelationshipTerminated(resp, res, originalRequests.get(res.getUri()));
+            observedResources.remove(uri);
+            res.getObservers().forEach(obs -> {
+                obs.observationRelationshipTerminated(resp, res, originalRequests.get(uri));
             });
 
-            RefreshTask oldTask = this.cachedResponses.get(uri);
+            RefreshTask oldTask = cachedResponses.get(uri);
             if (oldTask != null) {
                 oldTask.cancel();
             }
@@ -200,12 +201,12 @@ public class ObservationHandler {
         // Put in the cached responses, replacing the old task if
         RefreshTask task = new RefreshTask(resp, uri);
 
-        RefreshTask oldTask = this.cachedResponses.get(uri);
+        RefreshTask oldTask = cachedResponses.get(uri);
         if (oldTask != null) {
             oldTask.cancel();
         }
 
-        this.cachedResponses.put(uri, task);
+        cachedResponses.put(uri, task);
 
         // Read the max-age option
         long maxAge = resp.getMaxAge();
@@ -255,8 +256,7 @@ public class ObservationHandler {
             byte[] content = resp.getPayload();
             res.setContent(content);
 
-            List<CoAPResourceObserver> observers = res.getObservers();
-            observers.forEach((observer) -> {
+            res.getObservers().forEach(observer -> {
                 CoAPRequest req = originalRequests.get(res.getUri());
                 observer.observeResponseReceived(resp, res, req);
             });
@@ -309,7 +309,7 @@ public class ObservationHandler {
     }
 
     public boolean isObserved(URI uri) {
-        return this.observedResources.get(uri) != null;
+        return observedResources.get(uri) != null;
     }
 
     public CoAPResource getResource(URI uri) {
@@ -424,6 +424,6 @@ public class ObservationHandler {
      * bundle.
      */
     public void stopService() {
-        this.timer.cancel();
+        timer.cancel();
     }
 }

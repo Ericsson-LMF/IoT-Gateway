@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
@@ -45,7 +45,10 @@ import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAP
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 /**
@@ -58,8 +61,8 @@ import java.util.stream.Collectors;
 public class LinkFormatDirectory {
 
     // This keeps the already known endpoints
-    private HashMap<URI, RemoteEndpointRefreshTask> refreshTasks;
-    private Timer timer;
+    private final HashMap<URI, RemoteEndpointRefreshTask> refreshTasks;
+    private final Timer timer;
     private int resourceDiscoveryInterval;
 
     /**
@@ -69,8 +72,8 @@ public class LinkFormatDirectory {
      */
     private class RemoteEndpointRefreshTask extends TimerTask {
 
-        private URI uri;
-        private CoAPRemoteEndpoint endpoint;
+        private final URI uri;
+        private final CoAPRemoteEndpoint endpoint;
 
         protected RemoteEndpointRefreshTask(URI uri, CoAPRemoteEndpoint endpoint) {
             this.uri = uri;
@@ -207,8 +210,7 @@ public class LinkFormatDirectory {
                  + serverURI.toString()
                  + "] before expiration, now reset timer!");
                  */
-                RemoteEndpointRefreshTask task = (RemoteEndpointRefreshTask) this.refreshTasks
-                        .get(serverURI);
+                RemoteEndpointRefreshTask task = refreshTasks.get(serverURI);
                 // cancel the refresh task and update the scheduled time for
                 // expiration
                 try {
@@ -251,8 +253,7 @@ public class LinkFormatDirectory {
         // TODO call on the services that a server is removed!!
         if (services != null) {
             for (Object s : services) {
-                ((DeviceInterface) s).deviceRemoved(task
-                        .getCoAPRemoteEndpoint());
+                ((DeviceInterface) s).deviceRemoved(task.getCoAPRemoteEndpoint());
             }
         }
     }
