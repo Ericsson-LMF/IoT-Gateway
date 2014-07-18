@@ -86,14 +86,14 @@ public class CoAPActivator implements BundleActivator {
         //logger.open();
         //logger.info("Start CoAPActivator, try to register coap service");
         //OSGILogFactory.initOSGI(context);
-        Bundle b = context.getBundle();
-        InputStream in = null;
+        Bundle bundle = context.getBundle();
+        InputStream is = null;
 
         try {
-            URL url = b.getEntry("/META-INF/coap.properties");
+            URL url = bundle.getEntry("/META-INF/coap.properties");
             if (url != null) {
                 try {
-                    in = url.openStream();
+                    is = url.openStream();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -112,10 +112,10 @@ public class CoAPActivator implements BundleActivator {
         InetAddress discovery = null;
         int maximumBlockSzx = 6;
 
-        if (in != null) {
+        if (is != null) {
 
             try {
-                p.load(in);
+                p.load(is);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -235,24 +235,21 @@ public class CoAPActivator implements BundleActivator {
 
         //logger.info("CoAP driver address: " + address.getHostAddress());
         service = new CoAPService(address, coapPort, maximumBlockSzx);
-        serviceRegistration = context.registerService(
-                CoAPService.class.getName(), service, null);
+        serviceRegistration = context.registerService(CoAPService.class, service, null);
 
         //logger.debug("Service registered");
         // Create a tracker for CoAPRequestListener services.
-        tracker = new ServiceTracker(context, DeviceInterface.class.getName(), null);
+        tracker = new ServiceTracker(context, DeviceInterface.class, null);
         tracker.open();
 
-        incomingCoAPTracker = new ServiceTracker(context,
-                IncomingCoAPRequestListener.class.getName(), null);
+        incomingCoAPTracker = new ServiceTracker(context, IncomingCoAPRequestListener.class, null);
         incomingCoAPTracker.open();
 
         FileWriter fstream = new FileWriter("coapmessaging.log");
         out = new BufferedWriter(fstream);
 
         service.init();
-        service.startResourceDiscoveryService(discoveryInterval, discovery,
-                discoveryPort);
+        service.startResourceDiscoveryService(discoveryInterval, discovery, discoveryPort);
     }
 
     /**

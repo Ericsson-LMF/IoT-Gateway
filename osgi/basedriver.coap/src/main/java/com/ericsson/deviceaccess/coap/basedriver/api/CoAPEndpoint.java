@@ -74,7 +74,7 @@ public abstract class CoAPEndpoint {
      * @return map of resources, URI as the key
      */
     public Map<URI, CoAPResource> getResources() {
-        return this.resources;
+        return resources;
     }
 
     /**
@@ -85,17 +85,17 @@ public abstract class CoAPEndpoint {
      * @param resource found
      */
     public void addResource(CoAPResource resource) {
-        this.resources.put(resource.getUri(), resource);
+        resources.put(resource.getUri(), resource);
     }
 
     /**
      * This method will be needed from RD when updating the resource tree
      */
     public void removeResources() {
-        this.resources.clear();
+        resources.clear();
     }
 
     public void removeResource(CoAPResource res) {
-        this.resources.remove(res.getUri());
+        resources.remove(res.getUri());
     }
 }

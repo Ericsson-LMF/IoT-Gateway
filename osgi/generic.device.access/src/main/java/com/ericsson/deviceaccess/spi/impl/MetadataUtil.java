@@ -160,44 +160,4 @@ public enum MetadataUtil {
                     + " is below the min value '" + metadata.getMinValue() + "'");
         }
     }
-
-//    /**
-//     * Makes a JSON string of the specified metadata.
-//     *
-//     * @param path
-//     * @param format
-//     * @param name
-//     * @param metadata
-//     * @return JSON string of the specified metadata
-//     * @throws GDException
-//     */
-//    public String metadataToJson(String path, Format format, String name, Collection<GDPropertyMetadata> metadata) throws GDException {
-//        String retVal = "";
-//        if (path == null) {
-//            path = "";
-//        }
-//        if (format.isJson()) {
-//            if (metadata.size() > 0) {
-//                StringBuilder builder = new StringBuilder();
-//                builder.append('"').append(name).append("\": {");
-//                for (GDPropertyMetadata meta : metadata) {
-//                    if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
-//                        builder.append('"').append(meta.getName()).append('"').append(':')
-//                                .append(meta.getSerializedNode(path.substring(path.indexOf(Constants.PATH_DELIMITER)), format));
-//                    } else {
-//                        builder.append('"').append(meta.getName()).append('"').append(':')
-//                                .append(meta.getSerializedNode("", format));
-//                    }
-//                    builder.append(',');
-//                }
-//                builder.setLength(builder.length() - 1);
-//                builder.append('}');
-//                retVal = builder.toString();
-//            }
-//        } else {
-//            throw new GDException(405, "No such format supported");
-//        }
-//
-//        return retVal;
-//    }
 }

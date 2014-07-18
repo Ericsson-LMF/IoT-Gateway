@@ -64,6 +64,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,8 +78,8 @@ public class CoAPService {
     private TransportLayerReceiver transportLayerReceiver;
     private TransportLayerSender transportLayerSender;
 
-    private IncomingMessageHandler incomingMessageHandler;
-    private OutgoingMessageHandler outgoingMessageHandler;
+    private IncomingMessageHandler inMsgHandler;
+    private OutgoingMessageHandler outMagHandler;
 
     private final InetAddress address;
     private final int coapPort;
@@ -178,7 +179,7 @@ public class CoAPService {
         @Override
         public void piggyPackedResponseReceived(CoAPResponse response,
                 CoAPRequest request) {
-            this.handleResponse(response);
+            handleResponse(response);
         }
 
         /**
@@ -191,12 +192,12 @@ public class CoAPService {
         @Override
         public void separateResponseReceived(CoAPResponse response,
                 CoAPRequest request) {
-            this.handleResponse(response);
+            handleResponse(response);
 
         }
 
         private void handleResponse(CoAPResponse response) {
-            String payload = new String(response.getPayload());
+            String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
 
             /*
              logger.debug("Message payload : [" + payload + "]");
@@ -309,7 +310,7 @@ public class CoAPService {
     public CoAPRequest createPostRequest(String host, int port, String path,
             CoAPMessageType messageType, byte[] payload) throws CoAPException {
 
-        CoAPRequest req = this.createRequest(messageType, 2, host, port, path);
+        CoAPRequest req = createRequest(messageType, 2, host, port, path);
         if (payload != null && payload.length > 0) {
             req.setPayload(payload);
         }
@@ -329,7 +330,7 @@ public class CoAPService {
      */
     public CoAPRequest createGetRequest(String host, int port, String path,
             CoAPMessageType messageType) throws CoAPException {
-        return this.createRequest(messageType, 1, host, port, path);
+        return createRequest(messageType, 1, host, port, path);
     }
 
     /**
@@ -346,7 +347,7 @@ public class CoAPService {
      */
     public CoAPRequest createPutRequest(String host, int port, String path,
             CoAPMessageType messageType, byte[] payload) throws CoAPException {
-        CoAPRequest req = this.createRequest(messageType, 3, host, port, path);
+        CoAPRequest req = createRequest(messageType, 3, host, port, path);
         if (payload != null && payload.length > 0) {
             req.setPayload(payload);
         }
@@ -366,7 +367,7 @@ public class CoAPService {
      */
     public CoAPRequest createDeleteRequest(String host, int port, String path,
             CoAPMessageType messageType) throws CoAPException {
-        return this.createRequest(messageType, 4, host, port, path);
+        return createRequest(messageType, 4, host, port, path);
     }
 
     /**
@@ -389,7 +390,6 @@ public class CoAPService {
 
         URI uri = null;
         try {
-
             if (port > 0 && port < 65536) {
                 uri = new URI("coap", null, host, port, path, null, null);
             } else {
@@ -404,15 +404,12 @@ public class CoAPService {
         try {
             String socketAddress = host;
             InetAddress addr = InetAddress.getByName(socketAddress);
-
             sockaddr = new InetSocketAddress(addr, uri.getPort());
-
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        return endpoint.createCoAPRequest(messageType, messageCode, sockaddr,
-                uri, null);
+        return endpoint.createCoAPRequest(messageType, messageCode, sockaddr, uri, null);
     }
 
     /**
@@ -494,29 +491,23 @@ public class CoAPService {
      * listeners to transport layer.
      */
     private void initCoAP() throws CoAPException {
-        CoAPMessageHandlerFactory messageHandlerFactory = CoAPMessageHandlerFactory
-                .getInstance();
+        CoAPMessageHandlerFactory factory = CoAPMessageHandlerFactory.getInstance();
 
         // these are the "message level" handler, at this point divided into
         // incoming/outgoing
-        incomingMessageHandler = messageHandlerFactory
-                .getIncomingCoAPMessageHandler();
-        outgoingMessageHandler = messageHandlerFactory
-                .getOutgoingCoAPMessageHandler(this.transportLayerSender);
+        inMsgHandler = factory.getIncomingCoAPMessageHandler();
+        outMagHandler = factory.getOutgoingCoAPMessageHandler(transportLayerSender);
 
         // get the local endpoint (singleton), add outgoing message handler as
         // listener
-        CoAPEndpointFactory endpointFactory = CoAPEndpointFactory.getInstance();
-        endpoint = endpointFactory.createLocalCoAPEndpoint(
-                outgoingMessageHandler, incomingMessageHandler, address,
-                coapPort);
+        endpoint = CoAPEndpointFactory.INSTANCE.createLocalCoAPEndpoint(outMagHandler, inMsgHandler, address, coapPort);
 
-        if (this.maximumBlockSzx != 6) {
-            endpoint.setMaxSzx(this.maximumBlockSzx);
+        if (maximumBlockSzx != 6) {
+            endpoint.setMaxSzx(maximumBlockSzx);
         }
 
-        incomingMessageHandler.setIncomingCoAPListener(endpoint);
-        transportLayerReceiver.addListener(incomingMessageHandler);
+        inMsgHandler.setIncomingCoAPListener(endpoint);
+        transportLayerReceiver.addListener(inMsgHandler);
 
     }
 
@@ -530,20 +521,18 @@ public class CoAPService {
     private void initUDPListeners() throws CoAPException, SocketException {
         // If address is a multicast address, and port is set, use
         // multicastsocket
-        if (address != null && address.isMulticastAddress()
-                && this.coapPort != -1) {
+        if (address != null && address.isMulticastAddress() && coapPort != -1) {
             // If given address is multicast, use multicast socket
             try {
 
                 /*
                  CoAPActivator.logger.debug("Join multicast group");
                  */
-                this.multicastSocket = new MulticastSocket(this.coapPort);
-                this.multicastSocket.joinGroup(address);
+                multicastSocket = new MulticastSocket(coapPort);
+                multicastSocket.joinGroup(address);
 
-                this.transportLayerReceiver = new UDPReceiver(this.multicastSocket);
-
-                this.transportLayerSender = new UDPSender(this.multicastSocket);
+                transportLayerReceiver = new UDPReceiver(multicastSocket);
+                transportLayerSender = new UDPSender(multicastSocket);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new CoAPException(e);
@@ -552,23 +541,23 @@ public class CoAPService {
         } else {
             try {
                 // If the port is set, use the defined port
-                if (this.coapPort != -1 && address != null) {
-                    this.socket = new DatagramSocket(this.coapPort, address);
+                if (coapPort != -1 && address != null) {
+                    socket = new DatagramSocket(coapPort, address);
                 } else if (this.coapPort != -1) {
-                    this.socket = new DatagramSocket(this.coapPort);
+                    socket = new DatagramSocket(coapPort);
                 } else {
-                    this.socket = new DatagramSocket();
+                    socket = new DatagramSocket();
                 }
             } catch (SocketException e) {
                 e.printStackTrace();
                 throw new CoAPException(e);
             }
-            this.socket.setReuseAddress(true);
-            this.socket.setSoTimeout(0);
+            socket.setReuseAddress(true);
+            socket.setSoTimeout(0);
 
             // System.out.println("init receiver & sender");
-            this.transportLayerReceiver = new UDPReceiver(this.socket);
-            this.transportLayerSender = new UDPSender(this.socket);
+            transportLayerReceiver = new UDPReceiver(socket);
+            transportLayerSender = new UDPSender(socket);
         }
     }
 
@@ -599,30 +588,30 @@ public class CoAPService {
      * factories etc.
      */
     public void stopService() {
-        if (this.socket != null) {
-            this.socket.close();
+        if (socket != null) {
+            socket.close();
         }
-        if (this.multicastSocket != null) {
-            this.multicastSocket.close();
+        if (multicastSocket != null) {
+            multicastSocket.close();
         }
 
         CoAPEndpointFactory.stopService();
         CoAPMessageHandlerFactory.stopService();
 
-        this.directory.stopService();
+        directory.stopService();
 
-        this.transportLayerReceiver.stopService();
-        this.transportLayerReceiver = null;
-        this.transportLayerSender.stopService();
-        this.transportLayerSender = null;
+        transportLayerReceiver.stopService();
+        transportLayerReceiver = null;
+        transportLayerSender.stopService();
+        transportLayerSender = null;
 
-        if (this.timer != null) {
-            this.timer.cancel();
+        if (timer != null) {
+            timer.cancel();
         }
-        this.outgoingMessageHandler.stopService();
-        this.outgoingMessageHandler = null;
+        outMagHandler.stopService();
+        outMagHandler = null;
 
-        this.endpoint.stopService();
-        this.endpoint = null;
+        endpoint.stopService();
+        endpoint = null;
     }
 }

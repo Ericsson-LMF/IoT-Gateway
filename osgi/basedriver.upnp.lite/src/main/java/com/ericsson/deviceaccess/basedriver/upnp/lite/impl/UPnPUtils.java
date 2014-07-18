@@ -83,45 +83,6 @@ public enum UPnPUtils {
             string = string.replace(entry.getValue(), entry.getKey());
         }
         return string;
-//        StringBuilder sb = new StringBuilder();
-//
-//        for (int i = 0; i < xml.length(); i++) {
-//            if ('&' == xml.charAt(i)) {
-//                if (i < xml.length() - 3) {
-//                    if ('l' == xml.charAt(i + 1) && 't' == xml.charAt(i + 2) && ';' == xml.charAt(i + 3)) {
-//                        sb.append('<');
-//                        i += 3;
-//                    } else if ('g' == xml.charAt(i + 1) && 't' == xml.charAt(i + 2) && ';' == xml.charAt(i + 3)) {
-//                        sb.append('>');
-//                        i += 3;
-//                    } else if (i < xml.length() - 4) {
-//                        if ('a' == xml.charAt(i + 1) && 'm' == xml.charAt(i + 2) && 'p' == xml.charAt(i + 3) && ';' == xml.charAt(i + 4)) {
-//                            sb.append('&');
-//                            i += 4;
-//                        } else if (i < xml.length() - 5) {
-//                            if ('q' == xml.charAt(i + 1) && 'u' == xml.charAt(i + 2) && 'o' == xml.charAt(i + 3) && 't' == xml.charAt(i + 4) && ';' == xml.charAt(i + 5)) {
-//                                sb.append('"');
-//                                i += 5;
-//                            } else if ('a' == xml.charAt(i + 1) && 'p' == xml.charAt(i + 2) && 'o' == xml.charAt(i + 3) && 's' == xml.charAt(i + 4) && ';' == xml.charAt(i + 5)) {
-//                                sb.append('\'');
-//                                i += 6;
-//                            } else {
-//                                sb.append(xml.charAt(i));
-//                            }
-//                        } else {
-//                            sb.append(xml.charAt(i));
-//                        }
-//                    } else {
-//                        sb.append(xml.charAt(i));
-//                    }
-//                } else {
-//                    sb.append(xml.charAt(i));
-//                }
-//            } else {
-//                sb.append(xml.charAt(i));
-//            }
-//        }
-//        return new String(sb);
     }
 
     public static Object parseString(String value, String upnpType) throws Exception {

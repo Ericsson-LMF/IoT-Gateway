@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,47 +29,29 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
+import com.ericsson.deviceaccess.coap.basedriver.util.NetUtil;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.util.NetUtil;
 
 /**
  * This class is used for creating a singleton instance of the
  * LocalCoAPEndpoint.
  */
-public class CoAPEndpointFactory {
+public enum CoAPEndpointFactory {
 
-    private static CoAPEndpointFactory coapEndpointFactory;
+    /**
+     * Singleton.
+     */
+    INSTANCE;
+
     private LocalCoAPEndpoint localEndpoint;
-
-    /**
-     * Constructor is private, use getInstance method to get an instance of the
-     * factory.
-     */
-    private CoAPEndpointFactory() {
-        localEndpoint = null;
-    }
-
-    /**
-     * Returns a singleton instance of this factory. Creates a new one if one
-     * doesn't exist, or if one already exists, returns that one.
-     *
-     * @return a singleton instance of the CoAPEndpointFactory
-     */
-    public static synchronized CoAPEndpointFactory getInstance() {
-        if (coapEndpointFactory == null) {
-            coapEndpointFactory = new CoAPEndpointFactory();
-        }
-        return coapEndpointFactory;
-    }
 
     /**
      * Returns a singleton instance of the LocalCoAPEndpoint
@@ -84,13 +66,11 @@ public class CoAPEndpointFactory {
             address = NetUtil.getMyInetAddress(NetUtil.ADDR_SCOPE_PRIORITISED_IPV6);
         }
         synchronized (this) {
-            if (this.localEndpoint == null) {
+            if (localEndpoint == null) {
                 String hostAddress = address.getHostAddress();
                 try {
-                    URI uri = new URI(null, null, hostAddress, port, null,
-                            null, null);
-                    localEndpoint = new LocalCoAPEndpoint(outgoingHandler,
-                            incomingHandler, uri);
+                    URI uri = new URI(null, null, hostAddress, port, null, null, null);
+                    localEndpoint = new LocalCoAPEndpoint(outgoingHandler, incomingHandler, uri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                     throw new CoAPException(e);
@@ -115,6 +95,6 @@ public class CoAPEndpointFactory {
      * be set to null.
      */
     public static synchronized void stopService() {
-        coapEndpointFactory.localEndpoint = null;
+        INSTANCE.localEndpoint = null;
     }
 }
