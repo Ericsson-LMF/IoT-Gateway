@@ -58,7 +58,6 @@ public abstract class CoAPMessage {
     public static final String TOKEN = "token";
     public static final String URI = "uri";
 
-
     // Core CoAP 07 draft
     /**
      * Version (Ver): 2-bit unsigned integer. Indicates the CoAP version number.
@@ -110,7 +109,6 @@ public abstract class CoAPMessage {
 
     // boolean indicating if this message has been canceled
     private boolean canceled;
-
 
     private InetSocketAddress remoteSocketAddress;
 
@@ -821,7 +819,10 @@ public abstract class CoAPMessage {
      */
     public static enum CoAPMessageType {
 
-        CONFIRMABLE("Confirmable"), NON_CONFIRMABLE("Non-Confirmable"), ACKNOWLEDGEMENT("Acknowledgement"), RESET("Reset")
+        CONFIRMABLE("Confirmable"),
+        NON_CONFIRMABLE("Non-Confirmable"),
+        ACKNOWLEDGEMENT("Acknowledgement"),
+        RESET("Reset");
         private final String name;
 
         private CoAPMessageType(String name) {

@@ -133,7 +133,6 @@ public class CoAPResource {
      */
     private final HashMap<String, String> values;
 
-
     /**
      * Constructor. A CoAP resource is identified using the URI
      * (coap://host:port/path)
@@ -529,7 +528,18 @@ public class CoAPResource {
      */
     public static enum CoAPResourceType {
 
-        CARELESS("/careless"), FEEDBACK("/feedback"), HELLO_WORLD("/helloWorld"), LARGE("/large"), MIRROR("/mirror"), SEPARATE("/separate"), STORAGE("/storage"), TIME_RESOURCE("/timeResource"), TO_UPPER("/toUpper"), WEATHER_RESOURCE("/weatherResource"), OTHER("/other")
+        CARELESS("/careless"),
+        FEEDBACK("/feedback"),
+        HELLO_WORLD("/helloWorld"),
+        LARGE("/large"),
+        MIRROR("/mirror"),
+        SEPARATE("/separate"),
+        STORAGE("/storage"),
+        TIME_RESOURCE("/timeResource"),
+        O_UPPER("/toUpper"),
+        WEATHER_RESOURCE("/weatherResource"),
+        OTHER("/other");
+
         private final String path;
 
         private CoAPResourceType(String path) {
