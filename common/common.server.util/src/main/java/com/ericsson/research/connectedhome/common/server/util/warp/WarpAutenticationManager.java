@@ -36,6 +36,7 @@ package com.ericsson.research.connectedhome.common.server.util.warp;
 
 import com.ericsson.research.connectedhome.common.BasicAuthFilter;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import java.io.IOException;
 import java.net.URI;
@@ -105,7 +106,7 @@ public class WarpAutenticationManager {
             WebResource webResource = createRequestResource(
                     "users/" + userName);
             return webResource.get(AuthIdentity.class);
-        } catch (Exception t) {
+        } catch (UniformInterfaceException t) {
             throw new CommunicationException(
                     "Exception when executing GET user: " + userName, t);
         }
@@ -124,7 +125,7 @@ public class WarpAutenticationManager {
             WebResource webResource = createRequestResource(
                     "users/" + userName);
             webResource.delete();
-        } catch (Exception t) {
+        } catch (UniformInterfaceException t) {
             throw new CommunicationException(
                     "Exception when executing DELETE user: " + userName, t);
         }
@@ -163,7 +164,7 @@ public class WarpAutenticationManager {
             WebResource webResource = createRequestResource(
                     "users/" + currentUserName);
             webResource.put(userCred);
-        } catch (Exception t) {
+        } catch (UniformInterfaceException t) {
             throw new CommunicationException(
                     "Exception when executing PUT user: " + newUserCredentials, t);
         }

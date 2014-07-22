@@ -41,8 +41,6 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
-
-
 import junit.framework.TestCase;
 
 public class BlockwiseResponseCacheTest extends TestCase {

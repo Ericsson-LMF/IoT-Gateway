@@ -198,62 +198,14 @@ public class AsyncActions {
 
     static class Executor {
 
-        Map<String, Device> devices = new HashMap<String, Device>() {
-            {
-                put("d2", new Device() {
-                    final List<Runnable> jobs = new ArrayList<>();
-                    final Thread runner = new Thread() {
-                        @Override
-                        public void run() {
-                            while (true) {
-                                ArrayList<Runnable> tmpJobs = new ArrayList<>();
-                                synchronized (jobs) {
-                                    try {
-                                        jobs.wait();
-                                    } catch (InterruptedException e) {
-                                        continue;
-                                    }
-                                    tmpJobs.addAll(jobs);
-                                    jobs.clear();
-                                }
-                                tmpJobs.stream().forEach((job) -> {
-                                    job.run();
-                                });
-                            }
-                        }
-                    };
-
-                    {
-                        runner.start();
-                    }
-
-                    @Override
-                    public Service getService(String serviceName) {
-                        return (String actionName) -> (final ActionContext ctx) -> {
-                            synchronized (jobs) {
-                                jobs.add((Runnable) () -> {
-                                    System.out.println("Starting job on " + ctx);
-                                    try {
-                                        Thread.sleep(10000);
-                                    } catch (InterruptedException e) {
-                                        // ignore
-                                    }
-                                    System.out.println("Completed job on " + ctx);
-                                    ctx.sendResult();
-                                });
-                                jobs.notifyAll();
-                            }
-                        };
-                    }
-                });
-            }
-        };
         private static final Device DEFAULT_DEVICE = new Device() {
+            @Override
             public Service getService(String serviceName) {
                 return DEFAULT_SERVICE;
             }
         }; // returns default service
         private static final Service DEFAULT_SERVICE = new Service() {
+            @Override
             public Action getAction(String actionName) {
                 return DEFAULT_ACTION;
             }
@@ -282,6 +234,55 @@ public class AsyncActions {
                         }
                     }
                 }.start();
+            }
+        };
+        Map<String, Device> devices = new HashMap<String, Device>() {
+            {
+                put("d2", new Device() {
+                    final List<Runnable> jobs = new ArrayList<>();
+                    final Thread runner = new Thread() {
+                        @Override
+                        public void run() {
+                            while (true) {
+                                ArrayList<Runnable> tmpJobs = new ArrayList<>();
+                                synchronized (jobs) {
+                                    try {
+                                        jobs.wait();
+                                    } catch (InterruptedException e) {
+                                        continue;
+                                    }
+                                    tmpJobs.addAll(jobs);
+                                    jobs.clear();
+                                }
+                                tmpJobs.stream().forEach((job) -> {
+                                    job.run();
+                                });
+                            }
+                        }
+                    };
+                    {
+                        runner.start();
+                    }
+
+                    @Override
+                    public Service getService(String serviceName) {
+                        return (String actionName) -> (final ActionContext ctx) -> {
+                            synchronized (jobs) {
+                                jobs.add(() -> {
+                                    System.out.println("Starting job on " + ctx);
+                                    try {
+                                        Thread.sleep(10000);
+                                    } catch (InterruptedException e) {
+                                        // ignore
+                                    }
+                                    System.out.println("Completed job on " + ctx);
+                                    ctx.sendResult();
+                                });
+                                jobs.notifyAll();
+                            }
+                        };
+                    }
+                });
             }
         };
 

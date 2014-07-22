@@ -53,7 +53,7 @@ public interface GDFramework {
      * @param dev The device to be registered
      * @throws GDException
      */
-    public void register(GenericDevice dev) throws GDException;
+    void register(GenericDevice dev) throws GDException;
 
     /**
      * This method should be called when an update occurs on the concerning
@@ -64,7 +64,7 @@ public interface GDFramework {
      * concerns.
      * @throws GDException
      */
-    public void update(GenericDevice dev, String updatedPaths) throws GDException;
+    void update(GenericDevice dev, String updatedPaths) throws GDException;
 
     /**
      * Method to be called when the concerned device gets unavailable and should
@@ -73,7 +73,7 @@ public interface GDFramework {
      * @param dev the device to be unregistered.
      * @throws GDException
      */
-    public void unregister(GenericDevice dev) throws GDException;
+    void unregister(GenericDevice dev) throws GDException;
 
     /**
      * Method to get the list of all the devices registered to the framework
@@ -96,13 +96,13 @@ public interface GDFramework {
      *
      * @param listener
      */
-    public void addListener(GDFrameworkListener listener);
+    void addListener(GDFrameworkListener listener);
 
     /**
      * Method to be called when removing a listener for device discovery events.
      *
      * @param listener
      */
-    public void removeListener(GDFrameworkListener listener);
+    void removeListener(GDFrameworkListener listener);
 
 }

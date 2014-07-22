@@ -62,7 +62,7 @@ public interface GDAction extends GDContextNode {
      * @return Name of the action.
      */
     @JsonView(View.ID.class)
-    public String getName();
+     String getName();
 
     /**
      * Method to execute the action. An instance of GenericDeviceActionContext
@@ -76,7 +76,7 @@ public interface GDAction extends GDContextNode {
      * @throws GDException Thrown on failure of the action.
      * @deprecated use {@link #execute(GenericDeviceProperties)} instead.
      */
-    public void execute(GDActionContext sac)
+    void execute(GDActionContext sac)
             throws GDException;
 
     /**
@@ -86,7 +86,7 @@ public interface GDAction extends GDContextNode {
      * @return the result
      * @throws GDException Thrown on failure of the action.
      */
-    public GDActionResult execute(GDProperties arguments)
+    GDActionResult execute(GDProperties arguments)
             throws GDException;
 
     /**
@@ -97,7 +97,7 @@ public interface GDAction extends GDContextNode {
      * @return a fresh properties pre-populated with default values according to
      * the schema.
      */
-    public GDProperties createArguments();
+    GDProperties createArguments();
 
     /**
      * Creates a context to be used in an invocation of this action.
@@ -106,7 +106,7 @@ public interface GDAction extends GDContextNode {
      * @deprecated use {@link #execute(GenericDeviceProperties)} instead, then
      * no context is needed.
      */
-    public GDActionContext createActionContext();
+    GDActionContext createActionContext();
 
     /**
      * Gets metadata describing the result.
@@ -114,7 +114,7 @@ public interface GDAction extends GDContextNode {
      * @return metadata describing the result
      */
     @JsonProperty("result")
-    public Map<String, GDPropertyMetadata> getResultMetadata();
+     Map<String, GDPropertyMetadata> getResultMetadata();
 
     /**
      * Gets metadata describing the arguments.
@@ -122,5 +122,5 @@ public interface GDAction extends GDContextNode {
      * @return metadata describing the arguments
      */
     @JsonProperty("arguments")
-    public Map<String, GDPropertyMetadata> getArgumentsMetadata();
+     Map<String, GDPropertyMetadata> getArgumentsMetadata();
 }

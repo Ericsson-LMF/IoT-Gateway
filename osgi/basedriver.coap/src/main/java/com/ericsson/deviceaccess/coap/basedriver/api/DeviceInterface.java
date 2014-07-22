@@ -46,7 +46,7 @@ public interface DeviceInterface {
      *
      * @param endpoint new CoAP remote endpoint discovered in the network.
      */
-    public void deviceAdded(CoAPRemoteEndpoint endpoint);
+    void deviceAdded(CoAPRemoteEndpoint endpoint);
 
     /**
      * This method will be called when a CoAP endpoint is removed from the
@@ -55,6 +55,6 @@ public interface DeviceInterface {
      *
      * @param endpoint which has been become unavailable in the network.
      */
-    public void deviceRemoved(CoAPRemoteEndpoint endpoint);
+    void deviceRemoved(CoAPRemoteEndpoint endpoint);
 
 }

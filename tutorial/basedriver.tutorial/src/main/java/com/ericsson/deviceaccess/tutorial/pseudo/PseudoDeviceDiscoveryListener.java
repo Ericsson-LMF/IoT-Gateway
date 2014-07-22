@@ -36,7 +36,7 @@ package com.ericsson.deviceaccess.tutorial.pseudo;
 
 public interface PseudoDeviceDiscoveryListener {
 
-    public void deviceDiscovered(PseudoDevice dev);
+    void deviceDiscovered(PseudoDevice dev);
 
-    public void deviceRemoved(PseudoDevice dev);
+    void deviceRemoved(PseudoDevice dev);
 }

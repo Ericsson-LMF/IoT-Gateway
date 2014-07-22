@@ -34,15 +34,13 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import com.ericsson.deviceaccess.coap.basedriver.util.TokenGenerator;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-
 import junit.framework.TestCase;
 
 public class CoAPRequestTest extends TestCase {

@@ -49,6 +49,6 @@ public interface IncomingMessageListener {
      * @param datagram received packet
      * @throws CoAPException
      */
-    public void messageReceived(DatagramPacket datagram);
+    void messageReceived(DatagramPacket datagram);
 
 }

@@ -166,6 +166,11 @@ public class NanoHTTPD {
 
     public class Response {
 
+        public String status;
+        public String mimeType;
+        public InputStream data;
+        public Properties header = new Properties();
+
         public Response() {
             this.status = HTTP_OK;
         }
@@ -179,13 +184,10 @@ public class NanoHTTPD {
         public void addHeader(String name, String value) {
             header.put(name, value);
         }
-        public String status;
-        public String mimeType;
-        public InputStream data;
-        public Properties header = new Properties();
     }
 
     private class HTTPSession implements Runnable {
+        private Socket mySocket;
 
         HTTPSession(Socket s) {
             mySocket = s;
@@ -265,39 +267,42 @@ public class NanoHTTPD {
                     //System.out.println("Raw: " + raw);
                     // Create a BufferedReader for easily reading it as string.
                     ByteArrayInputStream bin = new ByteArrayInputStream(fbuf);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(bin));
                     // If the method is POST, there may be parameters
                     // in data section, too, read it:
                     //System.out.println("#########################NANO: " + method);
-                    if (method.equalsIgnoreCase("POST")) {
-                        String contentType = "";
-                        String contentTypeHeader = header.getProperty("content-type");
-                        StringTokenizer st = new StringTokenizer(contentTypeHeader, "; ");
-                        if (st.hasMoreTokens()) {
-                            contentType = st.nextToken();
+                    try (BufferedReader in = new BufferedReader(new InputStreamReader(bin))) {
+                        // If the method is POST, there may be parameters
+                        // in data section, too, read it:
+                        //System.out.println("#########################NANO: " + method);
+                        if (method.equalsIgnoreCase("POST")) {
+                            String contentType = "";
+                            String contentTypeHeader = header.getProperty("content-type");
+                            StringTokenizer st = new StringTokenizer(contentTypeHeader, "; ");
+                            if (st.hasMoreTokens()) {
+                                contentType = st.nextToken();
+                            }
+                            
+                            // Handle application/x-www-form-urlencoded
+                            String postLine = "";
+                            char pbuf[] = new char[512];
+                            int read = in.read(pbuf);
+                            while (read >= 0 && !postLine.endsWith("\r\n")) {
+                                postLine += String.valueOf(pbuf, 0, read);
+                                read = in.read(pbuf);
+                            }
+                            postLine = postLine.trim();
+                            //System.out.println(postLine);
+                            //System.out.println("#########################NANO");
+                            decodeParms(postLine, parms);
                         }
-
-                        // Handle application/x-www-form-urlencoded
-                        String postLine = "";
-                        char pbuf[] = new char[512];
-                        int read = in.read(pbuf);
-                        while (read >= 0 && !postLine.endsWith("\r\n")) {
-                            postLine += String.valueOf(pbuf, 0, read);
-                            read = in.read(pbuf);
+                        // Ok, now do the serve()
+                        Response r = serve(uri, method, header, parms, in);
+                        if (r == null) {
+                            sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
+                        } else {
+                            sendResponse(r.status, r.mimeType, r.header, r.data);
                         }
-                        postLine = postLine.trim();
-                        //System.out.println(postLine);
-                        //System.out.println("#########################NANO");
-                        decodeParms(postLine, parms);
                     }
-                    // Ok, now do the serve()
-                    Response r = serve(uri, method, header, parms, in);
-                    if (r == null) {
-                        sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
-                    } else {
-                        sendResponse(r.status, r.mimeType, r.header, r.data);
-                    }
-                    in.close();
                 }
             } catch (IOException ioe) {
                 try {
@@ -471,6 +476,5 @@ public class NanoHTTPD {
                 }
             }
         }
-        private Socket mySocket;
     }
 }

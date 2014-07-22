@@ -47,7 +47,7 @@ public class MediaItem extends MediaObject {
     }
 
     public String getType() {
-        return (String) get(TYPE);
+        return get(TYPE);
     }
 
     public void setUrl(String url) {
@@ -55,7 +55,7 @@ public class MediaItem extends MediaObject {
     }
 
     public String getUrl() {
-        return (String) get(URL);
+        return get(URL);
     }
 
 }

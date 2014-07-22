@@ -15,7 +15,7 @@ public interface CodeBlock extends Component {
      * @param code code to be added
      * @return this
      */
-    public CodeBlock add(String code);
+    CodeBlock add(String code);
 
     /**
      * Appends to last line of code
@@ -23,7 +23,7 @@ public interface CodeBlock extends Component {
      * @param code code to be appended
      * @return this
      */
-    public CodeBlock append(Object code);
+    CodeBlock append(Object code);
 
     /**
      * Adds whole block of code
@@ -32,5 +32,5 @@ public interface CodeBlock extends Component {
      * @param block consumer to add block code in
      * @return this
      */
-    public CodeBlock addBlock(String code, Consumer<CodeBlock> block);
+    CodeBlock addBlock(String code, Consumer<CodeBlock> block);
 }

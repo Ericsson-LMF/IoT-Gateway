@@ -80,6 +80,9 @@ public class EventManager implements ServiceListener, Runnable,
         ServiceTrackerCustomizer<GenericDevice, Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
+    private static final String LISTENER_FILTER = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class
+            .getName() + ")";
+    private static final Pattern DELTA_PATTERN = Pattern.compile("\\((([^(]*)__delta)");
     private BundleContext context;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final Map<GDEventListener, Filter> listeners = new ConcurrentHashMap<>();
@@ -206,8 +209,6 @@ public class EventManager implements ServiceListener, Runnable,
         });
     }
 
-    private static final String LISTENER_FILTER = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class
-            .getName() + ")";
 
     /**
      * Registers EventManager to listen generic device events
@@ -224,7 +225,6 @@ public class EventManager implements ServiceListener, Runnable,
         }
     }
 
-    private static final Pattern DELTA_PATTERN = Pattern.compile("\\((([^(]*)__delta)");
 
     /**
      * If filter and event is for delta property, this then updates it

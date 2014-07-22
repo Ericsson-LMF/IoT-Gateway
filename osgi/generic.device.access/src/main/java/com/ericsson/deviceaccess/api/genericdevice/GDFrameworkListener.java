@@ -54,7 +54,7 @@ public interface GDFrameworkListener {
      * @throws GDFrameworkException
      *
      */
-    public boolean addingDevice(GenericDevice dev) throws GDFrameworkException;
+    boolean addingDevice(GenericDevice dev) throws GDFrameworkException;
 
     /**
      * Invoked when a parameter update occurs on the device.
@@ -65,7 +65,7 @@ public interface GDFrameworkListener {
      * @throws GDFrameworkException
      *
      */
-    public void modifiedDevice(GenericDevice dev, String updatedPaths) throws GDFrameworkException;
+    void modifiedDevice(GenericDevice dev, String updatedPaths) throws GDFrameworkException;
 
     /**
      * Invoked when a device is removed.
@@ -74,5 +74,5 @@ public interface GDFrameworkListener {
      * @throws GDFrameworkException
      *
      */
-    public void removedDevice(GenericDevice dev) throws GDFrameworkException;
+    void removedDevice(GenericDevice dev) throws GDFrameworkException;
 }

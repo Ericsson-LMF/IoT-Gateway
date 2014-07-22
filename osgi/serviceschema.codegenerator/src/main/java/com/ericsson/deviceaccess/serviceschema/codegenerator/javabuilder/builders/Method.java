@@ -15,6 +15,7 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifie
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier.INTERFACE;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -101,13 +102,14 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
     /**
      * Builds Method to string with specified indent
      *
+     * @param clazz
      * @param indent how much indent there is
      * @return builded string
      */
-    public String build(int indent) {
+    public String build(JavaClass clazz, int indent) {
         StringBuilder builder = new StringBuilder();
         addJavadoc(builder, indent);
-        if (addMethodDeclaration(builder, indent)) {
+        if (addMethodDeclaration(clazz, builder, indent)) {
             return builder.toString();
         }
         {
@@ -164,9 +166,11 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
      * @param indent indent
      * @return is there code or not
      */
-    private boolean addMethodDeclaration(StringBuilder builder, int indent) {
-        String access = accessModifier.get();
-        indent(builder, indent).append(access).append(" ");
+    private boolean addMethodDeclaration(JavaClass clazz, StringBuilder builder, int indent) {
+        indent(builder, indent);
+        if (clazz.getClassModifier() != INTERFACE) {
+            builder.append(accessModifier.get()).append(" ");
+        }
         modifiers.forEach(m -> builder.append(m.get()).append(" "));
         builder.append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
         addThrows(builder);

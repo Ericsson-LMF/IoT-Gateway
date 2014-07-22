@@ -33,7 +33,7 @@ public enum LegacyUtil {
 
         private final Map<K, V> map;
 
-        public MapWrapper(Map<K, V> map) {
+        MapWrapper(Map<K, V> map) {
             this.map = map;
         }
 
@@ -59,7 +59,7 @@ public enum LegacyUtil {
 
         @Override
         public V get(Object key) {
-            return map.get((K) key);
+            return map.get(key);
         }
 
         @Override
@@ -69,7 +69,7 @@ public enum LegacyUtil {
 
         @Override
         public V remove(Object key) {
-            return map.remove((K) key);
+            return map.remove(key);
         }
     }
 
@@ -77,7 +77,7 @@ public enum LegacyUtil {
 
         private final Dictionary dictionary;
 
-        public DictionaryWrapper(Dictionary dictionary) {
+        DictionaryWrapper(Dictionary dictionary) {
             this.dictionary = dictionary;
         }
 

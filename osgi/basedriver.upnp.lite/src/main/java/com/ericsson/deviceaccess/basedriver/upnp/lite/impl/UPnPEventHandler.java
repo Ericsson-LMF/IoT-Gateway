@@ -180,17 +180,17 @@ public class UPnPEventHandler extends NanoHTTPD implements ServiceTrackerCustomi
             wr.write("Content-Length: 0\r\n");
             wr.write("\r\n");
             wr.flush();
-            BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                sb.append(inputLine).append("\n");
-                if (inputLine.trim().length() == 0) {
-                    break;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()))) {
+                StringBuilder sb = new StringBuilder();
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    sb.append(inputLine).append("\n");
+                    if (inputLine.trim().length() == 0) {
+                        break;
+                    }
                 }
+                log.debug("SUBSCRIBE RESPONSE:\n" + sb.toString());
             }
-            log.debug("SUBSCRIBE RESPONSE:\n" + sb.toString());
-            in.close();
         }
     }
 

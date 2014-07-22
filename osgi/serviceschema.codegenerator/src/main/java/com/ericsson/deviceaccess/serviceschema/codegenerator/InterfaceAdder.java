@@ -1,5 +1,6 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
+import com.ericsson.commonutil.StringUtil;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
@@ -12,7 +13,6 @@ import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builder
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
-import com.ericsson.commonutil.StringUtil;
 
 /**
  * This generates interfaces in

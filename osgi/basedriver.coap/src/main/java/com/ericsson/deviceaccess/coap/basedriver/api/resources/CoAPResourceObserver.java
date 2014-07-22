@@ -55,7 +55,7 @@ public interface CoAPResourceObserver {
      * @param request original request that triggered the observation
      * relationship.
      */
-    public void observeResponseReceived(CoAPResponse response,
+    void observeResponseReceived(CoAPResponse response,
             CoAPResource resource, CoAPRequest req);
 
     /**
@@ -66,7 +66,7 @@ public interface CoAPResourceObserver {
      * @param response
      * @param resource
      */
-    public void observationRelationshipTerminated(CoAPResponse response,
+    void observationRelationshipTerminated(CoAPResponse response,
             CoAPObservationResource resource, CoAPRequest request);
 
 }

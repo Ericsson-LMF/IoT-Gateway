@@ -52,5 +52,5 @@ public interface IncomingCoAPRequestListener {
      *
      * @param req incoming CoAP request
      */
-    public void incomingRequestReceived(CoAPRequest req);
+    void incomingRequestReceived(CoAPRequest req);
 }

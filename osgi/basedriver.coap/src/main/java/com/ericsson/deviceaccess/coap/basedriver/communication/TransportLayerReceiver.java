@@ -49,7 +49,7 @@ public interface TransportLayerReceiver {
      *
      * @param listener
      */
-    public void addListener(IncomingMessageListener listener);
+    void addListener(IncomingMessageListener listener);
 
     /**
      * Remove listener from this transport protocol received.
@@ -58,11 +58,11 @@ public interface TransportLayerReceiver {
      * @return true, if the given listener was successfully removed, false
      * otherwise
      */
-    public boolean removeListener(IncomingMessageListener listener);
+    boolean removeListener(IncomingMessageListener listener);
 
     /**
      * Stop the threads.
      */
-    public void stopService();
+    void stopService();
 
 }

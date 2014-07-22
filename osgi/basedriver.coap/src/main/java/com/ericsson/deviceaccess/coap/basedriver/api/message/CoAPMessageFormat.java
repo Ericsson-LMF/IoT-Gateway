@@ -45,17 +45,17 @@ public interface CoAPMessageFormat {
      * Implementations of this specification MUST set this field to 1. Other
      * values are reserved for future versions
      */
-    public static final int VERSION_BYTE = 0;
-    public static final int VERSION_LENGTH = 2;
-    public static final int VERSION_START = 6;
+    int VERSION_BYTE = 0;
+    int VERSION_LENGTH = 2;
+    int VERSION_START = 6;
 
     /**
      * Type (T): 2-bit unsigned integer. Indicates if this message is of type
      * Confirmable (0), Non-Confirmable (1), Acknowledgement (2) or Reset (3).
      */
-    public static final int TYPE_BYTE = 0;
-    public static final int TYPE_LENGTH = 2;
-    public static final int TYPE_START = 4;
+    int TYPE_BYTE = 0;
+    int TYPE_LENGTH = 2;
+    int TYPE_START = 4;
 
     /**
      * Option Count (OC): 4-bit unsigned integer. Indicates the number of
@@ -63,9 +63,9 @@ public interface CoAPMessageFormat {
      * payload (if any) immediately follows the header. The format of options is
      * defined below.
      */
-    public static final int OPTION_BYTE = 0;
-    public static final int OPTION_COUNT_LENGTH = 4;
-    public static final int OPTION_COUNT_START = 0;
+    int OPTION_BYTE = 0;
+    int OPTION_COUNT_LENGTH = 4;
+    int OPTION_COUNT_START = 0;
 
     /**
      * Code: 8-bit unsigned integer. Indicates if the message carries a request
@@ -75,20 +75,20 @@ public interface CoAPMessageFormat {
      * maintained in the CoAP Code Registry (Section 11.1). See Section 5 for
      * the semantics of requests and responses.
      */
-    public static final int CODE_BYTE = 1;
-    public static final int CODE_LENGTH = 8;
-    public static final int CODE_START = 0;
+    int CODE_BYTE = 1;
+    int CODE_LENGTH = 8;
+    int CODE_START = 0;
 
     /**
      * Option delta.
      */
-    public static final int OPTION_DELTA_LENGTH = 4;
-    public static final int OPTION_DELTA_START = 4;
+    int OPTION_DELTA_LENGTH = 4;
+    int OPTION_DELTA_START = 4;
 
     /**
      * Option length
      */
-    public static final int OPTION_LENGTH_LENGTH = 4;
-    public static final int OPTION_LENGTH_START = 0;
+    int OPTION_LENGTH_LENGTH = 4;
+    int OPTION_LENGTH_START = 0;
 
 }

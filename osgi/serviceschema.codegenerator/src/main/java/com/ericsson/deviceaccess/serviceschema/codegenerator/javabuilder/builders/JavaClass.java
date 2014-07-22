@@ -17,6 +17,7 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier.INTERFACE;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -226,7 +227,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      */
     private void addMethods(StringBuilder builder, int indent) {
         if (!methods.isEmpty()) {
-            methods.forEach(m -> builder.append(m.build(indent)).append(LINE_END));
+            methods.forEach(m -> builder.append(m.build(this, indent)).append(LINE_END));
             emptyLine(builder);
         }
     }
@@ -238,7 +239,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      * @param indent indent
      */
     private void addConstructors(StringBuilder builder, int indent) {
-        if (!constructors.isEmpty()) {
+        if (classModifier != INTERFACE && !constructors.isEmpty()) {
             constructors.forEach(c -> builder.append(c.build(indent)).append(LINE_END));
             emptyLine(builder);
         }
@@ -267,7 +268,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      */
     private void addVariables(StringBuilder builder, int indent) {
         if (!variables.isEmpty()) {
-            variables.forEach(v -> builder.append(v.build(indent)));
+            variables.forEach(v -> builder.append(v.build(this, indent)));
             emptyLine(builder);
         }
     }
@@ -283,8 +284,11 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
         indent(builder, indent).append(access).append(" ");
         modifiers.forEach(m -> builder.append(m.get()).append(" "));
         builder.append(classModifier.get()).append(" ").append(name).append(" ");
-        addSuperType(builder);
-        addImplements(builder);
+        boolean isInterface = classModifier == INTERFACE;
+        if (!isInterface) {
+            addSuperType(builder);
+        }
+        addImplements(isInterface ? EXTENDS : IMPLEMENTS, builder);
         builder.append(BLOCK_START).append(LINE_END);
         emptyLine(builder);
     }
@@ -294,9 +298,9 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      *
      * @param builder builder to add implements to
      */
-    private void addImplements(StringBuilder builder) {
+    private void addImplements(String tag, StringBuilder builder) {
         if (!interfaces.isEmpty()) {
-            builder.append(IMPLEMENTS).append(" ");
+            builder.append(tag).append(" ");
             interfaces.forEach(i -> builder.append(i).append(", "));
             builder.setLength(builder.length() - 2);
             builder.append(" ");

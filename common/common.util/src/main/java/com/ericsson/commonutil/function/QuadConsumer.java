@@ -11,6 +11,6 @@ package com.ericsson.commonutil.function;
 @FunctionalInterface
 public interface QuadConsumer<A, B, C, D> {
 
-    public void consume(A a, B b, C c, D d);
+    void consume(A a, B b, C c, D d);
 
 }

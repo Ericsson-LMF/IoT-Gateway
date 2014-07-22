@@ -44,11 +44,11 @@ import com.fasterxml.jackson.annotation.JsonView;
  */
 public interface GDPropertyMetadata extends GDContextNode {
 
-    static final String NAME = "name";
-    static final String TYPE = "type";
-    static final String MIN_VALUE = "minValue";
-    static final String MAX_VALUE = "maxValue";
-    static final String DEFAULT_VALUE = "defaultValue";
+    String NAME = "name";
+    String TYPE = "type";
+    String MIN_VALUE = "minValue";
+    String MAX_VALUE = "maxValue";
+    String DEFAULT_VALUE = "defaultValue";
 
     /**
      * Gets the name of the property.

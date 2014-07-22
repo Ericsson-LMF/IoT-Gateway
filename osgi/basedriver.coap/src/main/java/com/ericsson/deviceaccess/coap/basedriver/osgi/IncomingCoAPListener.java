@@ -50,7 +50,7 @@ public interface IncomingCoAPListener {
      *
      * @param request received CoAP requets
      */
-    public void handleRequest(CoAPRequest request);
+    void handleRequest(CoAPRequest request);
 
     /**
      * This listener method is called when a new incoming CoAP response is
@@ -59,20 +59,20 @@ public interface IncomingCoAPListener {
      * @param response received CoAP response
      * @throws CoAPException
      */
-    public void handleResponse(CoAPResponse response) throws CoAPException;
+    void handleResponse(CoAPResponse response) throws CoAPException;
 
     /**
      * Return OutgoingMessageHandler instance
      *
      * @return OutgoingMessageHandler instance
      */
-    public OutgoingMessageHandler getOutgoingMessageHandler();
+    OutgoingMessageHandler getOutgoingMessageHandler();
 
     /**
      * Return IncomingMessageHandler instance
      *
      * @return IncomingMessageHandler instance
      */
-    public IncomingMessageHandler getIncomingMessageHandler();
+    IncomingMessageHandler getIncomingMessageHandler();
 
 }

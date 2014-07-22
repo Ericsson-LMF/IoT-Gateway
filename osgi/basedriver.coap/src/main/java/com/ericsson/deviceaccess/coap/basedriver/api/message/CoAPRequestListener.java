@@ -49,7 +49,7 @@ public interface CoAPRequestListener {
      * @param response CoAP response received from the network
      * @param request original request that was sent out to CoAP network
      */
-    public void resetResponseReceived(CoAPResponse response, CoAPRequest request);
+    void resetResponseReceived(CoAPResponse response, CoAPRequest request);
 
     /**
      * Callback method that is called when a separate response related to the
@@ -59,7 +59,7 @@ public interface CoAPRequestListener {
      * @param response
      * @param request request that the response relates to
      */
-    public void separateResponseReceived(CoAPResponse response,
+    void separateResponseReceived(CoAPResponse response,
             CoAPRequest request);
 
     /**
@@ -68,7 +68,7 @@ public interface CoAPRequestListener {
      * @param response
      * @param request request that the response relates to
      */
-    public void piggyPackedResponseReceived(CoAPResponse response,
+    void piggyPackedResponseReceived(CoAPResponse response,
             CoAPRequest request);
 
     /**
@@ -79,7 +79,7 @@ public interface CoAPRequestListener {
      * @param response received response
      * @param request request that the response relates to
      */
-    public void emptyAckReceived(CoAPResponse response, CoAPRequest request);
+    void emptyAckReceived(CoAPResponse response, CoAPRequest request);
 
     /**
      * This method will be called when a maximum 4 retransmissions for the
@@ -88,7 +88,7 @@ public interface CoAPRequestListener {
      *
      * @param request
      */
-    public void maximumRetransmissionsReached(CoAPRequest request);
+    void maximumRetransmissionsReached(CoAPRequest request);
 
     /**
      * This method will be called in case the request was not sent towards the
@@ -97,6 +97,6 @@ public interface CoAPRequestListener {
      *
      * @param request
      */
-    public void serviceBusy(CoAPRequest request);
+    void serviceBusy(CoAPRequest request);
 
 }

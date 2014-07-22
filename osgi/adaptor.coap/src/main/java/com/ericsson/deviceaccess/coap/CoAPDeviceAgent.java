@@ -39,7 +39,6 @@ import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPRemoteEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPService;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
@@ -48,9 +47,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPObservationRe
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import java.net.URI;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -212,7 +208,7 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
 
     private class CoAPAgentListener implements CoAPRequestListener {
 
-        public CoAPAgentListener() {
+        CoAPAgentListener() {
         }
 
         @Override

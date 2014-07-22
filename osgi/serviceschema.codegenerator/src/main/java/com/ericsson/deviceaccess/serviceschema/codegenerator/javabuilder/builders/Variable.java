@@ -6,6 +6,7 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.indent;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
+import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier.INTERFACE;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.EnumSet;
 
@@ -71,15 +72,18 @@ public class Variable implements Component, Modifierable {
     /**
      * Builds Variable to string with specified indent
      *
+     * @param clazz
      * @param indent how much indent there is
      * @return builded string
      */
-    public String build(int indent) {
+    public String build(JavaClass clazz, int indent) {
         StringBuilder builder = new StringBuilder();
-        String access = modifier.get();
         addJavadoc(builder, indent);
-        indent(builder, indent).append(access).append(" ");
-        modifiers.forEach(m -> builder.append(m.get()).append(" "));
+        indent(builder, indent);
+        if (clazz.getClassModifier() != INTERFACE) {
+            builder.append(modifier.get()).append(" ");
+            modifiers.forEach(m -> builder.append(m.get()).append(" "));
+        }
         builder.append(type).append(" ").append(name);
         addInitialization(builder);
         builder.append(STATEMENT_END).append(LINE_END);

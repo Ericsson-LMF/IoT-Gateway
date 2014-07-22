@@ -154,6 +154,6 @@ public class ConfigurationManager implements ManagedService {
 
     public interface ConfigurationManagerListener {
 
-        public void updated(Dictionary added, Dictionary removed, Dictionary modified);
+        void updated(Dictionary added, Dictionary removed, Dictionary modified);
     }
 }

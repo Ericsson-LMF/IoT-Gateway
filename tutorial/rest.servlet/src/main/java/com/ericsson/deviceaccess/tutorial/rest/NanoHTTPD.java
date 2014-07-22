@@ -283,6 +283,23 @@ public class NanoHTTPD {
     public class Response {
 
         /**
+         * HTTP status code after processing, e.g. "200 OK", HTTP_OK
+         */
+        public String status;
+        /**
+         * MIME type of content, e.g. "text/html"
+         */
+        public String mimeType;
+        /**
+         * Data of the response, may be null.
+         */
+        public InputStream data;
+        /**
+         * Headers for the HTTP response. Use addHeader() to add lines.
+         */
+        public Properties header = new Properties();
+
+        /**
          * Default constructor: response = HTTP_OK, data = mime = 'null'
          */
         public Response() {
@@ -313,22 +330,6 @@ public class NanoHTTPD {
         public void addHeader(String name, String value) {
             header.put(name, value);
         }
-        /**
-         * HTTP status code after processing, e.g. "200 OK", HTTP_OK
-         */
-        public String status;
-        /**
-         * MIME type of content, e.g. "text/html"
-         */
-        public String mimeType;
-        /**
-         * Data of the response, may be null.
-         */
-        public InputStream data;
-        /**
-         * Headers for the HTTP response. Use addHeader() to add lines.
-         */
-        public Properties header = new Properties();
     }
 
     /**
@@ -336,6 +337,7 @@ public class NanoHTTPD {
      * response.
      */
     private class HTTPSession implements Runnable {
+        private Socket mySocket;
 
         HTTPSession(Socket s) {
             mySocket = s;
@@ -419,50 +421,52 @@ public class NanoHTTPD {
                     byte[] fbuf = f.toByteArray();
                     // Create a BufferedReader for easily reading it as string.
                     ByteArrayInputStream bin = new ByteArrayInputStream(fbuf);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(bin));
                     // If the method is POST, there may be parameters
                     // in data section, too, read it:
-                    if (method.equalsIgnoreCase("POST")) {
-                        String contentType = "";
-                        String contentTypeHeader = header.getProperty("content-type");
-                        StringTokenizer st = new StringTokenizer(contentTypeHeader, "; ");
-                        if (st.hasMoreTokens()) {
-                            contentType = st.nextToken();
+                    try (BufferedReader in = new BufferedReader(new InputStreamReader(bin))) {
+                        // If the method is POST, there may be parameters
+                        // in data section, too, read it:
+                        if (method.equalsIgnoreCase("POST")) {
+                            String contentType = "";
+                            String contentTypeHeader = header.getProperty("content-type");
+                            StringTokenizer st = new StringTokenizer(contentTypeHeader, "; ");
+                            if (st.hasMoreTokens()) {
+                                contentType = st.nextToken();
+                            }
+                            if (contentType.equalsIgnoreCase("multipart/form-data")) {
+                                // Handle multipart/form-data
+                                if (!st.hasMoreTokens()) {
+                                    sendError(HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
+                                }
+                                String boundaryExp = st.nextToken();
+                                st = new StringTokenizer(boundaryExp, "=");
+                                if (st.countTokens() != 2) {
+                                    sendError(HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary syntax error. Usage: GET /example/file.html");
+                                }
+                                st.nextToken();
+                                String boundary = st.nextToken();
+                                decodeMultipartData(boundary, fbuf, in, parms, files);
+                            } else {
+                                // Handle application/x-www-form-urlencoded
+                                String postLine = "";
+                                char pbuf[] = new char[512];
+                                int read = in.read(pbuf);
+                                while (read >= 0 && !postLine.endsWith("\r\n")) {
+                                    postLine += String.valueOf(pbuf, 0, read);
+                                    read = in.read(pbuf);
+                                }
+                                postLine = postLine.trim();
+                                decodeParms(postLine, parms);
+                            }
                         }
-                        if (contentType.equalsIgnoreCase("multipart/form-data")) {
-                            // Handle multipart/form-data
-                            if (!st.hasMoreTokens()) {
-                                sendError(HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
-                            }
-                            String boundaryExp = st.nextToken();
-                            st = new StringTokenizer(boundaryExp, "=");
-                            if (st.countTokens() != 2) {
-                                sendError(HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary syntax error. Usage: GET /example/file.html");
-                            }
-                            st.nextToken();
-                            String boundary = st.nextToken();
-                            decodeMultipartData(boundary, fbuf, in, parms, files);
+                        // Ok, now do the serve()
+                        Response r = serve(uri, method, header, parms, files);
+                        if (r == null) {
+                            sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
                         } else {
-                            // Handle application/x-www-form-urlencoded
-                            String postLine = "";
-                            char pbuf[] = new char[512];
-                            int read = in.read(pbuf);
-                            while (read >= 0 && !postLine.endsWith("\r\n")) {
-                                postLine += String.valueOf(pbuf, 0, read);
-                                read = in.read(pbuf);
-                            }
-                            postLine = postLine.trim();
-                            decodeParms(postLine, parms);
+                            sendResponse(r.status, r.mimeType, r.header, r.data);
                         }
                     }
-                    // Ok, now do the serve()
-                    Response r = serve(uri, method, header, parms, files);
-                    if (r == null) {
-                        sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
-                    } else {
-                        sendResponse(r.status, r.mimeType, r.header, r.data);
-                    }
-                    in.close();
                 }
             } catch (IOException ioe) {
                 try {
@@ -775,6 +779,5 @@ public class NanoHTTPD {
                 }
             }
         }
-        private Socket mySocket;
     }
 }

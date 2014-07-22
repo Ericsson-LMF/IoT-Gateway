@@ -216,18 +216,7 @@ public class NetUtil {
 
     private static class ClassifiedAddresses {
 
-        final public LinkedList<InetAddress> globalIPv4 = new LinkedList<>();
-        final public LinkedList<InetAddress> globalIPv6 = new LinkedList<>();
-        final public LinkedList<InetAddress> siteLocalIPv4 = new LinkedList<>();
-        final public LinkedList<InetAddress> siteLocalIPv6 = new LinkedList<>();
-        final public LinkedList<InetAddress> linkLocalIPv4 = new LinkedList<>();
-        final public LinkedList<InetAddress> linkLocalIPv6 = new LinkedList<>();
-
-        private ClassifiedAddresses() {
-        }
-
         static ClassifiedAddresses getClassifiedAddresses() {
-            
             ClassifiedAddresses result = new ClassifiedAddresses();
             
             Enumeration eNetIf = null;
@@ -266,5 +255,19 @@ public class NetUtil {
             }
             return result;
         }
+
+        final public LinkedList<InetAddress> globalIPv4 = new LinkedList<>();
+        final public LinkedList<InetAddress> globalIPv6 = new LinkedList<>();
+        final public LinkedList<InetAddress> siteLocalIPv4 = new LinkedList<>();
+        final public LinkedList<InetAddress> siteLocalIPv6 = new LinkedList<>();
+        final public LinkedList<InetAddress> linkLocalIPv4 = new LinkedList<>();
+        final public LinkedList<InetAddress> linkLocalIPv6 = new LinkedList<>();
+
+        private ClassifiedAddresses() {
+        }
+
+    }
+
+    private NetUtil() {
     }
 }

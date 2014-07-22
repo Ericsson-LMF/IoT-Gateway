@@ -64,26 +64,9 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     private static final Logger logger = LoggerFactory.getLogger(UPnPDeviceAgent.class);
 
     private static final Pattern TITLE_PATTERN = Pattern.compile("dc:title[>&gt;]+([^&]*)[&<lt;]+/dc:title");
-
-    protected static String getMediaTitle(String didl) {
-        Matcher matcher = TITLE_PATTERN.matcher(didl);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return "";
-    }
-
-    private final BundleContext context;
-    private final SBGenericDevice device;
-    private ServiceRegistration eventListenerReg;
-    private ServiceRegistration devReg;
-
-    final private Map<String, GDService> idToService = new HashMap<>();
-
     private static final Map<String, BiConsumer<GDProperties, String>> eventTypes = new HashMap<>();
     private static final BiConsumer<GDProperties, String> EMPTY = (a, b) -> {
     };
-
     static {
         eventTypes.put("Volume", (properties, value) -> {
             try {
@@ -110,6 +93,22 @@ public class UPnPDeviceAgent implements UPnPEventListener {
             }
         });
     }
+
+    protected static String getMediaTitle(String didl) {
+        Matcher matcher = TITLE_PATTERN.matcher(didl);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "";
+    }
+
+    private final BundleContext context;
+    private final SBGenericDevice device;
+    private ServiceRegistration eventListenerReg;
+    private ServiceRegistration devReg;
+
+    final private Map<String, GDService> idToService = new HashMap<>();
+
 
     public UPnPDeviceAgent(BundleContext bc, UPnPDevice upnpdev) {
         this.context = bc;
@@ -292,7 +291,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
 
     public interface UpdatePropertyInterface {
 
-        public void updateProperty(String name, Object value);
+        void updateProperty(String name, Object value);
     }
 
 }

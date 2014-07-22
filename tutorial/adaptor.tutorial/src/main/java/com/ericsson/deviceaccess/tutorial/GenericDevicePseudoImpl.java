@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
+import com.ericsson.commonutil.LegacyUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.service.homeautomation.hvac.TemperatureSensor;
 import com.ericsson.deviceaccess.api.service.homeautomation.hvac.thermostat.ThermostatMode;
@@ -43,7 +44,6 @@ import com.ericsson.deviceaccess.api.service.util.PowerMeter;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceUpdateListener;
-import com.ericsson.commonutil.LegacyUtil;
 import java.util.HashMap;
 import java.util.Map;
 import org.osgi.framework.ServiceRegistration;

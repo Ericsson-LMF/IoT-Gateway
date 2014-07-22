@@ -34,13 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 
+import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAPResourceType;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-//import org.jmock.lib.legacy.ClassImposteriser;
-
-import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAPResourceType;
-
 import junit.framework.TestCase;
 
 public class CoAPResourceTest extends TestCase {

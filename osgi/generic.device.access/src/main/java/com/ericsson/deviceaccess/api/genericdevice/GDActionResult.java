@@ -55,33 +55,33 @@ public interface GDActionResult extends Serializable {
      *
      * @return
      */
-    public int getCode();
+    int getCode();
 
     /**
      * Sets the status code.
      *
      * @param code
      */
-    public void setCode(int code);
+    void setCode(int code);
 
     /**
      * Gets the reason (associated with code).
      *
      * @return
      */
-    public String getReason();
+    String getReason();
 
     /**
      * Sets the reason (associated with code).
      *
      * @param reason
      */
-    public void setReason(String reason);
+    void setReason(String reason);
 
     /**
      * Gets the result value.
      *
      * @return
      */
-    public GDProperties getValue();
+    GDProperties getValue();
 }

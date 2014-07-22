@@ -41,7 +41,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseTransferHandler;
-
 import junit.framework.TestCase;
 
 public class BlockOptionHeaderTest extends TestCase {

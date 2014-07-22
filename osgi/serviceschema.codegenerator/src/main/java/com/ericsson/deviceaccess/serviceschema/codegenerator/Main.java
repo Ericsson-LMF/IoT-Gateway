@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 public class Main implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final String DIRECTORY = "osgi";
 
     /**
      * Runs the code generation between xml file in first argument and output
@@ -161,7 +162,6 @@ public class Main implements Runnable {
         }
     }
 
-    private static final String DIRECTORY = "osgi";
 
     private String parsePackageName(String path) {
         return DIRECTORY + path.split(DIRECTORY)[1];

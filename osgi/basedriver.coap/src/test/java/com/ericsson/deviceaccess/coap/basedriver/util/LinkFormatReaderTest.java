@@ -37,9 +37,8 @@ package com.ericsson.deviceaccess.coap.basedriver.util;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import java.net.URISyntaxException;
-import junit.framework.TestCase;
-
 import java.util.List;
+import junit.framework.TestCase;
 
 public class LinkFormatReaderTest extends TestCase {
 

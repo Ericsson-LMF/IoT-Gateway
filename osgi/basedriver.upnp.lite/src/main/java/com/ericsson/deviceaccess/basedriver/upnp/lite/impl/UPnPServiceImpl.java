@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashMap;

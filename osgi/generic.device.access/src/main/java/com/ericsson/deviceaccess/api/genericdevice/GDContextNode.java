@@ -54,14 +54,14 @@ public interface GDContextNode extends Serializable {
      * Device Connectivity, but is deprecated. getPath() without an argument
      * should be used instead.
      */
-    public String getPath(boolean isAbsolute);
+    String getPath(boolean isAbsolute);
 
     /**
      * @param pathToParent
      * @deprecate Method to update path until the node's parent by the specified
      * value. This method is used in Web Device Connectivity, but is deprecated.
      */
-    public void updatePath(String pathToParent);
+    void updatePath(String pathToParent);
 
     /**
      * Method to get path from device node to this node.
@@ -69,7 +69,7 @@ public interface GDContextNode extends Serializable {
      * @return path from the device node to the node with "/" as delimiter.
      */
     @JsonIgnore
-    public String getPath();
+     String getPath();
 
     String getSerializedNode(String path, Format format) throws GDException;
 }

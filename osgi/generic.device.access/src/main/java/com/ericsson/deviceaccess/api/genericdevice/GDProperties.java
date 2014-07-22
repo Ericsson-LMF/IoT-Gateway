@@ -54,8 +54,8 @@ public interface GDProperties extends Serializable {
     public static abstract class Stub implements GDProperties {
     }
 
-    static final String CURRENT_VALUE = "currentValue";
-    static final String METADATA = "metadata";
+    String CURRENT_VALUE = "currentValue";
+    String METADATA = "metadata";
 
     /**
      * Tester to check if a property identified by the key is in the object or
@@ -64,7 +64,7 @@ public interface GDProperties extends Serializable {
      * @param key Name of the property in question.
      * @return Whether or not the object contains a property with the key
      */
-    public boolean hasProperty(String key);
+    boolean hasProperty(String key);
 
     /**
      * Getter for a property identified by the key that returns the value as
@@ -74,7 +74,7 @@ public interface GDProperties extends Serializable {
      * @return Value of the property identified by the parameter "key". Returns
      * default value from service schema if the value is not set.
      */
-    public int getIntValue(String key);
+    int getIntValue(String key);
 
     /**
      * Getter for a property identified by the key that returns the value as
@@ -84,7 +84,7 @@ public interface GDProperties extends Serializable {
      * @return Value of the property identified by the parameter "key". Returns
      * default value from service schema if the value is not set.
      */
-    public long getLongValue(String key);
+    long getLongValue(String key);
 
     /**
      * Getter for a property identified by the key that returns the value as
@@ -94,7 +94,7 @@ public interface GDProperties extends Serializable {
      * @return Value of the property identified by the parameter "key". Returns
      * default value from service schema if the value is not set.
      */
-    public float getFloatValue(String key);
+    float getFloatValue(String key);
 
     /**
      * Setter for an long property identified by the key.
@@ -102,7 +102,7 @@ public interface GDProperties extends Serializable {
      * @param key Name of the property in question.
      * @param value An integer value to be set for the property.
      */
-    public void setLongValue(String key, long value);
+    void setLongValue(String key, long value);
 
     /**
      * Setter for an integer property identified by the key.
@@ -110,7 +110,7 @@ public interface GDProperties extends Serializable {
      * @param key Name of the property in question.
      * @param value An integer value to be set for the property.
      */
-    public void setIntValue(String key, int value);
+    void setIntValue(String key, int value);
 
     /**
      * Setter for a float property identified by the key.
@@ -118,7 +118,7 @@ public interface GDProperties extends Serializable {
      * @param key Name of the property in question.
      * @param value A float value to be set for the property.
      */
-    public void setFloatValue(String key, float value);
+    void setFloatValue(String key, float value);
 
     /**
      * Getter for the type of the property identified by the key.
@@ -127,7 +127,7 @@ public interface GDProperties extends Serializable {
      * @return Simple class name of the value identified by the key. Null if no
      * property is found by the key.
      */
-    public String getValueType(String key);
+    String getValueType(String key);
 
     /**
      * Getter for a property identified by the key that returns the value as
@@ -137,7 +137,7 @@ public interface GDProperties extends Serializable {
      * @return Value of the property identified by the parameter "key". Returns
      * default value from service schema if the value is not set.
      */
-    public String getStringValue(String key);
+    String getStringValue(String key);
 
     /**
      * Setter for a string property identified by the key. If the metadata
@@ -146,7 +146,7 @@ public interface GDProperties extends Serializable {
      * @param key Name of the property in question.
      * @param value A string value to be set for the property.
      */
-    public void setStringValue(String key, String value);
+    void setStringValue(String key, String value);
 
     /**
      * Getter for a map from name to value.
@@ -154,7 +154,7 @@ public interface GDProperties extends Serializable {
      * @return map from name to value
      */
     @JsonAnyGetter
-    public Map<String, Data> getProperties();
+     Map<String, Data> getProperties();
 
     /**
      * Gets the value with the specified name. The only allowed types are
@@ -163,14 +163,14 @@ public interface GDProperties extends Serializable {
      * @param name
      * @return
      */
-    public Object getValue(String name);
+    Object getValue(String name);
 
     /**
      * Adds all elements from the specified properties.
      *
      * @param source
      */
-    public void addAll(GDProperties source);
+    void addAll(GDProperties source);
 
     /**
      * Serializes the state (i.e. values of all properties) to JSON

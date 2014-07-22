@@ -59,7 +59,7 @@ public interface GenericDevice extends GDContextNode {
      *
      * @param name
      */
-    public void setName(String name);
+    void setName(String name);
 
     /**
      * Method to query a service offered by the device by its name.
@@ -68,14 +68,14 @@ public interface GenericDevice extends GDContextNode {
      * @return GenericDeviceService object if the device offers the queried
      * service. Null otherwise.
      */
-    public GDService getService(String name);
+    GDService getService(String name);
 
     /**
      * Method to return map from service name to service offered by device
      *
      * @return name to service map
      */
-    public Map<String, GDService> getServices();
+    Map<String, GDService> getServices();
 
     /**
      * Getter for the device ID field. This is a gateway local ID.
@@ -84,7 +84,7 @@ public interface GenericDevice extends GDContextNode {
      */
     @JsonProperty("ID")
     @JsonView(View.ID.class)
-    public String getId();
+     String getId();
 
     /**
      * Sets the URN of this device. The URN will be persisted.
@@ -92,28 +92,28 @@ public interface GenericDevice extends GDContextNode {
      * @param URN
      */
     @JsonProperty("URN")
-    public void setURN(String URN);
+     void setURN(String URN);
 
     /**
      * Gets the URN of this device.
      *
      * @return
      */
-    public String getURN();
+    String getURN();
 
     /**
      * Getter the friendly name of the device.
      *
      * @return Friendly name of the device.
      */
-    public String getName();
+    String getName();
 
     /**
      * Getter for the device type field.
      *
      * @return Device type.
      */
-    public String getType();
+    String getType();
 
     /**
      * Getter for the name of protocol used for discovery of the device. The
@@ -122,14 +122,14 @@ public interface GenericDevice extends GDContextNode {
      *
      * @return Name of the protocol used for discovery of the device.
      */
-    public String getProtocol();
+    String getProtocol();
 
     /**
      * Getter for location where the device is discovered.
      *
      * @return Location where the device is discovered.
      */
-    public String getLocation();
+    String getLocation();
 
     /**
      * Getter for the boolean field that indicates if the device is online, i.e.
@@ -137,14 +137,14 @@ public interface GenericDevice extends GDContextNode {
      *
      * @return true if the device is online. false otherwise.
      */
-    public boolean isOnline();
+    boolean isOnline();
 
     /**
      * Gets the running {@link State} of the device.
      *
      * @return
      */
-    public State getState();
+    State getState();
 
     /**
      * Getter for the icon url field. The value should be URL for an icon image
@@ -153,7 +153,7 @@ public interface GenericDevice extends GDContextNode {
      *
      * @return URL for an icon image of the device.
      */
-    public String getIcon();
+    String getIcon();
 
     /**
      * @return Contact URL of the device.
@@ -162,42 +162,42 @@ public interface GenericDevice extends GDContextNode {
      * application should have its own way of exposing the device and thus the
      * contact URL of the device depends.
      */
-    public String getContact();
+    String getContact();
 
     /**
      * Getter for name of the manufactuer of the device.
      *
      * @return name of the manufacturer. Null if the manufacturer is unknown.
      */
-    public String getManufacturer();
+    String getManufacturer();
 
     /**
      * Getter for the description of the device.
      *
      * @return description of the device. Null if no description is available.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * Getter for serial number of the device.
      *
      * @return Serial number of the device. Null if unknown.
      */
-    public String getSerialNumber();
+    String getSerialNumber();
 
     /**
      * Getter for product class of the device.
      *
      * @return product class of the device. Null if unknown.
      */
-    public String getProductClass();
+    String getProductClass();
 
     /**
      * Getter for model name of the device
      *
      * @return model name of the device. Null if the model name is unknown.
      */
-    public String getModelName();
+    String getModelName();
 
     /**
      * Serializes the state (i.e. values of all properties in all services) to
@@ -207,7 +207,7 @@ public interface GenericDevice extends GDContextNode {
      * <code>{"Service1" : {"property1" : "99","property2" : "99"},"Service2" : {"property3" : "99","property4" : "99"}}</code>
      * @throws com.ericsson.deviceaccess.api.genericdevice.GDException
      */
-    public String serializeState() throws GDException;
+    String serializeState() throws GDException;
 
     public enum State {
 

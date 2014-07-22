@@ -62,7 +62,7 @@ public interface GDService extends GDContextNode {
      * @param name Name of the action in question.
      * @return An instance of an action that has the name. Null if not found.
      */
-    public GDAction getAction(String name);
+    GDAction getAction(String name);
 
     /**
      * Getter for the name of the service.
@@ -70,7 +70,7 @@ public interface GDService extends GDContextNode {
      * @return Name of the service.
      */
     @JsonView(View.ID.class)
-    public String getName();
+     String getName();
 
     /**
      * Getter for the GenericDeviceProperties object that represents the list of
@@ -78,7 +78,7 @@ public interface GDService extends GDContextNode {
      *
      * @return List of properties of the service.
      */
-    public GDProperties getProperties();
+    GDProperties getProperties();
 
     /**
      * Gets the metadata for the properties of this service.
@@ -86,7 +86,7 @@ public interface GDService extends GDContextNode {
      * @return the metadata for the properties of this service.
      */
     @JsonIgnore
-    public List<GDPropertyMetadata> getPropertiesMetadata();
+     List<GDPropertyMetadata> getPropertiesMetadata();
 
     /**
      * Method to return a map from name to action supported by service
@@ -94,7 +94,7 @@ public interface GDService extends GDContextNode {
      * @return map from name to action
      */
     @JsonView(View.Stateless.class)
-    public Map<String, GDAction> getActions();
+     Map<String, GDAction> getActions();
 
     /**
      * Serializes the state (i.e. values of all properties in the service) to
@@ -104,5 +104,5 @@ public interface GDService extends GDContextNode {
      * <code>{"property1" : "99","property2" : "99"}</code>
      *
      */
-    public String serializeState();
+    String serializeState();
 }

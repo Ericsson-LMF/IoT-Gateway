@@ -69,6 +69,7 @@ public class UPnPUtil {
     private static final String BROWSE_ACTION = "Browse";
     private static final String RESULT = "Result";
     static final String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final Pattern varPattern = Pattern.compile("<(\\w+)\\s.*val=\"(.*)\".*/");
 
     public static String getCurrentMediaUri(UPnPDevice dev) throws Exception {
         Properties args = new Properties();
@@ -172,24 +173,6 @@ public class UPnPUtil {
         return md;
     }
 
-    protected static class HttpClient {
-
-        public static String getHeader(String urlStr, String header) throws IOException {
-            URL url = new URL(urlStr);
-
-            HttpURLConnection urlconn = (HttpURLConnection) url.openConnection();
-            urlconn.setRequestMethod("HEAD");
-            urlconn.setInstanceFollowRedirects(true);
-
-            urlconn.connect();
-            String value = urlconn.getHeaderField(header);
-            urlconn.disconnect();
-            return value;
-        }
-
-        private HttpClient() {
-        }
-    }
 
     public static void setVolume(UPnPDevice dev, String volume)
             throws Exception {
@@ -235,7 +218,6 @@ public class UPnPUtil {
         return args;
     }
 
-    private static final Pattern varPattern = Pattern.compile("<(\\w+)\\s.*val=\"(.*)\".*/");
 
     public static Map<String, String> parseLastChangeEvent(String value) {
         Map<String, String> result = new HashMap<>();
@@ -347,5 +329,24 @@ public class UPnPUtil {
     }
 
     private UPnPUtil() {
+    }
+
+    protected static class HttpClient {
+
+        public static String getHeader(String urlStr, String header) throws IOException {
+            URL url = new URL(urlStr);
+            
+            HttpURLConnection urlconn = (HttpURLConnection) url.openConnection();
+            urlconn.setRequestMethod("HEAD");
+            urlconn.setInstanceFollowRedirects(true);
+            
+            urlconn.connect();
+            String value = urlconn.getHeaderField(header);
+            urlconn.disconnect();
+            return value;
+        }
+
+        private HttpClient() {
+        }
     }
 }

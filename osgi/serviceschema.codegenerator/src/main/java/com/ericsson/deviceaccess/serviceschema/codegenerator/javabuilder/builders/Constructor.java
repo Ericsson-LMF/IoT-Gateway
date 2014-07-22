@@ -1,5 +1,6 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
+import com.ericsson.commonutil.StringUtil;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
@@ -13,7 +14,6 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
-import com.ericsson.commonutil.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;

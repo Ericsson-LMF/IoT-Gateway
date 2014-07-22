@@ -46,11 +46,11 @@ public interface TransportLayerSender {
      *
      * @param message CoAP message to send
      */
-    public void sendMessage(CoAPMessage message);
+    void sendMessage(CoAPMessage message);
 
     /**
      * Method to close the threads
      */
-    public void stopService();
+    void stopService();
 
 }

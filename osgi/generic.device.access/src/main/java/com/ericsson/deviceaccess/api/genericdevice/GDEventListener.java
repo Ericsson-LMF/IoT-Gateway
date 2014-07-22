@@ -132,14 +132,14 @@ import java.util.Map;
  */
 public interface GDEventListener {
 
-    public static final String GENERICDEVICE_FILTER = "genericdevice.filter";
-    public static final String DEVICE_ID = "device.id";
-    public static final String DEVICE_URN = "device.urn";
-    public static final String DEVICE_NAME = "device.name";
-    public static final String DEVICE_PROTOCOL = "device.protocol";
-    public static final String DEVICE_ONLINE = "device.online";
-    public static final String DEVICE_STATE = "device.state";
-    public static final String SERVICE_NAME = "service.name";
+    String GENERICDEVICE_FILTER = "genericdevice.filter";
+    String DEVICE_ID = "device.id";
+    String DEVICE_URN = "device.urn";
+    String DEVICE_NAME = "device.name";
+    String DEVICE_PROTOCOL = "device.protocol";
+    String DEVICE_ONLINE = "device.online";
+    String DEVICE_STATE = "device.state";
+    String SERVICE_NAME = "service.name";
 
     /**
      * Called when changes according to the specified filter, specified at
@@ -152,9 +152,9 @@ public interface GDEventListener {
      * @param serviceName the name of the service that the change affect
      * @param properties the properties that was changed
      */
-    public void notifyGDEvent(String deviceId, String serviceName, Map<String, Object> properties);
+    void notifyGDEvent(String deviceId, String serviceName, Map<String, Object> properties);
 
-    public void notifyGDPropertyEvent(Type type, String deviceId, String serviceName, String propertyId);
+    void notifyGDPropertyEvent(Type type, String deviceId, String serviceName, String propertyId);
 
     public enum Type {
 
