@@ -46,8 +46,12 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NetUtil {
+public enum NetUtil {
 
+    /**
+     * Singleton.
+     */
+    INSTANCE;
 
     static public final int IPV4_ONLY = 1;
     static public final int IPV6_ONLY = 2;
@@ -165,7 +169,7 @@ public class NetUtil {
      *
      * @param addressPortStr String for Address and Port. Enclose with "[" and
      * "]" for IPv6 addresses.
-     * @param defautlPort defaultPort when port is not specified in
+     * @param defaultPort defaultPort when port is not specified in
      * addressPortStr
      * @return InetSocketAddress
      * @throws UnknownHostException
@@ -218,7 +222,7 @@ public class NetUtil {
 
         static ClassifiedAddresses getClassifiedAddresses() {
             ClassifiedAddresses result = new ClassifiedAddresses();
-            
+
             Enumeration eNetIf = null;
             try {
                 eNetIf = NetworkInterface.getNetworkInterfaces();
@@ -233,7 +237,7 @@ public class NetUtil {
                 Enumeration eInetAddr = netIf.getInetAddresses();
                 while (eInetAddr.hasMoreElements()) {
                     InetAddress inetAddr = (InetAddress) eInetAddr.nextElement();
-                    
+
                     if (inetAddr instanceof Inet4Address) {
                         if (inetAddr.isLinkLocalAddress()) {
                             result.linkLocalIPv4.add(inetAddr);
@@ -255,7 +259,6 @@ public class NetUtil {
             }
             return result;
         }
-
         final public LinkedList<InetAddress> globalIPv4 = new LinkedList<>();
         final public LinkedList<InetAddress> globalIPv6 = new LinkedList<>();
         final public LinkedList<InetAddress> siteLocalIPv4 = new LinkedList<>();
@@ -265,9 +268,5 @@ public class NetUtil {
 
         private ClassifiedAddresses() {
         }
-
-    }
-
-    private NetUtil() {
     }
 }

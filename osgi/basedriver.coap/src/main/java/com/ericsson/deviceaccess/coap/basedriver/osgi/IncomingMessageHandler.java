@@ -34,20 +34,24 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.ACKNOWLEDGEMENT;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.CONFIRMABLE;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.BAD_OPTION;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageReader;
 import java.net.DatagramPacket;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class handles the incoming (CoAP) messages, detects duplicates and
@@ -55,14 +59,15 @@ import java.util.TimerTask;
  * req/resp matching)
  */
 public class IncomingMessageHandler implements IncomingMessageListener {
+
     static final long incomingRequestsExpirationTime = 60000; //msec
 
     private IncomingCoAPListener incomingCoAPListener;
 
     // Keep track of incoming messages with socket address (toString) + message
     // ID as key, these are used for detecting duplicate incoming messages
-    final private HashMap<String, CoAPRequest> incomingRequests;
-    final private HashMap<String, CoAPResponse> incomingResponses;
+    final private Map<String, CoAPRequest> incomingRequests;
+    final private Map<String, CoAPResponse> incomingResponses;
 
     // Remove the entry of incomingRequests when expired
     final private Timer incomingRequestsTimer = new Timer();
@@ -72,8 +77,8 @@ public class IncomingMessageHandler implements IncomingMessageListener {
      * fetched using the CoAPMessageHandlerFactory class.
      */
     protected IncomingMessageHandler() {
-        incomingRequests = new HashMap<>();
-        incomingResponses = new HashMap<>();
+        incomingRequests = new ConcurrentHashMap<>();
+        incomingResponses = new ConcurrentHashMap<>();
     }
 
     /**
@@ -86,9 +91,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
     @Override
     public void messageReceived(DatagramPacket datagram) {
         if (incomingCoAPListener == null) {
-            /*
-             CoAPActivator.logger.error("No incoming CoAP listener defined");
-             */
+            // CoAPActivator.logger.error("No incoming CoAP listener defined");
             return;
         }
 
@@ -108,26 +111,13 @@ public class IncomingMessageHandler implements IncomingMessageListener {
          e.printStackTrace();
          }
          */
-        if (datagram.getLength() == 1281) {
+        if (datagram.getLength() >= 1281) {
             // response with a 4.13 entity too large
-			/*CoAPActivator.logger
-             .debug("Too large datagram received, reply with a 4.13 response");
-             */
-            OutgoingMessageHandler outgoingMessageHandler = this.incomingCoAPListener
-                    .getOutgoingMessageHandler();
+            //CoAPActivator.logger.debug("Too large datagram received, reply with a 4.13 response");
+            OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
             if (msg instanceof CoAPRequest) {
-                CoAPRequest req = (CoAPRequest) msg;
-                CoAPResponse resp = new CoAPResponse(1,
-                        CoAPMessageType.CONFIRMABLE,
-                        CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE,
-                        req.getMessageId());
-
-                CoAPOptionHeader header = req.getTokenHeader();
-                if (header != null) {
-                    resp.addOptionHeader(header);
-                }
-                resp.setSocketAddress(req.getSocketAddress());
-                outgoingMessageHandler.send(resp, false);
+                CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, REQUEST_ENTITY_TOO_LARGE);
+                outHandler.send(resp, false);
             } else {
                 System.out.println("TODO: If a response is larger than would fit in the buffer, repeat the request with a suitable Block1 option");
             }
@@ -137,43 +127,27 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         // If there are unrecognized options, reply with a reset message for
         // confirmable response and 4.02 response to a confirmable request
         // (fraft-ietf-core-coap-08)
-        if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE && !handler.validOptions()) {
+        if (msg.getMessageType() == CONFIRMABLE && !handler.validOptions()) {
             //CoAPActivator.logger.debug("Options in the message not valid");
 
-            OutgoingMessageHandler outgoingMessageHandler = incomingCoAPListener
-                    .getOutgoingMessageHandler();
-
+            OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
             // in case of response, return rst
             if (msg instanceof CoAPResponse) {
-                CoAPResponse resp = (CoAPResponse) msg;
-                CoAPResponse reset = resp.createReset();
-                /*CoAPActivator.logger
-                 .debug("Reply to unrecognized options in a response with reset message ");
-                 */
-                outgoingMessageHandler.send(reset, false);
+                //CoAPActivator.logger.debug("Reply to unrecognized options in a response with reset message ");
+                resetMessage((CoAPResponse) msg);
             } else {
                 // in case of request, return 4.02 bad option
-                CoAPRequest req = (CoAPRequest) msg;
-                CoAPResponse resp = new CoAPResponse(
-                        CoAPMessageType.CONFIRMABLE,
-                        CoAPResponseCode.BAD_OPTION.getNo(), req.getMessageId());
-                /*CoAPActivator.logger
-                 .debug("Reply to unrecognized options in a response with a 4.02 response");
-                 */
-                CoAPOptionHeader header = req.getTokenHeader();
-                if (header != null) {
-                    resp.addOptionHeader(header);
-                }
-                resp.setSocketAddress(req.getSocketAddress());
-                outgoingMessageHandler.send(resp, false);
+                //CoAPActivator.logger.debug("Reply to unrecognized options in a response with a 4.02 response");
+                CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, BAD_OPTION);
+                outHandler.send(resp, false);
             }
         } else {
             try {
                 // If the incoming message is a response and try to find a match
                 if (msg instanceof CoAPResponse) {
-                    this.handleResponse((CoAPResponse) msg);
+                    handleResponse((CoAPResponse) msg);
                 } else if (msg instanceof CoAPRequest) {
-                    this.handleRequest((CoAPRequest) msg);
+                    handleRequest((CoAPRequest) msg);
                 }
             } catch (CoAPException e) {
                 e.printStackTrace();
@@ -189,72 +163,56 @@ public class IncomingMessageHandler implements IncomingMessageListener {
     private void handleResponse(CoAPResponse response) throws CoAPException {
         // On messaging level, check for duplicates based on message ID + IP
         // check the received responses
-
         /*
          CoAPActivator.logger
          .debug("Check if this is a duplicate response with ID: ["
          + resp.getIdentifier() + "] and message type ["
          + resp.getMessageType().getName() + "]");
          */
-        CoAPResponse duplicate = incomingResponses.get(response.getIdentifier());
-
-        if (duplicate != null) {
-            /*
-             CoAPActivator.logger
-             .debug("A duplicate response was received, try to reply with the same message");
-             */
+        String id = response.getIdentifier();
+        OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
+        if (incomingResponses.containsKey(id)) {
+            //CoAPActivator.loggerdebug("A duplicate response was received, try to reply with the same message");
             // TODO process only in case of CON??
-
-            OutgoingMessageHandler outgoingMessageHandler = incomingCoAPListener.getOutgoingMessageHandler();
-            CoAPResponse cachedResponse = outgoingMessageHandler.getOutgoingResponses().get(response.getIdentifier());
-
+            CoAPResponse cachedResponse = outHandler.getOutgoingResponses().get(id);
             if (cachedResponse != null) {
-                /*
-                 CoAPActivator.logger
-                 .debug("A cached response was found, try to reply with the same message");
-                 */
-                outgoingMessageHandler.send(cachedResponse, false);
+                //CoAPActivator.logger.debug("A cached response was found, try to reply with the same message");
+                outHandler.send(cachedResponse, false);
             } else {
-                /*
-                 CoAPActivator.logger
-                 .warn("No cached response was found, discard this response");
-                 */
+                //CoAPActivator.logger.warn("No cached response was found, discard this response");
             }
             return;
         }
 
-        // No duplicate was found so this is a new incoming response. Stop
-        // retransmission task.
-        OutgoingMessageHandler outgoingMessageHandler = incomingCoAPListener.getOutgoingMessageHandler();
-
-        HashMap<String, CoAPRequest> outgoingRequests = outgoingMessageHandler.getOutgoingRequests();
-        HashMap<String, CoAPResponse> outgoingReplies = outgoingMessageHandler.getOutgoingResponses();
-        CoAPRequest sentRequest = outgoingRequests.get(response.getIdentifier());
+        // No duplicate was found so this is a new incoming response. Stop retransmission task.
+        HashMap<String, CoAPRequest> outgoingRequests = outHandler.getOutgoingRequests();
+        HashMap<String, CoAPResponse> outgoingReplies = outHandler.getOutgoingResponses();
+        CoAPRequest sentRequest = outgoingRequests.get(id);
 
         // Message ID will be different if this is a separate response (tokens
         // will match with the request)
         // If a match for the incoming response was found
         if (sentRequest != null) {
-            if (response.getMessageType() == CoAPMessageType.CONFIRMABLE) {
+            if (response.getMessageType() == CONFIRMABLE) {
                 ackMessage(response);
             }
 
             // some kind of response received, remove retransmission task
-            outgoingMessageHandler.removeRetransmissionTask(sentRequest);
-            incomingResponses.put(response.getIdentifier(), response);
+            outHandler.removeRetransmissionTask(sentRequest);
+            incomingResponses.put(id, response);
             incomingCoAPListener.handleResponse(response);
             return;
         }
 
-        if (response.getMessageType() == CoAPMessageType.ACKNOWLEDGEMENT) {
-            CoAPResponse sentResponse = outgoingReplies.get(response.getIdentifier());
+        if (response.getMessageType() == ACKNOWLEDGEMENT) {
+            CoAPResponse sentResponse = outgoingReplies.get(id);
             if (sentResponse != null) {
                 /*
                  * If the outgoing request was also a response, then there's no
                  * need to nofify the listener. the ack acknowledges the con
                  * response.
                  */
-                outgoingMessageHandler.removeRetransmissionTask(sentResponse);
+                outHandler.removeRetransmissionTask(sentResponse);
                 return;
             }
         }
@@ -269,21 +227,24 @@ public class IncomingMessageHandler implements IncomingMessageListener {
                     .filter(v -> Arrays.equals(v.getTokenHeader().getValue(), header.getValue()))
                     .findAny();
             if (request.isPresent()) {
-                if (response.getMessageType() == CoAPMessageType.CONFIRMABLE) {
+                if (response.getMessageType() == CONFIRMABLE) {
                     ackMessage(response);
                 }
-                outgoingMessageHandler.removeRetransmissionTask(request.get());
+                outHandler.removeRetransmissionTask(request.get());
                 incomingCoAPListener.handleResponse(response);
                 return;
             }
         }
-        incomingCoAPListener.getOutgoingMessageHandler().send(response.createReset(), false);
+        resetMessage(response);
     }
 
     private void ackMessage(CoAPResponse resp) {
         //CoAPActivator.logger.info("Outgoing request found. Confirmable message received, ack immediately");
-        CoAPResponse acknowledgement = resp.createAcknowledgement();
-        incomingCoAPListener.getOutgoingMessageHandler().send(acknowledgement, false);
+        incomingCoAPListener.getOutgoingMessageHandler().send(resp.createAcknowledgement(), false);
+    }
+
+    private void resetMessage(CoAPResponse resp) {
+        incomingCoAPListener.getOutgoingMessageHandler().send(resp.createReset(), false);
     }
 
     /**
@@ -293,31 +254,18 @@ public class IncomingMessageHandler implements IncomingMessageListener {
      * @param req
      */
     private void handleRequest(final CoAPRequest req) {
-
+        String id = req.getIdentifier();
         // Register requests until expired
-        synchronized (incomingRequests) {
-            incomingRequests.put(req.getIdentifier(), req);
-        }
-        this.incomingRequestsTimer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (incomingRequests) {
-                            if (incomingRequests.get(req.getIdentifier()) == req) {
-                                incomingRequests.remove(req.getIdentifier());
-                            }
-                        }
-                    }
-                },
+        incomingRequests.put(id, req);
+        incomingRequestsTimer.schedule(
+                FunctionalUtil.timerTask(() -> incomingRequests.computeIfPresent(id, (k, v) -> v == req ? null : req)),
                 incomingRequestsExpirationTime
         );
         incomingCoAPListener.handleRequest(req);
     }
 
     public CoAPRequest getIncomingRequest(CoAPMessage msg) {
-        synchronized (incomingRequests) {
-            return incomingRequests.get(msg.getIdentifier());
-        }
+        return incomingRequests.get(msg.getIdentifier());
     }
 
     /**

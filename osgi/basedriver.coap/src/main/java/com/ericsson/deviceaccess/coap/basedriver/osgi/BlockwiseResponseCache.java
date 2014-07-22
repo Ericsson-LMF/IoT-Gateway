@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
@@ -42,11 +43,11 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class BlockwiseResponseCache {
@@ -61,10 +62,9 @@ public class BlockwiseResponseCache {
                 .collect(Collectors.toList());
     }
 
-    final private Map<SessionKey, SessionData> cache = new HashMap<>();
+    final private Map<SessionKey, SessionData> cache = new ConcurrentHashMap<>();
     final private long cacheTime;
     final private Timer timer;
-
 
     public BlockwiseResponseCache(long cacheTime) {
         this.cacheTime = cacheTime;
@@ -72,49 +72,42 @@ public class BlockwiseResponseCache {
     }
 
     public void cleanup() {
-        synchronized (cache) {
-            cache.values().forEach(session -> session.stopTimer());
-            cache.clear();
-        }
+        cache.values().forEach(session -> session.stopTimer());
+        cache.clear();
     }
 
     public void put(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders, byte[] payload, int responseCode) {
-        synchronized (cache) {
-            SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
-            SessionData data = new SessionData(key, payload, responseCode);
+        SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
+        SessionData data = new SessionData(key, payload, responseCode);
 
-            SessionData oldData = cache.get(key);
-            if (oldData != null) {
-                oldData.stopTimer();
+        cache.compute(key, (k, v) -> {
+            if (v != null) {
+                v.stopTimer();
             }
-
-            this.cache.put(key, data);
-        }
+            return data;
+        });
     }
 
     public void put(CoAPRequest request, CoAPResponse response) throws CoAPException {
-        this.put(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request), response.getPayload(), response.getCode());
+        put(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request), response.getPayload(), response.getCode());
     }
 
     public SessionData get(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-        synchronized (cache) {
-            return cache.get(new SessionKey(clientAddress, resourceUri, queryHeaders));
-        }
+        return cache.get(new SessionKey(clientAddress, resourceUri, queryHeaders));
     }
 
     public SessionData get(CoAPRequest request) throws CoAPException {
-        return this.get(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
+        return get(request.getSocketAddress(), request.getUriFromRequest(), getQueryStrings(request));
     }
 
     public void remove(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-        synchronized (cache) {
-            SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
-            SessionData data = cache.get(key);
-            if (data != null) {
-                data.stopTimer();
+        SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
+        cache.compute(key, (k, v) -> {
+            if (v != null) {
+                v.stopTimer();
             }
-            cache.remove(key);
-        }
+            return null;
+        });
     }
 
     public void remove(CoAPRequest request) throws CoAPException {
@@ -122,11 +115,9 @@ public class BlockwiseResponseCache {
     }
 
     public void updateTimer(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
-        synchronized (cache) {
-            SessionData data = this.get(clientAddress, resourceUri, queryHeaders);
-            if (data != null) {
-                data.startTimer();
-            }
+        SessionData data = get(clientAddress, resourceUri, queryHeaders);
+        if (data != null) {
+            data.startTimer();
         }
     }
 
@@ -162,22 +153,20 @@ public class BlockwiseResponseCache {
             }
             SessionKey target = (SessionKey) obj;
 
-            return (((this.clientAddress == null) && (target.clientAddress == null))
-                    || ((this.clientAddress != null) && (this.clientAddress.equals(target.clientAddress))))
-                    && (((this.resourceUri == null) && (target.resourceUri == null))
-                    || ((this.resourceUri != null) && (this.resourceUri.equals(target.resourceUri))))
-                    && (((this.queryStrings == null) && (target.queryStrings == null))
-                    || ((this.queryStrings != null) && (this.queryStrings.equals(target.queryStrings))));
+            return ((clientAddress == null && clientAddress == null)
+                    || (clientAddress != null && clientAddress.equals(target.clientAddress)))
+                    && ((resourceUri == null && target.resourceUri == null)
+                    || (resourceUri != null && resourceUri.equals(target.resourceUri)))
+                    && ((queryStrings == null && target.queryStrings == null)
+                    || (queryStrings != null && queryStrings.equals(target.queryStrings)));
         }
 
         @Override
         public int hashCode() {
             int value = 1;
-
-            value += value * 31 + ((clientAddress != null) ? clientAddress.hashCode() : Void.class.hashCode());
-            value += value * 31 + ((resourceUri != null) ? resourceUri.hashCode() : Void.class.hashCode());
-            value += value * 31 + ((queryStrings != null) ? queryStrings.hashCode() : Void.class.hashCode());
-
+            value += value * 31 + (clientAddress != null ? clientAddress.hashCode() : Void.class.hashCode());
+            value += value * 31 + (resourceUri != null ? resourceUri.hashCode() : Void.class.hashCode());
+            value += value * 31 + (queryStrings != null ? queryStrings.hashCode() : Void.class.hashCode());
             return value;
         }
     }
@@ -196,37 +185,36 @@ public class BlockwiseResponseCache {
         }
 
         public SessionKey getSessionKey() {
-            return this.key;
+            return key;
         }
 
         // Never change payload !!
         public byte[] getPayload() {
-            return this.payload;
-            // return (byte[])this.payload.clone();
+            return payload;
         }
 
         public int getResponseCode() {
-            return this.responseCode;
+            return responseCode;
         }
 
-        synchronized public void startTimer() {
-            this.stopTimer();
-
-            this.timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    synchronized (cache) {
+        public void startTimer() {
+            stopTimer();
+            synchronized (cache) {
+                if (timerTask == null) {
+                    timerTask = FunctionalUtil.timerTask(() -> {
                         cache.remove(key);
-                    }
+                    });
+                    timer.schedule(timerTask, cacheTime);
                 }
-            };
-            timer.schedule(this.timerTask, cacheTime);
+            }
         }
 
-        synchronized public void stopTimer() {
-            if (this.timerTask != null) {
-                this.timerTask.cancel();
-                this.timerTask = null;
+        public void stopTimer() {
+            synchronized (cache) {
+                if (timerTask != null) {
+                    timerTask.cancel();
+                    timerTask = null;
+                }
             }
         }
     }

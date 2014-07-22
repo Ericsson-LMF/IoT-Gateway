@@ -47,6 +47,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -61,10 +62,9 @@ import java.util.stream.Collectors;
 public class LinkFormatDirectory {
 
     // This keeps the already known endpoints
-    private final HashMap<URI, RemoteEndpointRefreshTask> refreshTasks;
+    private final Map<URI, RemoteEndpointRefreshTask> refreshTasks;
     private final Timer timer;
     private int resourceDiscoveryInterval;
-
 
     /**
      * Constructor.
@@ -253,8 +253,8 @@ public class LinkFormatDirectory {
         @Override
         public void run() {
             /*
-            CoAPActivator.logger.debug("Cached remote endpoint expired");
-            */
+             CoAPActivator.logger.debug("Cached remote endpoint expired");
+             */
             removeCachedRemoteEndpoint(uri);
         }
 

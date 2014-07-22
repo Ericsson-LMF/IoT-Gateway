@@ -1,6 +1,7 @@
 package com.ericsson.commonutil.function;
 
 import java.util.Optional;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -80,5 +81,14 @@ public enum FunctionalUtil {
         if (type.isInstance(object)) {
             code.accept((T) object);
         }
+    }
+
+    public static TimerTask timerTask(Runnable runnable) {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                runnable.run();
+            }
+        };
     }
 }

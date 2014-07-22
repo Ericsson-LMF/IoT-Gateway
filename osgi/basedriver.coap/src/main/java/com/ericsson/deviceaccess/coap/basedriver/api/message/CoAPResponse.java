@@ -34,6 +34,8 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import java.util.Optional;
+
 /**
  * Class representing a CoAP response.
  */
@@ -68,21 +70,23 @@ public class CoAPResponse extends CoAPMessage {
         this(version, messageType, responseCode.getNo(), messageId);
     }
 
+    public CoAPResponse(int version, CoAPRequest request, CoAPMessageType messageType, CoAPResponseCode responseCode) {
+        this(version, messageType, responseCode.getNo(), request.getMessageId());
+        CoAPOptionHeader header = request.getTokenHeader();
+        if (header != null) {
+            addOptionHeader(header);
+        }
+        setSocketAddress(request.getSocketAddress());
+    }
+
     /**
      * Create an empty ack for a response (empty ACKs are handled as a response)
      *
      * @return empty ACK for this response
      */
     public CoAPResponse createAcknowledgement() {
-
         CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId());
-        for (CoAPOptionHeader header : getOptionHeaders()) {
-            if (header.getOptionName() == CoAPOptionName.TOKEN) {
-                resp.addOptionHeader(header);
-                break;
-            }
-        }
-
+        addToken(resp);
         resp.setSocketAddress(getSocketAddress());
         return resp;
     }
@@ -96,15 +100,19 @@ public class CoAPResponse extends CoAPMessage {
      */
     public CoAPResponse createReset() {
         CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0, getMessageId());
-        for (CoAPOptionHeader header : getOptionHeaders()) {
-            if (header.getOptionName() == CoAPOptionName.TOKEN) {
-                resp.addOptionHeader(header);
-                break;
-            }
-        }
-
+        addToken(resp);
         resp.setSocketAddress(getSocketAddress());
         return resp;
+    }
+
+    private void addToken(CoAPResponse resp) {
+        Optional<CoAPOptionHeader> header = getOptionHeaders()
+                .stream()
+                .filter(h -> h.getOptionName() == CoAPOptionName.TOKEN)
+                .findAny();
+        if (header.isPresent()) {
+            resp.addOptionHeader(header.get());
+        }
     }
 
     public boolean isCacheable() {

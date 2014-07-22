@@ -121,19 +121,16 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         byte lastBlock = blockValue[blockValue.length - 1];
         int decodedMFlag = lastBlock >> 3 & 0x1;
 
-        byte szxByte = BitOperations.getBitsInByteAsByte(
-                blockValue[blockValue.length - 1], 0, 3);
+        byte szxByte = BitOperations.getBitsInByteAsByte(blockValue[blockValue.length - 1], 0, 3);
 
         int decodedBlockNumber = -1;
         byte blockNumberByte;
 
         // Length of the block is 1-3 bytes, get the block number
         if (blockValue.length == 1) {
-            blockNumberByte = BitOperations.getBitsInByteAsByte(blockValue[0],
-                    4, 4);
+            blockNumberByte = BitOperations.getBitsInByteAsByte(blockValue[0], 4, 4);
             decodedBlockNumber = blockNumberByte & 0xFF;
         } else if (blockValue.length == 2) {
-
             byte[] testArray = new byte[2];
             byte newByte = BitOperations.setBitsInByte(testArray[0], 0, 4,
                     BitOperations.getBitsInIntAsInt(blockValue[0], 4, 4));
@@ -251,7 +248,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
             firstByte = BitOperations.setBitsInByte(tmpByte, 4, 4,
                     BitOperations.getBitsInIntAsInt(blockNumber, 0, 4));
 
-            int flagVal = (mFlag) ? 1 : 0;
+            int flagVal = mFlag ? 1 : 0;
             firstByte = BitOperations.setBitInByte(firstByte, 3, flagVal);
 
             firstByte = BitOperations.setBitsInByte(firstByte, 0, 3,
@@ -268,7 +265,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
             byte newByte = BitOperations.setBitsInByte(testArray[0], 4, 4,
                     BitOperations.getBitsInIntAsInt(split[3], 4, 4));
 
-            int flagVal = (mFlag) ? 1 : 0;
+            int flagVal = mFlag ? 1 : 0;
             newByte = BitOperations.setBitInByte(newByte, 3, flagVal);
             newByte = BitOperations.setBitsInByte(newByte, 0, 3,
                     BitOperations.getBitsInIntAsByte(this.szx, 0, 3));
@@ -278,15 +275,14 @@ public class BlockOptionHeader extends CoAPOptionHeader {
 
             byte[] split = BitOperations.splitIntToBytes(blockNumber);
 
-            int blockNumberShifted = (blockNumber << 4);
+            int blockNumberShifted = blockNumber << 4;
             split = BitOperations.splitIntToBytes(blockNumberShifted);
             stream.write(split[1]);
             stream.write(split[2]);
 
-            byte thirdByte = (byte) (BitOperations.getBitsInByteAsByte(
-                    split[3], 4, 4) << 4);
+            byte thirdByte = (byte) (BitOperations.getBitsInByteAsByte(split[3], 4, 4) << 4);
 
-            int flagVal = (mFlag) ? 1 : 0;
+            int flagVal = mFlag ? 1 : 0;
             thirdByte = BitOperations.setBitInByte(thirdByte, 3, flagVal);
             thirdByte = BitOperations.setBitsInByte(thirdByte, 0, 3,
                     BitOperations.getBitsInIntAsByte(this.szx, 0, 3));

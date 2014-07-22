@@ -43,6 +43,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class takes care of handling blockwise transfers identified by Block1
@@ -55,8 +56,8 @@ import java.util.List;
  */
 public class BlockwiseTransferHandler {
 
-    private final HashMap<String, CoAPMessage> blockwiseMessages;
-    private final HashMap<String, CoAPRequest> ongoingBlockwiseRequests;
+    private final Map<String, CoAPMessage> blockwiseMessages;
+    private final Map<String, CoAPRequest> ongoingBlockwiseRequests;
     private final LocalCoAPEndpoint endpoint;
 
     // Max block size from draft-ietf-core-blao
@@ -151,13 +152,10 @@ public class BlockwiseTransferHandler {
 
             // append received payload to first response
             byte[] initialPayload = originalResponse.getPayload();
-            byte[] newPayload = new byte[initialPayload.length
-                    + response.getPayload().length];
+            byte[] newPayload = new byte[initialPayload.length + response.getPayload().length];
 
-            System.arraycopy(initialPayload, 0, newPayload, 0,
-                    initialPayload.length);
-            System.arraycopy(response.getPayload(), 0, newPayload,
-                    initialPayload.length, response.getPayload().length);
+            System.arraycopy(initialPayload, 0, newPayload, 0, initialPayload.length);
+            System.arraycopy(response.getPayload(), 0, newPayload, initialPayload.length, response.getPayload().length);
 
             response.setPayload(newPayload);
         }
@@ -365,17 +363,17 @@ public class BlockwiseTransferHandler {
         }
 
         response.getOptionHeaders().stream().filter((optionHeader) -> (/*!optionHeader.getOptionName().equals(
-                CoAPOptionName.URI_HOST.getName())
-                && !optionHeader.getOptionName().equals(
-                CoAPOptionName.URI_PATH.getName())
-                && !optionHeader.getOptionName().equals(
-                CoAPOptionName.URI_PORT.getName())
-                && !optionHeader.getOptionName().equals(
-                CoAPOptionName.TOKEN.getName())
-                && */optionHeader.getOptionName() != CoAPOptionName.BLOCK1
-                        && optionHeader.getOptionName() != CoAPOptionName.BLOCK2)).forEach((optionHeader) -> {
-                        blockResponse.addOptionHeader(optionHeader);
-        });
+                 CoAPOptionName.URI_HOST.getName())
+                 && !optionHeader.getOptionName().equals(
+                 CoAPOptionName.URI_PATH.getName())
+                 && !optionHeader.getOptionName().equals(
+                 CoAPOptionName.URI_PORT.getName())
+                 && !optionHeader.getOptionName().equals(
+                 CoAPOptionName.TOKEN.getName())
+                 && */optionHeader.getOptionName() != CoAPOptionName.BLOCK1
+                && optionHeader.getOptionName() != CoAPOptionName.BLOCK2)).forEach((optionHeader) -> {
+                    blockResponse.addOptionHeader(optionHeader);
+                });
 
         // Calculate szx from the block size:
         // 2^(4+SZX) = 512 =>

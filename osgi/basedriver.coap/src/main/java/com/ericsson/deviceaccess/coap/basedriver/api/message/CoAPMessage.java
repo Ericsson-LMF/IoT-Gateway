@@ -513,7 +513,7 @@ public abstract class CoAPMessage {
      * @return option headers in this message
      */
     public List<CoAPOptionHeader> getOptionHeaders() {
-        return this.headers;
+        return headers;
     }
 
     /**
