@@ -121,10 +121,9 @@ public class LinkFormatDirectory {
 
                 // This is a hack to figure out the type of the server
                 CoAPRemoteEndpointType type = CoAPRemoteEndpointType.OTHER;
-                if (!updatedResources.isEmpty()) {
-                    if (updatedResources.get(1).getResourceType().equals("\"SepararateResponseTester\"")) {
-                        type = CoAPRemoteEndpointType.CALIFORNIUM;
-                    }
+                if (!updatedResources.isEmpty()
+                        && updatedResources.get(1).getResourceType().equals("\"SepararateResponseTester\"")) {
+                    type = CoAPRemoteEndpointType.CALIFORNIUM;
                 }
                 endpoint = new CoAPRemoteEndpoint(serverURI, type);
 
@@ -175,10 +174,7 @@ public class LinkFormatDirectory {
                     refreshTasks.remove(task.uri);
                     task.cancel();
                 } catch (IllegalStateException e) {
-                    /*
-                     CoAPActivator.logger
-                     .warn("Task already cancelled");
-                     */
+                    //CoAPActivator.logger.warn("Task already cancelled");
                 }
                 int scheduled = (30 + this.resourceDiscoveryInterval) * 1000;
                 RemoteEndpointRefreshTask newTask = new RemoteEndpointRefreshTask(serverURI, endpoint);

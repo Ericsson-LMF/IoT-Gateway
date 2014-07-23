@@ -56,8 +56,7 @@ public class CoAPMessageWriterTest extends TestCase {
      */
     public void testEncode() throws URISyntaxException {
 
-        URI uri = null;
-        uri = new URI("coap://127.0.0.1:5683/storage/helloworld");
+        URI uri = new URI("coap://127.0.0.1:5683/storage/helloworld");
         CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
 
         int msgCode = 2;
@@ -180,8 +179,7 @@ public class CoAPMessageWriterTest extends TestCase {
     }
 
     public void testFencepostOptions() throws URISyntaxException {
-        URI uri = null;
-        uri = new URI("coap://127.0.0.1:/storage/helloworld");
+        URI uri = new URI("coap://127.0.0.1:/storage/helloworld");
         CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
 
         int msgCode = 64;

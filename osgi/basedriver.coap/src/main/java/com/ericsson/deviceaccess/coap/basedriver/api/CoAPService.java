@@ -152,10 +152,7 @@ public class CoAPService {
             // Schedule tasks to do resource discovery
             timer.schedule(task, 0, resourceDiscoveryInterval * 1000);
         } else {
-            /*
-             CoAPActivator.logger
-             .debug("Resource discovery interval set to 0, do not use resource discovery");
-             */
+            //CoAPActivator.logger.debug("Resource discovery interval set to 0, do not use resource discovery");
         }
     }
 
@@ -249,10 +246,8 @@ public class CoAPService {
             int messageCode, String host, int port, String path)
             throws CoAPException {
 
-        if (path != null && !path.isEmpty()) {
-            if (!path.startsWith("/")) {
-                path = "/" + path;
-            }
+        if (path != null && !path.isEmpty() && !path.startsWith("/")) {
+            path = "/" + path;
         }
 
         URI uri = null;

@@ -156,7 +156,7 @@ public enum BitOperations {
      * @return
      */
     public static int setBitsInInt(int i, int n, int k, int v) {
-        return ((i & ~(~(~0 << k) << n)) | (v << n));
+        return (i & ~(~(~0 << k) << n)) | (v << n);
     }
 
     /**
@@ -176,7 +176,7 @@ public enum BitOperations {
         long temp = ~(~0L << k);
         long temp2 = ~(temp << n);
         long temp3 = l & temp2;
-        return ((temp3) | (v << n));
+        return temp3 | (v << n);
     }
 
     /**
@@ -322,7 +322,7 @@ public enum BitOperations {
      * @return
      */
     public static int getBitsInIntAsInt(int i, int n, int k) {
-        return ((i & (~(~0 << k) << n)) >> n);
+        return (i & (~(~0 << k) << n)) >> n;
     }
 
     /**
@@ -447,7 +447,7 @@ public enum BitOperations {
                 result.append("0");
                 counter++;
             }
-            if (((counter % 8) == 0) && (counter != 64)) {
+            if (counter % 8 == 0 && counter != 64) {
                 result.append("|");
             }
         }
@@ -473,7 +473,7 @@ public enum BitOperations {
                 result.append("0");
                 counter++;
             }
-            if (((counter % 8) == 0) && (counter != 32)) {
+            if (counter % 8 == 0 && counter != 32) {
                 result.append("|");
             }
         }

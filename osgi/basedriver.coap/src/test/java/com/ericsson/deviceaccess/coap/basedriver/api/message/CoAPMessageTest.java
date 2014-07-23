@@ -201,7 +201,7 @@ public class CoAPMessageTest extends TestCase {
         resp.removeOptionHeader(observeOpt);
 
         // Test maximum value
-        double max = (Math.pow(2, 16)) - 1;
+        double max = Math.pow(2, 16) - 1;
         Double maxDouble = max;
         int unsignedShortMax = maxDouble.intValue();
 
@@ -260,7 +260,7 @@ public class CoAPMessageTest extends TestCase {
 
         resp.removeOptionHeader(maxAgeOpt);
         // unsigned max value
-        double max = (Math.pow(2, 32)) - 1;
+        double max = Math.pow(2, 32) - 1;
 
         Double maxDouble = max;
         long unsignedIntMax = maxDouble.longValue();
@@ -297,7 +297,7 @@ public class CoAPMessageTest extends TestCase {
 
         resp.removeOptionHeader(h);
 
-        double max = (Math.pow(2, 32)) - 1;
+        double max = Math.pow(2, 32) - 1;
 
         Double maxDouble = max;
         long unsignedIntMax = maxDouble.longValue();
@@ -312,8 +312,7 @@ public class CoAPMessageTest extends TestCase {
         h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
         resp.addOptionHeader(h);
 
-        CoAPOptionHeader retrieved = (resp
-                .getOptionHeaders(CoAPOptionName.MAX_OFE).get(0));
+        CoAPOptionHeader retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
         long maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
         assertEquals(maxOfeFromHeader, unsignedIntMax);
 
@@ -332,15 +331,14 @@ public class CoAPMessageTest extends TestCase {
         h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
         resp.addOptionHeader(h);
 
-        retrieved = (resp
-                .getOptionHeaders(CoAPOptionName.MAX_OFE).get(0));
+        retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
         maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
         assertEquals(maxOfeFromHeader, oneByteInt);
 
         resp.removeOptionHeader(h);
 
         // test with two byte value
-        double twoByteValue = (Math.pow(2, 9)) - 1;
+        double twoByteValue = Math.pow(2, 9) - 1;
         maxDouble = twoByteValue;
         long twoByteLong = maxDouble.longValue();
         longBytes = BitOperations.splitLongToBytes(twoByteLong);
@@ -354,8 +352,7 @@ public class CoAPMessageTest extends TestCase {
         h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
         resp.addOptionHeader(h);
 
-        retrieved = (resp
-                .getOptionHeaders(CoAPOptionName.MAX_OFE).get(0));
+        retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
         maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
         assertEquals(maxOfeFromHeader, maxDouble.intValue());
     }

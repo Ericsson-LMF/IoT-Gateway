@@ -37,7 +37,12 @@ package com.ericsson.deviceaccess.coap.basedriver.osgi;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK2;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.TOKEN;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_HOST;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
@@ -101,13 +106,11 @@ public class BlockwiseTransferHandler {
      * @return
      * @throws CoAPException
      */
-    public CoAPRequest createBlockwiseRequest(CoAPRequest request,
-            int blockNumber, int szx) throws CoAPException {
-        if (!request.getOptionHeaders(CoAPOptionName.BLOCK2).isEmpty()) {
-            return request;
-        } else {
+    public CoAPRequest createBlockwiseRequest(CoAPRequest request, int blockNumber, int szx) throws CoAPException {
+        if (request.getOptionHeaders(BLOCK2).isEmpty()) {
             return createBlock1Request(request, blockNumber, szx);
         }
+        return request;
     }
 
     /**
@@ -121,14 +124,12 @@ public class BlockwiseTransferHandler {
      * @return
      */
     public CoAPResponse createBlockwiseResponse(CoAPResponse response, int blockNumber, int szx) {
-
         // Control usage of Block1 option in CoAP response
-        if (!response.getOptionHeaders(CoAPOptionName.BLOCK1).isEmpty()) {
+        if (!response.getOptionHeaders(BLOCK1).isEmpty()) {
             return response;
         }
-
         // Descriptive usage of Block2 option
-        return this.createBlock2Response(response, blockNumber, szx);
+        return createBlock2Response(response, blockNumber, szx);
     }
 
     /**
@@ -138,11 +139,11 @@ public class BlockwiseTransferHandler {
      *
      * @param response response with block2 option received
      * @param request original request
+     * @return
      * @throws CoAPException
      */
     public CoAPRequest block2OptionReceived(CoAPResponse response, CoAPRequest request) throws CoAPException {
-
-        List<CoAPOptionHeader> block2 = response.getOptionHeaders(CoAPOptionName.BLOCK2);
+        List<CoAPOptionHeader> block2 = response.getOptionHeaders(BLOCK2);
         // TODO can there be multiple block options?
         CoAPOptionHeader blockOption = block2.get(0);
 
@@ -168,33 +169,28 @@ public class BlockwiseTransferHandler {
 
         // if the m flag is set, there are still more blocks
         if (blockOptionHeader.getMFlag()) {
-
             CoAPOptionHeader tokenHeader = response.getTokenHeader();
-            CoAPRequest blockRequest = this.endpoint.createCoAPRequest(
+            CoAPRequest blockRequest = endpoint.createCoAPRequest(
                     request.getMessageType(), 1, request.getSocketAddress(),
                     request.getUriFromRequest(), tokenHeader);
             // blockRequest.setListener(request.getListener());
             int nextBlockNumber = blockOptionHeader.getBlockNumber() + 1;
-            int szx;
+            int szx = blockOptionHeader.getSzx();
             // If the received szx is bigger that the client can accept, change
             // it to correct one for the next request
-            if (blockOptionHeader.getSzx() > this.maxSzx) {
-                szx = this.maxSzx;
-            } else {
-                szx = blockOptionHeader.getSzx();
+            if (blockOptionHeader.getSzx() > maxSzx) {
+                szx = maxSzx;
             }
 
             // TODO do this in a more clever way
-            BlockOptionHeader nextBlock = new BlockOptionHeader(CoAPOptionName.BLOCK2, nextBlockNumber, false, szx);
+            BlockOptionHeader nextBlock = new BlockOptionHeader(BLOCK2, nextBlockNumber, false, szx);
 
             blockRequest.setListener(request.getListener());
             blockRequest.addOptionHeader(nextBlock);
 
             return blockRequest;
-        } else {
-            return null;
         }
-
+        return null;
     }
 
     /**
@@ -205,13 +201,12 @@ public class BlockwiseTransferHandler {
      * @return
      * @throws CoAPException
      */
-    public CoAPRequest block1OptionResponseReceived(CoAPResponse response,
-            CoAPRequest request) throws CoAPException {
-		// Block1 in a response means that the request is acknowledged
+    public CoAPRequest block1OptionResponseReceived(CoAPResponse response, CoAPRequest request) throws CoAPException {
+        // Block1 in a response means that the request is acknowledged
         // need to check if the size of block should be changed from the request
 
         // read the block size from the sent request
-        CoAPOptionHeader blockOption = response.getOptionHeaders(CoAPOptionName.BLOCK1).get(0);
+        CoAPOptionHeader blockOption = response.getOptionHeaders(BLOCK1).get(0);
         BlockOptionHeader header = new BlockOptionHeader(blockOption);
 
         // read szx from the response
@@ -220,9 +215,8 @@ public class BlockwiseTransferHandler {
         String tokenString = new String(request.getTokenHeader().getValue(), StandardCharsets.UTF_8);
         CoAPRequest originalRequest = ongoingBlockwiseRequests.get(tokenString);
         int diff = 1;
-        int payloadHandled = 0;
-        if (!originalRequest.getOptionHeaders(CoAPOptionName.BLOCK1).isEmpty()) {
-            CoAPOptionHeader coapOption = originalRequest.getOptionHeaders(CoAPOptionName.BLOCK1).get(0);
+        if (!originalRequest.getOptionHeaders(BLOCK1).isEmpty()) {
+            CoAPOptionHeader coapOption = originalRequest.getOptionHeaders(BLOCK1).get(0);
             BlockOptionHeader h = new BlockOptionHeader(coapOption);
             int originalSzx = h.getSzx();
 
@@ -290,29 +284,27 @@ public class BlockwiseTransferHandler {
         }
 
         // copy the options
-        for (CoAPOptionHeader optionHeader : request.getOptionHeaders()) {
-            CoAPOptionName optionName = optionHeader.getOptionName();
-            if (optionName != CoAPOptionName.URI_HOST
-                    && optionName != CoAPOptionName.URI_PATH
-                    && optionName != CoAPOptionName.URI_PORT
-                    && optionName != CoAPOptionName.TOKEN
-                    && optionName != CoAPOptionName.BLOCK1
-                    && optionName != CoAPOptionName.BLOCK2) {
-                blockRequest.addOptionHeader(optionHeader);
-            }
-        }
+        request.getOptionHeaders()
+                .stream()
+                .filter(h -> h.getOptionName() != URI_HOST)
+                .filter(h -> h.getOptionName() != URI_PATH)
+                .filter(h -> h.getOptionName() != URI_PORT)
+                .filter(h -> h.getOptionName() != TOKEN)
+                .filter(h -> h.getOptionName() != BLOCK1)
+                .filter(h -> h.getOptionName() != BLOCK2)
+                .forEach(blockRequest::addOptionHeader);
 
         // Calculate szx from the block size:
         // 2^(4+SZX) = 512 =>
         // Form the block option header
-        BlockOptionHeader nextBlock = new BlockOptionHeader(CoAPOptionName.BLOCK1, blockNumber, mFlag, szx);
+        BlockOptionHeader nextBlock = new BlockOptionHeader(BLOCK1, blockNumber, mFlag, szx);
 
         boolean ok = blockRequest.addOptionHeader(nextBlock);
         blockRequest.setListener(request.getListener());
 
         if (blockNumber == 0) {
             String tokenString = new String(request.getTokenHeader().getValue(), StandardCharsets.UTF_8);
-            this.ongoingBlockwiseRequests.put(tokenString, request);
+            ongoingBlockwiseRequests.put(tokenString, request);
         }
         return blockRequest;
     }
@@ -353,23 +345,16 @@ public class BlockwiseTransferHandler {
             blockSize = payloadLeft;
         }
 
-        response.getOptionHeaders().stream().filter((optionHeader) -> (/*!optionHeader.getOptionName().equals(
-                 CoAPOptionName.URI_HOST.getName())
-                 && !optionHeader.getOptionName().equals(
-                 CoAPOptionName.URI_PATH.getName())
-                 && !optionHeader.getOptionName().equals(
-                 CoAPOptionName.URI_PORT.getName())
-                 && !optionHeader.getOptionName().equals(
-                 CoAPOptionName.TOKEN.getName())
-                 && */optionHeader.getOptionName() != CoAPOptionName.BLOCK1
-                && optionHeader.getOptionName() != CoAPOptionName.BLOCK2)).forEach((optionHeader) -> {
-                    blockResponse.addOptionHeader(optionHeader);
-                });
+        response.getOptionHeaders()
+                .stream()
+                .filter(h -> h.getOptionName() != BLOCK1)
+                .filter(h -> h.getOptionName() != BLOCK2)
+                .forEach(blockResponse::addOptionHeader);
 
         // Calculate szx from the block size:
         // 2^(4+SZX) = 512 =>
         // Form the block option header
-        BlockOptionHeader nextBlock = new BlockOptionHeader(CoAPOptionName.BLOCK2, blockNumber, mFlag, szx);
+        BlockOptionHeader nextBlock = new BlockOptionHeader(BLOCK2, blockNumber, mFlag, szx);
 
         boolean ok = blockResponse.addOptionHeader(nextBlock);
 

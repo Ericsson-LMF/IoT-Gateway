@@ -216,7 +216,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
 
                 // If this option is fence post, it should not be added in the
                 // headers
-                if ((optionNumber % 14) == 0) {
+                if (optionNumber % 14 == 0) {
                     fencePost = true;
                 }
             }
@@ -275,7 +275,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             // So apply to CON messages only
             if (!okToAdd
                     && header.isCritical()
-                    && (message.getMessageType() == CoAPMessageType.CONFIRMABLE)) {
+                    && message.getMessageType() == CoAPMessageType.CONFIRMABLE) {
                 this.okOptions = false;
                 //CoAPActivator.logger.debug("Unrecognized options in a confirmable message");
             }

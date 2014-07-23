@@ -210,32 +210,28 @@ public class ObservationHandler {
             CoAPResourceObserver observer) throws CoAPException {
 
         boolean removed = resource.removeObserver(observer);
-        List<CoAPResourceObserver> observers = resource.getObservers();
+        // If no more observers are left, finish the observation
+        // relationship by sending a request without observe option
+        if (removed && resource.getObservers().isEmpty()) {
 
-        if (removed) {
-            // If no more observers are left, finish the observation
-            // relationship by sending a request without observe option
-            if (observers.isEmpty()) {
-
-                // TODO should the termination request be confirmable or non-confirmable
-                InetSocketAddress sockaddr = null;
-                try {
-                    String socketAddress = resource.getUri().getHost();
-                    InetAddress address = InetAddress.getByName(socketAddress);
-                    sockaddr = new InetSocketAddress(address, resource.getUri().getPort());
-                } catch (UnknownHostException e) {
-                    throw new CoAPException(e);
-                }
-
-                CoAPRequest req = endpoint.createCoAPRequest(
-                        CoAPMessageType.CONFIRMABLE, 1, sockaddr,
-                        resource.getUri(), null);
-                endpoint.sendRequest(req);
-
-                this.originalRequests.remove(resource.getUri());
-                // TODO identify if the relationship was terminated!
-                this.observedResources.remove(resource.getUri());
+            // TODO should the termination request be confirmable or non-confirmable
+            InetSocketAddress sockaddr = null;
+            try {
+                String socketAddress = resource.getUri().getHost();
+                InetAddress address = InetAddress.getByName(socketAddress);
+                sockaddr = new InetSocketAddress(address, resource.getUri().getPort());
+            } catch (UnknownHostException e) {
+                throw new CoAPException(e);
             }
+
+            CoAPRequest req = endpoint.createCoAPRequest(
+                    CoAPMessageType.CONFIRMABLE, 1, sockaddr,
+                    resource.getUri(), null);
+            endpoint.sendRequest(req);
+
+            originalRequests.remove(resource.getUri());
+            // TODO identify if the relationship was terminated!
+            observedResources.remove(resource.getUri());
         }
         return removed;
     }
@@ -344,6 +340,7 @@ public class ObservationHandler {
      */
     public void stopService() {
         timer.cancel();
+
     }
 
     /**

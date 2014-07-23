@@ -30,7 +30,6 @@
                         </Private-Package>
                         <Import-Package>
                             com.ericsson.deviceaccess.*,
-                            ,
                             org.osgi.*;version="[1.0,4.0)"
                         </Import-Package>
 						

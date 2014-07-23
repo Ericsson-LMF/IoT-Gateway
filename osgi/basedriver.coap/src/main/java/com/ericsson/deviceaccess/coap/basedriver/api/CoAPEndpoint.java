@@ -60,6 +60,7 @@ public abstract class CoAPEndpoint {
     private URI uri;
 
     public CoAPEndpoint(URI uri) {
+        this.uri = uri;
         resources = new HashMap<>();
     }
 

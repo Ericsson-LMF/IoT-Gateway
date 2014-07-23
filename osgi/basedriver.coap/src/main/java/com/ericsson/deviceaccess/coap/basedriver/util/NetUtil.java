@@ -152,7 +152,9 @@ public enum NetUtil {
             }
         }
         try {
-            if ((mode == IPV4_ONLY) || (mode == ADDR_FAMILY_PRIORITISED_IPV4) || (mode == ADDR_SCOPE_PRIORITISED_IPV4)) {
+            if (mode == IPV4_ONLY
+                    || mode == ADDR_FAMILY_PRIORITISED_IPV4
+                    || mode == ADDR_SCOPE_PRIORITISED_IPV4) {
                 return Inet4Address.getLocalHost();
             } else {
                 return Inet6Address.getLocalHost();
@@ -187,10 +189,10 @@ public enum NetUtil {
                 return null;
             }
             addressStr = addressPortStr.substring(1, i);
-            if ((addressPortStr.length() > (i + 2)) && (addressPortStr.charAt(i + 1) == ':')) {
+            if (addressPortStr.length() > i + 2 && addressPortStr.charAt(i + 1) == ':') {
                 // [2001:1::1]:1234
                 port = Integer.parseInt(addressPortStr.substring(i + 2));
-            } else if (addressPortStr.length() == (i + 1)) {
+            } else if (addressPortStr.length() == i + 1) {
                 // [2001:1::1] (is it legitimate??)
                 port = defaultPort;
             } else {
@@ -243,7 +245,7 @@ public enum NetUtil {
                             result.linkLocalIPv4.add(inetAddr);
                         } else if (inetAddr.isSiteLocalAddress()) {
                             result.siteLocalIPv4.add(inetAddr);
-                        } else if ((!inetAddr.isAnyLocalAddress()) && (!inetAddr.isMulticastAddress())) {
+                        } else if (!inetAddr.isAnyLocalAddress() && !inetAddr.isMulticastAddress()) {
                             result.globalIPv4.add(inetAddr);
                         }
                     } else if (inetAddr instanceof Inet6Address) {
@@ -251,7 +253,7 @@ public enum NetUtil {
                             result.linkLocalIPv6.add(inetAddr);
                         } else if (inetAddr.isSiteLocalAddress()) {
                             result.siteLocalIPv6.add(inetAddr);
-                        } else if ((!inetAddr.isAnyLocalAddress()) && (!inetAddr.isMulticastAddress())) {
+                        } else if (!inetAddr.isAnyLocalAddress() && !inetAddr.isMulticastAddress()) {
                             result.globalIPv6.add(inetAddr);
                         }
                     }

@@ -60,9 +60,6 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
-import static org.osgi.framework.ServiceEvent.MODIFIED;
-import static org.osgi.framework.ServiceEvent.REGISTERED;
-import static org.osgi.framework.ServiceEvent.UNREGISTERING;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -209,7 +206,6 @@ public class EventManager implements ServiceListener, Runnable,
         });
     }
 
-
     /**
      * Registers EventManager to listen generic device events
      */
@@ -224,7 +220,6 @@ public class EventManager implements ServiceListener, Runnable,
             logger.warn("Filter format was hardcoded wrong", e);
         }
     }
-
 
     /**
      * If filter and event is for delta property, this then updates it
@@ -308,13 +303,13 @@ public class EventManager implements ServiceListener, Runnable,
         ServiceReference reference = event.getServiceReference();
         GDEventListener listener = (GDEventListener) context.getService(reference);
         switch (event.getType()) {
-            case REGISTERED:
+            case ServiceEvent.REGISTERED:
                 Object filter = reference.getProperty(GENERICDEVICE_FILTER);
                 listeners.put(listener, getFilter(filter));
                 break;
-            case MODIFIED:
+            case ServiceEvent.MODIFIED:
                 break;
-            case UNREGISTERING:
+            case ServiceEvent.UNREGISTERING:
                 listeners.remove(listener);
                 break;
         }
@@ -463,9 +458,9 @@ public class EventManager implements ServiceListener, Runnable,
             this.propertyId = propertyId;
             this.type = type;
             this.properties = new HashMap<>();
-            properties.put(GDEventListener.DEVICE_ID, deviceId);
+            properties.put(DEVICE_ID, deviceId);
             properties.put(propertyId, new Object());
-            properties.put(GDEventListener.SERVICE_NAME, serviceId);
+            properties.put(SERVICE_NAME, serviceId);
         }
 
         @Override

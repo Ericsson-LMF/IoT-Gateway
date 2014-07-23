@@ -44,11 +44,14 @@ import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,15 +64,15 @@ public class UPnPDeviceMgr {
     private static final int SEARCH_WAIT = 60;
     private static final int SEARCH_INTERVAL = 60 * 1000;
 
-    private HashMap m_deviceList = new HashMap();
-    private Vector m_searchThreads = new Vector();
+    private final Map<String, UPnPDeviceImpl> m_deviceList = new ConcurrentHashMap<>();
+    private List m_searchThreads = new ArrayList<>();
     private final Object m_searchThreadSyncObject = new Object();
     private Thread m_listenThread = null;
     private final Object m_listenThreadSyncObjet = new Object();
     private boolean shutdown;
     private MulticastSocket m_listenSocket = null;
     private String lanIP = null;
-    private BundleContext context;
+    private final BundleContext context;
     private UPnPEventHandler eventHandler = null;
 
     public UPnPDeviceMgr(BundleContext context) {
@@ -96,15 +99,13 @@ public class UPnPDeviceMgr {
             if (lanIP != null) {
                 m_searchThreads.add(startSearchThread(new InetSocketAddress(lanIP, 0)));
             } else {
-                for (Enumeration interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements();) {
-                    NetworkInterface ni = (NetworkInterface) interfaces.nextElement();
-                    for (Enumeration inetAddresses = ni.getInetAddresses(); inetAddresses.hasMoreElements();) {
-                        InetAddress ia = (InetAddress) inetAddresses.nextElement();
-                        if (ia != null) {
-                            if (!ia.getHostAddress().contains(":")) {
-                                log.debug(ni.getDisplayName() + ", " + ia.getHostAddress());
-                                m_searchThreads.add(startSearchThread(new InetSocketAddress(ia.getHostAddress(), 0)));
-                            }
+                for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements();) {
+                    NetworkInterface ni = interfaces.nextElement();
+                    for (Enumeration<InetAddress> inetAddresses = ni.getInetAddresses(); inetAddresses.hasMoreElements();) {
+                        InetAddress ia = inetAddresses.nextElement();
+                        if (ia != null && !ia.getHostAddress().contains(":")) {
+                            log.debug(ni.getDisplayName() + ", " + ia.getHostAddress());
+                            m_searchThreads.add(startSearchThread(new InetSocketAddress(ia.getHostAddress(), 0)));
                         }
                     }
                 }
@@ -120,23 +121,16 @@ public class UPnPDeviceMgr {
         shutdown = true;
     }
 
-    public HashMap getDevices() {
-        synchronized (m_deviceList) {
-            HashMap devices = new HashMap();
-            for (Iterator i = m_deviceList.keySet().iterator(); i.hasNext();) {
-                String udn = (String) i.next();
-                UPnPDeviceImpl device = (UPnPDeviceImpl) m_deviceList.get(udn);
-                if (device.isReady()) {
-                    devices.put(device.getUuid(), device);
-                }
-            }
-            return devices;
-        }
+    public Map<String, UPnPDeviceImpl> getDevices() {
+        return m_deviceList.values()
+                .stream()
+                .filter(d -> d.isReady())
+                .collect(Collectors.toMap(d -> d.getUuid(), Function.identity()));
     }
 
     // Send SSDP M-SEARCH request to 239.255.255.255:1900 and listen for responses
     private Thread startSearchThread(final SocketAddress bindaddr) {
-        Thread t = new Thread() {
+        Thread thread = new Thread() {
             @Override
             public void run() {
                 DatagramSocket socket;
@@ -165,8 +159,6 @@ public class UPnPDeviceMgr {
                         } catch (IOException e) {
                             log.warn(e.getMessage(), e);
                         }
-
-                        Vector answers = new Vector();
                         byte[] buf = new byte[20000];
                         DatagramPacket dp = new DatagramPacket(buf, buf.length);
 
@@ -195,21 +187,19 @@ public class UPnPDeviceMgr {
                         }
 
                         // Remove stale devices
-                        HashMap devices = getDevices();
-                        for (Iterator i = devices.values().iterator(); i.hasNext();) {
-                            UPnPDeviceImpl device = ((UPnPDeviceImpl) i.next());
-                            if (!device.isAlive()) {
-                                removeUPnPDeviceInstance(device);
-                            }
-                        }
+                        getDevices()
+                                .values()
+                                .stream()
+                                .filter(device -> !device.isAlive())
+                                .forEach(device -> removeUPnPDeviceInstance(device));
                     } catch (Exception e) {
                         log.warn("Got exception in search thread", e);
                     }
                 }
             }
         };
-        t.start();
-        return t;
+        thread.start();
+        return thread;
     }
 
     private void startListenOnMulticast() {
@@ -221,7 +211,6 @@ public class UPnPDeviceMgr {
                     m_listenSocket.joinGroup(InetAddress.getByName(SSDP_ADDRESS));
                     m_listenSocket.setBroadcast(true);
 
-                    Vector answers = new Vector();
                     byte[] buf = new byte[m_listenSocket.getReceiveBufferSize()];
                     DatagramPacket dp = new DatagramPacket(buf, buf.length);
 
@@ -277,28 +266,17 @@ public class UPnPDeviceMgr {
     }
 
     private UPnPDeviceImpl getDevice(String uuid) {
-        synchronized (m_deviceList) {
-            return (UPnPDeviceImpl) m_deviceList.get(uuid.toLowerCase());
-        }
+        return m_deviceList.get(uuid.toLowerCase());
     }
 
     private void removeUPnPDeviceInstance(UPnPDeviceImpl device) {
-        synchronized (m_deviceList) {
-            UPnPDeviceImpl oldDevice = getDevice(device.getUuid());
-            if (oldDevice == null) {
-                m_deviceList.remove(device.getUuid().toLowerCase());
-                log.debug("Remove device which broadcasted byebye: " + device.getUuid());
-            }
-        }
-
+        m_deviceList.remove(device.getUuid().toLowerCase());
         device.stop();
     }
 
     private void addUPnPDeviceInstance(UPnPDeviceImpl device) {
         log.debug("Add device which broadcasted itself: " + device.getUuid());
-        synchronized (m_deviceList) {
-            m_deviceList.put(device.getUuid().toLowerCase(), device);
-        }
+        m_deviceList.put(device.getUuid().toLowerCase(), device);
 
         try {
             device.start();

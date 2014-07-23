@@ -46,8 +46,6 @@ import java.util.Set;
 
 public class CoAPExtEndpoint extends LocalCoAPEndpoint {
 
-    static final private String THIS_CLASS_NAME = CoAPExtEndpoint.class.getSimpleName();
-
     //final private LogTracker logger;
     final private Set<IncomingCoAPRequestListener> reqListenerSet;
 

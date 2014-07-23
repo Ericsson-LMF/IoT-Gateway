@@ -84,7 +84,7 @@ public interface GenericDevice extends GDContextNode {
      */
     @JsonProperty("ID")
     @JsonView(View.ID.class)
-     String getId();
+    String getId();
 
     /**
      * Sets the URN of this device. The URN will be persisted.
@@ -92,7 +92,7 @@ public interface GenericDevice extends GDContextNode {
      * @param URN
      */
     @JsonProperty("URN")
-     void setURN(String URN);
+    void setURN(String URN);
 
     /**
      * Gets the URN of this device.

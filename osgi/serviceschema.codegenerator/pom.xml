@@ -55,17 +55,16 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.ericsson.deviceaccess</groupId>
             <artifactId>serviceschema.xmlparser</artifactId>
             <version>1.42-SNAPSHOT</version>
             <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.ericsson.research.connectedhome</groupId>
-            <artifactId>common.util</artifactId>
-            <version>1.20-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

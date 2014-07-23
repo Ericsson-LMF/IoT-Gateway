@@ -89,7 +89,7 @@ public enum UPnPUtils {
         if (value == null && upnpType.equals("string")) {
             value = "";
         }
-        if ((value == null) || (upnpType == null)) {
+        if (value == null || upnpType == null) {
             throw new NullPointerException("Must be specified a valid value and upnpType");
         }
 
@@ -180,9 +180,9 @@ public enum UPnPUtils {
     private static String normalizeTimeZone(String value) {
         if (value.endsWith("Z")) {
             value = value.substring(0, value.length() - 1) + "+0000";
-        } else if ((value.length() > 7)
-                && (value.charAt(value.length() - 3) == ':')
-                && ((value.charAt(value.length() - 6) == '-') || (value.charAt(value.length() - 6) == '+'))) {
+        } else if (value.length() > 7
+                && value.charAt(value.length() - 3) == ':'
+                && (value.charAt(value.length() - 6) == '-' || value.charAt(value.length() - 6) == '+')) {
 
             value = value.substring(0, value.length() - 3) + value.substring(value.length() - 2);
         }
@@ -200,11 +200,9 @@ public enum UPnPUtils {
             position = new ParsePosition(0);
             SimpleDateFormat sdt = new SimpleDateFormat(timeFormat);
             d = sdt.parse(value, position);
-            if (d != null) {
-                if (position.getIndex() >= value.length()) {
-                    choosedIndex[0] = timeFormat;
-                    return d;
-                }
+            if (d != null && position.getIndex() >= value.length()) {
+                choosedIndex[0] = timeFormat;
+                return d;
             }
         }
         throw new ParseException("Error parsing " + value, position.getIndex());

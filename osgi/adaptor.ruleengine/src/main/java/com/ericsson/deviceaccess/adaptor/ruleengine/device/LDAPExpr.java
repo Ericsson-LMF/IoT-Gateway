@@ -175,7 +175,7 @@ public class LDAPExpr {
             ps.skipWhite();
         } while (ps.peek() == '(');
         int n = v.size();
-        if (!ps.prefix(")") || n == 0 || (operator == NOT && n > 1)) {
+        if (!ps.prefix(")") || n == 0 || operator == NOT && n > 1) {
             ps.error(MALFORMED);
         }
         LDAPExpr[] args = new LDAPExpr[n];

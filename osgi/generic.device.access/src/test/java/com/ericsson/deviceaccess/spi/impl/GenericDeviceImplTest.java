@@ -45,7 +45,6 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.HashMap;
-import junit.framework.Assert;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -189,7 +188,7 @@ public class GenericDeviceImplTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 

@@ -79,7 +79,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = (value >> 1);
+            value = value >> 1;
         }
 
         if (bitsNeeded <= 4) {
@@ -165,14 +165,14 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         }
 
         this.blockNumber = decodedBlockNumber;
-        this.mFlag = (decodedMFlag != 0);
+        this.mFlag = decodedMFlag != 0;
         this.szx = szxByte;
 
         int value = blockNumber;
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = (value >> 1);
+            value = value >> 1;
         }
 
         if (bitsNeeded <= 4) {
@@ -254,7 +254,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         } else if (length == 2) {
 
             byte[] split = BitOperations.splitIntToBytes(blockNumber);
-            int blockNumberShifted = (blockNumber << 4);
+            int blockNumberShifted = blockNumber << 4;
             split = BitOperations.splitIntToBytes(blockNumberShifted);
             stream.write(split[2]);
 

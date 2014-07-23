@@ -163,7 +163,7 @@ public class CoAPActivator implements BundleActivator {
                     //logger.debug("Local address is now [" + address.toString()
                     //		+ "]");
 
-                } catch (java.net.UnknownHostException e) {
+                } catch (UnknownHostException e) {
                     e.printStackTrace();
                     throw new CoAPException(e);
                 }
@@ -227,7 +227,7 @@ public class CoAPActivator implements BundleActivator {
                 discoveryPort = 5683;
                 discovery = InetAddress.getByName("ff02::1:fe00:1");
                 discoveryInterval = 60;
-            } catch (java.net.UnknownHostException e) {
+            } catch (UnknownHostException e) {
                 e.printStackTrace();
                 // throw new CoAPException(e);
             }

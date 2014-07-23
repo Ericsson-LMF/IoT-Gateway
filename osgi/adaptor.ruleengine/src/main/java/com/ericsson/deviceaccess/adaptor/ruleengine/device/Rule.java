@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
+import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.adaptor.ruleengine.Activator;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
@@ -232,7 +233,7 @@ public class Rule {
         float time = hourOfDay + minute / 60;
 
         if (startTimeFloat < stopTimeFloat) {
-            return (time >= startTimeFloat && time < stopTimeFloat);
+            return time >= startTimeFloat && time < stopTimeFloat;
         } else {
             if (time >= startTimeFloat) {
                 return true;
@@ -335,13 +336,13 @@ public class Rule {
         timer = new Timer();
 
         if (startTime != null && !startTime.trim().isEmpty()) {
-            callTimer(startTime, "start");
+            callTimer(startTime, Condition.START);
         } else if (stopTime != null && !stopTime.trim().isEmpty()) {
-            callTimer(stopTime, "stop");
+            callTimer(stopTime, Condition.STOP);
         }
     }
 
-    private void callTimer(String time, String condition) {
+    private void callTimer(String time, Condition condition) {
         try {
             int idx = time.indexOf(':');
             if (idx <= 0) {
@@ -359,21 +360,18 @@ public class Rule {
                 triggerDate = new Date(triggerDate.getTime() + 24 * 3600000);
             }
             System.out.println(triggerDate);
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    if (ldapFilter.evaluate(PropertyManager.INSTANCE.getDeviceProperties(), true)) {
-                        switch (condition) {
-                            case "start":
-                                invokeStart();
-                                break;
-                            case "stop":
-                                invokeStop();
-                                break;
-                        }
+            TimerTask task = FunctionalUtil.timerTask(() -> {
+                if (ldapFilter.evaluate(PropertyManager.INSTANCE.getDeviceProperties(), true)) {
+                    switch (condition) {
+                        case START:
+                            invokeStart();
+                            break;
+                        case STOP:
+                            invokeStop();
+                            break;
                     }
                 }
-            };
+            });
             timer.scheduleAtFixedRate(task, triggerDate, 24 * 3600000);
         } catch (Exception e) {
         }
@@ -393,5 +391,10 @@ public class Rule {
     @Override
     public String toString() {
         return "Rule: " + name;
+    }
+
+    private static enum Condition {
+
+        START, STOP;
     }
 }

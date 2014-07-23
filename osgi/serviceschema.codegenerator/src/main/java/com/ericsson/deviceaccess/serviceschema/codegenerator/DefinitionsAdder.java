@@ -124,19 +124,17 @@ public enum DefinitionsAdder {
                 if (defaultStr != null) {
                     parameterBlock.add("p.setDefault(\"").append(defaultStr).append("\");");
                 }
-                if (isString) {
-                    if (parameter.isSetValues()) {
-                        parameterBlock.addBlock("p.setValidValues(new String[]", defaultBlock -> {
-                            boolean first = true;
-                            for (String value : parameter.getValues().getValueArray()) {
-                                if (!first) {
-                                    defaultBlock.append(",");
-                                }
-                                first = false;
-                                defaultBlock.add("\"").append(value).append('"');
+                if (isString && parameter.isSetValues()) {
+                    parameterBlock.addBlock("p.setValidValues(new String[]", defaultBlock -> {
+                        boolean first = true;
+                        for (String value : parameter.getValues().getValueArray()) {
+                            if (!first) {
+                                defaultBlock.append(",");
                             }
-                        }).append(");");
-                    }
+                            first = false;
+                            defaultBlock.add("\"").append(value).append('"');
+                        }
+                    }).append(");");
                 }
                 if (parameter.isSetMin()) {
                     parameterBlock.add("p.setMinValue(\"").append(parameter.getMin()).append("\");");

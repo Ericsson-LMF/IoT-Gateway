@@ -340,21 +340,18 @@ public abstract class CoAPMessage {
         }
 
         // If Uri-Path, it should contain only one segment of the absolute path
-        if (header.getOptionNumber() == CoAPOptionName.URI_PATH.getNo()) {
+        if (header.getOptionNumber() == CoAPOptionName.URI_PATH.getNo() && header.getLength() > 0) {
+            String path = new String(header.getValue());
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
 
-            if (header.getLength() > 0) {
-                String path = new String(header.getValue());
-                if (path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-
-                if (path.contains("/")) {
-                    /*
-                     CoAPActivator.logger
-                     .warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
-                     */
-                    return false;
-                }
+            if (path.contains("/")) {
+                /*
+                 CoAPActivator.logger
+                 .warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
+                 */
+                return false;
             }
         }
 
@@ -381,7 +378,7 @@ public abstract class CoAPMessage {
         // etag once in a response
         if (header.getOptionNumber() == CoAPOptionName.ETAG.getNo()
                 && this.findOptionHeader(CoAPOptionName.ETAG) != null
-                && (this instanceof CoAPResponse)) {
+                && this instanceof CoAPResponse) {
             /*
              CoAPActivator.logger
              .info("Etag header already included in the message");
@@ -566,7 +563,7 @@ public abstract class CoAPMessage {
             Random rand = new Random();
 
             // Both max & min values are inclusive, that's why +1
-            this.timeout = rand.nextInt((max + 1) - min) + min;
+            this.timeout = rand.nextInt(max + 1 - min) + min;
         }
     }
 
@@ -580,10 +577,7 @@ public abstract class CoAPMessage {
             this.retransmissions++;
             this.timeout *= 2;
         } else if (retransmissions == 4) {
-            /*
-             CoAPActivator.logger
-             .debug("Max nof retransmission reached (4), cancel this message");
-             */
+            //CoAPActivator.logger.debug("Max nof retransmission reached (4), cancel this message");
         }
     }
 

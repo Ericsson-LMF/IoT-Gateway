@@ -187,6 +187,7 @@ public class NanoHTTPD {
     }
 
     private class HTTPSession implements Runnable {
+
         private Socket mySocket;
 
         HTTPSession(Socket s) {
@@ -281,7 +282,7 @@ public class NanoHTTPD {
                             if (st.hasMoreTokens()) {
                                 contentType = st.nextToken();
                             }
-                            
+
                             // Handle application/x-www-form-urlencoded
                             String postLine = "";
                             char pbuf[] = new char[512];
@@ -455,7 +456,7 @@ public class NanoHTTPD {
                         int pending = data.available();	// This is to support partial sends, see serveFile()
                         byte[] buff = new byte[2048];
                         while (pending > 0) {
-                            int read = data.read(buff, 0, ((pending > 2048) ? 2048 : pending));
+                            int read = data.read(buff, 0, pending > 2048 ? 2048 : pending);
                             if (read <= 0) {
                                 break;
                             }

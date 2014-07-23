@@ -98,7 +98,7 @@ public class CoAPRequestTest extends TestCase {
             uri = req.getUriFromRequest();
             assertNotNull(uri);
 
-            assert (uri.getPort() == port);
+            assert uri.getPort() == port;
             assertEquals(uri.getHost(), host);
             // Check with different paths, with and without leading slash
             assertEquals(uri.getPath(), "/" + path);
@@ -137,7 +137,7 @@ public class CoAPRequestTest extends TestCase {
             req.addOptionHeader(pathOpt);
 
             uri = req.getUriFromRequest();
-            assertEquals((firstPart + "/" + secondPart), uri.getPath());
+            assertEquals(firstPart + "/" + secondPart, uri.getPath());
 
             req.removeOptionHeader(pathOpt);
             secondPart = "/secondPart";
@@ -146,7 +146,7 @@ public class CoAPRequestTest extends TestCase {
             req.addOptionHeader(pathOpt);
 
             uri = req.getUriFromRequest();
-            assertEquals((firstPart + secondPart), uri.getPath());
+            assertEquals(firstPart + secondPart, uri.getPath());
 
         } catch (CoAPException e) {
             e.printStackTrace();

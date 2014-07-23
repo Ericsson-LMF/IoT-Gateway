@@ -69,19 +69,19 @@ public final class Base64 {
     }
 
     protected static boolean isWhiteSpace(char octect) {
-        return (octect == 0x20 || octect == 0xd || octect == 0xa || octect == 0x9);
+        return octect == 0x20 || octect == 0xd || octect == 0xa || octect == 0x9;
     }
 
     protected static boolean isPad(char octect) {
-        return (octect == PAD);
+        return octect == PAD;
     }
 
     protected static boolean isData(char octect) {
-        return (octect < BASELENGTH && base64Alphabet[octect] != -1);
+        return octect < BASELENGTH && base64Alphabet[octect] != -1;
     }
 
     protected static boolean isBase64(char octect) {
-        return (isWhiteSpace(octect) || isPad(octect) || isData(octect));
+        return isWhiteSpace(octect) || isPad(octect) || isData(octect);
     }
 
     /**
@@ -196,7 +196,7 @@ public final class Base64 {
             return null;//should be divisible by four
         }
 
-        int numberQuadruple = (len / FOURBYTE);
+        int numberQuadruple = len / FOURBYTE;
 
         if (numberQuadruple == 0) {
             return new byte[0];
@@ -239,8 +239,7 @@ public final class Base64 {
 
         d3 = base64Data[dataIndex++];
         d4 = base64Data[dataIndex++];
-        if (!isData((d3))
-                || !isData((d4))) {//Check if they are PAD characters
+        if (!isData(d3) || !isData(d4)) {//Check if they are PAD characters
             if (isPad(d3) && isPad(d4)) {               //Two PAD e.g. 3c[Pad][Pad]
                 if ((b2 & 0xf) != 0) {//last 4 bits should be zero
                     return null;

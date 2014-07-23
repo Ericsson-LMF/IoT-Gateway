@@ -112,7 +112,7 @@ public class CoAPOptionHeaderConverter {
                     long longValue = this.convertIntToUnsignedLong(header);
                     // More details for debug (Ryoji)
                     //value = Long.toString(longValue);
-                    long num = (longValue >> 4);
+                    long num = longValue >> 4;
                     long m = (longValue >> 3) & 0x1L;
                     long szx = longValue & 7L;
                     return Long.toString(longValue) + " (Num=" + Long.toString(num) + "/M=" + Long.toString(m)
@@ -130,7 +130,7 @@ public class CoAPOptionHeaderConverter {
         boolean isHex = false;
         try {
             // try to parse the string to an integer, using 16 as radix
-            int hexInt = Integer.parseInt(in, 16);
+            Integer.parseInt(in, 16);
             isHex = true;
         } catch (NumberFormatException e) {
             return isHex;

@@ -162,7 +162,6 @@ public class Main implements Runnable {
         }
     }
 
-
     private String parsePackageName(String path) {
         return DIRECTORY + path.split(DIRECTORY)[1];
     }

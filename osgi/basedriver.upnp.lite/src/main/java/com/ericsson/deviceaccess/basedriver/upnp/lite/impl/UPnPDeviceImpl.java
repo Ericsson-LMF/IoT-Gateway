@@ -34,17 +34,18 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
+import com.ericsson.commonutil.LegacyUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import org.kxml2.io.KXmlParser;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -70,17 +71,17 @@ public class UPnPDeviceImpl implements UPnPDevice {
     private String m_ip = null;
     private int m_port = 0;
     private String m_location = null;
-    private HashMap m_services = new HashMap();
+    private final Map<String, UPnPService> m_services = new HashMap<>();
     private String m_descriptionXML;
     private long m_timestamp;
     private boolean isReady = false;
-    private Vector m_icons = new Vector();
-    private String m_localIp;
-    private UPnPEventHandler m_eventHandler;
-    private BundleContext context;
+    private final List<UPnPIcon> m_icons = new ArrayList<>();
+    private final String m_localIp;
+    private final UPnPEventHandler m_eventHandler;
+    private final BundleContext context;
     private ServiceRegistration sr = null;
-    private Dictionary<String, Object> props = new Hashtable<>();
-    private Map<String, String> map = new HashMap();
+    private final Map<String, Object> props = new HashMap<>();
+    private final Map<String, String> map = new HashMap();
 
     {
         put("friendlyName", FRIENDLY_NAME);
@@ -108,26 +109,26 @@ public class UPnPDeviceImpl implements UPnPDevice {
 
     @Override
     public UPnPIcon[] getIcons(String locale) {
-        return (UPnPIcon[]) m_icons.toArray(new UPnPIcon[m_icons.size()]);
+        return m_icons.toArray(new UPnPIcon[m_icons.size()]);
     }
 
     @Override
     public Dictionary getDescriptions(String locale) {
-        return props;
+        return LegacyUtil.toDictionary(props);
     }
 
     @Override
     public UPnPService[] getServices() {
-        return (UPnPService[]) m_services.values().toArray(new UPnPService[0]);
+        return m_services.values().toArray(new UPnPService[0]);
     }
 
     @Override
     public UPnPService getService(String serviceId) {
-        return (UPnPService) m_services.get(serviceId);
+        return m_services.get(serviceId);
     }
 
-    public UPnPIconImpl[] getIcons() {
-        return (UPnPIconImpl[]) m_icons.toArray(new UPnPIconImpl[m_icons.size()]);
+    public UPnPIcon[] getIcons() {
+        return m_icons.toArray(new UPnPIcon[m_icons.size()]);
     }
 
     // Returns false if no response has been received from the device within two minutes
@@ -188,9 +189,10 @@ public class UPnPDeviceImpl implements UPnPDevice {
             sr.unregister();
         }
 
-        for (Iterator i = m_services.values().iterator(); i.hasNext();) {
-            ((UPnPServiceImpl) i.next()).stop();
-        }
+        m_services.values()
+                .stream()
+                .map(s -> (UPnPServiceImpl) s)
+                .forEach(s -> s.stop());
     }
 
     private void put(String key, String value) {
@@ -296,10 +298,10 @@ public class UPnPDeviceImpl implements UPnPDevice {
                     }
 
                     // Find the icon with the highest resolution of type png or jpg and put this as a property to be used by the UPnP Adaptor
-                    UPnPIconImpl[] icons = getIcons();
-                    UPnPIconImpl bestMatch = null;
+                    UPnPIcon[] icons = getIcons();
+                    UPnPIcon bestMatch = null;
                     int bestMatchSum = 0;
-                    for (UPnPIconImpl icon : icons) {
+                    for (UPnPIcon icon : icons) {
                         if (icon.getMimeType().equalsIgnoreCase("image/jpeg") || icon.getMimeType().equalsIgnoreCase("image/png")) {
                             int iconSum = icon.getHeight() * icon.getWidth() * icon.getDepth();
                             if (bestMatch == null || bestMatchSum < iconSum) {
@@ -310,13 +312,13 @@ public class UPnPDeviceImpl implements UPnPDevice {
                     }
 
                     if (bestMatch != null) {
-                        props.put("GDA_ICON", bestMatch.getUrl());
+                        props.put("GDA_ICON", ((UPnPIconImpl) bestMatch).getUrl());
                     }
 
                     isReady = true;
                     log.debug("Finished with " + getUuid() + "(" + props.get(FRIENDLY_NAME) + ")");
 
-                    sr = context.registerService(UPnPDevice.class, self, props);
+                    sr = context.registerService(UPnPDevice.class, self, LegacyUtil.toDictionary(props));
                 } catch (Exception e) {
                     log.warn(e.getMessage(), e);
                 }

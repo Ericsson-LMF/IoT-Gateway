@@ -208,10 +208,8 @@ public class UPnPActionImpl implements UPnPAction {
                             ret.put(tagName, val);
                         }
                     }
-                } else if (p.getEventType() == XmlPullParser.END_TAG) {
-                    if (p.getName().equalsIgnoreCase(responseTag)) {
-                        inResponseTag = false;
-                    }
+                } else if (p.getEventType() == XmlPullParser.END_TAG && p.getName().equalsIgnoreCase(responseTag)) {
+                    inResponseTag = false;
                 }
                 p.next();
             }

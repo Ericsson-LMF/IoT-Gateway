@@ -12,25 +12,24 @@ public interface View {
     /**
      * Used as View to whitelist identification
      */
-    public interface ID {
+    interface ID {
 
         /**
          * Used as View to blacklist identification
          */
-        public static class Ignore implements Stateless {
+        class Ignore implements Stateless {
         }
     }
 
-    public interface Stateless {
+    interface Stateless {
 
-        public static class Ignore implements ID {
+        class Ignore implements ID {
         }
     }
 
-    public interface StatelessID extends ID, Stateless {
+    interface StatelessID extends ID, Stateless {
 
-        public static class Ignore {
-
+        class Ignore {
         }
     }
 }

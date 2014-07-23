@@ -14,7 +14,6 @@ import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Modifierable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Param;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.AccessModifier;
-import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.ClassModifier.INTERFACE;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.modifiers.OptionalModifier;
 import java.util.ArrayList;
@@ -174,7 +173,7 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
         modifiers.forEach(m -> builder.append(m.get()).append(" "));
         builder.append(type).append(" ").append(name).append("(").append(buildParameters()).append(")");
         addThrows(builder);
-        boolean isAbstract = modifiers.contains(OptionalModifier.ABSTRACT) || (owner != null && owner.getClassModifier() == ClassModifier.INTERFACE);
+        boolean isAbstract = modifiers.contains(OptionalModifier.ABSTRACT) || owner != null && owner.getClassModifier() == INTERFACE;
         if (isAbstract) {
             builder.append(STATEMENT_END).append(LINE_END);
             return true;

@@ -285,7 +285,7 @@ public abstract class GenericDeviceImpl extends GenericDevice.Stub implements Ge
         checkPermission(GenericDevice.class, Type.SET);
         State oldState = this.state;
         this.state = state;
-        if (isReady && ((state == null && oldState != null) || (state != null && !state.equals(oldState)))) {
+        if (isReady && (state == null && oldState != null || state != null && !state.equals(oldState))) {
             notifyEvent("DeviceProperties", new HashMap() {
                 {
                     put(GDEventListener.DEVICE_STATE, GenericDeviceImpl.this.state);

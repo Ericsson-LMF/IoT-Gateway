@@ -39,10 +39,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.IncomingCoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.ACKNOWLEDGEMENT;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.CONFIRMABLE;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.NON_CONFIRMABLE;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.RESET;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMethodCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
@@ -59,10 +55,7 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.BAD_REQUEST;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.CONTENT;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.NOT_FOUND;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.NOT_IMPLEMENTED;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
@@ -168,8 +161,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 // If size of the request is larger than default max size, split
                 // into smaller blocks
                 byte[] payload = request.getPayload();
-                //TODO: Should this be: (payload != null && payload.length > maxBlockSize) && (block2Request || block1Request)
-                if ((payload != null && payload.length > maxBlockSize) || block2Request || block1Request) {
+                //TODO: Should this be (payload != null && payload.length > maxBlockSize) && (block2Request || block1Request)?
+                if (payload != null && payload.length > maxBlockSize || block2Request || block1Request) {
 
                     int szx = maxSzx;
                     int blockNumber = 0;
@@ -227,10 +220,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                     return;
                 }
 
-                /*
-                 CoAPActivator.logger
-                 .debug("Option headers match, use cached response");
-                 */
+                //CoAPActivator.logger.debug("Option headers match, use cached response");
                 CoAPResponse response = resp.getCachedResponse();
 
                 // Remove old headers from the response and replace with updated
@@ -254,29 +244,26 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 options.add(new CoAPOptionHeader(MAX_AGE, maxAgeBytes));
                 // Notify listener
                 CoAPMessageType type = response.getMessageType();
-                if (type == CONFIRMABLE || type == NON_CONFIRMABLE) {
-
+                if (type == CoAPMessageType.CONFIRMABLE || type == CoAPMessageType.NON_CONFIRMABLE) {
                     // Cache response
                     // Check the response code to check conditions for caching
                     if (obsHandler.isObserved(request.getUriFromRequest())) {
                         obsHandler.handleObserveResponse(request, response);
                         return;
                     }
-
                     // Notify listener
                     CoAPRequestListener listener = request.getListener();
                     if (listener != null) {
                         listener.separateResponseReceived(response, request);
                     }
-                } else if (type == ACKNOWLEDGEMENT) {
+                } else if (type == CoAPMessageType.ACKNOWLEDGEMENT) {
                     if (obsHandler.isObserved(request.getUriFromRequest())) {
                         obsHandler.handleObserveResponse(request, response);
                         return;
                     }
-
                     // Check for block options
-                    List<CoAPOptionHeader> block2 = response.getOptionHeaders(BLOCK2);
                     List<CoAPOptionHeader> block1 = response.getOptionHeaders(BLOCK1);
+                    List<CoAPOptionHeader> block2 = response.getOptionHeaders(BLOCK2);
 
                     if (!block1.isEmpty()) {
                         // TODO
@@ -362,17 +349,14 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                         // throw new RuntimeException("Invalid Block2 option", e);
                         // XXX: Move on
                     }
-                } else if (TOKEN == optionName) {
-                    if (!hasTokenOption) {
-                        CoAPOptionHeader tokenOptionHeader = new CoAPOptionHeader(TOKEN, optionHeader.getValue());
-                        response.addOptionHeader(tokenOptionHeader);
-                    }
+                } else if (TOKEN == optionName && !hasTokenOption) {
+                    response.addOptionHeader(new CoAPOptionHeader(TOKEN, optionHeader.getValue()));
                 }
             }
         }
 
         /* cache payload if long enough */
-        if (!dontCache && request != null && !hasBlock2Option && (payload != null && payload.length > CoAPUtil.getBlockSize(szx))) {
+        if (!dontCache && request != null && !hasBlock2Option && payload != null && payload.length > CoAPUtil.getBlockSize(szx)) {
             /*
              CoAPActivator.logger.debug("Cache blockwise response: ");
              */
@@ -384,7 +368,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             }
         }
 
-        if (hasBlock2Option || (payload != null && payload.length > CoAPUtil.getBlockSize(szx))) {
+        if (hasBlock2Option || payload != null && payload.length > CoAPUtil.getBlockSize(szx)) {
             response = blockHandler.createBlockwiseResponse(response, blockNumber, szx);
         }
         outHandler.send(response, false);
@@ -398,12 +382,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      */
     @Override
     public void handleRequest(CoAPRequest request) {
-		// TODO handle different type of requests differently
-		/*
-         CoAPActivator.logger.debug("handleRequest() : Received ["
-         + request.getMessageType().getName() + "] request");
-
-         */
+	// TODO handle different type of requests differently
+        //CoAPActivator.logger.debug("handleRequest() : Received [" + request.getMessageType().getName() + "] request");
 
         // look up blockwise response cache if Request is GET and has Block2 option
         int code = request.getCode();
@@ -416,14 +396,12 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
                     byte[] payload = sessionData.getPayload();
                     if (payload != null) {
-                        /*
-                         CoAPActivator.logger.debug("Cached blockwise response found");
-                         */
+                        //CoAPActivator.logger.debug("Cached blockwise response found");
                         CoAPMessageType type = request.getMessageType();
-                        //TODO: getResponseType
+                        //TODO: Replace with getResponseType?
                         CoAPMessageType msgType
-                                = (type == CONFIRMABLE) ? ACKNOWLEDGEMENT
-                                : ((type == NON_CONFIRMABLE) ? NON_CONFIRMABLE : null);
+                                = type == CoAPMessageType.CONFIRMABLE ? CoAPMessageType.ACKNOWLEDGEMENT
+                                : type == CoAPMessageType.NON_CONFIRMABLE ? CoAPMessageType.NON_CONFIRMABLE : null;
                         if (msgType != null) {
                             CoAPResponse response = new CoAPResponse(
                                     1, /* version */
@@ -442,30 +420,28 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         }
 
         try {
-            if (request.getUriFromRequest().getPath().startsWith(WELLKNOWN_CORE)
-                    && request.getCode() == 1) {
+            if (request.getUriFromRequest().getPath().startsWith(WELLKNOWN_CORE) && request.getCode() == 1) {
                 replyToResourceDiscovery(request);
                 return;
             }
         } catch (CoAPException e) {
             e.printStackTrace();
-            this.replyWithNotImplemented(request);
+            replyWithNotImplemented(request);
             return;
         }
 
         // request type can be confirmable or non-confirmable
-        if (request.getMessageType() == CONFIRMABLE) {
-            // Reply for now with a not implemented response code
-            // if no listeners are found.
+        if (request.getMessageType() == CoAPMessageType.CONFIRMABLE) {
+            // Reply for now with a not implemented response code if no listeners are found.
             Object[] services = CoAPActivator.incomingCoAPTracker.getServices();
             if (services != null) {
                 for (Object s : services) {
                     ((IncomingCoAPRequestListener) s).incomingRequestReceived(request);
                 }
             } else {
-                this.replyWithNotImplemented(request);
+                replyWithNotImplemented(request);
             }
-        } else if (request.getMessageType() == NON_CONFIRMABLE) {
+        } else if (request.getMessageType() == CoAPMessageType.NON_CONFIRMABLE) {
             Object[] services = CoAPActivator.incomingCoAPTracker.getServices();
             if (services != null) {
                 for (Object s : services) {
@@ -484,14 +460,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      */
     @Override
     public void handleResponse(CoAPResponse resp) throws CoAPException {
-        /*
-         CoAPActivator.logger.info("CoAP response of type ["
-         + resp.getMessageType().toString() + "] received");
-         */
-
-        List<CoAPOptionHeader> headers = resp.getOptionHeaders();
-
-        headers.stream().forEach(h -> {
+        //CoAPActivator.logger.info("CoAP response of type [" + resp.getMessageType().toString() + "] received");
+        resp.getOptionHeaders().forEach(h -> {
             CoAPOptionHeaderConverter converter = new CoAPOptionHeaderConverter();
             /*
              String headerValue = "";
@@ -503,13 +473,12 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         });
 
         CoAPMessageType type = resp.getMessageType();
-        if (type == RESET) {
+        if (type == CoAPMessageType.RESET) {
             handleReset(resp);
-        } else if (type == CONFIRMABLE
-                || type == NON_CONFIRMABLE) {
+        } else if (type == CoAPMessageType.CONFIRMABLE
+                || type == CoAPMessageType.NON_CONFIRMABLE) {
             handleConAndNon(resp);
-
-        } else if (type == ACKNOWLEDGEMENT) {
+        } else if (type == CoAPMessageType.ACKNOWLEDGEMENT) {
             handleAck(resp);
         }
     }
@@ -517,11 +486,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     public CoAPRequest createCoAPRequest(CoAPMessageType messageType,
             int methodCode, InetSocketAddress address, URI uri,
             CoAPOptionHeader tokenHeader) throws CoAPException {
-        /*
-         CoAPActivator.logger.debug("Create CoAP request");
-         */
-
-        int messageId = this.outHandler.generateMessageId();
+        //CoAPActivator.logger.debug("Create CoAP request");
+        int messageId = outHandler.generateMessageId();
         CoAPRequest req = new CoAPRequest(messageType, methodCode, messageId);
         req.setUri(uri);
         req.setSocketAddress(address);
@@ -536,8 +502,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             path = uri.getPath();
         }
 
-        CoAPOptionHeader hostOpt = new CoAPOptionHeader(URI_HOST, host.getBytes());
-        req.addOptionHeader(hostOpt);
+        req.addOptionHeader(new CoAPOptionHeader(URI_HOST, host.getBytes()));
 
         if (uri.getPort() != -1) {
             byte[] portBytes = BitOperations.splitIntToBytes(uri.getPort());
@@ -624,9 +589,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     private void handleReset(CoAPResponse resp) throws CoAPException {
         CoAPRequest originalRequest = matchBasedOnIdentifier(resp);
         if (originalRequest == null) {
-            /*
-             CoAPActivator.logger.warn("[RESET] Matching request was not found");
-             */
+            //CoAPActivator.logger.warn("[RESET] Matching request was not found");
             return;
         }
         if (resp.isCacheable()) {
@@ -645,7 +608,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param resp response that is an acknowledgement
      */
     private void handleAck(CoAPResponse resp) throws CoAPException {
-        CoAPRequest originalRequest = this.matchBasedOnIdentifier(resp);
+        CoAPRequest originalRequest = matchBasedOnIdentifier(resp);
         if (originalRequest == null) {
             // Reply with a RESET message??
             //CoAPActivator.logger.warn("[ACK] Matching request was not found");
@@ -714,13 +677,11 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         }
 
         if (originalRequest == null) {
-            /*
-             CoAPActivator.logger.warn("[ConAndNon] Matching request was not found");
-             */
+            //CoAPActivator.logger.warn("[ConAndNon] Matching request was not found");
 
             // If no matching request can be found for a confirmable response,
             // reply with a reset
-            if (resp.getMessageType() == CONFIRMABLE) {
+            if (resp.getMessageType() == CoAPMessageType.CONFIRMABLE) {
                 sendResponse(resp.createReset());
             }
             return;
@@ -800,10 +761,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param uri URI identifying the response to be removed
      */
     protected void removeCachedResponse(URI uri) {
-        /*
-         CoAPActivator.logger.debug("Cached response for resource at ["
-         + uri.toString() + "] expired, remove from cache");
-         */
+        //CoAPActivator.logger.debug("Cached response for resource at [" + uri.toString() + "] expired, remove from cache");
         inResponseCache.remove(uri);
     }
 
@@ -822,11 +780,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         long maxAge = resp.getMaxAge();
         CachedResponse task = new CachedResponse(resp, originalRequest);
 
-        /*
-         CoAPActivator.logger.debug("Cache response for resource at ["
-         + originalRequest.getUriFromRequest().toString()
-         + "] for [" + maxAge + "] seconds");
-         */
+        //CoAPActivator.logger.debug("Cache response for resource at [" + originalRequest.getUriFromRequest().toString() + "] for [" + maxAge + "] seconds");
         // Cache response based on the max-age option
         inResponseCache.put(originalRequest.getUriFromRequest(), task);
         try {
@@ -864,7 +818,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             if (split.length > 1) {
                 attributes.put(split[0], split[1]);
             } else {
-                CoAPResponse resp = new CoAPResponse(1, req, messageType, BAD_REQUEST);
+                CoAPResponse resp = new CoAPResponse(1, req, messageType, CoAPResponseCode.BAD_REQUEST);
                 outHandler.send(resp, false);
                 return;
             }
@@ -892,21 +846,21 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 outputStream.write(contentTypeBytes[1]);
 
                 CoAPOptionHeader header = new CoAPOptionHeader(CONTENT_TYPE, outputStream.toByteArray());
-                resp = new CoAPResponse(1, messageType, CONTENT, req.getMessageId());
+                resp = new CoAPResponse(1, messageType, CoAPResponseCode.CONTENT, req.getMessageId());
                 if (tokenHeader != null) {
                     resp.addOptionHeader(tokenHeader);
                 }
                 resp.setPayload(payloadStr.toString().getBytes(StandardCharsets.UTF_8));
                 resp.addOptionHeader(header);
             } else {
-                resp = new CoAPResponse(1, messageType, NOT_FOUND, req.getMessageId());
+                resp = new CoAPResponse(1, messageType, CoAPResponseCode.NOT_FOUND, req.getMessageId());
                 if (tokenHeader != null) {
                     resp.addOptionHeader(tokenHeader);
                 }
             }
 
             resp.setSocketAddress(req.getSocketAddress());
-            this.outHandler.send(resp, false);
+            outHandler.send(resp, false);
         } catch (CoAPException e) {
             e.printStackTrace();
         }
@@ -920,10 +874,10 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      */
     private CoAPMessageType getResponseType(CoAPRequest req) {
         CoAPMessageType type = req.getMessageType();
-        if (type == CONFIRMABLE) {
-            return ACKNOWLEDGEMENT;
-        } else if (type == NON_CONFIRMABLE) {
-            return NON_CONFIRMABLE;
+        if (type == CoAPMessageType.CONFIRMABLE) {
+            return CoAPMessageType.ACKNOWLEDGEMENT;
+        } else if (type == CoAPMessageType.NON_CONFIRMABLE) {
+            return CoAPMessageType.NON_CONFIRMABLE;
         }
         // / TODO check correct response type for other cases
         return type;
@@ -932,7 +886,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     //TODO: What is this method supposed to do?
     private void replyWithNotImplemented(CoAPRequest request) {
         int messageId = request.getMessageId();
-        CoAPResponse resp = new CoAPResponse(1, CONFIRMABLE, NOT_IMPLEMENTED, messageId);
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_IMPLEMENTED, messageId);
 
         for (CoAPOptionHeader header : request.getOptionHeaders()) {
             if (header.getOptionName() == TOKEN) {
@@ -942,7 +896,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
         resp.setSocketAddress(request.getSocketAddress());
         // reply directly from here if no listeners are found
-        resp = new CoAPResponse(1, CONFIRMABLE, NOT_FOUND, messageId);
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_FOUND, messageId);
         resp.setSocketAddress(request.getSocketAddress());
         outHandler.send(resp, false);
     }

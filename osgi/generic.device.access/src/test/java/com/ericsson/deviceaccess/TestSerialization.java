@@ -182,10 +182,9 @@ public class TestSerialization {
         try {
             node = dev.getSerializedNode("services/nonexist", Format.JSON);
         } catch (GDException e) {
-
         }
 
-        assert (node == null);
+        assert node == null;
     }
 
     /*

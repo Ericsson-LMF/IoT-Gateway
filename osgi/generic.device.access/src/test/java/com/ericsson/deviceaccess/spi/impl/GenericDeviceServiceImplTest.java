@@ -46,7 +46,6 @@ import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import junit.framework.Assert;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -267,7 +266,7 @@ public class GenericDeviceServiceImplTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 }

@@ -160,7 +160,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE);
         CoAPOptionHeader h2 = new CoAPOptionHeader(CoAPOptionName.OBSERVE);
 
-        assertEquals((h.getOptionNumber() - h2.getOptionNumber()), -9);
+        assertEquals(h.getOptionNumber() - h2.getOptionNumber(), -9);
     }
 
     public void testOptionHeaderCodes() {

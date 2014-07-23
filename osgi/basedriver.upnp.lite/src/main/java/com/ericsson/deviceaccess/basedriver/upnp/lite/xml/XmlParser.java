@@ -70,10 +70,8 @@ public class XmlParser {
             while (parser.getEventType() != XmlPullParser.END_TAG) {
                 if (parser.getEventType() == XmlPullParser.START_TAG) {
                     node.children.add(_parse(parser, ignoreWhitespaces));
-                } else if (parser.getEventType() == XmlPullParser.TEXT) {
-                    if (!ignoreWhitespaces || !parser.isWhitespace()) {
-                        node.text += parser.getText();
-                    }
+                } else if (parser.getEventType() == XmlPullParser.TEXT && !ignoreWhitespaces || !parser.isWhitespace()) {
+                    node.text += parser.getText();
                 }
                 parser.next();
             }

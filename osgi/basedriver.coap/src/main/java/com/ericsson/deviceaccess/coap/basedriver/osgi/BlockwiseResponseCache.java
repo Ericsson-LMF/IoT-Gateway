@@ -153,12 +153,12 @@ public class BlockwiseResponseCache {
             }
             SessionKey target = (SessionKey) obj;
 
-            return ((clientAddress == null && clientAddress == null)
-                    || (clientAddress != null && clientAddress.equals(target.clientAddress)))
-                    && ((resourceUri == null && target.resourceUri == null)
-                    || (resourceUri != null && resourceUri.equals(target.resourceUri)))
-                    && ((queryStrings == null && target.queryStrings == null)
-                    || (queryStrings != null && queryStrings.equals(target.queryStrings)));
+            return (clientAddress == null && clientAddress == null
+                    || clientAddress != null && clientAddress.equals(target.clientAddress))
+                    && (resourceUri == null && target.resourceUri == null
+                    || resourceUri != null && resourceUri.equals(target.resourceUri))
+                    && (queryStrings == null && target.queryStrings == null
+                    || queryStrings != null && queryStrings.equals(target.queryStrings));
         }
 
         @Override

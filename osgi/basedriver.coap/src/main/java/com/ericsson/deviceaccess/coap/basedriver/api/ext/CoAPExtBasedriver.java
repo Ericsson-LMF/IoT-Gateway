@@ -66,8 +66,6 @@ import java.util.Timer;
 
 public class CoAPExtBasedriver {
 
-    static final private String THIS_CLASS_NAME = CoAPExtBasedriver.class.getSimpleName();
-
     private TransportLayerReceiver transportLayerReceiver;
     private TransportLayerSender transportLayerSender;
 
@@ -212,10 +210,8 @@ public class CoAPExtBasedriver {
             int messageCode, String host, int port, String path)
             throws CoAPException {
 
-        if (path != null && !path.isEmpty()) {
-            if (!path.startsWith("/")) {
-                path = "/" + path;
-            }
+        if (path != null && !path.isEmpty() && !path.startsWith("/")) {
+            path = "/" + path;
         }
 
         URI uri = null;

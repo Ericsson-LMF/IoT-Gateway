@@ -118,8 +118,6 @@ public class CoAPRequest extends CoAPMessage {
      */
     public void createUriFromRequest(SocketAddress socketAddress) throws CoAPException {
         // Get URI path of the message
-
-        String path = "";
         String host = "";
 
         StringBuilder pathParts = new StringBuilder();
@@ -147,21 +145,17 @@ public class CoAPRequest extends CoAPMessage {
                 port = shortInt & 0xFFFF;
             }
         }
-
-        if (host.isEmpty() || port == 0) {
-            // read from the socketaddress, that cannot be null
-            if (socketAddress instanceof InetSocketAddress) {
-
-                InetSocketAddress inetSocketAddr = (InetSocketAddress) socketAddress;
-                if (host.isEmpty()) {
-                    host = inetSocketAddr.getAddress().toString();
-                    if (host.startsWith("/")) {
-                        host = host.substring(1);
-                    }
+        // read from the socketaddress, that cannot be null
+        if ((host.isEmpty() || port == 0) && socketAddress instanceof InetSocketAddress) {
+            InetSocketAddress inetSocketAddr = (InetSocketAddress) socketAddress;
+            if (host.isEmpty()) {
+                host = inetSocketAddr.getAddress().toString();
+                if (host.startsWith("/")) {
+                    host = host.substring(1);
                 }
-                if (port == 0) {
-                    port = inetSocketAddr.getPort();
-                }
+            }
+            if (port == 0) {
+                port = inetSocketAddr.getPort();
             }
         }
 
