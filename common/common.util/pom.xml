@@ -116,7 +116,6 @@
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            com.fasterxml.jackson.*,
                             com.fasterxml.jackson.datatype.jdk7.*,
                             com.fasterxml.jackson.module.paramnames.*
                         </Private-Package>
