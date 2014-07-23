@@ -35,6 +35,8 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * response codes defined in core draft 11 (including obsoleted codes)
@@ -86,7 +88,7 @@ public enum CoAPResponseCode {
      * @return Textual description of the code
      */
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     /**
@@ -95,7 +97,7 @@ public enum CoAPResponseCode {
      * @return integer representing the code of the response
      */
     public int getNo() {
-        return this.no;
+        return no;
     }
 
     /**
@@ -106,15 +108,18 @@ public enum CoAPResponseCode {
      * @return
      */
     public int getResponseClass() {
-        return this.responseClass;
+        return responseClass;
+    }
+
+    private static final Map<Integer, CoAPResponseCode> noMap = new HashMap<>();
+
+    static {
+        for (CoAPResponseCode content : CoAPResponseCode.values()) {
+            noMap.put(content.getNo(), content);
+        }
     }
 
     public static CoAPResponseCode getResponseName(int no) {
-        for (CoAPResponseCode value : CoAPResponseCode.values()) {
-            if (value.getNo() == no) {
-                return value;
-            }
-        }
-        return null;
+        return noMap.get(no);
     }
 }

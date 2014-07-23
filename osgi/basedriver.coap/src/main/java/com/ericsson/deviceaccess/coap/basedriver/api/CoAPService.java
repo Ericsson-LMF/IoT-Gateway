@@ -97,12 +97,13 @@ public class CoAPService {
     protected LinkFormatReader reader;
     protected LinkFormatDirectory directory;
 
-
     /**
      * Create a CoAPService that can be used for sending messages towards the
      * CoAP network
      *
-     * @param
+     * @param address
+     * @param coapPort
+     * @param maximumBlockSzx
      * @throws CoAPException in case something goes wrong when initialising the
      * service
      */
@@ -123,8 +124,8 @@ public class CoAPService {
      * @throws SocketException
      */
     protected void init() throws CoAPException, SocketException {
-        this.initUDPListeners();
-        this.initCoAP();
+        initUDPListeners();
+        initCoAP();
     }
 
     /**
@@ -142,8 +143,8 @@ public class CoAPService {
             InetAddress resourceDiscoveryAddress, int resourceDiscoveryPort) {
         // Start the service if the value for the interval is > 0
         if (resourceDiscoveryInterval > 0) {
-            this.directory.setResourceDiscoveryInterval(resourceDiscoveryInterval);
-            this.timer = new Timer();
+            directory.setResourceDiscoveryInterval(resourceDiscoveryInterval);
+            timer = new Timer();
             ResourceDiscoveryTask task = new ResourceDiscoveryTask();
             this.resourceDiscoveryAddress = resourceDiscoveryAddress;
             this.resourceDiscoveryPort = resourceDiscoveryPort;
@@ -169,12 +170,13 @@ public class CoAPService {
      * @param host destination host in String format
      * @param port destination port. Value for port should be 0-65535.
      * @param path path to the resource to which this request is to be sent
+     * @param messageType
+     * @param payload
      * @return created CoAP POST request
      * @throws CoAPException if request generation fails for some reason
      */
     public CoAPRequest createPostRequest(String host, int port, String path,
             CoAPMessageType messageType, byte[] payload) throws CoAPException {
-
         CoAPRequest req = createRequest(messageType, 2, host, port, path);
         if (payload != null && payload.length > 0) {
             req.setPayload(payload);
@@ -261,7 +263,6 @@ public class CoAPService {
                 throw new CoAPException("Port not in range 0-65535");
             }
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             throw new CoAPException(e);
         }
 
@@ -271,7 +272,7 @@ public class CoAPService {
             InetAddress addr = InetAddress.getByName(socketAddress);
             sockaddr = new InetSocketAddress(addr, uri.getPort());
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new CoAPException(e);
         }
 
         return endpoint.createCoAPRequest(messageType, messageCode, sockaddr, uri, null);
@@ -302,7 +303,6 @@ public class CoAPService {
             }
             uri = new URI("coap", null, host, port, path, null, null);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             throw new CoAPException(e);
         }
 
@@ -316,6 +316,7 @@ public class CoAPService {
      *
      * @param resource
      * @param observer
+     * @return
      * @throws CoAPException
      */
     public boolean terminateObservationRelationship(CoAPResource resource,
@@ -347,7 +348,7 @@ public class CoAPService {
      *
      * @return list of known devices
      */
-    public List getKnownDevices() {
+    public List<CoAPRemoteEndpoint> getKnownDevices() {
         return directory.getKnownDevices();
     }
 
@@ -399,7 +400,6 @@ public class CoAPService {
                 transportLayerReceiver = new UDPReceiver(multicastSocket);
                 transportLayerSender = new UDPSender(multicastSocket);
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new CoAPException(e);
             }
             // Otherwise use normal UDP datagram socket
@@ -408,13 +408,12 @@ public class CoAPService {
                 // If the port is set, use the defined port
                 if (coapPort != -1 && address != null) {
                     socket = new DatagramSocket(coapPort, address);
-                } else if (this.coapPort != -1) {
+                } else if (coapPort != -1) {
                     socket = new DatagramSocket(coapPort);
                 } else {
                     socket = new DatagramSocket();
                 }
             } catch (SocketException e) {
-                e.printStackTrace();
                 throw new CoAPException(e);
             }
             socket.setReuseAddress(true);
@@ -424,6 +423,8 @@ public class CoAPService {
             transportLayerReceiver = new UDPReceiver(socket);
             transportLayerSender = new UDPSender(socket);
         }
+        transportLayerReceiver.start();
+        transportLayerSender.start();
     }
 
     /**
@@ -497,33 +498,33 @@ public class CoAPService {
 
         @Override
         public void run() {
-            
+
             /*
-            CoAPActivator.logger.debug("Send a discovery request to "
-            + resourceDiscoveryAddress.getCanonicalHostName());
-            */
+             CoAPActivator.logger.debug("Send a discovery request to "
+             + resourceDiscoveryAddress.getCanonicalHostName());
+             */
             try {
                 CoAPRequest discoveryReq = createGetRequest(
                         resourceDiscoveryAddress.getCanonicalHostName(),
                         resourceDiscoveryPort, path,
                         CoAPMessageType.NON_CONFIRMABLE);
                 discoveryReq.generateTokenHeader();
-                
+
                 short contentType = 40;
-                
+
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 DataOutputStream dos = new DataOutputStream(stream);
-                
+
                 dos.writeShort(contentType);// 2 bytes
                 dos.flush();
-                
+
                 CoAPOptionHeader header = new CoAPOptionHeader(
                         CoAPOptionName.CONTENT_TYPE, stream.toByteArray());
                 discoveryReq.addOptionHeader(header);
                 discoveryReq.setListener(this);
-                
+
                 endpoint.sendRequest(discoveryReq);
-                
+
             } catch (CoAPException | IOException e) {
                 e.printStackTrace();
             }
@@ -537,7 +538,7 @@ public class CoAPService {
         @Override
         public void emptyAckReceived(CoAPResponse response, CoAPRequest request) {
             // TODO Auto-generated method stub
-            
+
         }
 
         /**
@@ -549,7 +550,7 @@ public class CoAPService {
         @Override
         public void maximumRetransmissionsReached(CoAPRequest request) {
             // TODO Auto-generated method stub
-            
+
         }
 
         /**
@@ -575,15 +576,15 @@ public class CoAPService {
         public void separateResponseReceived(CoAPResponse response,
                 CoAPRequest request) {
             handleResponse(response);
-            
+
         }
 
         private void handleResponse(CoAPResponse response) {
             String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
-            
+
             /*
-            logger.debug("Message payload : [" + payload + "]");
-            */
+             logger.debug("Message payload : [" + payload + "]");
+             */
             try {
                 // Parse the received message into the list of resources
                 List resources = reader.parseLinkFormatData(payload);
@@ -604,7 +605,7 @@ public class CoAPService {
         @Override
         public void serviceBusy(CoAPRequest request) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override

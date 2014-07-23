@@ -64,7 +64,7 @@ public abstract class CoAPEndpoint {
     }
 
     public URI getUri() {
-        return this.uri;
+        return uri;
     }
 
     /**

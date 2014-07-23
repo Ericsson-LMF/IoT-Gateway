@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Properties;
 import org.osgi.framework.Bundle;
@@ -60,7 +61,6 @@ import org.osgi.util.tracker.ServiceTracker;
  * to send discovery requests.
  */
 public class CoAPActivator implements BundleActivator {
-
 
     //public static LogTracker logger;
     public static ServiceTracker tracker;
@@ -175,8 +175,9 @@ public class CoAPActivator implements BundleActivator {
             }
             if (port != null) {
                 try {
-                    if (Integer.parseInt(port) > 0) {
-                        coapPort = Integer.parseInt(port);
+                    coapPort = Integer.parseInt(port);
+                    if (coapPort <= 0) {
+                        coapPort = -1;
                         //logger.debug("set port to [" + coapPort + "]");
                     }
                 } catch (NumberFormatException e) {
@@ -206,8 +207,7 @@ public class CoAPActivator implements BundleActivator {
             if (discoveryAddress != null) {
                 try {
                     discovery = InetAddress.getByName(discoveryAddress);
-                } catch (java.net.UnknownHostException e) {
-                    e.printStackTrace();
+                } catch (UnknownHostException e) {
                     throw new CoAPException(e);
                 }
             }

@@ -65,7 +65,6 @@ public class BlockOptionHeader extends CoAPOptionHeader {
      * true, indicates there are more blocks.
      * @param szx size exponent (not the size of the block!!). The szx should be
      * between values 0 and 6.
-     * @param length length of the block (in bytes), 1-3
      *
      */
     public BlockOptionHeader(CoAPOptionName name, int blockNumber,
@@ -84,27 +83,25 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         }
 
         if (bitsNeeded <= 4) {
-            this.length = 1;
+            length = 1;
         } else if (4 < bitsNeeded && bitsNeeded <= 12) {
-            this.length = 2;
+            length = 2;
         } else {
-            this.length = 3;
+            length = 3;
         }
 
-        super.setValue(this.encode());
+        super.setValue(encode());
     }
 
     /**
      * Generate a BlockOptionHeader from the CoAPOptionHeader of type Block1 or
      * Block2
      *
-     * @param name
      * @param header
      * @throws CoAPException if a header that is not either Block1 or Block2 is
      * given as input
      */
-    public BlockOptionHeader(CoAPOptionHeader header)
-            throws CoAPException {
+    public BlockOptionHeader(CoAPOptionHeader header) throws CoAPException {
         super(CoAPOptionName.getFromNo(header.getOptionNumber()));
         decode(header);
     }

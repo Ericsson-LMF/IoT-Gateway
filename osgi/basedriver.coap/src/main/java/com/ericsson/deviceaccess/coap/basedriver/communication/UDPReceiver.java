@@ -43,11 +43,13 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class represents the UDP thread for listening to incoming UDP
  */
 public class UDPReceiver implements Runnable, TransportLayerReceiver {
+
     // IP MTU is suggested to 1280 bytes in draft-ieft-core-coap-08, 1152 for
     // the message size, 1024 for the payload size
     private static int BUFFER_SIZE = 1280;
@@ -55,10 +57,9 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
     final private DatagramSocket socket;
     final private MulticastSocket multicastSocket;
     final private List<IncomingMessageListener> coapListeners = Collections.synchronizedList(new ArrayList<>());
-    final Thread thread = new Thread(this);
+    Thread thread;
 
-    private volatile boolean running = true;
-
+    private volatile AtomicBoolean running = new AtomicBoolean(false);
 
     /**
      * Constructor using DatagramSocket
@@ -66,13 +67,9 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
      * @param socket
      */
     public UDPReceiver(DatagramSocket socket) {
-        /*
-         CoAPActivator.logger.debug("UDP receiver with datagram socket");
-         */
+        //CoAPActivator.logger.debug("UDP receiver with datagram socket");
         this.socket = socket;
         this.multicastSocket = null;
-
-        this.thread.start();
     }
 
     /**
@@ -81,17 +78,13 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
      * @param multicastSocket
      */
     public UDPReceiver(MulticastSocket multicastSocket) {
-        /*
-         CoAPActivator.logger.debug("UDP receiver with multicast socket");
-         */
+        //CoAPActivator.logger.debug("UDP receiver with multicast socket");
         this.multicastSocket = multicastSocket;
         this.socket = null;
-
-        this.thread.start();
     }
 
     public void cleanup() {
-        running = false;
+        running.set(false);
         coapListeners.clear();
 
         if (thread.isAlive() && !thread.isInterrupted()) {
@@ -101,7 +94,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
 
     @Override
     public void run() {
-        while (running) {
+        while (running.get()) {
             try {
                 // TODO allocate buffer properly
                 // allocate buffer
@@ -122,15 +115,15 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
                 // socket.close() will interrupt socket.receive()
                 //
                 if (socket != null && socket.isClosed()) {
-                    running = false;
+                    running.set(false);
                     continue;
                 }
                 if (multicastSocket != null && multicastSocket.isClosed()) {
-                    running = false;
+                    running.set(false);
                     continue;
                 }
                 if (thread.isInterrupted()) {
-                    running = false;
+                    running.set(false);
                     continue;
                 }
 
@@ -143,18 +136,25 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
                 if (socket != null && !socket.isClosed() || multicastSocket != null && !multicastSocket.isClosed()) {
                     e.printStackTrace();
                 }
-                this.running = false;
+                running.set(false);
             } catch (IOException e) {
                 // TODO error handling!
-                if (running == true) {
+                if (running.get()) {
                     e.printStackTrace();
                 }
-                running = false;
+                running.set(false);
             } catch (Exception e) {
-                running = false;
+                running.set(false);
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void start() {
+        running.set(true);
+        thread = new Thread(this);
+        thread.start();
     }
 
     /**

@@ -133,12 +133,13 @@ public class CoAPExtBasedriver {
      * @param host destination host in String format
      * @param port destination port. Value for port should be 0-65535.
      * @param path path to the resource to which this request is to be sent
+     * @param messageType
+     * @param payload
      * @return created CoAP POST request
      * @throws CoAPException if request generation fails for some reason
      */
     public CoAPRequest createPostRequest(String host, int port, String path,
             CoAPMessageType messageType, byte[] payload) throws CoAPException {
-
         CoAPRequest req = this.createRequest(messageType, 2, host, port, path);
         if (payload != null && payload.length > 0) {
             req.setPayload(payload);
@@ -225,7 +226,6 @@ public class CoAPExtBasedriver {
                 throw new CoAPException("Port not in range 0-65535");
             }
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             throw new CoAPException(e);
         }
 
@@ -237,7 +237,7 @@ public class CoAPExtBasedriver {
             sockaddr = new InetSocketAddress(addr, uri.getPort());
 
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new CoAPException(e);
         }
 
         return endpoint.createCoAPRequest(messageType, messageCode, sockaddr,
@@ -269,7 +269,6 @@ public class CoAPExtBasedriver {
             }
             uri = new URI("coap", null, host, port, path, null, null);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             throw new CoAPException(e);
         }
 
@@ -283,6 +282,7 @@ public class CoAPExtBasedriver {
      *
      * @param resource
      * @param observer
+     * @return
      * @throws CoAPException
      */
     public boolean terminateObservationRelationship(CoAPResource resource,
@@ -318,7 +318,6 @@ public class CoAPExtBasedriver {
         return this.directory.getKnownDevices();
     }
 
-
     /**
      * Init needed message handlers for this CoAP service and add then as
      * listeners to transport layer.
@@ -338,10 +337,9 @@ public class CoAPExtBasedriver {
         // listener
         URI uri;
         try {
-            String hostAddress = (address != null) ? address.getHostAddress() : null;
-            uri = new URI(null, null, hostAddress, this.coapPort, null, null, null);
-            this.endpoint = new CoAPExtEndpoint(
-                    outgoingMessageHandler, incomingMessageHandler, uri);
+            String hostAddress = address != null ? address.getHostAddress() : null;
+            uri = new URI(null, null, hostAddress, coapPort, null, null, null);
+            endpoint = new CoAPExtEndpoint(outgoingMessageHandler, incomingMessageHandler, uri);
         } catch (URISyntaxException e) {
             e.printStackTrace();
             //logger.error("URI Syntax Error : " + address.getAddress(), e);
@@ -365,8 +363,7 @@ public class CoAPExtBasedriver {
     private void initUDPListeners() throws CoAPException, SocketException {
         // If address is a multicast address, and port is set, use
         // multicastsocket
-        if (address != null && address.isMulticastAddress()
-                && this.coapPort != -1) {
+        if (address != null && address.isMulticastAddress() && this.coapPort != -1) {
             // If given address is multicast, use multicast socket
             //this.logger.debug("Multicast UDP");
             try {
@@ -374,15 +371,13 @@ public class CoAPExtBasedriver {
                 /*
                  CoAPActivator.logger.debug("Join multicast group");
                  */
-                this.multicastSocket = new MulticastSocket(this.coapPort);
-                this.multicastSocket.joinGroup(address);
+                multicastSocket = new MulticastSocket(this.coapPort);
+                multicastSocket.joinGroup(address);
 
-                this.transportLayerReceiver = new UDPReceiver(
-                        this.multicastSocket);
+                transportLayerReceiver = new UDPReceiver(multicastSocket);
 
-                this.transportLayerSender = new UDPSender(this.multicastSocket);
+                transportLayerSender = new UDPSender(multicastSocket);
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new CoAPException(e);
             }
             // Otherwise use normal UDP datagram socket
@@ -391,33 +386,34 @@ public class CoAPExtBasedriver {
             try {
 
                 // If the port is set, use the defined port
-                if (this.coapPort != -1 && address != null) {
+                if (coapPort != -1 && address != null) {
                     //this.logger.info("UDP1: " + address + ":" + this.coapPort);
-                    this.socket = new DatagramSocket(this.coapPort, address);
-                } else if (this.coapPort != -1) {
-                    this.socket = new DatagramSocket(this.coapPort);
-                    this.address = this.socket.getLocalAddress();
+                    socket = new DatagramSocket(coapPort, address);
+                } else if (coapPort != -1) {
+                    socket = new DatagramSocket(coapPort);
+                    address = socket.getLocalAddress();
                     //this.logger.info("UDP2: " + address + ":" + this.coapPort);
                 } else {
-                    this.socket = new DatagramSocket();
-                    this.address = this.socket.getLocalAddress();
-                    this.coapPort = this.socket.getLocalPort();
+                    socket = new DatagramSocket();
+                    address = socket.getLocalAddress();
+                    coapPort = socket.getLocalPort();
                     //this.logger.info("UDP3: " + address + ":" + this.coapPort);
                 }
             } catch (BindException e) {
                 // This could happen
                 throw e;
             } catch (SocketException e) {
-                e.printStackTrace();
                 throw new CoAPException(e);
             }
-            this.socket.setReuseAddress(true);
-            this.socket.setSoTimeout(0);
+            socket.setReuseAddress(true);
+            socket.setSoTimeout(0);
 
             // System.out.println("init receiver & sender");
-            this.transportLayerReceiver = new UDPReceiver(this.socket);
-            this.transportLayerSender = new UDPSender(this.socket);
+            transportLayerReceiver = new UDPReceiver(this.socket);
+            transportLayerSender = new UDPSender(this.socket);
         }
+        transportLayerReceiver.start();
+        transportLayerSender.start();
     }
 
     /**
@@ -449,38 +445,38 @@ public class CoAPExtBasedriver {
     public void stopService() {
         //this.logger.debug(THIS_CLASS_NAME + "::stopService()");
 
-        if (this.socket != null) {
-            this.socket.close();
+        if (socket != null) {
+            socket.close();
         }
-        if (this.multicastSocket != null) {
-            this.multicastSocket.close();
-        }
-
-        if (this.directory != null) {
-            this.directory.stopService();
+        if (multicastSocket != null) {
+            multicastSocket.close();
         }
 
-        this.transportLayerReceiver.stopService();
-        this.transportLayerReceiver = null;
-        this.transportLayerSender.stopService();
-        this.transportLayerSender = null;
-
-        if (this.timer != null) {
-            this.timer.cancel();
+        if (directory != null) {
+            directory.stopService();
         }
-        this.outgoingMessageHandler.stopService();
-        this.outgoingMessageHandler = null;
 
-        this.endpoint.stopService();
-        this.endpoint = null;
+        transportLayerReceiver.stopService();
+        transportLayerReceiver = null;
+        transportLayerSender.stopService();
+        transportLayerSender = null;
+
+        if (timer != null) {
+            timer.cancel();
+        }
+        outgoingMessageHandler.stopService();
+        outgoingMessageHandler = null;
+
+        endpoint.stopService();
+        endpoint = null;
     }
 
     public void setIncomingCoAPRequestListener(IncomingCoAPRequestListener reqListener) {
-        this.endpoint.setIncomingCoAPRequestListener(reqListener);
+        endpoint.setIncomingCoAPRequestListener(reqListener);
     }
 
     public void unsetIncomingCoAPRequestListener(IncomingCoAPRequestListener reqListener) {
-        this.endpoint.unsetIncomingCoAPRequestListener(reqListener);
+        endpoint.unsetIncomingCoAPRequestListener(reqListener);
     }
 
     class MyIncomingMessageHandler extends IncomingMessageHandler {

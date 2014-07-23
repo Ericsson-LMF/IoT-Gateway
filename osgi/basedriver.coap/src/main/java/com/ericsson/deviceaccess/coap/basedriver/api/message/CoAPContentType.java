@@ -34,6 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This class is to represent the CoAP content types as defined in the coap core
  * draft media type registry
@@ -64,29 +67,29 @@ public enum CoAPContentType {
     }
 
     public int getNo() {
-        return this.no;
+        return no;
     }
 
     public String getContentType() {
-        return this.contentType;
+        return contentType;
+    }
+
+    private static final Map<String, CoAPContentType> typeMap = new HashMap<>();
+    private static final Map<Integer, CoAPContentType> noMap = new HashMap<>();
+
+    static {
+        for (CoAPContentType content : CoAPContentType.values()) {
+            typeMap.put(content.getContentType(), content);
+            noMap.put(content.getNo(), content);
+        }
     }
 
     public static CoAPContentType getContentTypeNumber(String name) {
-        for (CoAPContentType value : CoAPContentType.values()) {
-            if (value.getContentType().equals(name)) {
-                return value;
-            }
-        }
-        return null;
+        return typeMap.get(name);
     }
 
     public static CoAPContentType getContentTypeName(int no) {
-        for (CoAPContentType value : CoAPContentType.values()) {
-            if (value.getNo() == no) {
-                return value;
-            }
-        }
-        return null;
+        return noMap.get(no);
     }
 
 }

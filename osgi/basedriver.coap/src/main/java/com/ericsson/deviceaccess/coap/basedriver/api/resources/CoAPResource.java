@@ -34,11 +34,13 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 
+import com.ericsson.commonutil.StringUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a CoAPResource on a CoAP endpoint, which is cached on
@@ -137,7 +139,7 @@ public class CoAPResource {
      * Constructor. A CoAP resource is identified using the URI
      * (coap://host:port/path)
      *
-     * @param URI unique URI to the resource
+     * @param uri unique URI to the resource
      */
     public CoAPResource(URI uri) {
         this.resourceIdentifier = uri;
@@ -170,7 +172,7 @@ public class CoAPResource {
      * @return URI identifying the resource
      */
     public URI getUri() {
-        return this.resourceIdentifier;
+        return resourceIdentifier;
     }
 
     public void setHost(String host) {
@@ -179,7 +181,7 @@ public class CoAPResource {
     }
 
     public String getHost() {
-        return this.host;
+        return host;
     }
 
     /**
@@ -216,11 +218,8 @@ public class CoAPResource {
 
         }
 
-        values.forEach((k, v) -> {
-            linkformat.append(";");
-            linkformat.append(k).append("=").append(v);
-        });
-        return linkformat.toString().trim();
+        values.forEach((k, v) -> linkformat.append(";").append(k).append("=").append(v));
+        return linkformat.toString();
     }
 
     /**
@@ -239,7 +238,7 @@ public class CoAPResource {
      * @return type of the resource
      */
     public CoAPResourceType getCoAPResourceType() {
-        return this.type;
+        return type;
     }
 
     /**
@@ -249,7 +248,7 @@ public class CoAPResource {
      */
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
-        this.values.put(RESOURCE_TYPE, this.resourceType);
+        values.put(RESOURCE_TYPE, this.resourceType);
     }
 
     /**
@@ -258,7 +257,7 @@ public class CoAPResource {
      * @return value for the "rt" attribute
      */
     public String getResourceType() {
-        return this.resourceType;
+        return resourceType;
     }
 
     /**
@@ -267,7 +266,7 @@ public class CoAPResource {
      * @return value for the "if" attribute
      */
     public String getInterfaceDescription() {
-        return this.interfaceDescription;
+        return interfaceDescription;
 
     }
 
@@ -278,7 +277,7 @@ public class CoAPResource {
      */
     public void setInterfaceDescription(String interfaceDescription) {
         this.interfaceDescription = interfaceDescription;
-        this.values.put(INTERFACE_DESCRIPTION, this.interfaceDescription);
+        values.put(INTERFACE_DESCRIPTION, this.interfaceDescription);
     }
 
     /**
@@ -288,7 +287,7 @@ public class CoAPResource {
      */
     public void setContentType(int contentType) {
         this.contentType = contentType;
-        this.values.put(CONTENT_TYPE, Integer.toString(contentType));
+        values.put(CONTENT_TYPE, Integer.toString(contentType));
     }
 
     /**
@@ -297,7 +296,7 @@ public class CoAPResource {
      * @return value of the "ct" attribute
      */
     public int getContentType() {
-        return this.contentType;
+        return contentType;
     }
 
     /**
@@ -315,7 +314,7 @@ public class CoAPResource {
      * @return content of the resource
      */
     public byte[] getContent() {
-        return this.content;
+        return content;
     }
 
     /**
@@ -325,7 +324,7 @@ public class CoAPResource {
      */
     public void setMaximumSize(int maximumSize) {
         this.maximumSize = maximumSize;
-        this.values.put(MAXIMUM_SIZE, Integer.toString(maximumSize));
+        values.put(MAXIMUM_SIZE, Integer.toString(maximumSize));
     }
 
     /**
@@ -352,7 +351,7 @@ public class CoAPResource {
      * @return maximum time to cache this resource in seconds
      */
     public int getMaxAge() {
-        return this.maxAge;
+        return maxAge;
     }
 
     /**
@@ -362,7 +361,7 @@ public class CoAPResource {
      */
     public void setTitle(String title) {
         this.title = title;
-        this.values.put(TITLE, title);
+        values.put(TITLE, title);
     }
 
     /**
@@ -371,7 +370,7 @@ public class CoAPResource {
      * @return human-readable title for this resource
      */
     public String getTitle() {
-        return this.title;
+        return title;
     }
 
     /**
@@ -381,7 +380,7 @@ public class CoAPResource {
      */
     public void setTitleAsterisk(String title) {
         this.titleAsterisk = title;
-        this.values.put(TITLE_ASTERISK, title);
+        values.put(TITLE_ASTERISK, title);
     }
 
     /**
@@ -390,7 +389,7 @@ public class CoAPResource {
      * @return title*
      */
     public String getTitleAsterisk() {
-        return this.titleAsterisk;
+        return titleAsterisk;
     }
 
     /**
@@ -400,7 +399,7 @@ public class CoAPResource {
      */
     public void setRelationType(String relationType) {
         this.relationType = relationType;
-        this.values.put(RELATION_TYPE, relationType);
+        values.put(RELATION_TYPE, relationType);
     }
 
     /**
@@ -409,7 +408,7 @@ public class CoAPResource {
      * @return
      */
     public String getRelationType() {
-        return this.relationType;
+        return relationType;
     }
 
     /**
@@ -419,7 +418,7 @@ public class CoAPResource {
      */
     public void setAnchor(String anchor) {
         this.anchor = anchor;
-        this.values.put(ANCHOR, anchor);
+        values.put(ANCHOR, anchor);
     }
 
     /**
@@ -428,12 +427,12 @@ public class CoAPResource {
      * @return value of the anchor
      */
     public String getAnchor() {
-        return this.anchor;
+        return anchor;
     }
 
     public void setInstance(String instance) {
         this.instance = instance;
-        this.values.put(INSTANCE, instance);
+        values.put(INSTANCE, instance);
     }
 
     /**
@@ -442,7 +441,7 @@ public class CoAPResource {
      * @param observer observer to be added
      */
     public void addObserver(CoAPResourceObserver observer) {
-        this.observers.add(observer);
+        observers.add(observer);
     }
 
     /**
@@ -452,8 +451,7 @@ public class CoAPResource {
      * @return true if the observer was successfully removed from this resource
      */
     public boolean removeObserver(CoAPResourceObserver observer) {
-        boolean removed = this.observers.remove(observer);
-        return removed;
+        return observers.remove(observer);
     }
 
     /**
@@ -463,11 +461,11 @@ public class CoAPResource {
      * @return list of observers
      */
     public List<CoAPResourceObserver> getObservers() {
-        return this.observers;
+        return observers;
     }
 
-    public HashMap<String, String> getAttributes() {
-        return this.values;
+    public Map<String, String> getAttributes() {
+        return values;
     }
 
     /**
@@ -493,7 +491,7 @@ public class CoAPResource {
     }
 
     public String getKey() {
-        return this.key;
+        return key;
     }
 
     /**
@@ -505,19 +503,13 @@ public class CoAPResource {
      * @return boolean value indicating whether or not this resource matches the
      * given parameters
      */
-    public boolean matchWithQueryParams(HashMap<String, String> params) {
-        return params.entrySet().stream()
+    public boolean matchWithQueryParams(Map<String, String> params) {
+        return params
+                .entrySet()
+                .stream()
                 .filter(e -> values.containsKey(e.getKey()))
-                .map(e -> {
-                    String v = e.getValue();
-                    if (!v.startsWith("\"") && !v.endsWith("\"")) {
-                        v = "\"" + v + "\"";
-                    }
-                    e.setValue(v);
-                    return e;
-                })
-                .filter(e -> values.get(e.getKey()).equals(e.getValue()))
-                .count() == params.size();
+                .peek(e -> e.setValue(StringUtil.ensureWrapping("\"", e.getValue(), "\"")))
+                .allMatch(e -> values.get(e.getKey()).equals(e.getValue()));
     }
 
     // TODO add subresources/information about the parent (maybe not needed in

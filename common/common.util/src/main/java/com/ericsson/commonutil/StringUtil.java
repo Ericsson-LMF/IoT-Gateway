@@ -67,6 +67,16 @@ public enum StringUtil {
         return sb.toString();
     }
 
+    public static String ensureWrapping(String prefix, String infix, String postfix) {
+        if (!infix.startsWith(prefix)) {
+            infix = prefix + infix;
+        }
+        if (!infix.endsWith(postfix)) {
+            infix = infix + postfix;
+        }
+        return infix;
+    }
+
     /**
      * Ensures that there is punctuation at end of string
      *
@@ -74,10 +84,7 @@ public enum StringUtil {
      * @return ensured string
      */
     public static String setEndPunctuation(String string) {
-        if (string.endsWith(".")) {
-            return string;
-        }
-        return string + ".";
+        return ensureWrapping("", string, ".");
     }
 
     /**

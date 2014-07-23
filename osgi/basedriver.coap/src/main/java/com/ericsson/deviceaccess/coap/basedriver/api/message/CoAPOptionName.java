@@ -34,6 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This class represents the enums for different CoAP option headers.
  *
@@ -82,21 +85,21 @@ public enum CoAPOptionName {
         return number;
     }
 
-    public static CoAPOptionName getFromNo(int no) {
+    private static final Map<String, CoAPOptionName> nameMap = new HashMap<>();
+    private static final Map<Integer, CoAPOptionName> noMap = new HashMap<>();
+
+    static {
         for (CoAPOptionName option : CoAPOptionName.values()) {
-            if (option.getNo() == no) {
-                return option;
-            }
+            nameMap.put(option.getName(), option);
+            noMap.put(option.getNo(), option);
         }
-        return UNKNOWN;
+    }
+
+    public static CoAPOptionName getFromNo(int no) {
+        return noMap.getOrDefault(no, UNKNOWN);
     }
 
     public static CoAPOptionName getFromName(String name) {
-        for (CoAPOptionName option : CoAPOptionName.values()) {
-            if (option.getName().equals(name)) {
-                return option;
-            }
-        }
-        return UNKNOWN;
+        return nameMap.getOrDefault(name, UNKNOWN);
     }
 }

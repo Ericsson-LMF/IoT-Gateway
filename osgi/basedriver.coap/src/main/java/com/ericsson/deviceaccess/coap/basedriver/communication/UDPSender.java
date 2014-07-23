@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,8 +29,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.communication;
 
@@ -51,7 +51,6 @@ public class UDPSender implements TransportLayerSender, Runnable {
 
     private final UDPTask POISON = new UDPTask();
 
-
     private MulticastSocket multicastSocket;
 
     private DatagramSocket socket;
@@ -70,8 +69,6 @@ public class UDPSender implements TransportLayerSender, Runnable {
     public UDPSender(MulticastSocket multicastSocket) {
         this.multicastSocket = multicastSocket;
         this.queue = new LinkedBlockingQueue<>();
-        this.running.set(true);
-        this.start();
     }
 
     /**
@@ -82,13 +79,13 @@ public class UDPSender implements TransportLayerSender, Runnable {
     public UDPSender(DatagramSocket socket) {
         this.socket = socket;
         this.queue = new LinkedBlockingQueue<>();
-        this.running.set(true);
-        this.start();
     }
 
-    private void start() {
-        this.thread = new Thread(this);
-        this.thread.start();
+    @Override
+    public void start() {
+        running.set(true);
+        thread = new Thread(this);
+        thread.start();
     }
 
     @Override
@@ -172,7 +169,7 @@ public class UDPSender implements TransportLayerSender, Runnable {
         public void stop() {
             Thread t = this.thread;
             this.thread = null;
-            
+
             // XXX: Quick & Dirty, otherwise it will end up with NullPointerException
             if (t != null) {
                 t.interrupt();

@@ -50,9 +50,10 @@ public enum CoAPMethodCode {
     }
 
     static public String getName(int code) {
-        if ((code <= 0) || (code >= CoAPMethodCode.values().length)) {
+        try {
+            return CoAPMethodCode.values()[code].toString();
+        } catch (Exception ex) {
             return null;
         }
-        return CoAPMethodCode.values()[code].toString();
     }
 }

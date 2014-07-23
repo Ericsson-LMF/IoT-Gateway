@@ -34,8 +34,6 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import java.util.Optional;
-
 /**
  * Class representing a CoAP response.
  */
@@ -49,8 +47,7 @@ public class CoAPResponse extends CoAPMessage {
      * @param responseCode code of the message
      * @param messageId message ID
      */
-    public CoAPResponse(int version, CoAPMessageType messageType,
-            int responseCode, int messageId) {
+    public CoAPResponse(int version, CoAPMessageType messageType, int responseCode, int messageId) {
         super(version, messageType, responseCode, messageId);
     }
 
@@ -61,8 +58,7 @@ public class CoAPResponse extends CoAPMessage {
      * @param responseCode
      * @param messageId
      */
-    public CoAPResponse(CoAPMessageType messageType, int responseCode,
-            int messageId) {
+    public CoAPResponse(CoAPMessageType messageType, int responseCode, int messageId) {
         super(messageType, responseCode, messageId);
     }
 
@@ -105,14 +101,16 @@ public class CoAPResponse extends CoAPMessage {
         return resp;
     }
 
-    private void addToken(CoAPResponse resp) {
-        Optional<CoAPOptionHeader> header = getOptionHeaders()
+    private void addToken(CoAPResponse response) {
+        getOptionHeaders()
                 .stream()
-                .filter(h -> h.getOptionName() == CoAPOptionName.TOKEN)
-                .findAny();
-        if (header.isPresent()) {
-            resp.addOptionHeader(header.get());
-        }
+                .filter(this::isToken)
+                .findAny()
+                .ifPresent(response::addOptionHeader);
+    }
+
+    private boolean isToken(CoAPOptionHeader header) {
+        return header.getOptionName() == CoAPOptionName.TOKEN;
     }
 
     public boolean isCacheable() {

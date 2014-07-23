@@ -601,6 +601,8 @@ public abstract class CoAPMessage {
      * If the retransmission counter reaches MAX_RETRANSMIT on a timeout, or if
      * the end-point receives a reset message, then the attempt to transmit the
      * message is canceled and the application process informed of failure.
+     *
+     * @param canceled
      */
     public void setMessageCanceled(boolean canceled) {
         this.canceled = canceled;
@@ -652,11 +654,11 @@ public abstract class CoAPMessage {
      * @return token as byte array or null if not found
      */
     public CoAPOptionHeader getTokenHeader() {
-        return this.findOptionHeader(CoAPOptionName.TOKEN);
+        return findOptionHeader(CoAPOptionName.TOKEN);
     }
 
     public CoAPOptionHeader getUriHostOptionHeader() {
-        return this.findOptionHeader(CoAPOptionName.URI_HOST);
+        return findOptionHeader(CoAPOptionName.URI_HOST);
     }
 
     private CoAPOptionHeader findOptionHeader(CoAPOptionName name) {
@@ -739,7 +741,7 @@ public abstract class CoAPMessage {
      * address, option headers, type, id, code and payload
      */
     public String logMessage() {
-        String logMessage = "*****************************\n";
+        StringBuilder logMessage = new StringBuilder("*****************************\n");
         try {
             String type;
             if (this instanceof CoAPRequest) {
@@ -748,20 +750,16 @@ public abstract class CoAPMessage {
                 type = "Response";
             }
 
-            logMessage += "COAP [" + type + "]\n";
+            logMessage.append("COAP [").append(type).append("]\n");
 
-            if (this.getSocketAddress() != null) {
-                logMessage += "Remote socket address ["
-                        + this.getSocketAddress().toString() + "]\n";
+            if (getSocketAddress() != null) {
+                logMessage.append("Remote socket address [").append(getSocketAddress()).append("]\n");
             }
             String codeDescription = "";
             if (this instanceof CoAPRequest) {
                 try {
-
-                    if (((CoAPRequest) (this)).getUriFromRequest() != null) {
-                        String uri = ((CoAPRequest) (this)).getUriFromRequest()
-                                .toString();
-                        logMessage += "Request URI [" + uri + "]\n";
+                    if (((CoAPRequest) this).getUriFromRequest() != null) {
+                        logMessage.append("Request URI [").append(((CoAPRequest) this).getUriFromRequest()).append("]\n");
                     }
                     String name = CoAPMethodCode.getName(getCode());
                     if (name != null) {
@@ -771,29 +769,24 @@ public abstract class CoAPMessage {
                 } catch (CoAPException e) {
                     e.printStackTrace();
                 }
-
             } else {
-
-                if (CoAPResponseCode.getResponseName(this.getCode()) != null) {
-                    codeDescription = CoAPResponseCode.getResponseName(
-                            this.getCode()).getDescription();
+                if (CoAPResponseCode.getResponseName(getCode()) != null) {
+                    codeDescription = CoAPResponseCode.getResponseName(getCode()).getDescription();
                 }
             }
-            if (this.getMessageId() > 0) {
-                logMessage += "Message ID [" + this.getMessageId() + "]\n";
+            if (getMessageId() > 0) {
+                logMessage.append("Message ID [").append(getMessageId()).append("]\n");
             }
-            if (this.getMessageType() != null) {
-                logMessage += "Message type ["
-                        + this.getMessageType().toString() + "]\n";
+            if (getMessageType() != null) {
+                logMessage.append("Message type [").append(getMessageType()).append("]\n");
             }
 
-            logMessage += "Message code [" + this.getCode() + "]\n";
+            logMessage.append("Message code [").append(getCode()).append("]\n");
             if (!codeDescription.isEmpty()) {
-                logMessage += type + " description [" + codeDescription
-                        + "]\n";
+                logMessage.append(type).append(" description [").append(codeDescription).append("]\n");
             }
 
-            this.getOptionHeaders().forEach(item -> {
+            getOptionHeaders().forEach(item -> {
                 CoAPOptionHeaderConverter converter = new CoAPOptionHeaderConverter();
                 /*
                  String headerValue = "";
@@ -803,15 +796,15 @@ public abstract class CoAPMessage {
                  */
             });
             // payload
-            if (this.getPayload() != null) {
+            if (getPayload() != null) {
                 String payloadStr = new String(payload, StandardCharsets.UTF_8);
-                logMessage += "Payload \n";
+                logMessage.append("Payload [").append(payloadStr).append("]\n");
             }
-            logMessage += "*****************************\n";
+            logMessage.append("*****************************\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return logMessage;
+        return logMessage.toString();
     }
 
     /**

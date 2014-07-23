@@ -101,15 +101,15 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
     /**
      * Constructor
      *
-     * @param optionName name of the option
+     * @param name name of the option
      * @param value value of the option in bytes
      */
     public CoAPOptionHeader(CoAPOptionName name, byte[] value) {
         this.optionName = name;
         if (value != null) {
-            this.length = value.length;
+            length = value.length;
         } else {
-            this.length = 0;
+            length = 0;
         }
         this.value = value;
     }
@@ -131,13 +131,12 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @param optionName name of the option
      * @param value value of the option header in bytes
      */
-    public CoAPOptionHeader(String optionName,
-            byte[] value) {
+    public CoAPOptionHeader(String optionName, byte[] value) {
         this.optionName = CoAPOptionName.getFromName(optionName);
         if (value != null) {
-            this.length = value.length;
+            length = value.length;
         } else {
-            this.length = 0;
+            length = 0;
         }
         this.value = value;
     }
@@ -182,7 +181,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @return length of the option value in bytes
      */
     public int getLength() {
-        return this.length;
+        return length;
     }
 
     /**
@@ -192,7 +191,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @return return true, if length is <15, false otherwise
      */
     public boolean isNormalLength() {
-        return this.length < 15;
+        return length < 15;
     }
 
     /**
@@ -201,7 +200,7 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
      * @return value of the option in bytes
      */
     public byte[] getValue() {
-        return this.value;
+        return value;
     }
 
     public void setValue(byte[] value) {

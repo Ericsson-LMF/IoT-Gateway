@@ -22,11 +22,13 @@ public enum LegacyUtil {
     INSTANCE;
 
     public static <K, V> Dictionary<K, V> toDictionary(Map<K, V> map) {
-        return FunctionalUtil.applyIfCan(DictionaryWrapper.class, map, m -> m.dictionary).orElse(new MapWrapper(map));
+        return FunctionalUtil.applyIfCan(DictionaryWrapper.class, map, m -> m.dictionary)
+                .orElseGet(() -> new MapWrapper(map));
     }
 
     public static <K, V> Map<K, V> toMap(Dictionary dictionary) {
-        return FunctionalUtil.applyIfCan(MapWrapper.class, dictionary, d -> d.map).orElse(new DictionaryWrapper(dictionary));
+        return FunctionalUtil.applyIfCan(MapWrapper.class, dictionary, d -> d.map)
+                .orElseGet(() -> new DictionaryWrapper(dictionary));
     }
 
     private static class MapWrapper<K, V> extends Dictionary<K, V> {
@@ -59,7 +61,7 @@ public enum LegacyUtil {
 
         @Override
         public V get(Object key) {
-            return map.get(key);
+            return map.get((K) key);
         }
 
         @Override
@@ -69,7 +71,7 @@ public enum LegacyUtil {
 
         @Override
         public V remove(Object key) {
-            return map.remove(key);
+            return map.remove((K) key);
         }
     }
 

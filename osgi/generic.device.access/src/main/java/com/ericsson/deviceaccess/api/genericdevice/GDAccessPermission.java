@@ -94,7 +94,8 @@ public final class GDAccessPermission extends BasicPermission {
 
     @Override
     public boolean implies(Permission permission) {
-        return FunctionalUtil.applyIfCan(GDAccessPermission.class, permission, target -> actionMask.containsAll(target.actionMask) && super.implies(target)).orElse(false);
+        return FunctionalUtil.applyIfCan(GDAccessPermission.class, permission, target -> actionMask.containsAll(target.actionMask) && super.implies(target))
+                .orElse(false);
     }
 
     @Override
@@ -127,7 +128,8 @@ public final class GDAccessPermission extends BasicPermission {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        return FunctionalUtil.applyIfCan(GDAccessPermission.class, obj, target -> getName().equals(target.getName()) && getMask().equals(target.getMask())).orElse(false);
+        return FunctionalUtil.applyIfCan(GDAccessPermission.class, obj, target -> getName().equals(target.getName()) && getMask().equals(target.getMask()))
+                .orElse(false);
     }
 
     class GenericDeviceAccessPermissionCollection extends PermissionCollection {

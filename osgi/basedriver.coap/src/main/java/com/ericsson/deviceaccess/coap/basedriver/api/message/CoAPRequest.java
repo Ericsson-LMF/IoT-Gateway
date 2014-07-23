@@ -42,9 +42,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a CoAP request. A request is carried in a Confirmable
@@ -66,8 +65,7 @@ public class CoAPRequest extends CoAPMessage {
      * @param methodCode code of the request
      * @param messageId message ID
      */
-    public CoAPRequest(int version, CoAPMessageType messageType,
-            int methodCode, int messageId) {
+    public CoAPRequest(int version, CoAPMessageType messageType, int methodCode, int messageId) {
         super(version, messageType, methodCode, messageId);
     }
 
@@ -79,8 +77,7 @@ public class CoAPRequest extends CoAPMessage {
      * @param methodCode code of the request
      * @param messageId message ID
      */
-    public CoAPRequest(CoAPMessageType messageType, int methodCode,
-            int messageId) {
+    public CoAPRequest(CoAPMessageType messageType, int methodCode, int messageId) {
         super(messageType, methodCode, messageId);
     }
 
@@ -104,24 +101,22 @@ public class CoAPRequest extends CoAPMessage {
     public void generateTokenHeader() throws CoAPException {
         TokenGenerator generator = new TokenGenerator();
         if (uri == null) {
-            throw new CoAPException(
-                    "Token header cannot be created, URI not set for the request");
+            throw new CoAPException("Token header cannot be created, URI not set for the request");
         }
         long token = generator.createToken(uri);
         byte[] bytes = BitOperations.splitLongToBytes(token);
 
-        CoAPOptionHeader tokenHeader = new CoAPOptionHeader(
-                CoAPOptionName.TOKEN, bytes);
-
-        this.addOptionHeader(tokenHeader);
+        addOptionHeader(new CoAPOptionHeader(CoAPOptionName.TOKEN, bytes));
     }
 
     /**
      * Form the URI based on the CoAP request (from option header URI-PATH,
      * PORT-URI AND HOST-URI, store it in the uri variable
+     *
+     * @param socketAddress
+     * @throws com.ericsson.deviceaccess.coap.basedriver.api.CoAPException
      */
-    public void createUriFromRequest(SocketAddress socketAddress)
-            throws CoAPException {
+    public void createUriFromRequest(SocketAddress socketAddress) throws CoAPException {
         // Get URI path of the message
 
         String path = "";
@@ -148,8 +143,7 @@ public class CoAPRequest extends CoAPMessage {
                     e.printStackTrace();
                 }
             } else if (name == CoAPOptionName.URI_PORT) {
-                short shortInt = BitOperations.mergeBytesToShort(header.getValue()[0],
-                        header.getValue()[1]);
+                short shortInt = BitOperations.mergeBytesToShort(header.getValue()[0], header.getValue()[1]);
                 port = shortInt & 0xFFFF;
             }
         }
@@ -175,9 +169,8 @@ public class CoAPRequest extends CoAPMessage {
             if (host == null || host.isEmpty()) {
                 throw new CoAPException("Host not defined");
             }
-            this.uri = new URI("coap", null, host, port, pathParts.toString(), null, null);
+            uri = new URI("coap", null, host, port, pathParts.toString(), null, null);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             throw new CoAPException(e);
         }
     }
@@ -187,18 +180,18 @@ public class CoAPRequest extends CoAPMessage {
      * PORT-URI AND HOST-URI
      *
      * @return constructed uri, or null if port or host was not defined
+     * @throws CoAPException
      */
     public URI getUriFromRequest() throws CoAPException {
         // re-generate the URI always when the URI is tried to be accessed
         try {
-            this.createUriFromRequest(this.getSocketAddress());
+            createUriFromRequest(getSocketAddress());
             // If creating the uri throws an CoAPException, the host is not
             // defined
         } catch (CoAPException e) {
             return null;
         }
-
-        return this.uri;
+        return uri;
     }
 
     /**
@@ -217,7 +210,7 @@ public class CoAPRequest extends CoAPMessage {
      * @return listener
      */
     public CoAPRequestListener getListener() {
-        return this.listener;
+        return listener;
     }
 
     /**
@@ -228,32 +221,11 @@ public class CoAPRequest extends CoAPMessage {
      * @return
      */
     public List<CoAPOptionHeader> optionsForMatching() {
-        List<CoAPOptionHeader> modified = new ArrayList<>(getOptionHeaders());
-
-        CoAPOptionHeader tokenHeader = null;
-        CoAPOptionHeader maxAgeHeader = null;
-
-        List<CoAPOptionHeader> etagHeaders = new LinkedList();
-
-        for (CoAPOptionHeader header : modified) {
-            CoAPOptionName name = header.getOptionName();
-            if (name == CoAPOptionName.TOKEN) {
-                tokenHeader = header;
-            } else if (name == CoAPOptionName.MAX_AGE) {
-                maxAgeHeader = header;
-            } else if (name == CoAPOptionName.ETAG) {
-                etagHeaders.add(header);
-            }
-        }
-        if (tokenHeader != null) {
-            modified.remove(tokenHeader);
-        }
-        if (maxAgeHeader != null) {
-            modified.remove(maxAgeHeader);
-        }
-        if (!etagHeaders.isEmpty()) {
-            modified.removeAll(etagHeaders);
-        }
-        return modified;
+        return getOptionHeaders()
+                .stream()
+                .filter(h -> h.getOptionName() != CoAPOptionName.ETAG)
+                .filter(h -> h.getOptionName() != CoAPOptionName.TOKEN)
+                .filter(h -> h.getOptionName() != CoAPOptionName.MAX_AGE)
+                .collect(Collectors.toList());
     }
 }
