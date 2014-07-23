@@ -45,6 +45,13 @@
 
 -install consoletty-IMPL-4.0.1.jar
 
+-install jackson-core-2.4.1.jar
+-install jackson-annotations-2.4.1.jar
+-install jackson-databind-2.4.1.jar
+-install jackson-dataformat-xml-2.4.1.jar
+-install jackson-module-jaxb-annotations-2.4.1.jar
+-install jackson-module-mrbean-2.4.1.jar
+
 -install common.util-1.20-SNAPSHOT.jar
 -install common.osgi.log.util-1.20-SNAPSHOT.jar
 -install generic.device.access-1.42-SNAPSHOT.jar
@@ -74,6 +81,13 @@
 -start prefs-4.0.1.jar
 -start event-4.0.1.jar
 -start component-5.0.0.jar
+
+-start jackson-core-2.4.1.jar
+-start jackson-annotations-2.4.1.jar
+-start jackson-databind-2.4.1.jar
+-start jackson-dataformat-xml-2.4.1.jar
+-start jackson-module-jaxb-annotations-2.4.1.jar
+-start jackson-module-mrbean-2.4.1.jar
 
 -start common.util-1.20-SNAPSHOT.jar
 -start common.osgi.log.util-1.20-SNAPSHOT.jar

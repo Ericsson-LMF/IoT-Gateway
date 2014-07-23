@@ -58,6 +58,41 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk7</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>    
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-mrbean</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -76,6 +111,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jackson.version>2.4.1</jackson.version>
     </properties>
 
     <build>
@@ -92,13 +128,21 @@
                         </Bundle-Activator>
                         <Private-Package>
                             com.ericsson.research.ag.util.*,
-                            com.ericsson.deviceaccess.tutorial.rest
+                            com.ericsson.deviceaccess.tutorial.rest,
+                            com.fasterxml.jackson.datatype.jdk7.*,
+                            com.fasterxml.jackson.module.paramnames.*
                         </Private-Package>
                         <Import-Package>
                             org.osgi.*;version="[1.0,4.0)",
                             com.ericsson.deviceaccess.*,
+                            com.ericsson.commonutil.*,
                             org.apache.commons.logging.*,
-                            org.json
+                            com.fasterxml.jackson.module.mrbean.*,
+                            com.fasterxml.jackson.module.jaxb.*,
+                            com.fasterxml.jackson.dataformat.xml.*,
+                            com.fasterxml.jackson.databind.*,
+                            com.fasterxml.jackson.core.*,
+                            com.fasterxml.jackson.annotation.*
                         </Import-Package>
                     </instructions>
                     <Bundle-Name>${project.artifactId}</Bundle-Name>
