@@ -56,7 +56,12 @@ public enum CoAPEndpointFactory {
     /**
      * Returns a singleton instance of the LocalCoAPEndpoint
      *
+     * @param outgoingHandler
+     * @param incomingHandler
+     * @param address
+     * @param port
      * @return singleton instance of the LocalCoAPEndpoint
+     * @throws com.ericsson.deviceaccess.coap.basedriver.api.CoAPException
      */
     public LocalCoAPEndpoint createLocalCoAPEndpoint(
             OutgoingMessageHandler outgoingHandler,
@@ -72,7 +77,6 @@ public enum CoAPEndpointFactory {
                     URI uri = new URI(null, null, hostAddress, port, null, null, null);
                     localEndpoint = new LocalCoAPEndpoint(outgoingHandler, incomingHandler, uri);
                 } catch (URISyntaxException e) {
-                    e.printStackTrace();
                     throw new CoAPException(e);
                 }
             }

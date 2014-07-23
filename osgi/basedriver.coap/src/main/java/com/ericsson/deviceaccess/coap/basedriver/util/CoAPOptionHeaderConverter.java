@@ -116,7 +116,7 @@ public class CoAPOptionHeaderConverter {
                     long m = (longValue >> 3) & 0x1L;
                     long szx = longValue & 7L;
                     return Long.toString(longValue) + " (Num=" + Long.toString(num) + "/M=" + Long.toString(m)
-                            + "/Sz=" + Long.toString(CoAPUtil.getBlockSize(szx)) + ")";
+                            + "/Sz=" + Long.toString(CoAPUtil.getBlockSize(szx).longValue()) + ")";
                 } catch (CoAPException e) {
                     e.printStackTrace();
                 }

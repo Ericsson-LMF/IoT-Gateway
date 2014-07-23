@@ -47,7 +47,6 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageReader;
 import java.net.DatagramPacket;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
@@ -185,8 +184,8 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         }
 
         // No duplicate was found so this is a new incoming response. Stop retransmission task.
-        HashMap<String, CoAPRequest> outgoingRequests = outHandler.getOutgoingRequests();
-        HashMap<String, CoAPResponse> outgoingReplies = outHandler.getOutgoingResponses();
+        Map<String, CoAPRequest> outgoingRequests = outHandler.getOutgoingRequests();
+        Map<String, CoAPResponse> outgoingReplies = outHandler.getOutgoingResponses();
         CoAPRequest sentRequest = outgoingRequests.get(id);
 
         // Message ID will be different if this is a separate response (tokens

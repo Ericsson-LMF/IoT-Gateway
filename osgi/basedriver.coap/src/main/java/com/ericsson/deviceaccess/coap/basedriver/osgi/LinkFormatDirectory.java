@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.commonutil.StringUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPRemoteEndpoint;
@@ -141,31 +142,15 @@ public class LinkFormatDirectory {
                     URI resourcePath = res.getUri();
 
                     InetSocketAddress address = resp.getSocketAddress();
-                    URI uri;
 
-                    String resourceString = resourcePath.toString();
-                    if (!resourceString.startsWith("/")) {
-                        resourceString = "/" + resourceString;
-                    }
+                    String resourceString = StringUtil.ensureWrapping("/", resourcePath.toString(), "");
+                    res.setCoAPResourceType(CoAPResourceType.getResourceTypePath(resourceString));
+                    res.setUri(new URI("coap", null,
+                            address.getAddress().getCanonicalHostName(),
+                            address.getPort(), resourceString,
+                            null, null));
 
-                    // by default set the type to other
-                    res.setCoAPResourceType(CoAPResourceType.OTHER);
-                    for (CoAPResourceType resourceType : CoAPResourceType.values()) {
-                        if (resourceString.equals(resourceType.getPath())) {
-                            res.setCoAPResourceType(resourceType);
-                            break;
-                        }
-                    }
-
-                    uri = new URI("coap", null, address.getAddress()
-                            .getCanonicalHostName(), address.getPort(),
-                            resourceString, null, null);
-                    res.setUri(uri);
-
-                    /*
-                     CoAPActivator.logger.info("A new resource with URI ["
-                     + uri.toString() + "]");
-                     */
+                    //CoAPActivator.logger.info("A new resource with URI [" + uri.toString() + "]");
                     endpoint.addResource(res);
                 }
 
@@ -196,12 +181,10 @@ public class LinkFormatDirectory {
                      */
                 }
                 int scheduled = (30 + this.resourceDiscoveryInterval) * 1000;
-                RemoteEndpointRefreshTask newTask = new RemoteEndpointRefreshTask(
-                        serverURI, endpoint);
+                RemoteEndpointRefreshTask newTask = new RemoteEndpointRefreshTask(serverURI, endpoint);
                 this.refreshTasks.put(serverURI, newTask);
                 timer.schedule(newTask, scheduled);
             }
-
         } catch (URISyntaxException e) {
             throw new CoAPException(e);
         }
@@ -232,7 +215,7 @@ public class LinkFormatDirectory {
     }
 
     public void stopService() {
-        this.timer.cancel();
+        timer.cancel();
     }
 
     /**

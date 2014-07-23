@@ -48,8 +48,8 @@ import java.util.List;
  */
 public class CoAPMessageWriter implements CoAPMessageFormat {
 
-    private CoAPMessage message;
-    private ByteArrayOutputStream outputStream;
+    private final CoAPMessage message;
+    private final ByteArrayOutputStream outputStream;
 
     /**
      * Constructor.
@@ -67,12 +67,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
      * @return encoded byte array
      */
     public byte[] encode() {
-
-        /*
-         CoAPActivator.logger
-         .debug("CoAPMessageWriter: encode a message with message ID "
-         + message.getIdentifier());
-         */
+        //CoAPActivator.logger.debug("CoAPMessageWriter: encode a message with message ID " + message.getIdentifier());
         // These are the header that all messages should have
         int version = message.getVersion();
         int messageType = message.getMessageType().getNo();
@@ -107,8 +102,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
         outputStream.write(codeByte);
 
         // Message ID is a 16-bit unsigned => two bytes
-        byte[] messageIdBytes = BitOperations.splitIntToBytes(message
-                .getMessageId());
+        byte[] messageIdBytes = BitOperations.splitIntToBytes(message.getMessageId());
         outputStream.write(messageIdBytes[2]);
         outputStream.write(messageIdBytes[3]);
 
@@ -148,15 +142,12 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
 
         // MultiMap options = message.getOptionHeaders();
         int previousOption = 0;
-        int optionDelta = 0;
 
         // Go through different option numbers
         for (CoAPOptionHeader header : options) {
             int optionNumber = header.getOptionNumber();
-
-            if ((previousOption % 14) == 0) {
-                optionDelta = optionNumber;
-            } else {
+            int optionDelta = optionNumber;
+            if (previousOption % 14 != 0) {
                 optionDelta = optionNumber - previousOption;
             }
 
@@ -165,13 +156,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
             previousOption = optionNumber;
             int optionLength = header.getLength();
 
-            /*
-             CoAPActivator.logger
-             .debug("CoAPMessageWriter: encode option number "
-             + optionNumber);
-             */
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-
+            //CoAPActivator.logger.debug("CoAPMessageWriter: encode option number " + optionNumber);
             byte[] bytes = new byte[3];
             byte tmpByte = bytes[0];
             byte optionByte2 = bytes[1];
@@ -183,7 +168,6 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
 
             // if the length is < 15, do this
             if (header.isNormalLength()) {
-
                 optionByte = BitOperations.setBitsInByte(optionByte,
                         OPTION_LENGTH_START, OPTION_LENGTH_LENGTH,
                         BitOperations.getBitsInIntAsByte(optionLength, 0,
@@ -192,15 +176,13 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
 
                 // If length >= 15, do this
             } else {
-
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
                 optionByte = BitOperations.setBitsInByte(optionByte,
                         OPTION_LENGTH_START, OPTION_LENGTH_LENGTH, 15);
                 stream.write(optionByte);
 
-                optionByte2 = BitOperations.setBitsInByte(optionByte2, 0, 8,
-                        (optionLength - 15));
+                optionByte2 = BitOperations.setBitsInByte(optionByte2, 0, 8, optionLength - 15);
                 stream.write(optionByte2);
                 try {
                     outputStream.write(stream.toByteArray());
@@ -210,10 +192,8 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
             }
 
             if (header.getLength() > 0) {
-                byte[] optionValueBytes = header.getValue();
-
                 try {
-                    outputStream.write(optionValueBytes);
+                    outputStream.write(header.getValue());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -34,6 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * This class represents an Option header in the CoAP message. At the moment the
  * Options are from core draft 07, block options draft 04 and observe option
@@ -227,5 +230,31 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
     @Override
     public int compareTo(CoAPOptionHeader header) {
         return getOptionNumber() - header.getOptionNumber();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(optionName);
+        hash = 59 * hash + Arrays.hashCode(value);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CoAPOptionHeader other = (CoAPOptionHeader) obj;
+        if (optionName != other.optionName) {
+            return false;
+        }
+        if (!Arrays.equals(value, other.value)) {
+            return false;
+        }
+        return true;
     }
 }

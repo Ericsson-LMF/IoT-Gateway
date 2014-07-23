@@ -76,7 +76,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
@@ -112,6 +111,10 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     /**
      * Constructor is protected. A LocalCoAPEndpoint should be instantiated
      * using the CoAPEndpointFactory.
+     *
+     * @param outgoingMessageHandler
+     * @param incomingMessageHandler
+     * @param uri
      */
     protected LocalCoAPEndpoint(OutgoingMessageHandler outgoingMessageHandler,
             IncomingMessageHandler incomingMessageHandler, URI uri) {
@@ -139,8 +142,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     public void setMaxSzx(int maxBlockSzx) {
         this.maxSzx = maxBlockSzx;
         // max block size is 2**(4+szx)
-        Double blockSizeDouble = Math.pow(2, (this.maxSzx + 4));
-        this.maxBlockSize = blockSizeDouble.intValue();
+        this.maxBlockSize = CoAPUtil.getBlockSize(maxSzx).intValue();
         this.blockHandler.setMaxSzx(this.maxSzx);
     }
 
@@ -190,8 +192,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             } else {
                 // If the response included a block2 option, do not use cached
                 // response (blockwise transfer)
-                List<CoAPOptionHeader> block2Headers = resp.getCachedResponse().getOptionHeaders(BLOCK2);
-                if (!block2Headers.isEmpty()) {
+                if (!resp.getCachedResponse().getOptionHeaders(BLOCK2).isEmpty()) {
                     outHandler.send(request, false);
                     return;
                 }
@@ -221,26 +222,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                     return;
                 }
 
-                List<CoAPOptionHeader> headers = request.optionsForMatching();
-                Collections.sort(headers);
-                List<CoAPOptionHeader> originalHeaders = originalReq.optionsForMatching();
-                Collections.sort(originalHeaders);
-
-                int toRemove = 0;
-
-                if (headers.size() == originalHeaders.size()) {
-                    for (int i = 0; i < headers.size(); i++) {
-                        CoAPOptionHeader header = headers.get(i);
-                        CoAPOptionHeader originalHeader = originalHeaders.get(i);
-                        if (originalHeader.getOptionName() == header.getOptionName()) {
-                            if (Arrays.equals(originalHeader.getValue(), header.getValue())) {
-                                toRemove++;
-                            }
-                        }
-                    }
-                }
-
-                if (toRemove < headers.size()) {
+                if (!request.optionsForMatching().equals(originalReq.optionsForMatching())) {
                     outHandler.send(request, false);
                     return;
                 }
@@ -272,8 +254,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 options.add(new CoAPOptionHeader(MAX_AGE, maxAgeBytes));
                 // Notify listener
                 CoAPMessageType type = response.getMessageType();
-                if (type == CONFIRMABLE
-                        || type == NON_CONFIRMABLE) {
+                if (type == CONFIRMABLE || type == NON_CONFIRMABLE) {
 
                     // Cache response
                     // Check the response code to check conditions for caching
@@ -498,8 +479,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * Called by the IncomingMessageHandler when a new incoming response is
      * received
      *
-     * @param received response
-     * @param original request that this request matches to
+     * @param resp response
+     * @throws com.ericsson.deviceaccess.coap.basedriver.api.CoAPException
      */
     @Override
     public void handleResponse(CoAPResponse resp) throws CoAPException {
@@ -804,6 +785,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param resource CoAP resource from which the relationship is to be
      * terminated
      * @param observer observer who wants to terminate the subscription
+     * @return
      * @throws CoAPException
      */
     public boolean terminateObservationRelationship(CoAPResource resource,

@@ -42,7 +42,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -220,12 +220,12 @@ public class CoAPRequest extends CoAPMessage {
      *
      * @return
      */
-    public List<CoAPOptionHeader> optionsForMatching() {
+    public Set<CoAPOptionHeader> optionsForMatching() {
         return getOptionHeaders()
                 .stream()
                 .filter(h -> h.getOptionName() != CoAPOptionName.ETAG)
                 .filter(h -> h.getOptionName() != CoAPOptionName.TOKEN)
                 .filter(h -> h.getOptionName() != CoAPOptionName.MAX_AGE)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

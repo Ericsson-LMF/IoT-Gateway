@@ -42,6 +42,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,9 +53,7 @@ import java.util.TimerTask;
  */
 public class OutgoingMessageHandler {
 
-
     private static final int MAX_RETRANSMIT = 4;
-
 
     // message id 16 bits, so values between 0 and 65535
     public final static int MESSAGE_ID_MAX = 65535;
@@ -99,10 +98,8 @@ public class OutgoingMessageHandler {
      * @param retransmission set to true if the message is resent
      */
     protected void send(CoAPMessage msg, boolean retransmission) {
-        // System.out.println("SEND REQUEST: " + msg.getMessageType().toString()
-        // + " and id: " + msg.getIdentifier());
-        // Can send a new request to the same host, if no messages are in the
-        // retransmission queue
+        // System.out.println("SEND REQUEST: " + msg.getMessageType().toString()  + " and id: " + msg.getIdentifier());
+        // Can send a new request to the same host, if no messages are in the retransmission queue
         if (!retransmission
                 && retransmissionTasks.containsKey(msg.getSocketAddress())
                 && msg instanceof CoAPRequest) {
@@ -116,24 +113,12 @@ public class OutgoingMessageHandler {
 
         // messages are only retransmitted if they're of type confirmable
         if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE) {
-
             int timeoutValue = msg.getTimeout();
-
-            /*
-             CoAPActivator.logger
-             .info("Transmit, nof retransmissions this far : ["
-             + msg.getRetransmissions()
-             + "] , max 4 (re)transmissions allowed");
-
-             CoAPActivator.logger.debug("Timeout value in milliseconds: ["
-             + timeoutValue + "]");
-             */
+            //CoAPActivator.logger .info("Transmit, nof retransmissions this far : ["  + msg.getRetransmissions() + "] , max 4 (re)transmissions allowed");
+            //CoAPActivator.logger.debug("Timeout value in milliseconds: [" + timeoutValue + "]");
             // start timer
             if (msg.getRetransmissions() < MAX_RETRANSMIT) {
-                /*
-                 CoAPActivator.logger.debug("Schedule retransmission");
-                 */
-
+                //CoAPActivator.logger.debug("Schedule retransmission");
                 // Create retransmission only if this is not multicast message
                 RetransmissionTask task = new RetransmissionTask(msg);
                 retransmissionTasks.put(msg.getSocketAddress(), task);
@@ -142,10 +127,7 @@ public class OutgoingMessageHandler {
                 // Increase timeout and number of retransmission
                 msg.messageRetransmitted();
             } else {
-                /*
-                 CoAPActivator.logger
-                 .info("Maximum number of retransmissions reached, cancel this message");
-                 */
+                //CoAPActivator.logger.info("Maximum number of retransmissions reached, cancel this message");
                 removeRetransmissionTask(msg);
                 msg.setMessageCanceled(true);
 
@@ -163,8 +145,7 @@ public class OutgoingMessageHandler {
         }
 
         if (!retransmission) {
-            // cache outgoing confirmable and non-confirm and ack if it has
-            // content
+            // cache outgoing confirmable and non-confirm and ack if it has content
             if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE
                     || msg.getMessageType() == CoAPMessageType.NON_CONFIRMABLE) {
                 this.cacheMessage(msg);
@@ -192,7 +173,7 @@ public class OutgoingMessageHandler {
          }
          */
         // TODO How to handle non-confirmable messages??
-        this.sender.sendMessage(msg);
+        sender.sendMessage(msg);
     }
 
     /**
@@ -237,7 +218,7 @@ public class OutgoingMessageHandler {
      *
      * @return list of responses
      */
-    public synchronized HashMap<String, CoAPResponse> getOutgoingResponses() {
+    public synchronized Map<String, CoAPResponse> getOutgoingResponses() {
         return outgoingReplies;
     }
 
@@ -246,7 +227,7 @@ public class OutgoingMessageHandler {
      *
      * @return list of requests
      */
-    public synchronized HashMap<String, CoAPRequest> getOutgoingRequests() {
+    public synchronized Map<String, CoAPRequest> getOutgoingRequests() {
         return outgoingRequests;
     }
 
@@ -257,21 +238,15 @@ public class OutgoingMessageHandler {
      * @param message message for which a confirmation was received
      */
     protected synchronized void removeRetransmissionTask(CoAPMessage message) {
-        RetransmissionTask task = null;
-
-        // Iterate first to find the task to remove, then remove to avoid
-        // concurrentmodificationexception
-        for (RetransmissionTask t : retransmissionTasks.values()) {
-            if (t.getMessage().getIdentifier().equals(message.getIdentifier())) {
-                task = t;
-                break;
-            }
-        }
-
-        if (task != null) {
-            task.cancel();
-            RetransmissionTask t = retransmissionTasks.remove(message.getSocketAddress());
-        }
+        retransmissionTasks
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue().getMessage().getIdentifier().equals(message.getIdentifier()))
+                .findAny()
+                .ifPresent(e -> {
+                    e.getValue().cancel();
+                    retransmissionTasks.remove(e.getKey());
+                });
     }
 
     /**
@@ -290,7 +265,7 @@ public class OutgoingMessageHandler {
      */
     private class RetransmissionTask extends TimerTask {
 
-        private CoAPMessage message;
+        private final CoAPMessage message;
 
         protected RetransmissionTask(CoAPMessage message) {
             this.message = message;
@@ -298,10 +273,7 @@ public class OutgoingMessageHandler {
 
         @Override
         public void run() {
-            /*
-            CoAPActivator.logger.debug("Retransmit message with ID: "
-            + message.getIdentifier());
-            */
+            //CoAPActivator.logger.debug("Retransmit message with ID: " + message.getIdentifier());
             send(this.message, true);
         }
 

@@ -532,6 +532,18 @@ public class CoAPResource {
         WEATHER_RESOURCE("/weatherResource"),
         OTHER("/other");
 
+        private static final Map<String, CoAPResourceType> pathMap = new HashMap<>();
+
+        static {
+            for (CoAPResourceType content : CoAPResourceType.values()) {
+                pathMap.put(content.getPath(), content);
+            }
+        }
+
+        public static CoAPResourceType getResourceTypePath(String path) {
+            return pathMap.getOrDefault(path, OTHER);
+        }
+
         private final String path;
 
         private CoAPResourceType(String path) {

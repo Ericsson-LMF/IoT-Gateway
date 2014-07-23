@@ -55,10 +55,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
 
     // this is the message being decoded
     private CoAPMessage message;
-    private DatagramPacket packet;
+    private final DatagramPacket packet;
     private int bytePosition;
-    private int optionCount;
-    private byte[] bytes;
     private boolean okOptions;
 
     /**
@@ -98,37 +96,29 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         // Version should be the first 2 bits (unsigned)
         byte[] bytes = packet.getData();
 
-        byte versionByte = BitOperations.getBitsInByteAsByte(
-                bytes[VERSION_BYTE], VERSION_START, VERSION_LENGTH);
+        byte versionByte = BitOperations.getBitsInByteAsByte(bytes[VERSION_BYTE], VERSION_START, VERSION_LENGTH);
         int version = (int) versionByte & 0xff;
 
-        byte typeByte = BitOperations.getBitsInByteAsByte(bytes[TYPE_BYTE],
-                TYPE_START, TYPE_LENGTH);
+        byte typeByte = BitOperations.getBitsInByteAsByte(bytes[TYPE_BYTE], TYPE_START, TYPE_LENGTH);
         int type = (int) typeByte & 0xff;
 
         // Get option count
-        byte optionCountByte = BitOperations.getBitsInByteAsByte(
-                bytes[OPTION_BYTE], OPTION_COUNT_START, OPTION_COUNT_LENGTH);
+        byte optionCountByte = BitOperations.getBitsInByteAsByte(bytes[OPTION_BYTE], OPTION_COUNT_START, OPTION_COUNT_LENGTH);
         bytePosition++;
         int optionCount = (int) optionCountByte & 0xff;
 
-        byte codeByte = BitOperations.getBitsInByteAsByte(bytes[CODE_BYTE],
-                CODE_START, CODE_LENGTH);
+        byte codeByte = BitOperations.getBitsInByteAsByte(bytes[CODE_BYTE], CODE_START, CODE_LENGTH);
         bytePosition++;
         int code = (int) codeByte & 0xff;
 
         // Message ID is a 16-bit unsigned => merge two bytes
-        byte firstByte = BitOperations.getBitsInByteAsByte(bytes[bytePosition],
-                0, 8);
+        byte firstByte = BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8);
         bytePosition++;
-        byte secondByte = BitOperations.getBitsInByteAsByte(
-                bytes[bytePosition], 0, 8);
-
-        int messageId = 0;
+        byte secondByte = BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8);
 
         short shortInt = BitOperations.mergeBytesToShort(firstByte, secondByte);
         // mask to unsigned 16 bit -> int
-        messageId = shortInt & 0xFFFF;
+        int messageId = shortInt & 0xFFFF;
 
         CoAPMessageType messageType = CoAPMessageType.getType(type);
         if (code == 0) {
@@ -139,7 +129,6 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             this.message = new CoAPRequest(version, messageType, code, messageId);
         } else if (code > 63 && code < 192) { // 64-191 response
             this.message = new CoAPResponse(version, messageType, code, messageId);
-
         } else {
             // TODO exception handling
             this.message = null;
@@ -154,14 +143,12 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         this.readPayload(bytes, dataLength);
 
         if (packet.getPort() != -1) {
-            this.message.setSocketAddress((InetSocketAddress) packet
-                    .getSocketAddress());
+            this.message.setSocketAddress((InetSocketAddress) packet.getSocketAddress());
         }
 
         if (this.message instanceof CoAPRequest) {
             try {
-                ((CoAPRequest) message).createUriFromRequest(packet
-                        .getSocketAddress());
+                ((CoAPRequest) message).createUriFromRequest(packet.getSocketAddress());
             } catch (CoAPException e) {
                 e.printStackTrace();
             }
@@ -244,7 +231,6 @@ public class CoAPMessageReader implements CoAPMessageFormat {
 
             // mask option byte
             int optionLength = (int) optionLengthByte & 0xff;
-            byte optionValue;
             // ByteBuffer buf;
             CoAPOptionHeader header;
 
@@ -253,10 +239,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             // to get length!
             if (optionLength == 15) {
                 // read next byte for length
-                optionLengthByte = BitOperations.getBitsInByteAsByte(
-                        bytes[bytePosition], 0, 8);
+                optionLength = (int) BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8) & 0xff;
                 bytePosition++;
-                optionLength = (int) optionLengthByte & 0xff;
 
                 // FIXME in draft core 06 in the message format figure:
                 // Length
@@ -270,10 +254,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
 
             // Go through
             for (int i = 0; i < optionLength; i++) {
-                optionValue = BitOperations.getBitsInByteAsByte(
-                        bytes[bytePosition], 0, 8);
+                buf.write(BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8));
                 bytePosition++;
-                buf.write(optionValue);
             }
 
             // Create new CoAPOptionHeader object and add it to the message
@@ -295,8 +277,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
                     && header.isCritical()
                     && (message.getMessageType() == CoAPMessageType.CONFIRMABLE)) {
                 this.okOptions = false;
-                //CoAPActivator.logger
-                //		.debug("Unrecognized options in a confirmable message");
+                //CoAPActivator.logger.debug("Unrecognized options in a confirmable message");
             }
 
             previousOption = optionNumber;
@@ -315,10 +296,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
         for (int i = 0; i < bytesLeft; i++) {
-            byte value = BitOperations.getBitsInByteAsByte(bytes[bytePosition],
-                    0, 8);
+            buf.write(BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8));
             bytePosition++;
-            buf.write(value);
         }
         message.setPayload(buf.toByteArray());
         /*
