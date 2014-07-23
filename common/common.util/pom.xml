@@ -117,16 +117,20 @@
                     <instructions>
                         <Private-Package>
                             com.fasterxml.jackson.*,
-                            org.codehaus.stax2.*
+                            com.fasterxml.jackson.datatype.jdk7.*,
+                            com.fasterxml.jackson.module.paramnames.*
                         </Private-Package>
-                        <Export-Package>
-                            com.ericsson.commonutil.*,
+                        <Import-Package>
                             com.fasterxml.jackson.module.mrbean.*,
                             com.fasterxml.jackson.module.jaxb.*,
                             com.fasterxml.jackson.dataformat.xml.*,
                             com.fasterxml.jackson.databind.*,
                             com.fasterxml.jackson.core.*,
-                            com.fasterxml.jackson.annotation.*
+                            com.fasterxml.jackson.annotation.*,
+                            org.codehaus.stax2.*
+                        </Import-Package>
+                        <Export-Package>
+                            com.ericsson.commonutil.*,
                         </Export-Package>
                     </instructions>
                 </configuration>

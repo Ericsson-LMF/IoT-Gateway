@@ -142,7 +142,8 @@
                             com.fasterxml.jackson.dataformat.xml.*,
                             com.fasterxml.jackson.databind.*,
                             com.fasterxml.jackson.core.*,
-                            com.fasterxml.jackson.annotation.*
+                            com.fasterxml.jackson.annotation.*,
+                            org.codehaus.stax2.*
                         </Import-Package>
                     </instructions>
                     <Bundle-Name>${project.artifactId}</Bundle-Name>

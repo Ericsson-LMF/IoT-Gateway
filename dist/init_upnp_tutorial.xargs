@@ -45,6 +45,8 @@
 
 -install consoletty-IMPL-4.0.1.jar
 
+-install stax2-api-3.1.4.jar
+
 -install jackson-core-2.4.1.jar
 -install jackson-annotations-2.4.1.jar
 -install jackson-databind-2.4.1.jar
@@ -81,6 +83,8 @@
 -start prefs-4.0.1.jar
 -start event-4.0.1.jar
 -start component-5.0.0.jar
+
+-start stax2-api-3.1.4.jar
 
 -start jackson-core-2.4.1.jar
 -start jackson-annotations-2.4.1.jar
