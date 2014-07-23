@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -202,7 +203,7 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                     .getServiceReferences(GenericDevice.class, null)
                     .stream()
                     .map(ref -> context.getService(ref))
-                    .collect(Collectors.toMap(dev -> dev.getId(), dev -> dev));
+                    .collect(Collectors.toMap(dev -> dev.getId(), Function.identity()));
             return SerializationUtil.execute(Format.JSON, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(devices));
         } catch (InvalidSyntaxException | SerializationException e) {
             logger.error(e);
