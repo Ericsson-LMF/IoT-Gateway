@@ -120,7 +120,13 @@
                             org.codehaus.stax2.*
                         </Private-Package>
                         <Export-Package>
-                            com.ericsson.commonutil.*
+                            com.ericsson.commonutil.*,
+                            com.fasterxml.jackson.module.mrbean.*,
+                            com.fasterxml.jackson.module.jaxb.*,
+                            com.fasterxml.jackson.dataformat.xml.*,
+                            com.fasterxml.jackson.databind.*,
+                            com.fasterxml.jackson.core.*,
+                            com.fasterxml.jackson.annotation.*
                         </Export-Package>
                     </instructions>
                 </configuration>
