@@ -177,7 +177,7 @@ public class BlockwiseTransferHandler {
             int szx = blockOptionHeader.getSzx();
             // If the received szx is bigger that the client can accept, change
             // it to correct one for the next request
-            if (blockOptionHeader.getSzx() > maxSzx) {
+            if (szx > maxSzx) {
                 szx = maxSzx;
             }
 

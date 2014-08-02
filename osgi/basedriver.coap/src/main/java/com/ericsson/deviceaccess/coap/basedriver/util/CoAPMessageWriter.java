@@ -37,6 +37,10 @@ package com.ericsson.deviceaccess.coap.basedriver.util;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInIntAsByte;
+import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInIntAsInt;
+import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.setBitsInByte;
+import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.splitIntToBytes;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -82,27 +86,27 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
         int messageCode = message.getCode();
 
         // First byte with version, message type & option count
-        byte headerByte = BitOperations.setBitsInByte(0, VERSION_START,
+        byte headerByte = setBitsInByte(0, VERSION_START,
                 VERSION_LENGTH,
-                BitOperations.getBitsInIntAsByte(version, 0, VERSION_LENGTH));
-        headerByte = BitOperations.setBitsInByte(headerByte, TYPE_START,
+                getBitsInIntAsByte(version, 0, VERSION_LENGTH));
+        headerByte = setBitsInByte(headerByte, TYPE_START,
                 TYPE_LENGTH,
-                BitOperations.getBitsInIntAsByte(messageType, 0, TYPE_LENGTH));
-        headerByte = BitOperations.setBitsInByte(headerByte,
+                getBitsInIntAsByte(messageType, 0, TYPE_LENGTH));
+        headerByte = setBitsInByte(headerByte,
                 TOKEN_LENGTH_START, TOKEN_LENGTH_LENGTH,
-                BitOperations.getBitsInIntAsByte(tokenLength, 0, TOKEN_LENGTH_LENGTH));
+                getBitsInIntAsByte(tokenLength, 0, TOKEN_LENGTH_LENGTH));
 
         outputStream.write(headerByte);
 
         // byte tmpByteCode = ByteBuffer.allocate(1).get();
-        byte codeByte = BitOperations.setBitsInByte(0, CODE_START,
+        byte codeByte = setBitsInByte(0, CODE_START,
                 CODE_LENGTH,
-                BitOperations.getBitsInIntAsByte(messageCode, 0, CODE_LENGTH));
+                getBitsInIntAsByte(messageCode, 0, CODE_LENGTH));
 
         outputStream.write(codeByte);
 
         // Message ID is a 16-bit unsigned => two bytes
-        byte[] messageIdBytes = BitOperations.splitIntToBytes(message.getMessageId());
+        byte[] messageIdBytes = splitIntToBytes(message.getMessageId());
         outputStream.write(messageIdBytes[2]);
         outputStream.write(messageIdBytes[3]);
 
@@ -157,15 +161,15 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
             if (optionDelta >= ADDITIONAL_DELTA) {
                 if (optionDelta >= ADDITIONAL_DELTA_MAX) {
                     optionDelta -= ADDITIONAL_DELTA_MAX;
-                    additionalDelta1 = BitOperations.getBitsInIntAsInt(optionDelta, 0, 8);
-                    additionalDelta2 = BitOperations.getBitsInIntAsInt(optionDelta, 8, 8);
+                    additionalDelta1 = getBitsInIntAsInt(optionDelta, 0, 8);
+                    additionalDelta2 = getBitsInIntAsInt(optionDelta, 8, 8);
                     optionDelta = ADDITIONAL_DELTA_2;
                 } else {
                     additionalDelta1 = optionDelta - ADDITIONAL_DELTA;
                     optionDelta = ADDITIONAL_DELTA;
                 }
             }
-            byte optionByte = BitOperations.setBitsInByte(0,
+            byte optionByte = setBitsInByte(0,
                     OPTION_DELTA_START, OPTION_DELTA_LENGTH, BitOperations
                     .getBitsInIntAsByte(optionDelta, 0,
                             OPTION_DELTA_LENGTH));
@@ -178,17 +182,17 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
             if (optionLength >= ADDITIONAL_LENGTH) {
                 if (optionLength >= ADDITIONAL_LENGTH_MAX) {
                     optionLength -= ADDITIONAL_LENGTH_MAX;
-                    additionalLength1 = BitOperations.getBitsInIntAsInt(optionLength, 0, 8);
-                    additionalLength2 = BitOperations.getBitsInIntAsInt(optionLength, 8, 8);
+                    additionalLength1 = getBitsInIntAsInt(optionLength, 0, 8);
+                    additionalLength2 = getBitsInIntAsInt(optionLength, 8, 8);
                     optionLength = ADDITIONAL_LENGTH_2;
                 } else {
                     additionalLength1 = optionLength - ADDITIONAL_LENGTH;
                     optionLength = ADDITIONAL_LENGTH;
                 }
             }
-            optionByte = BitOperations.setBitsInByte(optionByte,
+            optionByte = setBitsInByte(optionByte,
                     OPTION_LENGTH_START, OPTION_LENGTH_LENGTH,
-                    BitOperations.getBitsInIntAsByte(optionLength, 0,
+                    getBitsInIntAsByte(optionLength, 0,
                             OPTION_LENGTH_LENGTH));
             outputStream.write(optionByte);
 

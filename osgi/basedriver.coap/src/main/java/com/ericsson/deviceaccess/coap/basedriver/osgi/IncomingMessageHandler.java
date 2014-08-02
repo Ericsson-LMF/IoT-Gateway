@@ -40,12 +40,15 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.ACKNOWLEDGEMENT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.CONFIRMABLE;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.BAD_OPTION;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageReader;
 import java.net.DatagramPacket;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -110,6 +113,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
             }
             if (msg instanceof CoAPRequest) {
                 CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, REQUEST_ENTITY_TOO_LARGE);
+                resp.addOptionHeader(new CoAPOptionHeader(CoAPOptionName.SIZE1, "1280".getBytes(StandardCharsets.UTF_8)));
                 outHandler.send(resp, false);
             } else {
                 System.out.println("TODO: If a response is larger than would fit in the buffer, repeat the request with a suitable Block1 option");

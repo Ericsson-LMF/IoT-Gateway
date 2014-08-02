@@ -110,7 +110,7 @@ public class CoAPResponse extends CoAPMessage {
     }
 
     public boolean isCacheable() {
-		// Draft 07
+	// Draft 07
 
         // 2.03 valid
         if (this.getCode() == 67) {

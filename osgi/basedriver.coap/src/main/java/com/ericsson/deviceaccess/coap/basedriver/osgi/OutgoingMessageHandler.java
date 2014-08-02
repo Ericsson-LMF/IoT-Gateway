@@ -41,11 +41,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Sends the message using the transport layer. Takes care of retransmissions
@@ -63,8 +63,8 @@ public class OutgoingMessageHandler {
     // note that in case of transmission, the current state should be sent out
     // (rather than an old snapshot)
     // All sent messages with token as key
-    private final HashMap<String, CoAPResponse> outgoingReplies;
-    private final HashMap<String, CoAPRequest> outgoingRequests;
+    private final Map<String, CoAPResponse> outgoingReplies;
+    private final Map<String, CoAPRequest> outgoingRequests;
 
     // lower layer transport sender
     private final TransportLayerSender sender;
@@ -74,7 +74,7 @@ public class OutgoingMessageHandler {
 
     private final Timer timer;
 
-    private final HashMap<InetSocketAddress, RetransmissionTask> retransmissionTasks;
+    private final Map<InetSocketAddress, RetransmissionTask> retransmissionTasks;
 
     /**
      * Constructor is protected, an instance of this handler should be fetched
@@ -84,11 +84,11 @@ public class OutgoingMessageHandler {
      */
     protected OutgoingMessageHandler(TransportLayerSender sender) {
         this.messageId = -1;
-        this.outgoingReplies = new HashMap<>();
-        this.outgoingRequests = new HashMap<>();
+        this.outgoingReplies = new ConcurrentHashMap<>();
+        this.outgoingRequests = new ConcurrentHashMap<>();
         this.timer = new Timer();
         this.sender = sender;
-        this.retransmissionTasks = new HashMap<>();
+        this.retransmissionTasks = new ConcurrentHashMap<>();
     }
 
     /**
@@ -181,7 +181,7 @@ public class OutgoingMessageHandler {
      *
      * @param msg message to cache
      */
-    private synchronized void cacheMessage(CoAPMessage msg) {
+    private void cacheMessage(CoAPMessage msg) {
         if (msg instanceof CoAPRequest) {
             outgoingRequests.put(msg.getIdentifier(), (CoAPRequest) msg);
         } else if (msg instanceof CoAPResponse) {
@@ -218,7 +218,7 @@ public class OutgoingMessageHandler {
      *
      * @return list of responses
      */
-    public synchronized Map<String, CoAPResponse> getOutgoingResponses() {
+    public Map<String, CoAPResponse> getOutgoingResponses() {
         return outgoingReplies;
     }
 
@@ -227,7 +227,7 @@ public class OutgoingMessageHandler {
      *
      * @return list of requests
      */
-    public synchronized Map<String, CoAPRequest> getOutgoingRequests() {
+    public Map<String, CoAPRequest> getOutgoingRequests() {
         return outgoingRequests;
     }
 
@@ -237,7 +237,7 @@ public class OutgoingMessageHandler {
      *
      * @param message message for which a confirmation was received
      */
-    protected synchronized void removeRetransmissionTask(CoAPMessage message) {
+    protected void removeRetransmissionTask(CoAPMessage message) {
         retransmissionTasks
                 .entrySet()
                 .stream()

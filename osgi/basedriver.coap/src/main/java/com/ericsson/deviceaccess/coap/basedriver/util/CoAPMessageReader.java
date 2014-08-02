@@ -43,6 +43,8 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
+import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInByteAsByte;
+import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.mergeBytesToShort;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 
@@ -83,11 +85,33 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         return message;
     }
 
+    /**
+     * This method decodes the datagram
+     *
+     * @return
+     * @throws
+     * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
+     */
+    public CoAPMessage decode() throws IncorrectMessageException {
+
+        // CoAPActivator.logger.debug("CoAPMessageReader: Decode message");
+        byte[] bytes = packet.getData();
+
+        int position = decodeStartPos(bytes);
+
+        decodeOptions(bytes, position);
+
+        // Only payload left
+        readPayload(bytes, position);
+
+        return message;
+    }
+
     private int decodeStartPos(byte[] bytes) throws IncorrectMessageException {
         int position = 0;
         // Get version
         // Version should be the first 2 bits (unsigned)
-        byte versionByte = BitOperations.getBitsInByteAsByte(bytes[position], VERSION_START, VERSION_LENGTH);
+        byte versionByte = getBitsInByteAsByte(bytes[position], VERSION_START, VERSION_LENGTH);
         int version = (int) versionByte & 0xff;
         if (version != 1) {
             //MUST be silently ignored //TODO: Handle this
@@ -95,11 +119,11 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         }
 
         // Get type
-        byte typeByte = BitOperations.getBitsInByteAsByte(bytes[position], TYPE_START, TYPE_LENGTH);
+        byte typeByte = getBitsInByteAsByte(bytes[position], TYPE_START, TYPE_LENGTH);
         int type = (int) typeByte & 0xff;
 
         // Get token length
-        byte tokenLengthByte = BitOperations.getBitsInByteAsByte(bytes[position], TOKEN_LENGTH_START, TOKEN_LENGTH_LENGTH);
+        byte tokenLengthByte = getBitsInByteAsByte(bytes[position], TOKEN_LENGTH_START, TOKEN_LENGTH_LENGTH);
         position++;
         int tokenLength = (int) tokenLengthByte & 0xff;
         if (tokenLength > 8) {
@@ -108,7 +132,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         }
 
         // Get code
-        byte codeByte = BitOperations.getBitsInByteAsByte(bytes[position], CODE_START, CODE_LENGTH);
+        byte codeByte = getBitsInByteAsByte(bytes[position], CODE_START, CODE_LENGTH);
         position++;
         int code = (int) codeByte & 0xff;
 
@@ -118,7 +142,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         position++;
         byte secondByte = bytes[position];
         position++;
-        short shortInt = BitOperations.mergeBytesToShort(firstByte, secondByte);
+        short shortInt = mergeBytesToShort(firstByte, secondByte);
         // mask to unsigned 16 bit -> int
         int messageId = shortInt & 0xFFFF;
 
@@ -154,28 +178,6 @@ public class CoAPMessageReader implements CoAPMessageFormat {
     }
 
     /**
-     * This method decodes the datagram
-     *
-     * @return
-     * @throws
-     * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
-     */
-    public CoAPMessage decode() throws IncorrectMessageException {
-
-        // CoAPActivator.logger.debug("CoAPMessageReader: Decode message");
-        byte[] bytes = packet.getData();
-
-        int position = decodeStartPos(bytes);
-
-        decodeOptions(bytes, position);
-
-        // Only payload left
-        readPayload(bytes, position);
-
-        return message;
-    }
-
-    /**
      * This method decodes the options in the given data
      *
      * @param bytes bytes to decode
@@ -184,8 +186,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
     private int decodeOptions(byte[] bytes, int position) throws IncorrectMessageException {
         byte cur = bytes[position];
         position++;
-        int delta = BitOperations.getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
-        int length = BitOperations.getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
+        int delta = getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
+        int length = getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         int optionNumber = 0;
         // An Option can be followed by the end of the message, by another Option, or by the Payload Marker and the payload.
         while (delta != PAYLOAD_MARKER) {
@@ -234,8 +236,8 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             }
             cur = bytes[position];
             position++;
-            delta = BitOperations.getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
-            length = BitOperations.getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
+            delta = getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
+            length = getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         }
         if (length != 0) {
             // If the field is set to this value but the entire byte is not the payload marker, this MUST be processed as a message format error.

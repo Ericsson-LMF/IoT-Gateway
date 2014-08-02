@@ -34,7 +34,6 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPContentType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
@@ -55,7 +54,6 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_QUERY;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
-import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockOptionHeader;
 
 /**
  * This is a helper class to convert option header to string format from byte
@@ -104,19 +102,13 @@ public class CoAPOptionHeaderConverter {
             case BLOCK1:
             case BLOCK2:
                 // show the value as unsigned int
-                try {
-                    BlockOptionHeader b = new BlockOptionHeader(header);
-                    long longValue = this.convertIntToUnsignedLong(header);
-                    // More details for debug (Ryoji)
-                    //value = Long.toString(longValue);
-                    long num = longValue >> 4;
-                    long m = (longValue >> 3) & 0x1L;
-                    long szx = longValue & 7L;
-                    return Long.toString(longValue) + " (Num=" + Long.toString(num) + "/M=" + Long.toString(m)
-                            + "/Sz=" + Long.toString(CoAPUtil.getBlockSize(szx).longValue()) + ")";
-                } catch (CoAPException e) {
-                    e.printStackTrace();
-                }
+                long longValue = this.convertIntToUnsignedLong(header);
+                // More details for debug (Ryoji)
+                //value = Long.toString(longValue);
+                long num = longValue >> 4;
+                long m = (longValue >> 3) & 0x1L;
+                long szx = longValue & 7L;
+                return longValue + " (Num=" + num + "/M=" + m + "/Sz=" + CoAPUtil.getBlockSize(szx) + ")";
             case IF_NONE_MATCH:
             default:
                 return "";
@@ -130,7 +122,6 @@ public class CoAPOptionHeaderConverter {
             Integer.parseInt(in, 16);
             isHex = true;
         } catch (NumberFormatException e) {
-            return isHex;
         }
         return isHex;
     }
@@ -231,7 +222,6 @@ public class CoAPOptionHeaderConverter {
     public long convertIntToUnsignedLong(CoAPOptionHeader h) {
         long unsignedLong = -1;
         if (h.getOptionNumber() == MAX_AGE.getNo()
-                //                || h.getOptionNumber() == CoAPOptionName.MAX_OFE.getNo()
                 || h.getOptionNumber() == CoAPOptionName.BLOCK1.getNo()
                 || h.getOptionNumber() == CoAPOptionName.BLOCK2.getNo()) {
             byte[] valueBytes = h.getValue();

@@ -62,7 +62,6 @@ public class TokenGenerator {
         long hash = 0L;
         MessageDigest digest;
         try {
-            // digest = MessageDigest.getInstance("MD5");
             digest = MessageDigest.getInstance("SHA-256");
 
             long current = System.currentTimeMillis();
@@ -70,12 +69,12 @@ public class TokenGenerator {
             // TODO add destination URI (resource, destination port &
             // destination address)
             String value = String.valueOf(current) + ":" + uri.getHost() + ":" + uri.getPort() + ":" + uri.getPath();
-            byte[] md5hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+            byte[] digested = digest.digest(value.getBytes(StandardCharsets.UTF_8));
 
             for (int i = 0; i < 8; i++) {
                 // 8 bytes, do masking
                 // shift every round 8 to left
-                hash = hash << 8 | md5hash[i] & 0x00000000000000FFL;
+                hash = hash << 8 | digested[i] & 0x00000000000000FFL;
             }
         } catch (NoSuchAlgorithmException e) {
             throw new CoAPException(e);

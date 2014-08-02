@@ -34,12 +34,14 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-public class CoAPUtil {
+public enum CoAPUtil {
+
+    /**
+     * Singleton.
+     */
+    INSTANCE;
 
     public static Double getBlockSize(long szx) {
         return Math.pow(2, szx + 4);
-    }
-
-    private CoAPUtil() {
     }
 }

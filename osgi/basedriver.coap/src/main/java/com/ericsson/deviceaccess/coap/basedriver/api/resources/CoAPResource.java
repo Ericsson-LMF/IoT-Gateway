@@ -133,7 +133,7 @@ public class CoAPResource {
      * This map keeps the different link-format attribute values so that they
      * can be easily written into string
      */
-    private final HashMap<String, String> values;
+    private final Map<String, String> values;
 
     /**
      * Constructor. A CoAP resource is identified using the URI
@@ -196,7 +196,7 @@ public class CoAPResource {
             throws CoAPException {
         StringBuilder linkformat = new StringBuilder();
 
-        if (absolute && this.resourceIdentifier.getHost() == null && host.isEmpty()) {
+        if (absolute && resourceIdentifier.getHost() == null && host.isEmpty()) {
             throw new CoAPException("No host defined for the resource");
         }
 
@@ -546,7 +546,7 @@ public class CoAPResource {
 
         private final String path;
 
-        private CoAPResourceType(String path) {
+        CoAPResourceType(String path) {
             this.path = path;
         }
 
