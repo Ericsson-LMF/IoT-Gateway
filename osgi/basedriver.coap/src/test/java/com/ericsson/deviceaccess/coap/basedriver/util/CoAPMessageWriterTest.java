@@ -35,12 +35,15 @@
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import java.net.DatagramPacket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 public class CoAPMessageWriterTest extends TestCase {
@@ -189,7 +192,7 @@ public class CoAPMessageWriterTest extends TestCase {
         CoAPResponse resp = new CoAPResponse(version, type, msgCode, id);
 
         CoAPOptionHeader option1 = new CoAPOptionHeader("option_1", "test1".getBytes());
-        CoAPOptionHeader option2 = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, "hello".getBytes());
+        CoAPOptionHeader option2 = new CoAPOptionHeader(CoAPOptionName.ETAG, "hello".getBytes());
 
         resp.addOptionHeader(option1);
         resp.addOptionHeader(option2);
@@ -197,18 +200,28 @@ public class CoAPMessageWriterTest extends TestCase {
         assertEquals(2, resp.getOptionCount());
 
         CoAPMessageWriter writer = new CoAPMessageWriter(resp);
-        byte[] stream = writer.encode();
+        byte[] stream = null;
+        try {
+            stream = writer.encode();
+        } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+            Logger.getLogger(CoAPMessageWriterTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         DatagramPacket packet = new DatagramPacket(stream, stream.length);
 
         CoAPMessageReader reader = new CoAPMessageReader(packet);
-        CoAPResponse msg = (CoAPResponse) reader.decode();
+        CoAPResponse msg = null;
+        try {
+            msg = (CoAPResponse) reader.decode();
+        } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+            Logger.getLogger(CoAPMessageWriterTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         int i = 0;
         for (CoAPOptionHeader key : msg.getOptionHeaders()) {
             if (i == 0) {
                 assertEquals(CoAPOptionName.UNKNOWN, key.getOptionName());
             } else if (i == 1) {
-                assertEquals(CoAPOptionName.MAX_OFE, key.getOptionName());
+                assertEquals(CoAPOptionName.ETAG, key.getOptionName());
             }
             i++;
         }

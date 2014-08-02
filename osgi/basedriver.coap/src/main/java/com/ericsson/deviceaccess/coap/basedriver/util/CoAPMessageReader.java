@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
+import com.ericsson.commonutil.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
@@ -42,8 +43,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 
@@ -56,7 +55,6 @@ public class CoAPMessageReader implements CoAPMessageFormat {
     // this is the message being decoded
     private CoAPMessage message;
     private final DatagramPacket packet;
-    private int bytePosition;
     private boolean okOptions;
 
     /**
@@ -67,7 +65,6 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      */
     public CoAPMessageReader(DatagramPacket packet) {
         this.packet = packet;
-        this.bytePosition = 0;
         this.okOptions = true;
     }
 
@@ -81,78 +78,99 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         return okOptions;
     }
 
-    /**
-     * This method decodes the datagram
-     *
-     * @return
-     */
-    public CoAPMessage decode() {
-        /*
-         CoAPActivator.logger.debug("CoAPMessageReader: Decode message");
-         */
+    public CoAPMessage decodeStart() throws IncorrectMessageException {
+        decodeStartPos(packet.getData());
+        return message;
+    }
 
-        int dataLength = packet.getLength();
-
+    private int decodeStartPos(byte[] bytes) throws IncorrectMessageException {
+        int position = 0;
+        // Get version
         // Version should be the first 2 bits (unsigned)
-        byte[] bytes = packet.getData();
-
-        byte versionByte = BitOperations.getBitsInByteAsByte(bytes[VERSION_BYTE], VERSION_START, VERSION_LENGTH);
+        byte versionByte = BitOperations.getBitsInByteAsByte(bytes[position], VERSION_START, VERSION_LENGTH);
         int version = (int) versionByte & 0xff;
+        if (version != 1) {
+            //MUST be silently ignored //TODO: Handle this
+            throw new IncorrectMessageException("Wrong version: " + version);
+        }
 
-        byte typeByte = BitOperations.getBitsInByteAsByte(bytes[TYPE_BYTE], TYPE_START, TYPE_LENGTH);
+        // Get type
+        byte typeByte = BitOperations.getBitsInByteAsByte(bytes[position], TYPE_START, TYPE_LENGTH);
         int type = (int) typeByte & 0xff;
 
-        // Get option count
-        byte optionCountByte = BitOperations.getBitsInByteAsByte(bytes[OPTION_BYTE], OPTION_COUNT_START, OPTION_COUNT_LENGTH);
-        bytePosition++;
-        int optionCount = (int) optionCountByte & 0xff;
+        // Get token length
+        byte tokenLengthByte = BitOperations.getBitsInByteAsByte(bytes[position], TOKEN_LENGTH_START, TOKEN_LENGTH_LENGTH);
+        position++;
+        int tokenLength = (int) tokenLengthByte & 0xff;
+        if (tokenLength > 8) {
+            //MUST NOT be send and MUST be processed as a message format error //TODO: Handle this
+            throw new IncorrectMessageException("Wrong token length: " + tokenLength);
+        }
 
-        byte codeByte = BitOperations.getBitsInByteAsByte(bytes[CODE_BYTE], CODE_START, CODE_LENGTH);
-        bytePosition++;
+        // Get code
+        byte codeByte = BitOperations.getBitsInByteAsByte(bytes[position], CODE_START, CODE_LENGTH);
+        position++;
         int code = (int) codeByte & 0xff;
 
+        // Get message id
         // Message ID is a 16-bit unsigned => merge two bytes
-        byte firstByte = BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8);
-        bytePosition++;
-        byte secondByte = BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8);
-
+        byte firstByte = bytes[position];
+        position++;
+        byte secondByte = bytes[position];
+        position++;
         short shortInt = BitOperations.mergeBytesToShort(firstByte, secondByte);
         // mask to unsigned 16 bit -> int
         int messageId = shortInt & 0xFFFF;
 
+        //Get token
+        byte[] token = new byte[tokenLength];
+        System.arraycopy(bytes, position, token, 0, tokenLength);
+        position += tokenLength;
+
         CoAPMessageType messageType = CoAPMessageType.getType(type);
         if (code == 0) {
             // handle empty messages as responses, only acks can be empty?
-            this.message = new CoAPResponse(version, messageType, code, messageId);
+            message = new CoAPResponse(version, messageType, code, messageId, token);
         } // range 1-31 is a request
         else if (code > 0 && code < 32) {
-            this.message = new CoAPRequest(version, messageType, code, messageId);
+            message = new CoAPRequest(version, messageType, code, messageId, token);
         } else if (code > 63 && code < 192) { // 64-191 response
-            this.message = new CoAPResponse(version, messageType, code, messageId);
+            message = new CoAPResponse(version, messageType, code, messageId, token);
         } else {
             // TODO exception handling
-            this.message = null;
-            return this.message;
+            message = null;
         }
-
-        if (optionCount > 0) {
-            this.decodeOptions(bytes, optionCount);
+        if (message != null && packet.getPort() != -1) {
+            message.setSocketAddress((InetSocketAddress) packet.getSocketAddress());
         }
-
-        // Only payload left
-        this.readPayload(bytes, dataLength);
-
-        if (packet.getPort() != -1) {
-            this.message.setSocketAddress((InetSocketAddress) packet.getSocketAddress());
-        }
-
-        if (this.message instanceof CoAPRequest) {
+        FunctionalUtil.acceptIfCan(CoAPRequest.class, message, m -> {
             try {
-                ((CoAPRequest) message).createUriFromRequest(packet.getSocketAddress());
+                m.createUriFromRequest(packet.getSocketAddress());
             } catch (CoAPException e) {
                 e.printStackTrace();
             }
-        }
+        });
+        return position;
+    }
+
+    /**
+     * This method decodes the datagram
+     *
+     * @return
+     * @throws
+     * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
+     */
+    public CoAPMessage decode() throws IncorrectMessageException {
+
+        // CoAPActivator.logger.debug("CoAPMessageReader: Decode message");
+        byte[] bytes = packet.getData();
+
+        int position = decodeStartPos(bytes);
+
+        decodeOptions(bytes, position);
+
+        // Only payload left
+        readPayload(bytes, position);
 
         return message;
     }
@@ -163,126 +181,71 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      * @param bytes bytes to decode
      * @param optionCount option count (determined from the option count header)
      */
-    private void decodeOptions(byte[] bytes, int optionCount) {
-
-        int optionStartByte = 4;
-        bytePosition = optionStartByte; // Track the position
+    private int decodeOptions(byte[] bytes, int position) throws IncorrectMessageException {
+        byte cur = bytes[position];
+        position++;
+        int delta = BitOperations.getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
+        int length = BitOperations.getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         int optionNumber = 0;
+        // An Option can be followed by the end of the message, by another Option, or by the Payload Marker and the payload.
+        while (delta != PAYLOAD_MARKER) {
+            //Determine option number
+            if (delta == ADDITIONAL_DELTA) {
+                delta += bytes[position];
+                position++;
+            } else if (delta == ADDITIONAL_DELTA_2) {
+                cur = bytes[position];
+                position++;
+                delta = ADDITIONAL_DELTA_MAX + ((cur << 8) + bytes[position]);
+                position++;
+            }
+            optionNumber += delta;
+            CoAPOptionName name = CoAPOptionName.getFromNo(optionNumber);
 
-        /*
-         * Options MUST appear in order of their Option Number!
-         *
-         * The fields in an option are defined as follows:
-         *
-         * Option Delta: 4-bit unsigned integer. Indicates the difference
-         * between the Option Number of this option and the previous option (or
-         * zero for the first option). In other words, the Option Number is
-         * calculated by simply summing the Option Delta fields of this and
-         * previous options before it. The Option Numbers 14, 28, 42, ... are
-         * reserved for no-op options when they are sent with an empty value
-         * (they are ignored) and can be used as "fenceposts" if deltas larger
-         * than 15 would otherwise be required.
-         *
-         * Length: Indicates the length of the Option Value, in bytes. Normally
-         * Length is a 4-bit unsigned integer allowing value lengths of 0-14
-         * bytes. When the Length field is set to 15, another byte is added as
-         * an 8-bit unsigned integer whose value is added to the 15, allowing
-         * option value lengths of 15-270 bytes.
-         *
-         * The length and format of the Option Value depends on the respective
-         * option, which MAY define variable length values. Options defined in
-         * this document make use of the following formats for option values:
-         */
-        int previousOption = -1;
-
-        for (int optionIndex = 0; optionIndex < optionCount; optionIndex++) {
-            boolean fencePost = false;
-            // Options start from byte 4
-
-            byte optionDeltaByte = BitOperations.getBitsInByteAsByte(
-                    bytes[bytePosition], OPTION_DELTA_START,
-                    OPTION_DELTA_LENGTH);
-
-            int optionDelta = (int) optionDeltaByte & 0xff;
-
-            // If the same option number, delta is 0
-            if (optionDelta == 0 && optionIndex > 0) {
-                optionNumber = previousOption;
-            } else {
-
-                // sum the option delta of this and
-                // previous options before it
-                optionNumber += optionDelta;
-
-                // If this option is fence post, it should not be added in the
-                // headers
-                if (optionNumber % 14 == 0) {
-                    fencePost = true;
-                }
+            //Determine length
+            if (length == ADDITIONAL_LENGTH) {
+                length += bytes[position];
+                position++;
+            } else if (length == ADDITIONAL_LENGTH_2) {
+                cur = bytes[position];
+                position++;
+                length = ADDITIONAL_LENGTH_MAX + ((cur << 8) + bytes[position]);
+                position++;
+            }
+            if (!name.isLegalSize(length)) {
+                //If the length of an option value in a request is outside the defined range, that option MUST be treated like an unrecognized option
+                okOptions = false; //TODO: Handle this
             }
 
-            // If option is fence post, ignore content (content should be empty)
-            byte optionLengthByte = BitOperations.getBitsInByteAsByte(
-                    bytes[bytePosition], OPTION_LENGTH_START,
-                    OPTION_LENGTH_LENGTH);
-            // first byte now handled, increase the index of byte being
-            // progressed
-            bytePosition++;
-
-            // mask option byte
-            int optionLength = (int) optionLengthByte & 0xff;
-            // ByteBuffer buf;
-            CoAPOptionHeader header;
-
-            // If option length is set to 15, there is another byte=> read
-            // that
-            // to get length!
-            if (optionLength == 15) {
-                // read next byte for length
-                optionLength = (int) BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8) & 0xff;
-                bytePosition++;
-
-                // FIXME in draft core 06 in the message format figure:
-                // Length
-                // - 15
-                // (but I guess should be Length + 15 (acc to text)
-                optionLength += 15;
-            }
-            // allocate a buffer with needed length
-
-            ByteArrayOutputStream buf = new ByteArrayOutputStream();
-
-            // Go through
-            for (int i = 0; i < optionLength; i++) {
-                buf.write(BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8));
-                bytePosition++;
-            }
-
-            // Create new CoAPOptionHeader object and add it to the message
-            // if the option is fence post, ignore value
-            // if (!fencePost) {
-            header = new CoAPOptionHeader(CoAPOptionName.getFromNo(optionNumber), buf.toByteArray());
-            try {
-                buf.flush();
-                buf.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            boolean okToAdd = message.addOptionHeader(header);
+            byte[] value = new byte[length];
+            System.arraycopy(bytes, position, value, 0, length);
+            position += length;
+            boolean okToAdd = message.addOptionHeader(new CoAPOptionHeader(name, value));
             // TODO draft-ietf-core-coap-08 specifies behaviour when
             // unrecognized options are received in confirmable req/resp.
             // So apply to CON messages only
-            if (!okToAdd
-                    && header.isCritical()
-                    && message.getMessageType() == CoAPMessageType.CONFIRMABLE) {
-                this.okOptions = false;
+            if (!okToAdd && name.isCritical() && message.getMessageType() == CoAPMessageType.CONFIRMABLE) {
+                this.okOptions = false; //TODO: Handle this
                 //CoAPActivator.logger.debug("Unrecognized options in a confirmable message");
             }
 
-            previousOption = optionNumber;
-            fencePost = false;
+            if (position == bytes.length - 1) {
+                return position;
+            }
+            cur = bytes[position];
+            position++;
+            delta = BitOperations.getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
+            length = BitOperations.getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         }
+        if (length != 0) {
+            // If the field is set to this value but the entire byte is not the payload marker, this MUST be processed as a message format error.
+            throw new IncorrectMessageException("Payload marker was bad: " + length); //TODO: Handle this
+        }
+        if (position == bytes.length - 1) {
+            // The presence of a marker followed by a zero-length payload MUST be processed as a message format error.
+            throw new IncorrectMessageException("Empty payload after payload marker"); //TODO: Handle this
+        }
+        return position;
     }
 
     /**
@@ -290,30 +253,10 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      *
      * @param bytes byte array to decode
      */
-    private void readPayload(byte[] bytes, int dataLength) {
-        int bytesLeft = dataLength - bytePosition;
-
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-
-        for (int i = 0; i < bytesLeft; i++) {
-            buf.write(BitOperations.getBitsInByteAsByte(bytes[bytePosition], 0, 8));
-            bytePosition++;
-        }
-        message.setPayload(buf.toByteArray());
-        /*
-         try {
-         CoAPActivator.logger.debug("Received payload: "
-         + new String(buf.toByteArray()));
-         } catch (Exception e) {
-         System.out.println("content cannot be shown as string");
-         }
-         */
-
-        try {
-            buf.flush();
-            buf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void readPayload(byte[] bytes, int position) {
+        int bytesLeft = bytes.length - position;
+        byte[] payload = new byte[bytesLeft];
+        System.arraycopy(bytes, position, payload, 0, bytesLeft);
+        message.setPayload(payload);
     }
 }

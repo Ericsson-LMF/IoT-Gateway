@@ -65,8 +65,12 @@ public class CoAPRequest extends CoAPMessage {
      * @param methodCode code of the request
      * @param messageId message ID
      */
+    public CoAPRequest(int version, CoAPMessageType messageType, int methodCode, int messageId, byte[] token) {
+        super(version, messageType, methodCode, messageId, token);
+    }
+
     public CoAPRequest(int version, CoAPMessageType messageType, int methodCode, int messageId) {
-        super(version, messageType, methodCode, messageId);
+        super(version, messageType, methodCode, messageId, null);
     }
 
     /**
@@ -77,8 +81,12 @@ public class CoAPRequest extends CoAPMessage {
      * @param methodCode code of the request
      * @param messageId message ID
      */
+    public CoAPRequest(CoAPMessageType messageType, int methodCode, int messageId, byte[] token) {
+        super(messageType, methodCode, messageId, token);
+    }
+
     public CoAPRequest(CoAPMessageType messageType, int methodCode, int messageId) {
-        super(messageType, methodCode, messageId);
+        super(messageType, methodCode, messageId, null);
     }
 
     /**
@@ -106,7 +114,7 @@ public class CoAPRequest extends CoAPMessage {
         long token = generator.createToken(uri);
         byte[] bytes = BitOperations.splitLongToBytes(token);
 
-        addOptionHeader(new CoAPOptionHeader(CoAPOptionName.TOKEN, bytes));
+        setToken(bytes);
     }
 
     /**
@@ -208,9 +216,9 @@ public class CoAPRequest extends CoAPMessage {
     }
 
     /**
-     * This method returns a list of CoAP option headers without token, max-age
-     * and etag headers. The method is used when matching two requests for
-     * caching purposes.
+     * This method returns a list of CoAP option headers without max-age and
+     * etag headers. The method is used when matching two requests for caching
+     * purposes.
      *
      * @return
      */
@@ -218,7 +226,6 @@ public class CoAPRequest extends CoAPMessage {
         return getOptionHeaders()
                 .stream()
                 .filter(h -> h.getOptionName() != CoAPOptionName.ETAG)
-                .filter(h -> h.getOptionName() != CoAPOptionName.TOKEN)
                 .filter(h -> h.getOptionName() != CoAPOptionName.MAX_AGE)
                 .collect(Collectors.toSet());
     }

@@ -65,37 +65,37 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
      * This method actually does the encoding.
      *
      * @return encoded byte array
+     * @throws
+     * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
      */
-    public byte[] encode() {
+    public byte[] encode() throws IncorrectMessageException {
         //CoAPActivator.logger.debug("CoAPMessageWriter: encode a message with message ID " + message.getIdentifier());
         // These are the header that all messages should have
         int version = message.getVersion();
         int messageType = message.getMessageType().getNo();
-        int optionCount = message.getOptionCount();
+        byte[] token = message.getToken();
+        int tokenLength = token == null ? 0 : token.length;
+        if (tokenLength > 8) {
+            //MUST NOT be send and MUST be processed as a message format error
+            throw new IncorrectMessageException("Wrong token length: " + tokenLength); //TODO: Handle this
+        }
         int messageCode = message.getCode();
 
-        byte[] bytes = new byte[1];
-        byte tmpByte = bytes[0];
-
         // First byte with version, message type & option count
-        byte headerByte = BitOperations.setBitsInByte(tmpByte, VERSION_START,
+        byte headerByte = BitOperations.setBitsInByte(0, VERSION_START,
                 VERSION_LENGTH,
                 BitOperations.getBitsInIntAsByte(version, 0, VERSION_LENGTH));
         headerByte = BitOperations.setBitsInByte(headerByte, TYPE_START,
                 TYPE_LENGTH,
                 BitOperations.getBitsInIntAsByte(messageType, 0, TYPE_LENGTH));
         headerByte = BitOperations.setBitsInByte(headerByte,
-                OPTION_COUNT_START, OPTION_COUNT_LENGTH,
-                BitOperations.getBitsInIntAsByte(optionCount, 0,
-                        OPTION_COUNT_LENGTH));
+                TOKEN_LENGTH_START, TOKEN_LENGTH_LENGTH,
+                BitOperations.getBitsInIntAsByte(tokenLength, 0, TOKEN_LENGTH_LENGTH));
 
         outputStream.write(headerByte);
 
-        bytes = new byte[1];
-        byte tmpByteCode = bytes[0];
-
         // byte tmpByteCode = ByteBuffer.allocate(1).get();
-        byte codeByte = BitOperations.setBitsInByte(tmpByteCode, CODE_START,
+        byte codeByte = BitOperations.setBitsInByte(0, CODE_START,
                 CODE_LENGTH,
                 BitOperations.getBitsInIntAsByte(messageCode, 0, CODE_LENGTH));
 
@@ -106,12 +106,15 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
         outputStream.write(messageIdBytes[2]);
         outputStream.write(messageIdBytes[3]);
 
-        if (optionCount > 0) {
-            this.encodeOptionHeaders();
+        for (int n = 0; n < tokenLength; n++) {
+            outputStream.write(token[n]);
         }
+
+        this.encodeOptionHeaders();
 
         if (message.getPayload() != null && message.getPayload().length > 0) {
             try {
+                outputStream.write(PAYLOAD_MARKER);
                 outputStream.write(message.getPayload());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -146,49 +149,60 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
         // Go through different option numbers
         for (CoAPOptionHeader header : options) {
             int optionNumber = header.getOptionNumber();
-            int optionDelta = optionNumber;
-            if (previousOption % 14 != 0) {
-                optionDelta = optionNumber - previousOption;
+
+            //Determine delta and if needed additional deltas
+            int optionDelta = optionNumber - previousOption;
+            int additionalDelta1 = -1;
+            int additionalDelta2 = -1;
+            if (optionDelta >= ADDITIONAL_DELTA) {
+                if (optionDelta >= ADDITIONAL_DELTA_MAX) {
+                    optionDelta -= ADDITIONAL_DELTA_MAX;
+                    additionalDelta1 = BitOperations.getBitsInIntAsInt(optionDelta, 0, 8);
+                    additionalDelta2 = BitOperations.getBitsInIntAsInt(optionDelta, 8, 8);
+                    optionDelta = ADDITIONAL_DELTA_2;
+                } else {
+                    additionalDelta1 = optionDelta - ADDITIONAL_DELTA;
+                    optionDelta = ADDITIONAL_DELTA;
+                }
             }
-
-            // cache the previous option number so it can be used to detect
-            // fenceposts
-            previousOption = optionNumber;
-            int optionLength = header.getLength();
-
-            //CoAPActivator.logger.debug("CoAPMessageWriter: encode option number " + optionNumber);
-            byte[] bytes = new byte[3];
-            byte tmpByte = bytes[0];
-            byte optionByte2 = bytes[1];
-
-            byte optionByte = BitOperations.setBitsInByte(tmpByte,
+            byte optionByte = BitOperations.setBitsInByte(0,
                     OPTION_DELTA_START, OPTION_DELTA_LENGTH, BitOperations
                     .getBitsInIntAsByte(optionDelta, 0,
                             OPTION_DELTA_LENGTH));
+            previousOption = optionNumber;
 
-            // if the length is < 15, do this
-            if (header.isNormalLength()) {
-                optionByte = BitOperations.setBitsInByte(optionByte,
-                        OPTION_LENGTH_START, OPTION_LENGTH_LENGTH,
-                        BitOperations.getBitsInIntAsByte(optionLength, 0,
-                                OPTION_LENGTH_LENGTH));
-                outputStream.write(optionByte);
-
-                // If length >= 15, do this
-            } else {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-                optionByte = BitOperations.setBitsInByte(optionByte,
-                        OPTION_LENGTH_START, OPTION_LENGTH_LENGTH, 15);
-                stream.write(optionByte);
-
-                optionByte2 = BitOperations.setBitsInByte(optionByte2, 0, 8, optionLength - 15);
-                stream.write(optionByte2);
-                try {
-                    outputStream.write(stream.toByteArray());
-                } catch (IOException e) {
-                    e.printStackTrace();
+            //Determine optionLength and if needed additional lengths
+            int optionLength = header.getLength();
+            int additionalLength1 = -1;
+            int additionalLength2 = -1;
+            if (optionLength >= ADDITIONAL_LENGTH) {
+                if (optionLength >= ADDITIONAL_LENGTH_MAX) {
+                    optionLength -= ADDITIONAL_LENGTH_MAX;
+                    additionalLength1 = BitOperations.getBitsInIntAsInt(optionLength, 0, 8);
+                    additionalLength2 = BitOperations.getBitsInIntAsInt(optionLength, 8, 8);
+                    optionLength = ADDITIONAL_LENGTH_2;
+                } else {
+                    additionalLength1 = optionLength - ADDITIONAL_LENGTH;
+                    optionLength = ADDITIONAL_LENGTH;
                 }
+            }
+            optionByte = BitOperations.setBitsInByte(optionByte,
+                    OPTION_LENGTH_START, OPTION_LENGTH_LENGTH,
+                    BitOperations.getBitsInIntAsByte(optionLength, 0,
+                            OPTION_LENGTH_LENGTH));
+            outputStream.write(optionByte);
+
+            if (additionalDelta1 != -1) {
+                outputStream.write(additionalDelta1);
+            }
+            if (additionalDelta2 != -1) {
+                outputStream.write(additionalDelta2);
+            }
+            if (additionalLength1 != -1) {
+                outputStream.write(additionalLength1);
+            }
+            if (additionalLength2 != -1) {
+                outputStream.write(additionalLength2);
             }
 
             if (header.getLength() > 0) {

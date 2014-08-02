@@ -514,7 +514,7 @@ public class CoAPService {
                 dos.flush();
 
                 CoAPOptionHeader header = new CoAPOptionHeader(
-                        CoAPOptionName.CONTENT_TYPE, stream.toByteArray());
+                        CoAPOptionName.CONTENT_FORMAT, stream.toByteArray());
                 discoveryReq.addOptionHeader(header);
                 discoveryReq.setListener(this);
 

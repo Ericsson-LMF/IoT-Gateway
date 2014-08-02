@@ -39,7 +39,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.ACKNOWLEDGEMENT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.CONFIRMABLE;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.BAD_OPTION;
@@ -51,6 +51,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class handles the incoming (CoAP) messages, detects duplicates and
@@ -95,9 +97,34 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         }
 
         CoAPMessageReader handler = new CoAPMessageReader(datagram);
-        CoAPMessage msg = handler.decode();
-        // log each message
 
+        if (datagram.getLength() >= 1281) {
+            // response with a 4.13 entity too large
+            //CoAPActivator.logger.debug("Too large datagram received, reply with a 4.13 response");
+            OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
+            CoAPMessage msg = null;
+            try {
+                msg = handler.decodeStart();
+            } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+                Logger.getLogger(IncomingMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (msg instanceof CoAPRequest) {
+                CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, REQUEST_ENTITY_TOO_LARGE);
+                outHandler.send(resp, false);
+            } else {
+                System.out.println("TODO: If a response is larger than would fit in the buffer, repeat the request with a suitable Block1 option");
+            }
+            return;
+        }
+
+        CoAPMessage msg = null;
+        try {
+            msg = handler.decode();
+        } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+            Logger.getLogger(IncomingMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        // log each message
         /*
          String msgStr = "*** Incoming CoAP message ***\n"
          + msg.logMessage();
@@ -110,35 +137,23 @@ public class IncomingMessageHandler implements IncomingMessageListener {
          e.printStackTrace();
          }
          */
-        if (datagram.getLength() >= 1281) {
-            // response with a 4.13 entity too large
-            //CoAPActivator.logger.debug("Too large datagram received, reply with a 4.13 response");
-            OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
-            if (msg instanceof CoAPRequest) {
-                CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, REQUEST_ENTITY_TOO_LARGE);
-                outHandler.send(resp, false);
-            } else {
-                System.out.println("TODO: If a response is larger than would fit in the buffer, repeat the request with a suitable Block1 option");
-            }
-            return;
-        }
-
         // If there are unrecognized options, reply with a reset message for
         // confirmable response and 4.02 response to a confirmable request
         // (fraft-ietf-core-coap-08)
-        if (msg.getMessageType() == CONFIRMABLE && !handler.validOptions()) {
-            //CoAPActivator.logger.debug("Options in the message not valid");
-
-            OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
-            // in case of response, return rst
-            if (msg instanceof CoAPResponse) {
-                //CoAPActivator.logger.debug("Reply to unrecognized options in a response with reset message ");
-                resetMessage((CoAPResponse) msg);
-            } else {
-                // in case of request, return 4.02 bad option
-                //CoAPActivator.logger.debug("Reply to unrecognized options in a response with a 4.02 response");
-                CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, BAD_OPTION);
-                outHandler.send(resp, false);
+        if (!handler.validOptions()) {
+            if (msg.getMessageType() == CONFIRMABLE) {
+                //CoAPActivator.logger.debug("Options in the message not valid");
+                OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
+                // in case of response, return rst
+                if (msg instanceof CoAPResponse) {
+                    //CoAPActivator.logger.debug("Reply to unrecognized options in a response with reset message ");
+                    resetMessage((CoAPResponse) msg);
+                } else {
+                    // in case of request, return 4.02 bad option
+                    //CoAPActivator.logger.debug("Reply to unrecognized options in a response with a 4.02 response");
+                    CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, BAD_OPTION);
+                    outHandler.send(resp, false);
+                }
             }
         } else {
             try {
@@ -217,13 +232,13 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         }
 
         // Check also the tokens, this is the case for separate responses
-        CoAPOptionHeader header = response.getTokenHeader();
+        byte[] header = response.getToken();
         if (header != null) {
             Optional<CoAPRequest> request = outgoingRequests
                     .values()
                     .stream()
-                    .filter(v -> v.getTokenHeader() != null)
-                    .filter(v -> Arrays.equals(v.getTokenHeader().getValue(), header.getValue()))
+                    .filter(v -> v.getToken() != null)
+                    .filter(v -> Arrays.equals(v.getToken(), header))
                     .findAny();
             if (request.isPresent()) {
                 if (response.getMessageType() == CONFIRMABLE) {

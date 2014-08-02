@@ -165,16 +165,6 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
 
     // TODO add setters if needed
     /**
-     * This method can be used to check if the option is critical. Odd number
-     * means a critical option.
-     *
-     * @return true if this option is critical (odd), false otherwise
-     */
-    public boolean isCritical() {
-        return getOptionNumber() % 2 != 0;
-    }
-
-    /**
      * Indicates the length of the option value in bytes. Normally Length is a
      * 4-bit unsigned integer allowing value lengths of 0-14 bytes. When the
      * Length field is set to 15, another byte is added as an 8-bit unsigned
@@ -187,16 +177,15 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         return length;
     }
 
-    /**
-     * Helper method to check how is the length of this option header value. If
-     * the length is < 15, returns true. False otherwise.
-     *
-     * @return return true, if length is <15, false otherwise
-     */
-    public boolean isNormalLength() {
-        return length < 15;
-    }
-
+//    /**
+//     * Helper method to check how is the length of this option header value. If
+//     * the length is < 15, returns true. False otherwise.
+//     *
+//     * @return return true, if length is <15, false otherwise
+//     */
+//    public boolean isNormalLength() {
+//        return length < 15;
+//    }
     /**
      * Get the value of the option in bytes
      *
@@ -210,17 +199,16 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         this.value = value;
     }
 
-    /**
-     * Option Numbers 14, 28, 42 are reserved for no-op options when they are
-     * sent with an empty value (they are ignored)
-     *
-     * @return true, if the option is a fencepost option (defined in core coap
-     * 07)
-     */
-    public boolean isFencepost() {
-        return getOptionNumber() % 14 == 0;
-    }
-
+//    /**
+//     * Option Numbers 14, 28, 42 are reserved for no-op options when they are
+//     * sent with an empty value (they are ignored)
+//     *
+//     * @return true, if the option is a fencepost option (defined in core coap
+//     * 07)
+//     */
+//    public boolean isFencepost() {
+//        return getOptionNumber() % 14 == 0;
+//    }
     /**
      * implementation of compareTo method of the Java comparable interface. This
      * is needed when ordering the list of options in a message
@@ -242,19 +230,13 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         final CoAPOptionHeader other = (CoAPOptionHeader) obj;
         if (optionName != other.optionName) {
             return false;
         }
-        if (!Arrays.equals(value, other.value)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(value, other.value);
     }
 }

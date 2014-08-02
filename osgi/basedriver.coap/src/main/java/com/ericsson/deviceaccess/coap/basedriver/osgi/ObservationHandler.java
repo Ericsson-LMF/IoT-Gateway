@@ -44,14 +44,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPObservationRe
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -153,38 +150,37 @@ public class ObservationHandler {
         // Read the max-age option
         long maxAge = resp.getMaxAge();
 
-        // from draft-ietf-core-observe-03, read the max-ofe header too
-        List<CoAPOptionHeader> headers = resp.getOptionHeaders(CoAPOptionName.MAX_OFE);
-        // by default the maxOfe is 0
-        int maxOfe = 0;
-        if (!headers.isEmpty()) {
-            bytes = headers.get(0).getValue();
-
-            // make the header 4 bytes long
-            if (bytes.length < 4) {
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-
-                int diff = 4 - bytes.length;
-                for (int i = 0; i < diff; i++) {
-                    outStream.write(0);
-                }
-
-                try {
-                    outStream.write(bytes);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                bytes = outStream.toByteArray();
-                maxOfe = BitOperations.mergeBytesToInt(bytes[0], bytes[1], bytes[2], bytes[3]);
-            } else {
-                maxOfe = BitOperations.mergeBytesToInt(bytes[0], bytes[1], bytes[2], bytes[3]);
-            }
-
-            // make signed int to unsigned long
-            res.setMaxOfe(0xffffffffL & maxOfe);
-        }
-
-        long cachingTime = maxAge + maxOfe;
+//        // from draft-ietf-core-observe-03, read the max-ofe header too
+//        List<CoAPOptionHeader> headers = resp.getOptionHeaders(CoAPOptionName.MAX_OFE);
+//        // by default the maxOfe is 0
+//        int maxOfe = 0;
+//        if (!headers.isEmpty()) {
+//            bytes = headers.get(0).getValue();
+//
+//            // make the header 4 bytes long
+//            if (bytes.length < 4) {
+//                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//
+//                int diff = 4 - bytes.length;
+//                for (int i = 0; i < diff; i++) {
+//                    outStream.write(0);
+//                }
+//
+//                try {
+//                    outStream.write(bytes);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                bytes = outStream.toByteArray();
+//                maxOfe = BitOperations.mergeBytesToInt(bytes[0], bytes[1], bytes[2], bytes[3]);
+//            } else {
+//                maxOfe = BitOperations.mergeBytesToInt(bytes[0], bytes[1], bytes[2], bytes[3]);
+//            }
+//
+//            // make signed int to unsigned long
+//            res.setMaxOfe(0xffffffffL & maxOfe);
+//        }
+        long cachingTime = maxAge;// + maxOfe;
         timer.schedule(task, cachingTime * 1000);
 
         if (res != null) {

@@ -37,7 +37,6 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
-import com.ericsson.deviceaccess.coap.basedriver.util.TokenGenerator;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -176,31 +175,18 @@ public class CoAPRequestTest extends TestCase {
 
         req.addOptionHeader(maxAgeHeader);
 
-        TokenGenerator generator = new TokenGenerator();
-        try {
-            long token = generator.createToken(req.getUriFromRequest());
+        String etag = "helloetag";
 
-            byte[] bytes = BitOperations.splitLongToBytes(token);
-            CoAPOptionHeader tokenHeader = new CoAPOptionHeader(
-                    CoAPOptionName.TOKEN, bytes);
-            req.addOptionHeader(tokenHeader);
-            String etag = "helloetag";
+        CoAPOptionHeader etagOpt = new CoAPOptionHeader(
+                CoAPOptionName.ETAG, etag.getBytes());
+        req.addOptionHeader(etagOpt);
 
-            CoAPOptionHeader etagOpt = new CoAPOptionHeader(
-                    CoAPOptionName.ETAG, etag.getBytes());
-            req.addOptionHeader(etagOpt);
+        Set<CoAPOptionHeader> options = req.optionsForMatching();
+        assertFalse(options.contains(etagOpt));
+        assertFalse(options.contains(maxAgeHeader));
 
-            Set<CoAPOptionHeader> options = req.optionsForMatching();
-            assertFalse(options.contains(etagOpt));
-            assertFalse(options.contains(tokenHeader));
-            assertFalse(options.contains(maxAgeHeader));
-
-            assertTrue(options.contains(this.hostOpt));
-            assertTrue(options.contains(this.portOpt));
-
-        } catch (CoAPException e) {
-            e.printStackTrace();
-        }
+        assertTrue(options.contains(this.hostOpt));
+        assertTrue(options.contains(this.portOpt));
     }
 
 }

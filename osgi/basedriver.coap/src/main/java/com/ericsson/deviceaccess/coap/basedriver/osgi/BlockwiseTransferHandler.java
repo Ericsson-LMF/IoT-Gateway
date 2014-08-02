@@ -39,7 +39,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK2;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.TOKEN;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_HOST;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
@@ -148,7 +147,7 @@ public class BlockwiseTransferHandler {
         CoAPOptionHeader blockOption = block2.get(0);
 
         // Check if there exist a message with the same token
-        String tokenString = new String(response.getTokenHeader().getValue(), StandardCharsets.UTF_8);
+        String tokenString = new String(response.getToken(), StandardCharsets.UTF_8);
         CoAPMessage originalResponse = blockwiseMessages.get(tokenString);
 
         if (originalResponse != null) {
@@ -169,7 +168,7 @@ public class BlockwiseTransferHandler {
 
         // if the m flag is set, there are still more blocks
         if (blockOptionHeader.getMFlag()) {
-            CoAPOptionHeader tokenHeader = response.getTokenHeader();
+            byte[] tokenHeader = response.getToken();
             CoAPRequest blockRequest = endpoint.createCoAPRequest(
                     request.getMessageType(), 1, request.getSocketAddress(),
                     request.getUriFromRequest(), tokenHeader);
@@ -212,7 +211,7 @@ public class BlockwiseTransferHandler {
         // read szx from the response
         int szx = header.getSzx();
 
-        String tokenString = new String(request.getTokenHeader().getValue(), StandardCharsets.UTF_8);
+        String tokenString = new String(request.getToken(), StandardCharsets.UTF_8);
         CoAPRequest originalRequest = ongoingBlockwiseRequests.get(tokenString);
         int diff = 1;
         if (!originalRequest.getOptionHeaders(BLOCK1).isEmpty()) {
@@ -264,7 +263,7 @@ public class BlockwiseTransferHandler {
 
         blockRequest = endpoint.createCoAPRequest(request.getMessageType(),
                 request.getCode(), request.getSocketAddress(),
-                request.getUriFromRequest(), request.getTokenHeader());
+                request.getUriFromRequest(), request.getToken());
 
         blockRequest.setListener(request.getListener());
 
@@ -289,7 +288,6 @@ public class BlockwiseTransferHandler {
                 .filter(h -> h.getOptionName() != URI_HOST)
                 .filter(h -> h.getOptionName() != URI_PATH)
                 .filter(h -> h.getOptionName() != URI_PORT)
-                .filter(h -> h.getOptionName() != TOKEN)
                 .filter(h -> h.getOptionName() != BLOCK1)
                 .filter(h -> h.getOptionName() != BLOCK2)
                 .forEach(blockRequest::addOptionHeader);
@@ -303,7 +301,7 @@ public class BlockwiseTransferHandler {
         blockRequest.setListener(request.getListener());
 
         if (blockNumber == 0) {
-            String tokenString = new String(request.getTokenHeader().getValue(), StandardCharsets.UTF_8);
+            String tokenString = new String(request.getToken(), StandardCharsets.UTF_8);
             ongoingBlockwiseRequests.put(tokenString, request);
         }
         return blockRequest;
@@ -327,7 +325,7 @@ public class BlockwiseTransferHandler {
             return response;
         }
 
-        CoAPResponse blockResponse = new CoAPResponse(1, response.getMessageType(), response.getCode(), response.getMessageId());
+        CoAPResponse blockResponse = new CoAPResponse(1, response.getMessageType(), response.getCode(), response.getMessageId(), response.getToken());
         blockResponse.setSocketAddress(response.getSocketAddress());
 
         //byte[] payload = new byte[blockSize];

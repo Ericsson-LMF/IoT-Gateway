@@ -44,10 +44,9 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK2;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.CONTENT_TYPE;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.CONTENT_FORMAT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.ETAG;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.MAX_AGE;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.TOKEN;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_HOST;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
@@ -226,13 +225,10 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 // Remove old headers from the response and replace with updated
                 // information
                 // Replace token header with the token from the request
-                CoAPOptionHeader tokenHeader = request.getTokenHeader();
-                CoAPOptionHeader oldTokenHeader = response.getTokenHeader();
-                List<CoAPOptionHeader> options = response.getOptionHeaders();
+                response.setToken(request.getToken());
 
                 // Replace max-age option header
-                options.remove(oldTokenHeader);
-                options.add(tokenHeader);
+                List<CoAPOptionHeader> options = response.getOptionHeaders();
 
                 options.removeAll(response.getOptionHeaders(MAX_AGE));
 
@@ -306,16 +302,13 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         //
         byte[] payload = response.getPayload();
 
-        boolean hasEtagOption = false;
-        boolean hasTokenOption = false;
-        for (CoAPOptionHeader optionHeader : response.getOptionHeaders()) {
-            CoAPOptionName optionName = optionHeader.getOptionName();
-            if (ETAG == optionName) {
-                hasEtagOption = true;
-            } else if (TOKEN == optionName) {
-                hasTokenOption = true;
-            }
-        }
+        boolean hasTokenOption = response.getToken() != null;
+        boolean hasEtagOption = response.getOptionHeaders()
+                .stream()
+                .map(h -> h.getOptionName())
+                .filter(n -> n == ETAG)
+                .findAny()
+                .isPresent();
 
         // Add ETag option if payload exists
         if (payload != null && payload.length > 0 && !hasEtagOption) {
@@ -349,9 +342,11 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                         // throw new RuntimeException("Invalid Block2 option", e);
                         // XXX: Move on
                     }
-                } else if (TOKEN == optionName && !hasTokenOption) {
-                    response.addOptionHeader(new CoAPOptionHeader(TOKEN, optionHeader.getValue()));
                 }
+            }
+            byte[] token = request.getToken();
+            if (!hasTokenOption) {
+                response.setToken(token);
             }
         }
 
@@ -485,16 +480,13 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
     public CoAPRequest createCoAPRequest(CoAPMessageType messageType,
             int methodCode, InetSocketAddress address, URI uri,
-            CoAPOptionHeader tokenHeader) throws CoAPException {
+            byte[] tokenHeader) throws CoAPException {
         //CoAPActivator.logger.debug("Create CoAP request");
         int messageId = outHandler.generateMessageId();
-        CoAPRequest req = new CoAPRequest(messageType, methodCode, messageId);
+        CoAPRequest req = new CoAPRequest(messageType, methodCode, messageId, tokenHeader);
         req.setUri(uri);
         req.setSocketAddress(address);
 
-        if (tokenHeader != null) {
-            req.addOptionHeader(tokenHeader);
-        }
         String path = "";
         // Add host, port and path options
         String host = uri.getHost();
@@ -548,22 +540,22 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @return request that was matched based on the token
      */
     private CoAPRequest matchBasedOnTokens(CoAPResponse resp) {
-        CoAPOptionHeader tokenHeader = resp.getTokenHeader();
+        byte[] tokenHeader = resp.getToken();
         if (tokenHeader == null) {
             return null;
         }
-        String token = new String(tokenHeader.getValue());
+        String token = new String(tokenHeader, StandardCharsets.UTF_8);
 
         Map<String, CoAPRequest> requests = outHandler.getOutgoingRequests();
         //TODO: Is there better way to do this?
         while (true) {
             try {
                 for (CoAPRequest req : requests.values()) {
-                    CoAPOptionHeader header = req.getTokenHeader();
+                    byte[] header = req.getToken();
                     if (header == null) {
                         return null;
                     }
-                    String reqToken = new String(header.getValue(), StandardCharsets.UTF_8);
+                    String reqToken = new String(header, StandardCharsets.UTF_8);
                     if (token.equals(reqToken)) {
                         return req;
                     }
@@ -808,7 +800,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         // If no uri-query parameters present for rd service or mp service,
         // reply from here
         List<CoAPOptionHeader> queryHeaders = req.getOptionHeaders(URI_QUERY);
-        CoAPOptionHeader tokenHeader = req.getTokenHeader();
+        byte[] tokenHeader = req.getToken();
 
         // TODO how to handle these properly without enum etc..
         HashMap<String, String> attributes = new HashMap<>();
@@ -845,18 +837,13 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 outputStream.write(contentTypeBytes[1]);
 
-                CoAPOptionHeader header = new CoAPOptionHeader(CONTENT_TYPE, outputStream.toByteArray());
-                resp = new CoAPResponse(1, messageType, CoAPResponseCode.CONTENT, req.getMessageId());
-                if (tokenHeader != null) {
-                    resp.addOptionHeader(tokenHeader);
-                }
+                CoAPOptionHeader header = new CoAPOptionHeader(CONTENT_FORMAT, outputStream.toByteArray());
+                resp = new CoAPResponse(1, messageType, CoAPResponseCode.CONTENT, req.getMessageId(), tokenHeader);
+
                 resp.setPayload(payloadStr.toString().getBytes(StandardCharsets.UTF_8));
                 resp.addOptionHeader(header);
             } else {
-                resp = new CoAPResponse(1, messageType, CoAPResponseCode.NOT_FOUND, req.getMessageId());
-                if (tokenHeader != null) {
-                    resp.addOptionHeader(tokenHeader);
-                }
+                resp = new CoAPResponse(1, messageType, CoAPResponseCode.NOT_FOUND, req.getMessageId(), tokenHeader);
             }
 
             resp.setSocketAddress(req.getSocketAddress());
@@ -886,17 +873,11 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     //TODO: What is this method supposed to do?
     private void replyWithNotImplemented(CoAPRequest request) {
         int messageId = request.getMessageId();
-        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_IMPLEMENTED, messageId);
-
-        for (CoAPOptionHeader header : request.getOptionHeaders()) {
-            if (header.getOptionName() == TOKEN) {
-                resp.addOptionHeader(new CoAPOptionHeader(TOKEN, header.getValue()));
-            }
-        }
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_IMPLEMENTED, messageId, request.getToken());
 
         resp.setSocketAddress(request.getSocketAddress());
         // reply directly from here if no listeners are found
-        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_FOUND, messageId);
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_FOUND, messageId, request.getToken());
         resp.setSocketAddress(request.getSocketAddress());
         outHandler.send(resp, false);
     }

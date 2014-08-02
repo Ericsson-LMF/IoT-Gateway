@@ -42,10 +42,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -74,10 +79,6 @@ public abstract class CoAPMessage {
      */
     private CoAPMessageType messageType;
 
-    /*
-     * Option Count (OC): 4-bit unsigned integer.
-     */
-    // private int optionCount;
     /**
      * Code: 8-bit unsigned integer. Indicates if the message carries a request
      * (1-31) or a response (64-191), or is empty (0). (All other code values
@@ -115,7 +116,9 @@ public abstract class CoAPMessage {
     /**
      * List of options. Options MUST appear in order of their Option Number.
      */
-    private List<CoAPOptionHeader> headers;
+    private Map<CoAPOptionName, List<CoAPOptionHeader>> headers;
+
+    private byte[] token;
 
     /**
      * Constructor.
@@ -124,10 +127,11 @@ public abstract class CoAPMessage {
      * @param messageType type of message
      * @param methodCode method code
      * @param messageId message ID
+     * @param token token
      */
     public CoAPMessage(int version, CoAPMessageType messageType,
-            int methodCode, int messageId) {
-        this(messageType, methodCode, messageId);
+            int methodCode, int messageId, byte[] token) {
+        this(messageType, methodCode, messageId, token);
         this.version = version;
     }
 
@@ -137,10 +141,12 @@ public abstract class CoAPMessage {
      * @param messageType type of message
      * @param methodCode method code
      * @param messageId message ID
+     * @param token token
      */
     public CoAPMessage(CoAPMessageType messageType, int methodCode,
-            int messageId) {
-        this.headers = new LinkedList();
+            int messageId, byte[] token) {
+        this.token = token;
+        this.headers = new ConcurrentHashMap<>();
         this.code = methodCode;
         this.messageType = messageType;
         this.version = VERSION_07;
@@ -220,6 +226,20 @@ public abstract class CoAPMessage {
         return this.code;
     }
 
+    public void setToken(byte[] token) {
+        this.token = token;
+    }
+
+    /**
+     * Return the option header from this message (needs to present in all
+     * messages)
+     *
+     * @return token as byte array or null if not found
+     */
+    public byte[] getToken() {
+        return token;
+    }
+
     /**
      * Set message ID for this message
      *
@@ -263,13 +283,9 @@ public abstract class CoAPMessage {
      * message.
      */
     public synchronized boolean addOptionHeader(CoAPOptionHeader option) {
-        if (this.headers.size() == 15) {
-            return false;
-        }
-
-        boolean ok = this.okToAddHeader(option);
+        boolean ok = okToAddHeader(option);
         if (ok) {
-            this.headers.add(option);
+            get(option).add(option);
         }
         return ok;
     }
@@ -290,189 +306,47 @@ public abstract class CoAPMessage {
 
         // TODO make private methods for each header
         // TODO make if elses..
-        // Token header can be added only once
-        if (header.getOptionNumber() == CoAPOptionName.TOKEN.getNo()
-                && this.getTokenHeader() != null) {
-
-            /*
-             CoAPActivator.logger
-             .info("Token header already included in the message");
-             */
-            return false;
-        }
-
         // If contains proxy-uri header(s), it must take precedence over
         // uri-host, uri-port, uri-path & uri-query. thus do not allow these
         // headers to be added if proxy-uri is there
         CoAPOptionName optionName = header.getOptionName();
-        if (this.getOptionHeaders(CoAPOptionName.PROXY_URI).size() > 0
+        if (headers.containsKey(CoAPOptionName.PROXY_URI)
                 && (optionName == CoAPOptionName.URI_HOST
                 || optionName == CoAPOptionName.URI_PATH
                 || optionName == CoAPOptionName.URI_PORT)) {
 
-            /*
-             CoAPActivator.logger
-             .info("Proxy-uri option in the message, not possible to add ["
-             + header.getOptionName() + "] option header");
-             */
+            // CoAPActivator.logger.info("Proxy-uri option in the message, not possible to add [" + header.getOptionName() + "] option header");
             return false;
         }
-
-        // Uri-host should be added only once
-        if (header.getOptionNumber() == CoAPOptionName.URI_HOST.getNo()
-                && this.getUriHostOptionHeader() != null) {
-            /*
-             CoAPActivator.logger
-             .info("Uri-host header already included in the message");
-             */
-
-            return false;
-        }
-
-        // Uri-port should be added only once
-        if (header.getOptionNumber() == CoAPOptionName.URI_PORT.getNo()
-                && this.findOptionHeader(CoAPOptionName.URI_PORT) != null) {
-            /*
-             CoAPActivator.logger
-             .info("Uri-port header already included in the message");
-             */
+        if (!optionName.isRepeatable() && headers.containsKey(optionName)) {
+            // Cannot add multiple repeatables
             return false;
         }
 
         // If Uri-Path, it should contain only one segment of the absolute path
-        if (header.getOptionNumber() == CoAPOptionName.URI_PATH.getNo() && header.getLength() > 0) {
-            String path = new String(header.getValue());
+        if (optionName == CoAPOptionName.URI_PATH && header.getLength() > 0) {
+            String path = new String(header.getValue(), StandardCharsets.UTF_8);
             if (path.startsWith("/")) {
                 path = path.substring(1);
             }
 
-            if (path.contains("/")) {
-                /*
-                 CoAPActivator.logger
-                 .warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
-                 */
-                return false;
-            }
-        }
-
-        // Content-type should be added only once
-        if (header.getOptionNumber() == CoAPOptionName.CONTENT_TYPE.getNo()
-                && this.findOptionHeader(CoAPOptionName.CONTENT_TYPE) != null) {
-            /*
-             CoAPActivator.logger
-             .info("Content-type option header already included in the message");
-             */
-            return false;
-        }
-
-        // max-age only once
-        if (header.getOptionNumber() == CoAPOptionName.MAX_AGE.getNo()
-                && this.findOptionHeader(CoAPOptionName.MAX_AGE) != null) {
-            /*
-             CoAPActivator.logger
-             .info("Max-age header already included in the message");
-             */
-            return false;
-        }
-
-        // etag once in a response
-        if (header.getOptionNumber() == CoAPOptionName.ETAG.getNo()
-                && this.findOptionHeader(CoAPOptionName.ETAG) != null
-                && this instanceof CoAPResponse) {
-            /*
-             CoAPActivator.logger
-             .info("Etag header already included in the message");
-             */
-            return false;
+            // CoAPActivator.logger.warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
+            return !path.contains("/");
         }
 
         // Proxy-uri must take precedence over any of the Uri-Host,
         // Uri-Port, Uri-Path or Uri-Query options. Thus, remove all these
         // headers first!
-        if (header.getOptionNumber() == CoAPOptionName.PROXY_URI.getNo()) {
-
-            /*
-             CoAPActivator.logger
-             .info("Proxy-uri in the message, overwrite Uri-host, Uri-port, Uri-path and Uri-query options");
-             */
-            // remove uri-host if present
-            if (this.getUriHostOptionHeader() != null) {
-                CoAPOptionHeader uriHost = this.getUriHostOptionHeader();
-                this.headers.remove(uriHost);
-            }
-
-            // remove uri-port if present
-            if (this.findOptionHeader(CoAPOptionName.URI_PORT) != null) {
-                CoAPOptionHeader uriPort = this
-                        .findOptionHeader(CoAPOptionName.URI_PORT);
-                this.headers.remove(uriPort);
-            }
-
-            // remove uri-path header(s) if present
-            if (this.findOptionHeader(CoAPOptionName.URI_PATH) != null) {
-
-                List uriPathOptions = this
-                        .getOptionHeaders(CoAPOptionName.URI_PATH);
-                Iterator it = uriPathOptions.iterator();
-                while (it.hasNext()) {
-                    CoAPOptionHeader h = (CoAPOptionHeader) it.next();
-                    this.headers.remove(h);
-                }
-            }
-
-            // remove uri-query header(s) if present
-            if (this.findOptionHeader(CoAPOptionName.URI_QUERY) != null) {
-                List uriPathOptions = this
-                        .getOptionHeaders(CoAPOptionName.URI_QUERY);
-                Iterator it = uriPathOptions.iterator();
-                while (it.hasNext()) {
-                    CoAPOptionHeader h = (CoAPOptionHeader) it.next();
-                    this.headers.remove(h);
-                }
-            }
-            return true;
+        if (optionName == CoAPOptionName.PROXY_URI) {
+            //CoAPActivator.logger.info("Proxy-uri in the message, overwrite Uri-host, Uri-port, Uri-path and Uri-query options");
+            headers = headers.keySet().stream()
+                    .filter(k -> k != CoAPOptionName.URI_HOST)
+                    .filter(k -> k != CoAPOptionName.URI_PORT)
+                    .filter(k -> k != CoAPOptionName.URI_PATH)
+                    .filter(k -> k != CoAPOptionName.URI_QUERY)
+                    .collect(Collectors.toMap(Function.identity(), headers::get));
         }
-
-        // if-none-match only once
-        if (header.getOptionNumber() == CoAPOptionName.IF_NONE_MATCH.getNo()
-                && this.findOptionHeader(CoAPOptionName.IF_NONE_MATCH) != null) {
-            /*
-             CoAPActivator.logger
-             .info("If-none-match header already included in the message");
-             }*/
-            return false;
-        }
-
-        // observe only once
-        if (header.getOptionNumber() == CoAPOptionName.OBSERVE.getNo()
-                && this.findOptionHeader(CoAPOptionName.OBSERVE) != null) {
-            /*
-             CoAPActivator.logger
-             .info("Observe header already included in the message");
-             */
-            return false;
-        }
-
-        // max-ofe only once in a response!
-        if (header.getOptionNumber() == CoAPOptionName.MAX_OFE.getNo()
-                && (this.findOptionHeader(CoAPOptionName.MAX_OFE) != null || !(this instanceof CoAPResponse))) {
-            /*
-             CoAPActivator.logger
-             .info("Max-ofe header already included in the message or this message is not a response");
-             */
-            return false;
-        }
-
-        if (header.getOptionNumber() == CoAPOptionName.BLOCK1.getNo()
-                && this.findOptionHeader(CoAPOptionName.BLOCK1) != null) {
-            /*
-             CoAPActivator.logger
-             .info("Block1 header already included in the message");
-             */
-            return false;
-        }
-
-        return header.getOptionNumber() != CoAPOptionName.BLOCK2.getNo() || this.findOptionHeader(CoAPOptionName.BLOCK2) == null;
+        return true;
     }
 
     /**
@@ -482,8 +356,16 @@ public abstract class CoAPMessage {
      * @return true, if an option header was successfully removed, false
      * otherwise
      */
-    public synchronized boolean removeOptionHeader(CoAPOptionHeader option) {
-        return this.headers.remove(option);
+    public boolean removeOptionHeader(CoAPOptionHeader option) {
+        return get(option).remove(option);
+    }
+
+    private List<CoAPOptionHeader> get(CoAPOptionHeader option) {
+        return get(option.getOptionName());
+    }
+
+    private List<CoAPOptionHeader> get(CoAPOptionName option) {
+        return headers.computeIfAbsent(option, k -> Collections.synchronizedList(new ArrayList<>()));
     }
 
     /**
@@ -505,12 +387,14 @@ public abstract class CoAPMessage {
     }
 
     /**
-     * Get the option headers in this message as LinkedList
+     * Get the option headers in this message as List
      *
      * @return option headers in this message
      */
     public List<CoAPOptionHeader> getOptionHeaders() {
-        return headers;
+        List<CoAPOptionHeader> result = new ArrayList<>();
+        headers.values().stream().forEach(result::addAll);
+        return result;
     }
 
     /**
@@ -521,7 +405,7 @@ public abstract class CoAPMessage {
      * @return list of options with the given option name.
      */
     public List<CoAPOptionHeader> getOptionHeaders(CoAPOptionName optionName) {
-        return headers.stream().filter(header -> header.getOptionName() == optionName).collect(Collectors.toList());
+        return headers.get(optionName);
     }
 
     /**
@@ -531,7 +415,7 @@ public abstract class CoAPMessage {
      */
     public void setOptionHeaders(List<CoAPOptionHeader> headers) {
         this.headers.clear();
-        this.headers = headers;
+        headers.forEach(h -> get(h).add(h));
     }
 
     /**
@@ -641,27 +525,8 @@ public abstract class CoAPMessage {
                 + this.messageId;
     }
 
-    /**
-     * Return the option header from this message (needs to present in all
-     * messages)
-     *
-     * @return token as byte array or null if not found
-     */
-    public CoAPOptionHeader getTokenHeader() {
-        return findOptionHeader(CoAPOptionName.TOKEN);
-    }
-
     public CoAPOptionHeader getUriHostOptionHeader() {
-        return findOptionHeader(CoAPOptionName.URI_HOST);
-    }
-
-    private CoAPOptionHeader findOptionHeader(CoAPOptionName name) {
-        for (CoAPOptionHeader header : headers) {
-            if (header.getOptionName() == name) {
-                return header;
-            }
-        }
-        return null;
+        return get(CoAPOptionName.URI_HOST).get(0);
     }
 
     /**
@@ -670,7 +535,12 @@ public abstract class CoAPMessage {
      * @return encoded message
      */
     public byte[] encoded() {
-        return new CoAPMessageWriter(this).encode();
+        try {
+            return new CoAPMessageWriter(this).encode();
+        } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+            Logger.getLogger(CoAPMessage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     /**
@@ -681,7 +551,7 @@ public abstract class CoAPMessage {
      * @return true if this message contains "observe" option, false otherwise
      */
     public boolean isObserveMessage() {
-        return headers.stream().anyMatch(header -> header.getOptionName() == CoAPOptionName.OBSERVE);
+        return headers.containsKey(CoAPOptionName.OBSERVE);
     }
 
     /**

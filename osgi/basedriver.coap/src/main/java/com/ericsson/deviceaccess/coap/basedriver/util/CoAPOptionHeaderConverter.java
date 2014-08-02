@@ -41,17 +41,15 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.ACCEPT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK2;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.CONTENT_TYPE;
+import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.CONTENT_FORMAT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.ETAG;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.IF_MATCH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.IF_NONE_MATCH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.LOCATION_PATH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.LOCATION_QUERY;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.MAX_AGE;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.MAX_OFE;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.OBSERVE;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.PROXY_URI;
-import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.TOKEN;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_HOST;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
@@ -84,13 +82,13 @@ public class CoAPOptionHeaderConverter {
      */
     public String convertOptionHeaderToString(CoAPOptionHeader header) {
         switch (header.getOptionName()) {
-            case CONTENT_TYPE:
+            case CONTENT_FORMAT:
             case URI_PORT:
             case ACCEPT:
             case OBSERVE:
                 return convertShortToString(header);
             case MAX_AGE:
-            case MAX_OFE:
+//            case MAX_OFE:
                 return convertIntToString(header);
             case PROXY_URI:
             case URI_HOST:
@@ -99,7 +97,6 @@ public class CoAPOptionHeaderConverter {
             case LOCATION_QUERY:
             case LOCATION_PATH:
                 return new String(header.getValue());
-            case TOKEN:
             case ETAG:
             case IF_MATCH: // TODO etag, token and if-match
                 // TODO check if the byte array is hex or string??
@@ -171,7 +168,7 @@ public class CoAPOptionHeaderConverter {
         // content type, uri-port and accept headers' length 0-2 bytes
         String value = "";
         int unsignedShort = this.shortToUnsignedInt(header);
-        if (header.getOptionName() == CONTENT_TYPE) {
+        if (header.getOptionName() == CONTENT_FORMAT) {
             value = CoAPContentType.getContentTypeName(unsignedShort)
                     .getContentType();
         } else if (header.getOptionName() == OBSERVE
@@ -192,20 +189,17 @@ public class CoAPOptionHeaderConverter {
     public int shortToUnsignedInt(CoAPOptionHeader h) {
         int unsignedShort = -1;
 
-        if (h.getOptionNumber() == CONTENT_TYPE.getNo()
-                || h.getOptionNumber() == URI_PORT.getNo()
-                || h.getOptionNumber() == ACCEPT.getNo()
-                || h.getOptionNumber() == OBSERVE.getNo()) {
+        if (h.getOptionName() == CONTENT_FORMAT
+                || h.getOptionName() == URI_PORT
+                || h.getOptionName() == ACCEPT
+                || h.getOptionName() == OBSERVE) {
 
             byte[] headerBytes = h.getValue();
             short shortInt = 0;
             if (headerBytes.length == 1) {
-                byte[] emptyByte = new byte[1];
-                shortInt = BitOperations.mergeBytesToShort(emptyByte[0],
-                        headerBytes[0]);
+                shortInt = BitOperations.mergeBytesToShort((byte) 0, headerBytes[0]);
             } else if (headerBytes.length == 2) {
-                shortInt = BitOperations.mergeBytesToShort(headerBytes[0],
-                        headerBytes[1]);
+                shortInt = BitOperations.mergeBytesToShort(headerBytes[0], headerBytes[1]);
             }
             unsignedShort = shortInt & 0xFFFF;
         }
@@ -237,7 +231,7 @@ public class CoAPOptionHeaderConverter {
     public long convertIntToUnsignedLong(CoAPOptionHeader h) {
         long unsignedLong = -1;
         if (h.getOptionNumber() == MAX_AGE.getNo()
-                || h.getOptionNumber() == CoAPOptionName.MAX_OFE.getNo()
+                //                || h.getOptionNumber() == CoAPOptionName.MAX_OFE.getNo()
                 || h.getOptionNumber() == CoAPOptionName.BLOCK1.getNo()
                 || h.getOptionNumber() == CoAPOptionName.BLOCK2.getNo()) {
             byte[] valueBytes = h.getValue();

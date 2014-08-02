@@ -46,24 +46,22 @@ public class CoAPOptionHeaderTest extends TestCase {
     }
 
     public void testGetOptionName() {
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE);
-        assertEquals(h.getOptionNumber(), CoAPOptionName.CONTENT_TYPE.getNo());
+        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT);
+        assertEquals(h.getOptionNumber(), CoAPOptionName.CONTENT_FORMAT.getNo());
 
         h = new CoAPOptionHeader(CoAPOptionName.OBSERVE);
         assertEquals(h.getOptionNumber(), CoAPOptionName.OBSERVE.getNo());
 
         // one negative test
         h = new CoAPOptionHeader(CoAPOptionName.OBSERVE);
-        assertFalse(h.getOptionNumber() == CoAPOptionName.CONTENT_TYPE.getNo());
+        assertFalse(h.getOptionNumber() == CoAPOptionName.CONTENT_FORMAT.getNo());
     }
 
     public void testIsCritical() {
         // observe header is not critical (even option number)
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.OBSERVE);
-        assertFalse(h.isCritical());
+        assertFalse(CoAPOptionName.OBSERVE.isCritical());
         // content-type header is critical (odd option number)
-        h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE);
-        assertTrue(h.isCritical());
+        assertTrue(CoAPOptionName.CONTENT_FORMAT.isCritical());
     }
 
     public void testGetLength() {
@@ -74,7 +72,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         outputStream.write(contentTypeBytes[1]);
 
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE,
+        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT,
                 outputStream.toByteArray());
 
         byte[] test = outputStream.toByteArray();
@@ -82,7 +80,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         int headerLength = h.getLength();
         assertEquals(test.length, headerLength);
 
-        h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE.getName(), outputStream.toByteArray());
+        h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT.getName(), outputStream.toByteArray());
         try {
             outputStream.flush();
         } catch (IOException e) {
@@ -96,32 +94,31 @@ public class CoAPOptionHeaderTest extends TestCase {
         assertFalse(test.length == headerLength);
     }
 
-    public void testIsNormalLength() {
-        short id = 41; // try with application/xml
-
-        byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(contentTypeBytes[1]);
-
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE,
-                outputStream.toByteArray());
-
-        byte[] test = outputStream.toByteArray();
-
-        boolean isNormalLength = h.isNormalLength();
-        assertTrue(isNormalLength);
-
-        outputStream = new ByteArrayOutputStream();
-        for (int i = 0; i < 17; i++) {
-            outputStream.write(contentTypeBytes[1]);
-        }
-        h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE,
-                outputStream.toByteArray());
-
-        // Now the header is not normal length anymore
-        assertFalse(h.isNormalLength());
-    }
-
+//    public void testIsNormalLength() {
+//        short id = 41; // try with application/xml
+//
+//        byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        outputStream.write(contentTypeBytes[1]);
+//
+//        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT,
+//                outputStream.toByteArray());
+//
+//        byte[] test = outputStream.toByteArray();
+//
+//        boolean isNormalLength = h.isNormalLength();
+//        assertTrue(isNormalLength);
+//
+//        outputStream = new ByteArrayOutputStream();
+//        for (int i = 0; i < 17; i++) {
+//            outputStream.write(contentTypeBytes[1]);
+//        }
+//        h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT,
+//                outputStream.toByteArray());
+//
+//        // Now the header is not normal length anymore
+//        assertFalse(h.isNormalLength());
+//    }
     public void testSetValue() {
         short id = 41; // try with application/xml
 
@@ -129,7 +126,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         outputStream.write(contentTypeBytes[1]);
 
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE,
+        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT,
                 outputStream.toByteArray());
         byte[] test = outputStream.toByteArray();
         org.junit.Assert.assertArrayEquals(h.getValue(), test);
@@ -143,63 +140,58 @@ public class CoAPOptionHeaderTest extends TestCase {
         org.junit.Assert.assertNotSame(test, h.getValue());
     }
 
-    public void testIsFencepost() {
-        short id = 41;
-        byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(contentTypeBytes[1]);
-        CoAPOptionHeader h = new CoAPOptionHeader("test", outputStream.toByteArray());
-
-        assertTrue(h.isFencepost());
-
-        h = new CoAPOptionHeader(CoAPOptionName.ACCEPT);
-        assertFalse(h.isFencepost());
-    }
-
-    public void testCompareTo() {
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE);
-        CoAPOptionHeader h2 = new CoAPOptionHeader(CoAPOptionName.OBSERVE);
-
-        assertEquals(h.getOptionNumber() - h2.getOptionNumber(), -9);
-    }
-
+//    public void testIsFencepost() {
+//        short id = 41;
+//        byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        outputStream.write(contentTypeBytes[1]);
+//        CoAPOptionHeader h = new CoAPOptionHeader("test", outputStream.toByteArray());
+//
+//        assertTrue(h.isFencepost());
+//
+//        h = new CoAPOptionHeader(CoAPOptionName.ACCEPT);
+//        assertFalse(h.isFencepost());
+//    }
+//    public void testCompareTo() {
+//        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT);
+//        CoAPOptionHeader h2 = new CoAPOptionHeader(CoAPOptionName.OBSERVE);
+//
+//        assertEquals(-9, h.getOptionNumber() - h2.getOptionNumber());
+//    }
     public void testOptionHeaderCodes() {
         // Test all the names and codes match!
 
-        CoAPOptionName name = CoAPOptionName.CONTENT_TYPE;
+        CoAPOptionName name = CoAPOptionName.CONTENT_FORMAT;
 
-        assertEquals(name.getName(), "Content-Type");
-        assertEquals(CoAPOptionName.CONTENT_TYPE.getNo(), 1);
+        assertEquals("Content-Type", name.getName());
+        assertEquals(CoAPOptionName.CONTENT_FORMAT.getNo(), 1);
 
-        assertEquals(CoAPOptionName.MAX_AGE.getName(), "Max-Age");
-        assertEquals(CoAPOptionName.MAX_AGE.getNo(), 2);
+        assertEquals("Max-Age", CoAPOptionName.MAX_AGE.getName());
+        assertEquals(2, CoAPOptionName.MAX_AGE.getNo());
 
-        assertEquals(CoAPOptionName.PROXY_URI.getName(), "Proxy-Uri");
-        assertEquals(CoAPOptionName.PROXY_URI.getNo(), 3);
+        assertEquals("Proxy-Uri", CoAPOptionName.PROXY_URI.getName());
+        assertEquals(3, CoAPOptionName.PROXY_URI.getNo());
 
-        assertEquals(CoAPOptionName.ETAG.getName(), "ETag");
-        assertEquals(CoAPOptionName.ETAG.getNo(), 4);
+        assertEquals("ETag", CoAPOptionName.ETAG.getName());
+        assertEquals(4, CoAPOptionName.ETAG.getNo());
 
-        assertEquals(CoAPOptionName.URI_HOST.getName(), "Uri-Host");
-        assertEquals(CoAPOptionName.URI_HOST.getNo(), 5);
+        assertEquals("Uri-Host", CoAPOptionName.URI_HOST.getName());
+        assertEquals(5, CoAPOptionName.URI_HOST.getNo());
 
-        assertEquals(CoAPOptionName.LOCATION_PATH.getName(), "Location-Path");
-        assertEquals(CoAPOptionName.LOCATION_PATH.getNo(), 6);
+        assertEquals("Location-Path", CoAPOptionName.LOCATION_PATH.getName());
+        assertEquals(6, CoAPOptionName.LOCATION_PATH.getNo());
 
-        assertEquals(CoAPOptionName.URI_PORT.getName(), "Uri-Port");
-        assertEquals(CoAPOptionName.URI_PORT.getNo(), 7);
+        assertEquals("Uri-Port", CoAPOptionName.URI_PORT.getName());
+        assertEquals(7, CoAPOptionName.URI_PORT.getNo());
 
-        assertEquals(CoAPOptionName.LOCATION_QUERY.getName(), "Location-Query");
-        assertEquals(CoAPOptionName.LOCATION_QUERY.getNo(), 8);
+        assertEquals("Location-Query", CoAPOptionName.LOCATION_QUERY.getName());
+        assertEquals(8, CoAPOptionName.LOCATION_QUERY.getNo());
 
-        assertEquals(CoAPOptionName.URI_PATH.getName(), "Uri-Path");
-        assertEquals(CoAPOptionName.URI_PATH.getNo(), 9);
+        assertEquals("Uri-Path", CoAPOptionName.URI_PATH.getName());
+        assertEquals(9, CoAPOptionName.URI_PATH.getNo());
 
-        assertEquals(CoAPOptionName.TOKEN.getName(), "Token");
-        assertEquals(CoAPOptionName.TOKEN.getNo(), 11);
-
-        assertEquals(CoAPOptionName.URI_QUERY.getName(), "Uri-Query");
-        assertEquals(CoAPOptionName.URI_QUERY.getNo(), 15);
+        assertEquals("Uri-Query", CoAPOptionName.URI_QUERY.getName());
+        assertEquals(15, CoAPOptionName.URI_QUERY.getNo());
 
     }
 }

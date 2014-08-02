@@ -55,19 +55,18 @@ public class CoAPMessageTest extends TestCase {
         converter = new CoAPOptionHeaderConverter();
     }
 
-    public void testAddTokenHeader() {
-        assertNull(resp.getTokenHeader());
-        // Token header
-        CoAPOptionHeader tokenHeader = new CoAPOptionHeader(
-                CoAPOptionName.TOKEN);
-        // should be ok to add one token header
-        assertTrue(resp.addOptionHeader(tokenHeader));
-        // but not a second one
-        assertFalse(resp.addOptionHeader(tokenHeader));
-
-        assertEquals(1, resp.getOptionCount());
-    }
-
+//    public void testAddTokenHeader() {
+//        assertNull(resp.getTokenHeader());
+//        // Token header
+//        CoAPOptionHeader tokenHeader = new CoAPOptionHeader(
+//                CoAPOptionName.TOKEN);
+//        // should be ok to add one token header
+//        assertTrue(resp.addOptionHeader(tokenHeader));
+//        // but not a second one
+//        assertFalse(resp.addOptionHeader(tokenHeader));
+//
+//        assertEquals(1, resp.getOptionCount());
+//    }
     public void testAddUriHeaders() {
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.URI_HOST);
         // should be ok to add one token header
@@ -120,14 +119,14 @@ public class CoAPMessageTest extends TestCase {
 
     public void testAddContentTypeHeader() {
         // content-type
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE);
+        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT);
         resp.addOptionHeader(h);
         List optionHeaders = resp.getOptionHeaders();
         Iterator it = optionHeaders.iterator();
 
         while (it.hasNext()) {
             CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-            assertEquals(CoAPOptionName.CONTENT_TYPE, header.getOptionName());
+            assertEquals(CoAPOptionName.CONTENT_FORMAT, header.getOptionName());
         }
 
         // Token header
@@ -282,82 +281,80 @@ public class CoAPMessageTest extends TestCase {
         }
     }
 
-    /*
-     * Test for max-ofe header (draft-ietf-core-observe-03). can be present only
-     * in responses
-     */
-    public void testAddMaxOfeHeader() {
-        int value = 20;
-        byte[] bytes = BitOperations.splitIntToBytes(value);
-        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, bytes);
-        // max-ofe cannot be added in request
-        assertFalse(req.addOptionHeader(h));
-        // can be added in response
-        assertTrue(resp.addOptionHeader(h));
-
-        resp.removeOptionHeader(h);
-
-        double max = Math.pow(2, 32) - 1;
-
-        Double maxDouble = max;
-        long unsignedIntMax = maxDouble.longValue();
-        byte[] longBytes = BitOperations.splitLongToBytes(unsignedIntMax);
-
-        byte[] intValue = new byte[4];
-        intValue[0] = longBytes[4];
-        intValue[1] = longBytes[5];
-        intValue[2] = longBytes[6];
-        intValue[3] = longBytes[7];
-
-        h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
-        resp.addOptionHeader(h);
-
-        CoAPOptionHeader retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
-        long maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
-        assertEquals(maxOfeFromHeader, unsignedIntMax);
-
-        // test with some normal value, 4
-        resp.removeOptionHeader(h);
-
-        int oneByteInt = 4;
-        longBytes = BitOperations.splitLongToBytes(oneByteInt);
-
-        intValue = new byte[4];
-        intValue[0] = longBytes[4];
-        intValue[1] = longBytes[5];
-        intValue[2] = longBytes[6];
-        intValue[3] = longBytes[7];
-
-        h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
-        resp.addOptionHeader(h);
-
-        retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
-        maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
-        assertEquals(maxOfeFromHeader, oneByteInt);
-
-        resp.removeOptionHeader(h);
-
-        // test with two byte value
-        double twoByteValue = Math.pow(2, 9) - 1;
-        maxDouble = twoByteValue;
-        long twoByteLong = maxDouble.longValue();
-        longBytes = BitOperations.splitLongToBytes(twoByteLong);
-
-        intValue = new byte[4];
-        intValue[0] = longBytes[4];
-        intValue[1] = longBytes[5];
-        intValue[2] = longBytes[6];
-        intValue[3] = longBytes[7];
-
-        h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
-        resp.addOptionHeader(h);
-
-        retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
-        maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
-        assertEquals(maxOfeFromHeader, maxDouble.intValue());
-    }
-
-
+//    /*
+//     * Test for max-ofe header (draft-ietf-core-observe-03). can be present only
+//     * in responses
+//     */
+//    public void testAddMaxOfeHeader() {
+//        int value = 20;
+//        byte[] bytes = BitOperations.splitIntToBytes(value);
+//        CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, bytes);
+//        // max-ofe cannot be added in request
+//        assertFalse(req.addOptionHeader(h));
+//        // can be added in response
+//        assertTrue(resp.addOptionHeader(h));
+//
+//        resp.removeOptionHeader(h);
+//
+//        double max = Math.pow(2, 32) - 1;
+//
+//        Double maxDouble = max;
+//        long unsignedIntMax = maxDouble.longValue();
+//        byte[] longBytes = BitOperations.splitLongToBytes(unsignedIntMax);
+//
+//        byte[] intValue = new byte[4];
+//        intValue[0] = longBytes[4];
+//        intValue[1] = longBytes[5];
+//        intValue[2] = longBytes[6];
+//        intValue[3] = longBytes[7];
+//
+//        h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
+//        resp.addOptionHeader(h);
+//
+//        CoAPOptionHeader retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
+//        long maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
+//        assertEquals(maxOfeFromHeader, unsignedIntMax);
+//
+//        // test with some normal value, 4
+//        resp.removeOptionHeader(h);
+//
+//        int oneByteInt = 4;
+//        longBytes = BitOperations.splitLongToBytes(oneByteInt);
+//
+//        intValue = new byte[4];
+//        intValue[0] = longBytes[4];
+//        intValue[1] = longBytes[5];
+//        intValue[2] = longBytes[6];
+//        intValue[3] = longBytes[7];
+//
+//        h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
+//        resp.addOptionHeader(h);
+//
+//        retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
+//        maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
+//        assertEquals(maxOfeFromHeader, oneByteInt);
+//
+//        resp.removeOptionHeader(h);
+//
+//        // test with two byte value
+//        double twoByteValue = Math.pow(2, 9) - 1;
+//        maxDouble = twoByteValue;
+//        long twoByteLong = maxDouble.longValue();
+//        longBytes = BitOperations.splitLongToBytes(twoByteLong);
+//
+//        intValue = new byte[4];
+//        intValue[0] = longBytes[4];
+//        intValue[1] = longBytes[5];
+//        intValue[2] = longBytes[6];
+//        intValue[3] = longBytes[7];
+//
+//        h = new CoAPOptionHeader(CoAPOptionName.MAX_OFE, intValue);
+//        resp.addOptionHeader(h);
+//
+//        retrieved = resp.getOptionHeaders(CoAPOptionName.MAX_OFE).get(0);
+//        maxOfeFromHeader = converter.convertIntToUnsignedLong(retrieved);
+//        assertEquals(maxOfeFromHeader, maxDouble.intValue());
+//    }
     /*
      * Test for observe option header (draft-ietf-core-observe-03). can be
      * present only once in req/resp
