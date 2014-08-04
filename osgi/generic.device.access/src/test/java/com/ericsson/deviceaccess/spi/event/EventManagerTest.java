@@ -49,6 +49,7 @@ import org.junit.After;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -103,6 +104,7 @@ public class EventManagerTest {
         listener = context.mock(GDEventListener.class);
         eventManager = new EventManager();
         eventManager.setContext(bundleContext);
+        eventManager.start();
         timer = new Timer();
         timer.schedule(new ShutdownTask(), 3000);
 
@@ -128,7 +130,7 @@ public class EventManagerTest {
         eventManager.shutdown();
     }
 
-//    @Test
+    @Test
     public void testNullFilter() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = null;
