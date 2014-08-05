@@ -104,7 +104,7 @@ public class EventManagerTest {
         listener = context.mock(GDEventListener.class);
         eventManager = new EventManager();
         eventManager.setContext(bundleContext);
-        eventManager.start();
+
         timer = new Timer();
         timer.schedule(new ShutdownTask(), 3000);
 
@@ -113,7 +113,8 @@ public class EventManagerTest {
                 oneOf(bundleContext).createFilter(with(aNonNull(String.class)));
                 allowing(bundleContext).addServiceListener(with(any(ServiceListener.class)), with(aNonNull(String.class)));
                 allowing(bundleContext).removeServiceListener(with(any(ServiceListener.class)));
-                allowing(bundleContext).getServiceReferences(with("com.ericsson.deviceaccess.api.GenericDevice"), with(aNull(String.class)));
+                allowing(bundleContext).getServiceReferences(with(any(Class.class)), with(any(String.class)));
+                allowing(bundleContext).getServiceReferences(with(any(String.class)), with(any(String.class)));
             }
         });
 
@@ -159,7 +160,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -218,7 +219,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -272,7 +273,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -331,7 +332,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -386,7 +387,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -434,7 +435,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -482,7 +483,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -513,7 +514,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -556,7 +557,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
 
@@ -599,7 +600,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
 
