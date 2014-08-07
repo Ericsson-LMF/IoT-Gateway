@@ -29,6 +29,7 @@
                             org.apache.commons.collections.map.*,
                         </Private-Package>
                         <Import-Package>
+                            com.ericsson.common.util.*,
                             com.ericsson.deviceaccess.*,
                             org.osgi.*;version="[1.0,4.0)"
                         </Import-Package>
@@ -60,6 +61,11 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

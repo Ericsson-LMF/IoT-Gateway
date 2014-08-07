@@ -33,13 +33,13 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.coap.basedriver.util;
+package com.ericsson.common.util;
 
 /**
  * A class that contains methods for manipulating binary values
  *
  */
-public enum BitOperations {
+public enum BitUtil {
 
     /**
      * Singleton.

@@ -34,6 +34,8 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
+import static com.ericsson.common.util.BitUtil.getBitsInByteAsByte;
+import static com.ericsson.common.util.BitUtil.mergeBytesToShort;
 import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
@@ -43,8 +45,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInByteAsByte;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.mergeBytesToShort;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 
@@ -152,13 +153,9 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         position += tokenLength;
 
         CoAPMessageType messageType = CoAPMessageType.getType(type);
-        if (code == 0) {
-            // handle empty messages as responses, only acks can be empty?
-            message = new CoAPResponse(version, messageType, code, messageId, token);
-        } // range 1-31 is a request
-        else if (code > 0 && code < 32) {
+        if (CoAPResponseCode.isValid(code)) {
             message = new CoAPRequest(version, messageType, code, messageId, token);
-        } else if (code > 63 && code < 192) { // 64-191 response
+        } else if (CoAPMessageType.isValid(code)) {
             message = new CoAPResponse(version, messageType, code, messageId, token);
         } else {
             // TODO exception handling

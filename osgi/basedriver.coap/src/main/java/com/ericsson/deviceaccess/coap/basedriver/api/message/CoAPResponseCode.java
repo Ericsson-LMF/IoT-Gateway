@@ -34,39 +34,37 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * response codes defined in core draft 11 (including obsoleted codes)
  */
-public enum CoAPResponseCode {
+public enum CoAPResponseCode implements CoAPCode {
 
-    //TODO: Where number comes from?
-    UNKNOWN(0, "ACK/RESET?"),
-    CREATED(65, "2.01 Created"),
-    DELETED(66, "2.02 Deleted"),
-    VALID(67, "2.03 Valid"),
-    CHANGED(68, "2.04 Changed"),
-    CONTENT(69, "2.05 Content"),
-    BAD_REQUEST(128, "4.00 Bad Request"),
-    UNAUTHORIZED(129, "4.01 Unauthorized"),
-    BAD_OPTION(130, "4.02 Bad Option"),
-    FORBIDDEN(131, "4.03 Forbidden"),
-    NOT_FOUND(132, "4.04 Not Found"),
-    METHOD_NOT_ALLOWED(133, "4.05 Method Not Allowed"),
-    NOT_ACCEPTABLE(134, "4.06 Not Acceptable"), // draft-ietf-core-coap-08
-    REQUEST_ENTITY_INCOMPLETE(136, "4.08 Request Entity Incomplete"), // draft-ietf-core-block-07
-    PRECONDITION_FAILED(140, "4.12 Precondition Failed"), // draft-ietf-core-block-11
-    REQUEST_ENTITY_TOO_LARGE(141, "4.13 Request Entity Too Large"),
-    UNSUPPORTED_MEDIA_TYPE(143, "4.15 Unsupported Media Type"),
-    INTERNAL_SERVER_ERROR(160, "5.00 Internal Server Error"),
-    NOT_IMPLEMENTED(161, "5.01 Not Implemented"),
-    BAD_GATEWAY(162, "5.02 Bad Gateway"),
-    SERVICE_UNAVAILABLE(163, "5.03 Service Unavailable"),
-    GATEWAY_TIMEOUT(164, "5.04 Gateway Timeout"),
-    PROXYING_NOT_SUPPORTED(165, "5.05 Proxying Not Supported");
+    EMPTY(0, 0, "Empty"),
+    CREATED(2, 1, "Created"),
+    DELETED(2, 2, "Deleted"),
+    VALID(2, 3, "Valid"),
+    CHANGED(2, 4, "Changed"),
+    CONTENT(2, 5, "Content"),
+    BAD_REQUEST(4, 0, "Bad Request"),
+    UNAUTHORIZED(4, 1, "Unauthorized"),
+    BAD_OPTION(4, 2, "Bad Option"),
+    FORBIDDEN(4, 3, "Forbidden"),
+    NOT_FOUND(4, 4, "Not Found"),
+    METHOD_NOT_ALLOWED(4, 5, "Method Not Allowed"),
+    NOT_ACCEPTABLE(4, 6, "Not Acceptable"), // draft-ietf-core-coap-08
+    REQUEST_ENTITY_INCOMPLETE(4, 8, "Request Entity Incomplete"), // draft-ietf-core-block-07
+    PRECONDITION_FAILED(4, 12, "Precondition Failed"), // draft-ietf-core-block-11
+    REQUEST_ENTITY_TOO_LARGE(4, 13, "Request Entity Too Large"),
+    UNSUPPORTED_MEDIA_TYPE(4, 15, "Unsupported Media Type"),
+    INTERNAL_SERVER_ERROR(5, 0, "Internal Server Error"),
+    NOT_IMPLEMENTED(5, 1, "Not Implemented"),
+    BAD_GATEWAY(5, 2, "Bad Gateway"),
+    SERVICE_UNAVAILABLE(5, 3, "Service Unavailable"),
+    GATEWAY_TIMEOUT(5, 4, "Gateway Timeout"),
+    PROXYING_NOT_SUPPORTED(5, 5, "Proxying Not Supported");
 
     /**
      * response class is either 2 (success),4 (client error) or 5 (server
@@ -74,49 +72,30 @@ public enum CoAPResponseCode {
      * not a real response)
      */
     private final int responseClass;
+    private final int detail;
     private final String description;
-    private final int no;
 
-    private CoAPResponseCode(int no, String description) {
+    private CoAPResponseCode(int responseClass, int detail, String description) {
+        this.responseClass = responseClass;
+        this.detail = detail;
         this.description = description;
-        this.no = no;
-
-        responseClass = BitOperations.getBitsInIntAsInt(this.no, 5, 3);
     }
 
     public boolean isCacheable() {
         // Valid
-        if (description.startsWith("2.03")) {
+        if (this == VALID) {
             return true;
         }
         // Content
-        if (description.startsWith("2.05")) {
+        if (this == CONTENT) {
             return true;
         }
         // Client Error 4.xx - Responses of this class are cacheable
-        if (description.startsWith("4")) {
+        if (this.responseClass == 4) {
             return true;
         }
         // Server Error 5.xx - Responses of this class are cacheable
-        return description.startsWith("5");
-    }
-
-    /**
-     * Textual description of the code as defined in draft-ietf-core-coap-08
-     *
-     * @return Textual description of the code
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Return the number of the response
-     *
-     * @return integer representing the code of the response
-     */
-    public int getNo() {
-        return no;
+        return this.responseClass == 5;
     }
 
     /**
@@ -126,8 +105,19 @@ public enum CoAPResponseCode {
      *
      * @return
      */
-    public int getResponseClass() {
+    @Override
+    public int getCodeClass() {
         return responseClass;
+    }
+
+    @Override
+    public int getCodeDetail() {
+        return detail;
+    }
+
+    @Override
+    public String getPlainDescription() {
+        return description;
     }
 
     private static final Map<Integer, CoAPResponseCode> noMap = new HashMap<>();
@@ -139,6 +129,10 @@ public enum CoAPResponseCode {
     }
 
     public static CoAPResponseCode getResponseName(int no) {
-        return noMap.getOrDefault(no, UNKNOWN);
+        return noMap.get(no);
+    }
+
+    public static boolean isValid(int no) {
+        return noMap.containsKey(no);
     }
 }

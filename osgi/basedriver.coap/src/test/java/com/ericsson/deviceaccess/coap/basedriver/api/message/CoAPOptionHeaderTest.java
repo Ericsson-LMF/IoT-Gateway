@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import com.ericsson.common.util.BitUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import junit.framework.TestCase;
@@ -68,7 +68,7 @@ public class CoAPOptionHeaderTest extends TestCase {
 
         short id = 41; // try with application/xml
 
-        byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
+        byte[] contentTypeBytes = BitUtil.splitShortToBytes(id);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         outputStream.write(contentTypeBytes[1]);
 
@@ -122,7 +122,7 @@ public class CoAPOptionHeaderTest extends TestCase {
     public void testSetValue() {
         short id = 41; // try with application/xml
 
-        byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
+        byte[] contentTypeBytes = BitUtil.splitShortToBytes(id);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         outputStream.write(contentTypeBytes[1]);
 
@@ -132,7 +132,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         org.junit.Assert.assertArrayEquals(h.getValue(), test);
 
         id = 43;
-        contentTypeBytes = BitOperations.splitShortToBytes(id);
+        contentTypeBytes = BitUtil.splitShortToBytes(id);
         outputStream = new ByteArrayOutputStream();
         outputStream.write(contentTypeBytes[1]);
 

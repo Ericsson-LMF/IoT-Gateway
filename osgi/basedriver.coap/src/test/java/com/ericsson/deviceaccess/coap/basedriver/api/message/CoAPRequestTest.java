@@ -36,7 +36,7 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import com.ericsson.common.util.BitUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -61,7 +61,7 @@ public class CoAPRequestTest extends TestCase {
 
             hostOpt = new CoAPOptionHeader(CoAPOptionName.URI_HOST,
                     host.getBytes());
-            byte[] portBytes = BitOperations.splitShortToBytes(port
+            byte[] portBytes = BitUtil.splitShortToBytes(port
                     .shortValue());
             portOpt = new CoAPOptionHeader(CoAPOptionName.URI_PORT, portBytes);
         } catch (URISyntaxException e) {
@@ -168,7 +168,7 @@ public class CoAPRequestTest extends TestCase {
 
         // options for matching should exclude token, max-age and etag headers
         int seconds = 40;
-        byte[] maxAgeBytes = BitOperations.splitIntToBytes(seconds);
+        byte[] maxAgeBytes = BitUtil.splitIntToBytes(seconds);
 
         CoAPOptionHeader maxAgeHeader = new CoAPOptionHeader(
                 CoAPOptionName.MAX_AGE, maxAgeBytes);

@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPContentType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
@@ -188,9 +189,9 @@ public class CoAPOptionHeaderConverter {
             byte[] headerBytes = h.getValue();
             short shortInt = 0;
             if (headerBytes.length == 1) {
-                shortInt = BitOperations.mergeBytesToShort((byte) 0, headerBytes[0]);
+                shortInt = BitUtil.mergeBytesToShort((byte) 0, headerBytes[0]);
             } else if (headerBytes.length == 2) {
-                shortInt = BitOperations.mergeBytesToShort(headerBytes[0], headerBytes[1]);
+                shortInt = BitUtil.mergeBytesToShort(headerBytes[0], headerBytes[1]);
             }
             unsignedShort = shortInt & 0xFFFF;
         }
@@ -229,21 +230,21 @@ public class CoAPOptionHeaderConverter {
             int intValue = 0;
             if (valueBytes.length == 1) {
                 byte[] emptyByte = new byte[1];
-                intValue = BitOperations.mergeBytesToInt(emptyByte[0],
+                intValue = BitUtil.mergeBytesToInt(emptyByte[0],
                         emptyByte[0], emptyByte[0], valueBytes[0]);
 
             } else if (valueBytes.length == 2) {
                 byte[] emptyByte = new byte[1];
-                intValue = BitOperations.mergeBytesToInt(emptyByte[0],
+                intValue = BitUtil.mergeBytesToInt(emptyByte[0],
                         emptyByte[0], valueBytes[0], valueBytes[1]);
 
             } else if (valueBytes.length == 3) {
                 byte[] emptyByte = new byte[1];
-                intValue = BitOperations.mergeBytesToInt(emptyByte[0],
+                intValue = BitUtil.mergeBytesToInt(emptyByte[0],
                         valueBytes[0], valueBytes[1], valueBytes[2]);
 
             } else if (valueBytes.length == 4) {
-                intValue = BitOperations.mergeBytesToInt(valueBytes[0],
+                intValue = BitUtil.mergeBytesToInt(valueBytes[0],
                         valueBytes[1], valueBytes[2], valueBytes[3]);
 
             }

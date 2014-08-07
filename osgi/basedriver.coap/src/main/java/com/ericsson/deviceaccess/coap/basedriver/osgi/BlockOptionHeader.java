@@ -37,14 +37,14 @@ package com.ericsson.deviceaccess.coap.basedriver.osgi;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInByteAsByte;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInIntAsByte;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.getBitsInIntAsInt;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.mergeBytesToInt;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.mergeBytesToShort;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.setBitInByte;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.setBitsInByte;
-import static com.ericsson.deviceaccess.coap.basedriver.util.BitOperations.splitIntToBytes;
+import static com.ericsson.common.util.BitUtil.getBitsInByteAsByte;
+import static com.ericsson.common.util.BitUtil.getBitsInIntAsByte;
+import static com.ericsson.common.util.BitUtil.getBitsInIntAsInt;
+import static com.ericsson.common.util.BitUtil.mergeBytesToInt;
+import static com.ericsson.common.util.BitUtil.mergeBytesToShort;
+import static com.ericsson.common.util.BitUtil.setBitInByte;
+import static com.ericsson.common.util.BitUtil.setBitsInByte;
+import static com.ericsson.common.util.BitUtil.splitIntToBytes;
 import java.io.ByteArrayOutputStream;
 
 /**

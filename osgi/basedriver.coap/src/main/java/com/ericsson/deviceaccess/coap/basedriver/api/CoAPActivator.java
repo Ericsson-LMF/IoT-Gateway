@@ -129,9 +129,9 @@ public class CoAPActivator implements BundleActivator {
                     address = null;
                     try {
                         NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-                        Enumeration ia = ni.getInetAddresses();
+                        Enumeration<InetAddress> ia = ni.getInetAddresses();
                         while (ia.hasMoreElements()) {
-                            InetAddress elem = (InetAddress) ia.nextElement();
+                            InetAddress elem = ia.nextElement();
 
 							//String ipv6 = p.getProperty("IPV6");
                             //Boolean ipv6Boolean = new Boolean(ipv6);

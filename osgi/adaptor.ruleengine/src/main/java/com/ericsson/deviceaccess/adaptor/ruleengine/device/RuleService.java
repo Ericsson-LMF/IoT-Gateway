@@ -90,7 +90,7 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
             .build();
     private BundleContext context;
     private final HashMap<String, ParameterSchema> ruleProperties = new HashMap<>();
-    private HashMap<String, Rule> rules = new HashMap<>();
+    private final HashMap<String, Rule> rules = new HashMap<>();
     private final HashMap<String, List<Rule>> ruleMap = new HashMap<>();
     private ConfigurationManager configManager;
 

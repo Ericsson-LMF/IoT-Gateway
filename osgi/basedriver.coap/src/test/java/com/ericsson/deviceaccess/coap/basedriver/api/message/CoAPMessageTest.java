@@ -36,7 +36,7 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
 import junit.framework.TestCase;
 
@@ -184,7 +184,7 @@ public class CoAPMessageTest extends TestCase {
 
         // A non-negative integer which is represented in network byte order
         short observe = 0;
-        byte[] observeBytes = BitOperations.splitShortToBytes(observe);
+        byte[] observeBytes = BitUtil.splitShortToBytes(observe);
 
         CoAPOptionHeader observeOpt = new CoAPOptionHeader(
                 CoAPOptionName.OBSERVE, observeBytes);
@@ -198,7 +198,7 @@ public class CoAPMessageTest extends TestCase {
         Double maxDouble = max;
         int unsignedShortMax = maxDouble.intValue();
 
-        byte[] shortBytes = BitOperations.splitIntToBytes(unsignedShortMax);
+        byte[] shortBytes = BitUtil.splitIntToBytes(unsignedShortMax);
 
         byte[] shortValue = new byte[]{
             shortBytes[2],
@@ -220,7 +220,7 @@ public class CoAPMessageTest extends TestCase {
         }
         int maxAgeValue = 20;
 
-        byte[] bytes = BitOperations.splitIntToBytes(maxAgeValue);
+        byte[] bytes = BitUtil.splitIntToBytes(maxAgeValue);
 
         CoAPOptionHeader maxAgeOpt = new CoAPOptionHeader(
                 CoAPOptionName.MAX_AGE, bytes);
@@ -233,7 +233,7 @@ public class CoAPMessageTest extends TestCase {
         }
 
         long unsignedLong = 0xffffffffL & Integer.MAX_VALUE;
-        byte[] longBytes = BitOperations.splitLongToBytes(unsignedLong);
+        byte[] longBytes = BitUtil.splitLongToBytes(unsignedLong);
 
         byte[] intValue = new byte[]{
             longBytes[4],
@@ -259,7 +259,7 @@ public class CoAPMessageTest extends TestCase {
 
         Double maxDouble = max;
         long unsignedIntMax = maxDouble.longValue();
-        longBytes = BitOperations.splitLongToBytes(unsignedIntMax);
+        longBytes = BitUtil.splitLongToBytes(unsignedIntMax);
 
         intValue = new byte[]{
             longBytes[4],
@@ -358,7 +358,7 @@ public class CoAPMessageTest extends TestCase {
      */
     public void testAddObserveHeader() {
         int value = 20;
-        byte[] bytes = BitOperations.splitIntToBytes(value);
+        byte[] bytes = BitUtil.splitIntToBytes(value);
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.OBSERVE, bytes);
 
         assertTrue(req.addOptionHeader(h));

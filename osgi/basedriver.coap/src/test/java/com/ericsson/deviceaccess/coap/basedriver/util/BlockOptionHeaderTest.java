@@ -35,6 +35,7 @@
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
 //import org.jmock.lib.legacy.ClassImposteriser;
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
@@ -152,7 +153,7 @@ public class BlockOptionHeaderTest extends TestCase {
         assertEquals(blockOption.getBlockNumber(), blockNumber);
 
         byte[] bytes = new byte[1];
-        short test = BitOperations.mergeBytesToShort(bytes[0], headerBytes[1]);
+        short test = BitUtil.mergeBytesToShort(bytes[0], headerBytes[1]);
 
         largeDouble = Math.pow(2, 1) + Math.pow(2, 3) + Math.pow(2, 4)
                 + Math.pow(2, 5) + Math.pow(2, 6) + Math.pow(2, 7);

@@ -59,7 +59,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseResponseCache.SessionData;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
 import java.io.ByteArrayOutputStream;
 import java.net.InetSocketAddress;
@@ -234,7 +234,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 long timeLeft = resp.scheduledExecutionTime() - System.currentTimeMillis();
 
                 int seconds = (int) (timeLeft / 1000) % 60;
-                byte[] maxAgeBytes = BitOperations.splitIntToBytes(seconds);
+                byte[] maxAgeBytes = BitUtil.splitIntToBytes(seconds);
 
                 options.add(new CoAPOptionHeader(MAX_AGE, maxAgeBytes));
                 // Notify listener
@@ -496,7 +496,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         req.addOptionHeader(new CoAPOptionHeader(URI_HOST, host.getBytes()));
 
         if (uri.getPort() != -1) {
-            byte[] portBytes = BitOperations.splitIntToBytes(uri.getPort());
+            byte[] portBytes = BitUtil.splitIntToBytes(uri.getPort());
             req.addOptionHeader(new CoAPOptionHeader(URI_PORT, portBytes));
         }
 
@@ -819,7 +819,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 payloadStr.setLength(payloadStr.length() - 1);
 
                 short contentTypeId = 40;
-                byte[] contentTypeBytes = BitOperations.splitShortToBytes(contentTypeId);
+                byte[] contentTypeBytes = BitUtil.splitShortToBytes(contentTypeId);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 outputStream.write(contentTypeBytes[1]);
 

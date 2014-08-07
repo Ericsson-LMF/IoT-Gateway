@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageWriter;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
 import java.io.ByteArrayOutputStream;
@@ -584,10 +584,10 @@ public abstract class CoAPMessage {
                     e.printStackTrace();
                 }
                 bytes = s.toByteArray();
-                maxAge = BitOperations.mergeBytesToInt(bytes[0], bytes[1],
+                maxAge = BitUtil.mergeBytesToInt(bytes[0], bytes[1],
                         bytes[2], bytes[3]);
             } else {
-                maxAge = BitOperations.mergeBytesToInt(bytes[0], bytes[1],
+                maxAge = BitUtil.mergeBytesToInt(bytes[0], bytes[1],
                         bytes[2], bytes[3]);
             }
         } else if (maxAgeOption.size() > 1) {
@@ -674,24 +674,36 @@ public abstract class CoAPMessage {
     /**
      * Enum representing the type of the message (as defined in coap core 07)
      */
-    public static enum CoAPMessageType {
+    public static enum CoAPMessageType implements CoAPCode {
 
-        CONFIRMABLE("Confirmable"),
-        NON_CONFIRMABLE("Non-Confirmable"),
-        ACKNOWLEDGEMENT("Acknowledgement"),
-        RESET("Reset");
+        CONFIRMABLE(0, 1, "Confirmable"),
+        NON_CONFIRMABLE(0, 2, "Non-Confirmable"),
+        ACKNOWLEDGEMENT(0, 3, "Acknowledgement"),
+        RESET(0, 4, "Reset");
+
         private final String name;
+        private final int codeClass;
+        private final int detail;
 
-        private CoAPMessageType(String name) {
+        private CoAPMessageType(int codeClass, int detail, String name) {
             this.name = name;
+            this.codeClass = codeClass;
+            this.detail = detail;
         }
 
-        public int getNo() {
-            return ordinal();
+        @Override
+        public int getCodeClass() {
+            return codeClass;
         }
 
-        public String getName() {
-            return this.name;
+        @Override
+        public int getCodeDetail() {
+            return detail;
+        }
+
+        @Override
+        public String getPlainDescription() {
+            return name;
         }
 
         public static CoAPMessageType getType(int no) {
@@ -700,6 +712,10 @@ public abstract class CoAPMessage {
             } catch (Exception e) {
                 return null;
             }
+        }
+
+        public static boolean isValid(int no) {
+            return CoAPMessageType.values()[no] != null;
         }
     }
 }

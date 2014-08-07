@@ -44,7 +44,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPObservationResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import com.ericsson.common.util.BitUtil;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -121,7 +121,7 @@ public class ObservationHandler {
         byte[] bytes = resp.getOptionHeaders(CoAPOptionName.OBSERVE).get(0).getValue();
 
         if (bytes.length == 2) {
-            short test = BitOperations.mergeBytesToShort(bytes[0], bytes[1]);
+            short test = BitUtil.mergeBytesToShort(bytes[0], bytes[1]);
             int observeValue = test & 0xFFFF;
 
             //CoAPActivator.logger.debug("Masked observe value in observation handler [" + observeValue + "]");
@@ -289,7 +289,7 @@ public class ObservationHandler {
 
         // A non-negative integer which is represented in network byte order
         short observe = 0;
-        byte[] observeBytes = BitOperations.splitShortToBytes(observe);
+        byte[] observeBytes = BitUtil.splitShortToBytes(observe);
 
         CoAPOptionHeader observeOpt = new CoAPOptionHeader(CoAPOptionName.OBSERVE, observeBytes);
         req.addOptionHeader(observeOpt);

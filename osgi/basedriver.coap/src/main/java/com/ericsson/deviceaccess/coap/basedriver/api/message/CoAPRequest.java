@@ -35,7 +35,7 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.util.TokenGenerator;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -112,7 +112,7 @@ public class CoAPRequest extends CoAPMessage {
             throw new CoAPException("Token header cannot be created, URI not set for the request");
         }
         long token = generator.createToken(uri);
-        byte[] bytes = BitOperations.splitLongToBytes(token);
+        byte[] bytes = BitUtil.splitLongToBytes(token);
 
         setToken(bytes);
     }
@@ -149,7 +149,7 @@ public class CoAPRequest extends CoAPMessage {
                     e.printStackTrace();
                 }
             } else if (name == CoAPOptionName.URI_PORT) {
-                short shortInt = BitOperations.mergeBytesToShort(header.getValue()[0], header.getValue()[1]);
+                short shortInt = BitUtil.mergeBytesToShort(header.getValue()[0], header.getValue()[1]);
                 port = shortInt & 0xFFFF;
             }
         }
