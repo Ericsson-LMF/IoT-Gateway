@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.ACKNOWLEDGEMENT;
@@ -46,9 +46,10 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.BAD_OPTION;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE;
+import com.ericsson.deviceaccess.coap.basedriver.communication.UDPConstants;
+import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageReader;
 import java.net.DatagramPacket;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -101,7 +102,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
 
         CoAPMessageReader handler = new CoAPMessageReader(datagram);
 
-        if (datagram.getLength() >= 1281) {
+        if (datagram.getLength() > UDPConstants.MAX_DATAGRAM_SIZE) {
             // response with a 4.13 entity too large
             //CoAPActivator.logger.debug("Too large datagram received, reply with a 4.13 response");
             OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
@@ -113,7 +114,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
             }
             if (msg instanceof CoAPRequest) {
                 CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, REQUEST_ENTITY_TOO_LARGE);
-                resp.addOptionHeader(new CoAPOptionHeader(CoAPOptionName.SIZE1, "1280".getBytes(StandardCharsets.UTF_8)));
+                resp.addOptionHeader(new CoAPOptionHeader(CoAPOptionName.SIZE1, BitOperations.splitIntToBytes(UDPConstants.MAX_DATAGRAM_SIZE)));
                 outHandler.send(resp, false);
             } else {
                 System.out.println("TODO: If a response is larger than would fit in the buffer, repeat the request with a suitable Block1 option");
@@ -146,22 +147,18 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         // (fraft-ietf-core-coap-08)
         if (!handler.validOptions()) {
             if (msg.getMessageType() == CONFIRMABLE) {
-                //CoAPActivator.logger.debug("Options in the message not valid");
                 OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
                 // in case of response, return rst
                 if (msg instanceof CoAPResponse) {
-                    //CoAPActivator.logger.debug("Reply to unrecognized options in a response with reset message ");
                     resetMessage((CoAPResponse) msg);
                 } else {
                     // in case of request, return 4.02 bad option
-                    //CoAPActivator.logger.debug("Reply to unrecognized options in a response with a 4.02 response");
                     CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, BAD_OPTION);
                     outHandler.send(resp, false);
                 }
             }
         } else {
             try {
-                // If the incoming message is a response and try to find a match
                 if (msg instanceof CoAPResponse) {
                     handleResponse((CoAPResponse) msg);
                 } else if (msg instanceof CoAPRequest) {
@@ -181,23 +178,13 @@ public class IncomingMessageHandler implements IncomingMessageListener {
     private void handleResponse(CoAPResponse response) throws CoAPException {
         // On messaging level, check for duplicates based on message ID + IP
         // check the received responses
-        /*
-         CoAPActivator.logger
-         .debug("Check if this is a duplicate response with ID: ["
-         + resp.getIdentifier() + "] and message type ["
-         + resp.getMessageType().getName() + "]");
-         */
         String id = response.getIdentifier();
         OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
         if (incomingResponses.containsKey(id)) {
-            //CoAPActivator.loggerdebug("A duplicate response was received, try to reply with the same message");
             // TODO process only in case of CON??
             CoAPResponse cachedResponse = outHandler.getOutgoingResponses().get(id);
             if (cachedResponse != null) {
-                //CoAPActivator.logger.debug("A cached response was found, try to reply with the same message");
                 outHandler.send(cachedResponse, false);
-            } else {
-                //CoAPActivator.logger.warn("No cached response was found, discard this response");
             }
             return;
         }

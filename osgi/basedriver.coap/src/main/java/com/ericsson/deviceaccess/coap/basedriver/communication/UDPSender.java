@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class UDPSender implements TransportLayerSender, Runnable {
 
-    private final UDPTask POISON = new UDPTask();
+    private final UDPTask POISON = new UDPTask(null);
 
     private MulticastSocket multicastSocket;
 
@@ -147,33 +147,18 @@ public class UDPSender implements TransportLayerSender, Runnable {
         queue.add(POISON);
     }
 
-    //TODO: What in the world this is supposed to do?
     protected class UDPTask implements Runnable {
 
-        private CoAPMessage message;
-        private Thread thread;
+        private final CoAPMessage message;
 
         protected UDPTask(CoAPMessage message) {
             this.message = message;
-        }
-
-        private UDPTask() {
         }
 
         @Override
         public void run() {
             byte[] encoded = message.encoded();
             send(encoded, encoded.length, message.getSocketAddress());
-        }
-
-        public void stop() {
-            Thread t = this.thread;
-            this.thread = null;
-
-            // XXX: Quick & Dirty, otherwise it will end up with NullPointerException
-            if (t != null) {
-                t.interrupt();
-            }
         }
     }
 }

@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.homeautomation.power.SwitchPowerBase;
 import java.util.HashMap;

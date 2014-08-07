@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 
-import com.ericsson.commonutil.StringUtil;
+import com.ericsson.common.util.StringUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import java.net.URI;
 import java.util.HashMap;
@@ -163,7 +163,7 @@ public class CoAPResource {
      * @param uri unique URI for this resource
      */
     public void setUri(URI uri) {
-        this.resourceIdentifier = uri;
+        resourceIdentifier = uri;
     }
 
     /**

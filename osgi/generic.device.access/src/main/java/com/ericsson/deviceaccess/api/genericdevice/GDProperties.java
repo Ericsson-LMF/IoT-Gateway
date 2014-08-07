@@ -34,9 +34,10 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.commonutil.serialization.View;
+import com.ericsson.common.util.serialization.View;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.util.Map;
 
@@ -154,7 +155,8 @@ public interface GDProperties extends Serializable {
      * @return map from name to value
      */
     @JsonAnyGetter
-     Map<String, Data> getProperties();
+    @JsonProperty("properties")
+    Map<String, Data> getProperties();
 
     /**
      * Gets the value with the specified name. The only allowed types are

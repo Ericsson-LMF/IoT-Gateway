@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
@@ -231,7 +231,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
                 //CoAPActivator.logger.debug("Unrecognized options in a confirmable message");
             }
 
-            if (position == bytes.length - 1) {
+            if (position >= bytes.length) {
                 return position;
             }
             cur = bytes[position];

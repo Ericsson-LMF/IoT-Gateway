@@ -1,6 +1,6 @@
-package com.ericsson.commonutil;
+package com.ericsson.common.util;
 
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import java.util.Set;
 
 /**
  *
- * @author aopkarja
+ * @author delma
  */
 public enum LegacyUtil {
 

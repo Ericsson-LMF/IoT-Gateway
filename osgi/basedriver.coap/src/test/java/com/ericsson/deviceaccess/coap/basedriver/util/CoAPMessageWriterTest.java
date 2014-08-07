@@ -42,8 +42,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import java.net.DatagramPacket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 public class CoAPMessageWriterTest extends TestCase {
@@ -200,32 +198,27 @@ public class CoAPMessageWriterTest extends TestCase {
         assertEquals(2, resp.getOptionCount());
 
         CoAPMessageWriter writer = new CoAPMessageWriter(resp);
-        byte[] stream = null;
+        byte[] stream;
         try {
             stream = writer.encode();
         } catch (CoAPMessageFormat.IncorrectMessageException ex) {
-            Logger.getLogger(CoAPMessageWriterTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail("Problem with encoding; " + ex);
+            return;
         }
 
         DatagramPacket packet = new DatagramPacket(stream, stream.length);
 
         CoAPMessageReader reader = new CoAPMessageReader(packet);
-        CoAPResponse msg = null;
+        CoAPResponse msg;
         try {
             msg = (CoAPResponse) reader.decode();
         } catch (CoAPMessageFormat.IncorrectMessageException ex) {
-            Logger.getLogger(CoAPMessageWriterTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail("Problem with decoding; " + ex);
+            return;
         }
-        int i = 0;
-        for (CoAPOptionHeader key : msg.getOptionHeaders()) {
-            if (i == 0) {
-                assertEquals(CoAPOptionName.UNKNOWN, key.getOptionName());
-            } else if (i == 1) {
-                assertEquals(CoAPOptionName.ETAG, key.getOptionName());
-            }
-            i++;
-        }
-        assertEquals(i, 2);
+        assertEquals(1, msg.getOptionHeaders(CoAPOptionName.ETAG).size());
+        assertEquals(1, msg.getOptionHeaders(CoAPOptionName.UNKNOWN).size());
+        assertEquals(2, msg.getOptionHeaders().size());
     }
 
     public void testEmptyAck() {

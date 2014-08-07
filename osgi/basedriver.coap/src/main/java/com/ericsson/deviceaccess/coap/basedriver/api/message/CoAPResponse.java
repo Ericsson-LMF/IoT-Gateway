@@ -110,21 +110,6 @@ public class CoAPResponse extends CoAPMessage {
     }
 
     public boolean isCacheable() {
-	// Draft 07
-
-        // 2.03 valid
-        if (this.getCode() == 67) {
-            return true;
-        }
-        // 2.05 content
-        if (this.getCode() == 69) {
-            return true;
-        }
-        // 4.xx
-        if (this.getCode() >= 128 && this.getCode() <= 143) {
-            return true;
-        }
-        // 5.xx
-        return this.getCode() >= 160 && this.getCode() <= 165;
+        return CoAPResponseCode.getResponseName(getCode()).isCacheable();
     }
 }

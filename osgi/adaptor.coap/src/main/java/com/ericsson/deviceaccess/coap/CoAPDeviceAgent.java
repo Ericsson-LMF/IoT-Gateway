@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPRemoteEndpoint;

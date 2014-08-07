@@ -129,7 +129,7 @@
                             org.codehaus.stax2.*
                         </Import-Package>
                         <Export-Package>
-                            com.ericsson.commonutil.*,
+                            com.ericsson.common.util.*,
                         </Export-Package>
                     </instructions>
                 </configuration>

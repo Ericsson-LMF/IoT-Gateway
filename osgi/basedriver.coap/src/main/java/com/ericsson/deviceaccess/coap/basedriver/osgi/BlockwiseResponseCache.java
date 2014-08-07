@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
@@ -79,13 +79,7 @@ public class BlockwiseResponseCache {
     public void put(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders, byte[] payload, int responseCode) {
         SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
         SessionData data = new SessionData(key, payload, responseCode);
-
-        cache.compute(key, (k, v) -> {
-            if (v != null) {
-                v.stopTimer();
-            }
-            return data;
-        });
+        FunctionalUtil.putAndClean(cache, key, data, v -> v.stopTimer());
     }
 
     public void put(CoAPRequest request, CoAPResponse response) throws CoAPException {
@@ -102,12 +96,7 @@ public class BlockwiseResponseCache {
 
     public void remove(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders) {
         SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
-        cache.compute(key, (k, v) -> {
-            if (v != null) {
-                v.stopTimer();
-            }
-            return null;
-        });
+        FunctionalUtil.putAndClean(cache, key, null, v -> v.stopTimer());
     }
 
     public void remove(CoAPRequest request) throws CoAPException {

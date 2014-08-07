@@ -93,7 +93,7 @@ import java.util.Map;
  *   import org.osgi.framework.BundleContext;
  *   import org.osgi.framework.Filter;
  *   import org.osgi.framework.FrameworkUtil;
- *   import com.ericsson.commonutil.LegacyUtil;
+ *   import com.ericsson.common.util.LegacyUtil;
  *
  *   BundleContext bc = ...;
  *   GenericDeviceEventListener myListener = ...;

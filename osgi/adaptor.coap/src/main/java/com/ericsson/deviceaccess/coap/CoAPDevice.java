@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;

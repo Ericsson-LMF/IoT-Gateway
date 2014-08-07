@@ -43,8 +43,7 @@ public class CoAPResponseTest extends TestCase {
 
     public CoAPResponseTest() {
         super("CoAPResponseTest");
-        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-                CoAPResponseCode.CREATED.getNo(), 1234);
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.CREATED, 1234);
     }
 
     /*
@@ -80,19 +79,19 @@ public class CoAPResponseTest extends TestCase {
         CoAPResponse reset = resp.createReset();
         assertFalse(reset.isCacheable());
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-                CoAPResponseCode.VALID.getNo(), 1234);
+                CoAPResponseCode.VALID, 1234);
 
         assertTrue(resp.isCacheable());
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-                CoAPResponseCode.CONTENT.getNo(), 1234);
+                CoAPResponseCode.CONTENT, 1234);
         assertTrue(resp.isCacheable());
 
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-                CoAPResponseCode.NOT_FOUND.getNo(), 1234);
+                CoAPResponseCode.NOT_FOUND, 1234);
         assertTrue(resp.isCacheable());
 
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE,
-                CoAPResponseCode.INTERNAL_SERVER_ERROR.getNo(), 1234);
+                CoAPResponseCode.INTERNAL_SERVER_ERROR, 1234);
         assertTrue(resp.isCacheable());
     }
 }

@@ -47,7 +47,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -142,9 +141,8 @@ public class BlockwiseTransferHandler {
      * @throws CoAPException
      */
     public CoAPRequest block2OptionReceived(CoAPResponse response, CoAPRequest request) throws CoAPException {
-        List<CoAPOptionHeader> block2 = response.getOptionHeaders(BLOCK2);
-        // TODO can there be multiple block options?
-        CoAPOptionHeader blockOption = block2.get(0);
+        //It MUST NOT occur more than once.
+        CoAPOptionHeader blockOption = response.getOptionHeaders(BLOCK2).get(0);
 
         // Check if there exist a message with the same token
         String tokenString = new String(response.getToken(), StandardCharsets.UTF_8);
@@ -205,6 +203,7 @@ public class BlockwiseTransferHandler {
         // need to check if the size of block should be changed from the request
 
         // read the block size from the sent request
+        // It MUST NOT occur more than once.
         CoAPOptionHeader blockOption = response.getOptionHeaders(BLOCK1).get(0);
         BlockOptionHeader header = new BlockOptionHeader(blockOption);
 
@@ -247,8 +246,6 @@ public class BlockwiseTransferHandler {
 
     private CoAPRequest createBlock1Request(CoAPRequest request,
             int blockNumber, int szx) throws CoAPException {
-
-        CoAPRequest blockRequest = null;
         int payloadLeft = 0;
         int blockSize = CoAPUtil.getBlockSize(szx).intValue();
 
@@ -258,19 +255,21 @@ public class BlockwiseTransferHandler {
             payloadLeft = request.getPayload().length - payloadHandled;
         }
         if (payloadLeft <= 0) {
-            return blockRequest;
+            return null;
         }
 
-        blockRequest = endpoint.createCoAPRequest(request.getMessageType(),
-                request.getCode(), request.getSocketAddress(),
-                request.getUriFromRequest(), request.getToken());
+        CoAPRequest blockRequest = endpoint.createCoAPRequest(
+                request.getMessageType(),
+                request.getCode(),
+                request.getSocketAddress(),
+                request.getUriFromRequest(),
+                request.getToken());
 
         blockRequest.setListener(request.getListener());
 
-        byte[] payload = new byte[blockSize];
-        System.arraycopy(request.getPayload(), payloadHandled, payload, 0,
-                // blockSize); // will cause OutOfArrayIndex
-                Math.min(payloadLeft, blockSize));
+        int size = Math.min(payloadLeft, blockSize);
+        byte[] payload = new byte[size];
+        System.arraycopy(request.getPayload(), payloadHandled, payload, 0, size);
 
         blockRequest.setPayload(payload);
 
@@ -310,7 +309,6 @@ public class BlockwiseTransferHandler {
     // TODO:
     //   This method is almost same as createBlock1Request() method.
     //   So common part should be cut off as an another method and be shared.
-    //
     private CoAPResponse createBlock2Response(CoAPResponse response, int blockNumber, int szx) {
         int payloadLeft = 0;
         int blockSize = CoAPUtil.getBlockSize(szx).intValue();
@@ -325,10 +323,13 @@ public class BlockwiseTransferHandler {
             return response;
         }
 
-        CoAPResponse blockResponse = new CoAPResponse(1, response.getMessageType(), response.getCode(), response.getMessageId(), response.getToken());
+        CoAPResponse blockResponse = new CoAPResponse(1,
+                response.getMessageType(),
+                response.getCode(),
+                response.getMessageId(),
+                response.getToken());
         blockResponse.setSocketAddress(response.getSocketAddress());
 
-        //byte[] payload = new byte[blockSize];
         int size = Math.min(payloadLeft, blockSize);
         byte[] payload = new byte[size];
         System.arraycopy(response.getPayload(), payloadHandled, payload, 0, size);

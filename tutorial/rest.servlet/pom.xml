@@ -135,7 +135,7 @@
                         <Import-Package>
                             org.osgi.*;version="[1.0,4.0)",
                             com.ericsson.deviceaccess.*,
-                            com.ericsson.commonutil.*,
+                            com.ericsson.common.util.*,
                             org.apache.commons.logging.*,
                             com.fasterxml.jackson.module.mrbean.*,
                             com.fasterxml.jackson.module.jaxb.*,

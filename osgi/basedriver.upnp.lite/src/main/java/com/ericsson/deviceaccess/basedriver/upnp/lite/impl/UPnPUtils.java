@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
-import com.ericsson.commonutil.StringUtil;
+import com.ericsson.common.util.StringUtil;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;

@@ -38,8 +38,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
-import java.util.Iterator;
-import java.util.List;
 import junit.framework.TestCase;
 
 public class CoAPMessageTest extends TestCase {
@@ -111,23 +109,19 @@ public class CoAPMessageTest extends TestCase {
         assertEquals(0, resp.getOptionHeaders(CoAPOptionName.URI_PATH).size());
         assertEquals(0, resp.getOptionHeaders(CoAPOptionName.URI_QUERY).size());
 
-        assertTrue(resp.addOptionHeader(h));
-        assertTrue(resp.addOptionHeader(h));
+        assertFalse(resp.addOptionHeader(h));
 
-        assertEquals(resp.getOptionHeaders(CoAPOptionName.PROXY_URI).size(), 3);
+        assertEquals(1, resp.getOptionHeaders(CoAPOptionName.PROXY_URI).size());
+        assertEquals(1, resp.getOptionHeaders().size());
     }
 
     public void testAddContentTypeHeader() {
         // content-type
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT);
         resp.addOptionHeader(h);
-        List optionHeaders = resp.getOptionHeaders();
-        Iterator it = optionHeaders.iterator();
-
-        while (it.hasNext()) {
-            CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+        resp.getOptionHeaders().forEach(header -> {
             assertEquals(CoAPOptionName.CONTENT_FORMAT, header.getOptionName());
-        }
+        });
 
         // Token header
         // should not be ok to add the content-type header for the 2nd time
@@ -153,7 +147,7 @@ public class CoAPMessageTest extends TestCase {
         // should be ok to add one uri-port header
         assertTrue(resp.addOptionHeader(h));
         // and a second one
-        assertFalse(resp.addOptionHeader(h));
+        assertTrue(resp.addOptionHeader(h));
 
         // In a request, etag can be present several times
         // should be ok to add one uri-port header
@@ -206,9 +200,10 @@ public class CoAPMessageTest extends TestCase {
 
         byte[] shortBytes = BitOperations.splitIntToBytes(unsignedShortMax);
 
-        byte[] shortValue = new byte[2];
-        shortValue[0] = shortBytes[2];
-        shortValue[1] = shortBytes[3];
+        byte[] shortValue = new byte[]{
+            shortBytes[2],
+            shortBytes[3]
+        };
         observeOpt = new CoAPOptionHeader(CoAPOptionName.OBSERVE, shortValue);
 
         int observeValue = converter.shortToUnsignedInt(observeOpt);
@@ -240,11 +235,12 @@ public class CoAPMessageTest extends TestCase {
         long unsignedLong = 0xffffffffL & Integer.MAX_VALUE;
         byte[] longBytes = BitOperations.splitLongToBytes(unsignedLong);
 
-        byte[] intValue = new byte[4];
-        intValue[0] = longBytes[4];
-        intValue[1] = longBytes[5];
-        intValue[2] = longBytes[6];
-        intValue[3] = longBytes[7];
+        byte[] intValue = new byte[]{
+            longBytes[4],
+            longBytes[5],
+            longBytes[6],
+            longBytes[7]
+        };;
 
         resp.removeOptionHeader(maxAgeOpt);
         maxAgeOpt = new CoAPOptionHeader(CoAPOptionName.MAX_AGE, intValue);
@@ -265,11 +261,12 @@ public class CoAPMessageTest extends TestCase {
         long unsignedIntMax = maxDouble.longValue();
         longBytes = BitOperations.splitLongToBytes(unsignedIntMax);
 
-        intValue = new byte[4];
-        intValue[0] = longBytes[4];
-        intValue[1] = longBytes[5];
-        intValue[2] = longBytes[6];
-        intValue[3] = longBytes[7];
+        intValue = new byte[]{
+            longBytes[4],
+            longBytes[5],
+            longBytes[6],
+            longBytes[7]
+        };
 
         maxAgeOpt = new CoAPOptionHeader(CoAPOptionName.MAX_AGE, intValue);
         resp.addOptionHeader(maxAgeOpt);

@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
-import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.function.TriConsumer;
+import com.ericsson.common.util.StringUtil;
+import com.ericsson.common.util.function.TriConsumer;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceSchemaDocument;
 import com.ericsson.deviceaccess.service.xmlparser.ServicesDocument.Services;

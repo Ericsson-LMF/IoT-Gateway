@@ -1,8 +1,8 @@
-package com.ericsson.commonutil.serialization;
+package com.ericsson.common.util.serialization;
 
 /**
  *
- * @author aopkarja
+ * @author delma
  */
 public enum Format {
 

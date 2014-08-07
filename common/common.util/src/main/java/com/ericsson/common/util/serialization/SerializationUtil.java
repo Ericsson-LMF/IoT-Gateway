@@ -1,7 +1,6 @@
-package com.ericsson.commonutil.serialization;
+package com.ericsson.common.util.serialization;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,12 +10,13 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk7.Jdk7Module;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
  *
- * @author aopkarja
+ * @author delma
  */
 public enum SerializationUtil {
 
@@ -51,10 +51,10 @@ public enum SerializationUtil {
         return XML_MAPPER;
     }
 
-    public static String execute(Format format, Serializer function) throws SerializationException {
+    public static <T> T execute(Format format, Serializer<T> function) throws SerializationException {
         try {
             return function.apply(get(format));
-        } catch (JsonProcessingException ex) {
+        } catch (IOException ex) {
             throw new SerializationException(ex.getMessage(), ex);
         }
     }

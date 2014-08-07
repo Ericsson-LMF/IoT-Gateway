@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceDiscoveryListener;

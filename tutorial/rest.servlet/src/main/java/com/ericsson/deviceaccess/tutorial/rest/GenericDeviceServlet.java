@@ -34,17 +34,18 @@
  */
 package com.ericsson.deviceaccess.tutorial.rest;
 
-import com.ericsson.commonutil.LegacyUtil;
-import com.ericsson.commonutil.serialization.Format;
-import com.ericsson.commonutil.serialization.SerializationException;
-import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.View;
+import com.ericsson.common.util.LegacyUtil;
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.common.util.serialization.SerializationException;
+import com.ericsson.common.util.serialization.SerializationUtil;
+import com.ericsson.common.util.serialization.View;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAction;
-import com.ericsson.deviceaccess.api.genericdevice.GDActionContext;
+import com.ericsson.deviceaccess.api.genericdevice.GDActionResult;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -143,14 +144,14 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                 if (svc != null) {
                     GDAction act = svc.getAction(action);
                     if (act != null) {
-                        GDActionContext ac = act.createActionContext();
-                        ac.setDevice(deviceId);
-                        ac.setService(service);
-                        ac.setAction(action);
-                        ac.setAuthorized(true);
-                        setArguments(ac, parms);
-                        act.execute(ac);
-                        return new NanoHTTPD.Response(HTTP_OK, "application/json", ac.getResult().getValue().serialize(Format.JSON));
+                        GDProperties properties = act.createArguments();
+                        properties.setStringValue("device", deviceId);
+                        properties.setStringValue("service", service);
+                        properties.setStringValue("action", action);
+                        properties.setStringValue("authorized", "true");
+                        setArguments(properties, parms);
+                        GDActionResult result = act.execute(properties);
+                        return new NanoHTTPD.Response(HTTP_OK, "application/json", result.getValue().serialize(Format.JSON));
                     } else {
                         return new NanoHTTPD.Response(HTTP_NOTFOUND, "text/plain", "Could not find action: " + action);
                     }
@@ -168,12 +169,12 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
     /**
      * @param ac
      */
-    private void setArguments(GDActionContext ac, Properties parms) {
+    private void setArguments(GDProperties ac, Properties parms) {
         Enumeration parameterNames = parms.keys();
         while (parameterNames.hasMoreElements()) {
             String paramName = (String) parameterNames.nextElement();
             String paramValue = parms.getProperty(paramName);
-            ac.getArguments().setStringValue(paramName, paramValue);
+            ac.setStringValue(paramName, paramValue);
         }
     }
 

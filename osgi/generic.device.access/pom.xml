@@ -108,7 +108,7 @@
                         </Private-Package>
                         <Import-Package>
                             org.osgi.*;version="[1.0,4.0)",
-                            com.ericsson.commonutil.*
+                            com.ericsson.common.util.*
                         </Import-Package>
                         <Export-Package>
                             com.ericsson.deviceaccess.*

@@ -34,7 +34,11 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.common.util.serialization.SerializationException;
+import com.ericsson.common.util.serialization.SerializationUtil;
 import com.ericsson.deviceaccess.adaptor.ruleengine.device.ConfigurationManager.ConfigurationManagerListener;
+import com.ericsson.deviceaccess.adaptor.ruleengine.device.Rule.RuleInfo;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
@@ -42,14 +46,12 @@ import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.deviceaccess.spi.schema.based.SBServiceBase;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 
@@ -99,20 +101,11 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
         defineAction("setRule", actionContext -> {
             GDProperties args = actionContext.getArguments();
             String id = args.getStringValue("id");
-            String name = args.getStringValue("name");
-            String conditions = args.getStringValue("conditions");
-            String startTime = args.getStringValue("startTime");
-            String stopTime = args.getStringValue("stopTime");
-            String weekDays = args.getStringValue("weekDays");
-            String actionsThen = args.getStringValue("actionsThen");
-            String actionsElse = args.getStringValue("actionsElse");
-            String actionsStart = args.getStringValue("actionsStart");
-            String actionsStop = args.getStringValue("actionsStop");
             System.out.println("setRule called");
 
             try {
-                setRule(id, name, conditions, startTime, stopTime, weekDays, actionsThen, actionsElse, actionsStart, actionsStop);
-            } catch (Exception e) {
+                setRule(id, new RuleInfo(args));
+            } catch (SerializationException e) {
                 throw new GDException("Invalid rule: " + e.getMessage(), e);
             }
         });
@@ -152,24 +145,20 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
         configManager.unregisterListener(this);
     }
 
-    public final void setRule(String id, String name, String conditions, String startTime, String stopTime, String weekDays, String actionsThen, String actionsElse, String actionsStart, String actionsStop) throws Exception {
+    public final void setRule(String id, RuleInfo info) throws SerializationException {
         Rule rule = rules.compute(id, (key, value) -> {
             if (value == null) {
-                return new Rule(key, name, conditions, startTime, stopTime, weekDays, actionsThen, actionsElse, actionsStart, actionsStop).start();
+                return new Rule(key, info).start();
             }
-            value.setStartTime(startTime);
-            value.setStopTime(stopTime);
-            value.setWeekDays(weekDays);
+            value.setStartTime(info.startTime);
+            value.setStopTime(info.stopTime);
+            value.setWeekDays(info.weekDays);
+            value.setActionsThen(info.actionsThen);
+            value.setActionsElse(info.actionsElse);
+            value.setActionsStop(info.actionsStop);
+            value.setActionsStart(info.actionsStart);
             try {
-                value.setActionsThen(actionsThen);
-                value.setActionsElse(actionsElse);
-                value.setActionsStop(actionsStop);
-                value.setActionsStart(actionsStart);
-            } catch (JSONException ex) {
-                throw new IllegalArgumentException(ex);
-            }
-            try {
-                value.setConditions(conditions);
+                value.setConditions(info.conditions);
             } catch (InvalidSyntaxException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -193,23 +182,7 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
             return ruleProperty;
         });
 
-        try {
-            JSONObject json = new JSONObject();
-            json.put("name", name);
-            json.put("conditions", conditions);
-            json.put("startTime", startTime);
-            json.put("stopTime", stopTime);
-            json.put("weekDays", weekDays);
-            json.put("actionsThen", actionsThen);
-            json.put("actionsElse", actionsElse);
-            json.put("actionsStart", actionsStart);
-            json.put("actionsStop", actionsStop);
-
-            String value = json.toString().replace('\r', '\n').replace('\n', ' ');
-            getProperties().setStringValue(id, value);
-            configManager.setParameter(id, value);
-        } catch (JSONException e) {
-        }
+        configManager.setParameter(id, SerializationUtil.execute(Format.JSON, m -> m.writer().writeValueAsString(info)));
     }
 
     public final void unsetRule(String id) {
@@ -224,7 +197,8 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
 
         // Remove all mappings from the filter attribute names to this rule
         if (rule != null) {
-            rule.getFilterAttributeNames().stream()
+            rule.getFilterAttributeNames()
+                    .stream()
                     .map(attrName -> ruleMap.getOrDefault(attrName, Collections.emptyList()))
                     .forEach(ruleList -> ruleList.remove(rule));
         }
@@ -246,39 +220,22 @@ public class RuleService extends SBServiceBase implements ConfigurationManagerLi
 
     // Updated configuration
     @Override
-    public void updated(Dictionary added, Dictionary removed, Dictionary modified) {
+    public void updated(Map<String, Object> added, Map<String, Object> removed, Map<String, Object> modified) {
         // TODO: Handle removed properties
-        for (Enumeration e = removed.keys(); e.hasMoreElements();) {
-            String id = (String) e.nextElement();
-        }
+        removed.forEach((k, v) -> {
+        });
 
         // TODO: Handle modified properties
-        for (Enumeration e = modified.keys(); e.hasMoreElements();) {
-            String id = (String) e.nextElement();
-        }
+        modified.forEach((k, v) -> {
+        });
 
         // Handle new properties (primarily at startup)
-        for (Enumeration e = added.keys(); e.hasMoreElements();) {
-            String id = (String) e.nextElement();
-            String value = (String) added.get(id);
-
+        modified.forEach((key, value) -> {
             try {
-                JSONObject json = new JSONObject(value);
-                String name = json.getString("name");
-                String conditions = json.getString("conditions");
-                String startTime = json.getString("startTime");
-                String stopTime = json.getString("stopTime");
-                String weekDays = json.getString("weekDays");
-                String actionsThen = json.getString("actionsThen");
-                String actionsElse = json.getString("actionsElse");
-                String actionsStart = json.getString("actionsStart");
-                String actionsStop = json.getString("actionsStop");
-                setRule(id, name, conditions, startTime, stopTime, weekDays, actionsThen, actionsElse, actionsStart, actionsStop);
-            } catch (Exception e2) {
-                e2.printStackTrace();
+                setRule(key, SerializationUtil.execute(Format.JSON, m -> m.reader().readValue((String) value)));
+            } catch (SerializationException ex) {
+                Logger.getLogger(RuleService.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-
-        // TODO: Handle change of listeners from other source than internally in this bundle
+        });
     }
 }

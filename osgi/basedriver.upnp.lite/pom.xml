@@ -82,7 +82,7 @@
                             org.xmlpull.v1.*,
                             org.kxml2.io.*,
                             org.osgi.*;version="[1.0,4.0)",
-                            com.ericsson.commonutil.*,
+                            com.ericsson.common.util.*,
                             javax.servlet.*
                         </Import-Package>
                     </instructions>

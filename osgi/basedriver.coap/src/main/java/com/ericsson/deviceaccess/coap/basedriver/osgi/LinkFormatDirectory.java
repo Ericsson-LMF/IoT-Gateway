@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
-import com.ericsson.commonutil.StringUtil;
+import com.ericsson.common.util.StringUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPRemoteEndpoint;

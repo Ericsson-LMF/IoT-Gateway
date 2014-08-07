@@ -34,9 +34,9 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.commonutil.LegacyUtil;
-import com.ericsson.commonutil.StringUtil;
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.common.util.LegacyUtil;
+import com.ericsson.common.util.StringUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.GenericDevice.State;

@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
-import com.ericsson.commonutil.function.FunctionalUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.adaptor.ruleengine.Activator;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
@@ -86,18 +86,18 @@ public class Rule {
     private Timer timer = null;
     private boolean started = false;
 
-    public Rule(String id, String name, String conditions, String startTime, String stopTime, String weekDays, String actionsThen, String actionsElse, String actionsStart, String actionsStop) {
+    public Rule(String id, RuleInfo info) {
         this.id = id;
-        this.name = name;
-        this.conditions = conditions;
-        setStartTime(startTime);
-        setStopTime(stopTime);
-        setWeekDays(weekDays);
+        this.name = info.name;
+        this.conditions = info.conditions;
+        setStartTime(info.startTime);
+        setStopTime(info.stopTime);
+        setWeekDays(info.weekDays);
         try {
-            setActionsThen(actionsThen);
-            setActionsElse(actionsElse);
-            setActionsStart(actionsStart);
-            setActionsStop(actionsStop);
+            setActionsThen(info.actionsThen);
+            setActionsElse(info.actionsElse);
+            setActionsStart(info.actionsStart);
+            setActionsStop(info.actionsStop);
         } catch (JSONException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -396,5 +396,43 @@ public class Rule {
     private static enum Condition {
 
         START, STOP;
+    }
+
+    public static class RuleInfo {
+
+        String name;
+        String conditions;
+        String startTime;
+        String stopTime;
+        String weekDays;
+        String actionsThen;
+        String actionsElse;
+        String actionsStart;
+        String actionsStop;
+
+        public RuleInfo(String name, String conditions, String startTime, String stopTime, String weekDays, String actionsThen, String actionsElse, String actionsStart, String actionsStop) {
+            this.name = name;
+            this.conditions = conditions;
+            this.startTime = startTime;
+            this.stopTime = stopTime;
+            this.weekDays = weekDays;
+            this.actionsThen = actionsThen;
+            this.actionsElse = actionsElse;
+            this.actionsStart = actionsStart;
+            this.actionsStop = actionsStop;
+        }
+
+        public RuleInfo(GDProperties args) {
+            name = args.getStringValue("name");
+            conditions = args.getStringValue("conditions");
+            startTime = args.getStringValue("startTime");
+            stopTime = args.getStringValue("stopTime");
+            weekDays = args.getStringValue("weekDays");
+            actionsThen = args.getStringValue("actionsThen");
+            actionsElse = args.getStringValue("actionsElse");
+            actionsStart = args.getStringValue("actionsStart");
+            actionsStop = args.getStringValue("actionsStop");
+        }
+
     }
 }

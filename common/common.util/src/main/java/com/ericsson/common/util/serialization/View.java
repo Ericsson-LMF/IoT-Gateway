@@ -1,11 +1,11 @@
-package com.ericsson.commonutil.serialization;
+package com.ericsson.common.util.serialization;
 
 /**
  * Holder for all Jackson Views. All of them should be interfaces and contain
  * Ignore class that implements all other views to allow exclusion which Jackson
  * currently doesn't support.
  *
- * @author aopkarja
+ * @author delma
  */
 public interface View {
 

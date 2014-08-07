@@ -1,6 +1,6 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator;
 
-import com.ericsson.commonutil.StringUtil;
+import com.ericsson.common.util.StringUtil;
 import com.ericsson.deviceaccess.service.xmlparser.ActionDocument.Action;
 import com.ericsson.deviceaccess.service.xmlparser.ParameterDocument.Parameter;
 import com.ericsson.deviceaccess.service.xmlparser.ServiceDocument.Service;

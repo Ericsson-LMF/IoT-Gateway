@@ -102,7 +102,7 @@
                             org.osgi.*;version="[1.0,2.0)",
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.api.*,
-                            com.ericsson.commonutil.*
+                            com.ericsson.common.util.*
                         </Import-Package>
                         <Bundle-Activator>com.ericsson.deviceaccess.adaptor.ruleengine.Activator</Bundle-Activator>
                     </instructions>

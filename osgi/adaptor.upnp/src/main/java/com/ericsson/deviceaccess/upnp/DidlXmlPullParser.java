@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.commonutil.function.QuadConsumer;
+import com.ericsson.common.util.function.QuadConsumer;
 import com.ericsson.deviceaccess.upnp.media.MediaContainer;
 import com.ericsson.deviceaccess.upnp.media.MediaItem;
 import com.ericsson.deviceaccess.upnp.media.MediaObject;

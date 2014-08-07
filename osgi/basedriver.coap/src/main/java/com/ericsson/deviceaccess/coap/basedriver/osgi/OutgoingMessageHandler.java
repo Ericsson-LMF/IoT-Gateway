@@ -114,7 +114,7 @@ public class OutgoingMessageHandler {
         // messages are only retransmitted if they're of type confirmable
         if (msg.getMessageType() == CoAPMessageType.CONFIRMABLE) {
             int timeoutValue = msg.getTimeout();
-            //CoAPActivator.logger .info("Transmit, nof retransmissions this far : ["  + msg.getRetransmissions() + "] , max 4 (re)transmissions allowed");
+            //CoAPActivator.logger.info("Transmit, nof retransmissions this far : ["  + msg.getRetransmissions() + "] , max 4 (re)transmissions allowed");
             //CoAPActivator.logger.debug("Timeout value in milliseconds: [" + timeoutValue + "]");
             // start timer
             if (msg.getRetransmissions() < MAX_RETRANSMIT) {
@@ -199,17 +199,17 @@ public class OutgoingMessageHandler {
      */
     public synchronized int generateMessageId() {
         // create message ID and return
-        if (this.messageId == -1) {
+        if (messageId == -1) {
             Random random = new Random();
-            this.messageId = random.nextInt(MESSAGE_ID_MAX + 1);
-            return this.messageId;
+            messageId = random.nextInt(MESSAGE_ID_MAX + 1);
+            return messageId;
         }
-        if (this.messageId < MESSAGE_ID_MAX) {
-            this.messageId++;
+        if (messageId < MESSAGE_ID_MAX) {
+            messageId++;
         } else { // start from 0
-            this.messageId = MESSAGE_ID_MIN;
+            messageId = MESSAGE_ID_MIN;
         }
-        return this.messageId;
+        return messageId;
     }
 
     /**

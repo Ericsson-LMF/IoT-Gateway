@@ -1,4 +1,4 @@
-package com.ericsson.commonutil.function;
+package com.ericsson.common.util.function;
 
 /**
  *

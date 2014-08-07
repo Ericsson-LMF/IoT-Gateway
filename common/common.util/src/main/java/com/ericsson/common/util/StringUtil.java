@@ -32,7 +32,7 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.commonutil;
+package com.ericsson.common.util;
 
 import java.util.function.UnaryOperator;
 import javax.xml.bind.DatatypeConverter;

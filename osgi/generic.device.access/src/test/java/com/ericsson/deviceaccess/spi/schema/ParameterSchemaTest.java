@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.spi.schema;
 
-import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.common.util.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import junit.framework.Assert;
 import org.jmock.Mockery;

@@ -144,7 +144,6 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         this.value = value;
     }
 
-    // TODO other constructores needed?
     /**
      * Return the name of the option
      *
@@ -177,15 +176,6 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         return length;
     }
 
-//    /**
-//     * Helper method to check how is the length of this option header value. If
-//     * the length is < 15, returns true. False otherwise.
-//     *
-//     * @return return true, if length is <15, false otherwise
-//     */
-//    public boolean isNormalLength() {
-//        return length < 15;
-//    }
     /**
      * Get the value of the option in bytes
      *
@@ -199,16 +189,6 @@ public class CoAPOptionHeader implements Comparable<CoAPOptionHeader> {
         this.value = value;
     }
 
-//    /**
-//     * Option Numbers 14, 28, 42 are reserved for no-op options when they are
-//     * sent with an empty value (they are ignored)
-//     *
-//     * @return true, if the option is a fencepost option (defined in core coap
-//     * 07)
-//     */
-//    public boolean isFencepost() {
-//        return getOptionNumber() % 14 == 0;
-//    }
     /**
      * implementation of compareTo method of the Java comparable interface. This
      * is needed when ordering the list of options in a message

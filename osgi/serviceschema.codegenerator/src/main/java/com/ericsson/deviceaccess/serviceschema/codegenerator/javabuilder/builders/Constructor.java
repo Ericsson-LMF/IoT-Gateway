@@ -1,6 +1,6 @@
 package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builders;
 
-import com.ericsson.commonutil.StringUtil;
+import com.ericsson.common.util.StringUtil;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;

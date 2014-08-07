@@ -43,6 +43,8 @@ import java.util.Map;
  */
 public enum CoAPResponseCode {
 
+    //TODO: Where number comes from?
+    UNKNOWN(0, "ACK/RESET?"),
     CREATED(65, "2.01 Created"),
     DELETED(66, "2.02 Deleted"),
     VALID(67, "2.03 Valid"),
@@ -80,6 +82,23 @@ public enum CoAPResponseCode {
         this.no = no;
 
         responseClass = BitOperations.getBitsInIntAsInt(this.no, 5, 3);
+    }
+
+    public boolean isCacheable() {
+        // Valid
+        if (description.startsWith("2.03")) {
+            return true;
+        }
+        // Content
+        if (description.startsWith("2.05")) {
+            return true;
+        }
+        // Client Error 4.xx - Responses of this class are cacheable
+        if (description.startsWith("4")) {
+            return true;
+        }
+        // Server Error 5.xx - Responses of this class are cacheable
+        return description.startsWith("5");
     }
 
     /**
@@ -120,6 +139,6 @@ public enum CoAPResponseCode {
     }
 
     public static CoAPResponseCode getResponseName(int no) {
-        return noMap.get(no);
+        return noMap.getOrDefault(no, UNKNOWN);
     }
 }

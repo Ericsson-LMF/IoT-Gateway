@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import java.util.HashMap;

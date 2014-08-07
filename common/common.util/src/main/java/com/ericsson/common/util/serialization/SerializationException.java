@@ -1,9 +1,9 @@
-package com.ericsson.commonutil.serialization;
+package com.ericsson.common.util.serialization;
 
 /**
  * Exception that happens while serialization
  *
- * @author aopkarja
+ * @author delma
  */
 public class SerializationException extends Exception {
 

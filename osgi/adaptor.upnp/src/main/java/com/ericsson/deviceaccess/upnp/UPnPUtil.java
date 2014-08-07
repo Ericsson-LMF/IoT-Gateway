@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.upnp;
 
-import com.ericsson.commonutil.LegacyUtil;
-import com.ericsson.commonutil.StringUtil;
+import com.ericsson.common.util.LegacyUtil;
+import com.ericsson.common.util.StringUtil;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;

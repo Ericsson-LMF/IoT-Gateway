@@ -34,10 +34,10 @@
  */
 package com.ericsson.deviceaccess.spi.impl.genericdevice;
 
-import com.ericsson.commonutil.serialization.Format;
-import com.ericsson.commonutil.serialization.SerializationException;
-import com.ericsson.commonutil.serialization.SerializationUtil;
-import com.ericsson.commonutil.serialization.View;
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.common.util.serialization.SerializationException;
+import com.ericsson.common.util.serialization.SerializationUtil;
+import com.ericsson.common.util.serialization.View;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.GenericDevice;
 import com.ericsson.deviceaccess.api.genericdevice.GDAccessPermission.Type;

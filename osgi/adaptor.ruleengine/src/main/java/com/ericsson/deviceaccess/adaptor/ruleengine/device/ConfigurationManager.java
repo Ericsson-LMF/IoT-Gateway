@@ -34,11 +34,14 @@
  */
 package com.ericsson.deviceaccess.adaptor.ruleengine.device;
 
+import com.ericsson.common.util.LegacyUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import java.io.IOException;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -53,7 +56,7 @@ public class ConfigurationManager implements ManagedService {
 
     private final BundleContext context;
     private final String pid;
-    private final Dictionary<String, Object> configProperties = new Hashtable<>();
+    private final Map<String, Object> configProperties = new ConcurrentHashMap<>();
     private ServiceRegistration serviceReg;
     private final Queue<ConfigurationManagerListener> listeners = new ConcurrentLinkedQueue<>();
 
@@ -63,9 +66,9 @@ public class ConfigurationManager implements ManagedService {
     }
 
     public void start() {
-        Dictionary<String, Object> properties = new Hashtable<>();
+        Map<String, Object> properties = new ConcurrentHashMap<>();
         properties.put(Constants.SERVICE_PID, pid);
-        serviceReg = context.registerService(ManagedService.class.getName(), this, properties);
+        serviceReg = context.registerService(ManagedService.class, this, LegacyUtil.toDictionary(properties));
     }
 
     public void stop() {
@@ -86,10 +89,10 @@ public class ConfigurationManager implements ManagedService {
     }
 
     public void unsetParameter(String key) {
-        if (configProperties.get(key) != null) {
-            configProperties.remove(key);
+        configProperties.computeIfPresent(key, (k, v) -> {
             updateConfig(configProperties);
-        }
+            return null;
+        });
     }
 
     @Override
@@ -97,54 +100,49 @@ public class ConfigurationManager implements ManagedService {
         if (properties == null) {
             return;
         }
-        properties.remove(Constants.SERVICE_PID);
+        Map<String, Object> props = LegacyUtil.toMap(properties);
+        props.remove(Constants.SERVICE_PID);
 
         // Check for added configuration parameters
-        Dictionary<String, Object> added = new Hashtable<>();
-        for (Enumeration<String> e = properties.keys(); e.hasMoreElements();) {
-            String key = e.nextElement();
-            Object value = properties.get(key);
-            if (configProperties.get(key) == null) {
-                added.put(key, value);
-                configProperties.put(key, value);
-            }
-        }
+        Map<String, Object> added = new HashMap<>();
+        props.forEach((key, v) -> {
+            configProperties.computeIfAbsent(key, k -> {
+                added.put(k, v);
+                return v;
+            });
+        });
 
         // Check for removed configuration parameters
-        Dictionary<String, Object> removed = new Hashtable<>();
-        for (Enumeration<String> e = configProperties.keys(); e.hasMoreElements();) {
-            String key = e.nextElement();
-            if (properties.get(key) == null) {
-                removed.put(key, configProperties.get(key));
-                configProperties.remove(key);
-            }
-        }
+        Map<String, Object> removed = configProperties
+                .entrySet()
+                .stream()
+                .filter(e -> !props.containsKey(e.getKey()))
+                .collect(FunctionalUtil.entryCollector());
+        removed.keySet().forEach(configProperties::remove);
 
         // Check for modified configuration parameters
-        Dictionary<String, Object> modified = new Hashtable<>();
-        for (Enumeration<String> e = properties.keys(); e.hasMoreElements();) {
-            String key = e.nextElement();
-            String newValue = (String) properties.get(key);
-            String oldValue = (String) configProperties.get(key);
-            if (!newValue.equals(oldValue)) {
-                modified.put(key, newValue);
-                configProperties.put(key, newValue);
-            }
-        }
+        Map<String, Object> modified = configProperties
+                .entrySet()
+                .stream()
+                .filter(e -> !props.get(e.getKey()).equals(e.getValue()))
+                .peek(e -> {
+                    e.setValue(props.get(e.getKey()));
+                })
+                .collect(FunctionalUtil.entryCollector());
 
         if (!added.isEmpty() || !removed.isEmpty() || !modified.isEmpty()) {
             listeners.forEach(l -> l.updated(added, removed, modified));
         }
     }
 
-    private void updateConfig(Dictionary updatedConfig) {
+    private void updateConfig(Map<String, Object> updatedConfig) {
         // Assume contest holds a valid BundleContext object for the bundle
         ServiceReference ref = context.getServiceReference(ConfigurationAdmin.class.getName());
         if (ref != null) {
             ConfigurationAdmin cfgAdm = (ConfigurationAdmin) context.getService(ref);
             try {
                 Configuration config = cfgAdm.getConfiguration(pid);
-                config.update(updatedConfig);
+                config.update(LegacyUtil.toDictionary(updatedConfig));
             } catch (IOException e) {
             }
         } else {
@@ -154,6 +152,6 @@ public class ConfigurationManager implements ManagedService {
 
     public interface ConfigurationManagerListener {
 
-        void updated(Dictionary added, Dictionary removed, Dictionary modified);
+        void updated(Map<String, Object> added, Map<String, Object> removed, Map<String, Object> modified);
     }
 }

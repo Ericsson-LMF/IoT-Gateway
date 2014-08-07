@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.common.util.serialization.Format;
 import com.ericsson.deviceaccess.api.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -69,7 +69,7 @@ public interface GDContextNode extends Serializable {
      * @return path from the device node to the node with "/" as delimiter.
      */
     @JsonIgnore
-     String getPath();
+    String getPath();
 
     String getSerializedNode(String path, Format format) throws GDException;
 }

@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.api;
 
-import com.ericsson.commonutil.serialization.Format;
+import com.ericsson.common.util.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 
 /**

@@ -114,7 +114,7 @@
                             javax.servlet.*,
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.api.*,
-                            com.ericsson.commonutil.*,
+                            com.ericsson.common.util.*,
                             org.osgi.*;version="[1.0,4.2)"
                         </Import-Package>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>

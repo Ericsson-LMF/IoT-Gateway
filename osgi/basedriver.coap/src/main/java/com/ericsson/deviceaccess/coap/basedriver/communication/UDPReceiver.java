@@ -38,8 +38,6 @@ import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageListener;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.MulticastSocket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,13 +48,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class UDPReceiver implements Runnable, TransportLayerReceiver {
 
-    // IP MTU is suggested to 1280 bytes in draft-ieft-core-coap-08, 1152 for
-    // the message size, 1024 for the payload size
-    private static int BUFFER_SIZE = 1280;
-
-    final private DatagramSocket socket;
-    final private MulticastSocket multicastSocket;
-    final private List<IncomingMessageListener> coapListeners = Collections.synchronizedList(new ArrayList<>());
+    private final DatagramSocket socket;
+    private final List<IncomingMessageListener> coapListeners = Collections.synchronizedList(new ArrayList<>());
     Thread thread;
 
     private volatile AtomicBoolean running = new AtomicBoolean(false);
@@ -69,83 +62,29 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
     public UDPReceiver(DatagramSocket socket) {
         //CoAPActivator.logger.debug("UDP receiver with datagram socket");
         this.socket = socket;
-        this.multicastSocket = null;
-    }
-
-    /**
-     * Constructor using MulticastSocket
-     *
-     * @param multicastSocket
-     */
-    public UDPReceiver(MulticastSocket multicastSocket) {
-        //CoAPActivator.logger.debug("UDP receiver with multicast socket");
-        this.multicastSocket = multicastSocket;
-        this.socket = null;
     }
 
     public void cleanup() {
-        running.set(false);
         coapListeners.clear();
-
-        if (thread.isAlive() && !thread.isInterrupted()) {
-            thread.interrupt();
-        }
+        socket.close();
     }
 
     @Override
     public void run() {
         while (running.get()) {
+            // TODO allocate buffer properly
+            byte[] buffer = new byte[UDPConstants.MAX_DATAGRAM_SIZE + 1];
+            DatagramPacket datagram = new DatagramPacket(buffer, buffer.length);
             try {
-                // TODO allocate buffer properly
-                // allocate buffer
-                byte[] buffer = new byte[BUFFER_SIZE + 1];
-                DatagramPacket datagram = new DatagramPacket(buffer, buffer.length);
-
-                if (multicastSocket != null) {
-                    multicastSocket.receive(datagram);
-                } else {
-                    if (socket.isClosed()) {
-                        System.out.println("Socket has been already closed!!");
-                    }
-                    socket.receive(datagram);
-                }
-
-                // check if receive is interrupted
-                //
-                // socket.close() will interrupt socket.receive()
-                //
-                if (socket != null && socket.isClosed()) {
-                    running.set(false);
-                    continue;
-                }
-                if (multicastSocket != null && multicastSocket.isClosed()) {
-                    running.set(false);
-                    continue;
-                }
-                if (thread.isInterrupted()) {
-                    running.set(false);
-                    continue;
-                }
-
-                /*
-                 CoAPActivator.logger.debug("UDP Datagram received");
-                 */
+                socket.receive(datagram);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            // socket.close() will interrupt socket.receive()
+            if (socket.isClosed()) {
+                running.set(false);
+            } else {
                 this.datagramReceived(datagram);
-
-            } catch (SocketException e) {
-                if (socket != null && !socket.isClosed() || multicastSocket != null && !multicastSocket.isClosed()) {
-                    e.printStackTrace();
-                }
-                running.set(false);
-            } catch (IOException e) {
-                // TODO error handling!
-                if (running.get()) {
-                    e.printStackTrace();
-                }
-                running.set(false);
-            } catch (Exception e) {
-                running.set(false);
-                e.printStackTrace();
             }
         }
     }

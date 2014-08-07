@@ -68,10 +68,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -160,7 +160,6 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 // If size of the request is larger than default max size, split
                 // into smaller blocks
                 byte[] payload = request.getPayload();
-                //TODO: Should this be (payload != null && payload.length > maxBlockSize) && (block2Request || block1Request)?
                 if (payload != null && payload.length > maxBlockSize || block2Request || block1Request) {
 
                     int szx = maxSzx;
@@ -539,32 +538,18 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param resp response that matches the given request
      * @return request that was matched based on the token
      */
-    private CoAPRequest matchBasedOnTokens(CoAPResponse resp) {
+    private Optional<CoAPRequest> matchBasedOnTokens(CoAPResponse resp) {
         byte[] tokenHeader = resp.getToken();
         if (tokenHeader == null) {
-            return null;
+            return Optional.empty();
         }
         String token = new String(tokenHeader, StandardCharsets.UTF_8);
-
-        Map<String, CoAPRequest> requests = outHandler.getOutgoingRequests();
-        //TODO: Is there better way to do this?
-        while (true) {
-            try {
-                for (CoAPRequest req : requests.values()) {
-                    byte[] header = req.getToken();
-                    if (header == null) {
-                        return null;
-                    }
-                    String reqToken = new String(header, StandardCharsets.UTF_8);
-                    if (token.equals(reqToken)) {
-                        return req;
-                    }
-                }
-                break;
-            } catch (ConcurrentModificationException e) {
-            }
-        }
-        return null;
+        return outHandler.getOutgoingRequests()
+                .values()
+                .stream()
+                .filter(req -> req != null)
+                .filter(req -> token.equals(new String(req.getToken(), StandardCharsets.UTF_8)))
+                .findAny();
     }
 
     /**
@@ -660,15 +645,15 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param resp response to handle
      */
     private void handleConAndNon(CoAPResponse resp) throws CoAPException {
-        CoAPRequest originalRequest = null;
+        Optional<CoAPRequest> originalRequest = Optional.empty();
         // Confirmable messages are identified based on tokens
         try {
-            originalRequest = this.matchBasedOnTokens(resp);
+            originalRequest = matchBasedOnTokens(resp);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (originalRequest == null) {
+        if (!originalRequest.isPresent()) {
             //CoAPActivator.logger.warn("[ConAndNon] Matching request was not found");
 
             // If no matching request can be found for a confirmable response,
@@ -678,6 +663,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             }
             return;
         }
+        CoAPRequest oRequest = originalRequest.get();
 
         // Check for block options
         List<CoAPOptionHeader> block2 = resp.getOptionHeaders(BLOCK2);
@@ -687,29 +673,29 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         // Check the response code to check conditions for caching, do not also
         // cache is there's a block option (either block1 or block2 present)
         if (resp.isCacheable() && block2.isEmpty() && block1.isEmpty()) {
-            cacheResponse(resp, originalRequest);
+            cacheResponse(resp, oRequest);
         }
 
         // Do not return from these methods, use the normal callback methods
         if (!block1.isEmpty()) {
-            CoAPRequest nextBlock = blockHandler.block1OptionResponseReceived(resp, originalRequest);
+            CoAPRequest nextBlock = blockHandler.block1OptionResponseReceived(resp, oRequest);
             if (nextBlock != null) {
                 outHandler.send(nextBlock, false);
             }
         } else if (!block2.isEmpty()) {
-            CoAPRequest nextBlock = blockHandler.block2OptionReceived(resp, originalRequest);
+            CoAPRequest nextBlock = blockHandler.block2OptionReceived(resp, oRequest);
             if (nextBlock != null) {
                 outHandler.send(nextBlock, false);
             }
         }
         // if the message is related to an observed resource or the resource
         // contains observe header
-        if (obsHandler.isObserved(originalRequest.getUriFromRequest())) {
-            obsHandler.handleObserveResponse(originalRequest, resp);
+        if (obsHandler.isObserved(oRequest.getUriFromRequest())) {
+            obsHandler.handleObserveResponse(oRequest, resp);
         } else {
-            CoAPRequestListener listener = originalRequest.getListener();
+            CoAPRequestListener listener = oRequest.getListener();
             if (listener != null) {
-                listener.separateResponseReceived(resp, originalRequest);
+                listener.separateResponseReceived(resp, oRequest);
             }
         }
 

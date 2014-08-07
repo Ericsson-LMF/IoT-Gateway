@@ -1,10 +1,21 @@
-package com.ericsson.commonutil.function;
+package com.ericsson.common.util.function;
 
+import java.util.EnumSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import static java.util.stream.Collector.Characteristics.CONCURRENT;
+import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
+import static java.util.stream.Collector.Characteristics.UNORDERED;
 
 /**
  * Utility class to help with functional interfaces.
@@ -83,6 +94,12 @@ public enum FunctionalUtil {
         }
     }
 
+    /**
+     * Wraps Runnable to TimerTask
+     *
+     * @param runnable Runnable
+     * @return TimerTask
+     */
     public static TimerTask timerTask(Runnable runnable) {
         return new TimerTask() {
             @Override
@@ -90,5 +107,57 @@ public enum FunctionalUtil {
                 runnable.run();
             }
         };
+    }
+
+    /**
+     * Puts to map cleaning what there was before if any.
+     *
+     * @param <K>
+     * @param <V>
+     * @param map
+     * @param key
+     * @param value
+     * @param cleaner
+     * @return
+     */
+    public static <K, V> V putAndClean(Map<K, V> map, K key, V value, Consumer<V> cleaner) {
+        return map.compute(key, (k, v) -> {
+            if (v != null) {
+                cleaner.accept(v);
+            }
+            return value;
+        });
+    }
+
+    public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> entryCollector() {
+        return new EntryCollector<>();
+    }
+
+    private static class EntryCollector<K, V> implements Collector<Map.Entry<K, V>, Map<K, V>, Map<K, V>> {
+
+        @Override
+        public Supplier<Map<K, V>> supplier() {
+            return ConcurrentHashMap::new;
+        }
+
+        @Override
+        public BiConsumer<Map<K, V>, Map.Entry<K, V>> accumulator() {
+            return (m, e) -> m.put(e.getKey(), e.getValue());
+        }
+
+        @Override
+        public BinaryOperator<Map<K, V>> combiner() {
+            return (a, b) -> a;
+        }
+
+        @Override
+        public Function<Map<K, V>, Map<K, V>> finisher() {
+            return Function.identity();
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return EnumSet.of(CONCURRENT, IDENTITY_FINISH, UNORDERED);
+        }
     }
 }

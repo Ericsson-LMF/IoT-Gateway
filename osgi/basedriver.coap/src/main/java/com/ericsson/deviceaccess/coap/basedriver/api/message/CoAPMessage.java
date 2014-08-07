@@ -205,7 +205,11 @@ public abstract class CoAPMessage {
      * @return option count of this message
      */
     public int getOptionCount() {
-        return this.headers.size();
+        return (int) headers
+                .values()
+                .stream()
+                .filter(c -> !c.isEmpty())
+                .count();
     }
 
     /**
@@ -303,22 +307,19 @@ public abstract class CoAPMessage {
      * added
      */
     private boolean okToAddHeader(CoAPOptionHeader header) {
-
         // TODO make private methods for each header
-        // TODO make if elses..
         // If contains proxy-uri header(s), it must take precedence over
         // uri-host, uri-port, uri-path & uri-query. thus do not allow these
         // headers to be added if proxy-uri is there
         CoAPOptionName optionName = header.getOptionName();
-        if (headers.containsKey(CoAPOptionName.PROXY_URI)
+        if (!get(CoAPOptionName.PROXY_URI).isEmpty()
                 && (optionName == CoAPOptionName.URI_HOST
                 || optionName == CoAPOptionName.URI_PATH
                 || optionName == CoAPOptionName.URI_PORT)) {
-
             // CoAPActivator.logger.info("Proxy-uri option in the message, not possible to add [" + header.getOptionName() + "] option header");
             return false;
         }
-        if (!optionName.isRepeatable() && headers.containsKey(optionName)) {
+        if (!optionName.isRepeatable() && !get(optionName).isEmpty()) {
             // Cannot add multiple repeatables
             return false;
         }
@@ -329,7 +330,6 @@ public abstract class CoAPMessage {
             if (path.startsWith("/")) {
                 path = path.substring(1);
             }
-
             // CoAPActivator.logger.warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
             return !path.contains("/");
         }
@@ -405,7 +405,7 @@ public abstract class CoAPMessage {
      * @return list of options with the given option name.
      */
     public List<CoAPOptionHeader> getOptionHeaders(CoAPOptionName optionName) {
-        return headers.get(optionName);
+        return headers.getOrDefault(optionName, Collections.emptyList());
     }
 
     /**

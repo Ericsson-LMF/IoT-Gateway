@@ -51,31 +51,26 @@ public class CoAPObservationResource extends CoAPResource {
     private int latestValidObserve; // uint, use integer and lowest 16 bits
     private Date latestTimestamp;
 
-    // unsigned int handled as long here
-    private long maxOfe;
-
     public CoAPObservationResource(URI uri) {
         super(uri);
         this.latestTimestamp = null;
         this.latestValidObserve = 0;
-        // max-ofe is defined by default to 0 in the draft
-        this.maxOfe = 0;
     }
 
     public void setLatestValidObserveValue(short validObserve) {
-        this.latestValidObserve = validObserve;
+        latestValidObserve = validObserve;
     }
 
     public int getLatestValidObserveValue() {
-        return this.latestValidObserve;
+        return latestValidObserve;
     }
 
     public Date getLatestValidTimestamp() {
-        return this.latestTimestamp;
+        return latestTimestamp;
     }
 
     public void setLatestValidTimestamp(Date timestamp) {
-        this.latestTimestamp = timestamp;
+        latestTimestamp = timestamp;
     }
 
     /**
@@ -88,49 +83,32 @@ public class CoAPObservationResource extends CoAPResource {
      */
     public boolean isFresh(int presentObserve, Date date) {
         // draft-ietf-core-observe-03
-
-        if (this.latestTimestamp == null && this.latestValidObserve == 0) {
-            /*
-             CoAPActivator.logger.debug("Initial observe notification");
-             */
-            this.latestTimestamp = date;
-            this.latestValidObserve = presentObserve;
+        if (latestTimestamp == null || latestValidObserve == 0) {
+            //CoAPActivator.logger.debug("Initial observe notification");
+            latestTimestamp = date;
+            latestValidObserve = presentObserve;
             return true;
         }
 
         // compare the values given as parameters to the ones of this instance
         // based on the formula in draft-ietf-core-observe-03
-        double val1 = (this.latestValidObserve - presentObserve) % Math.pow(2, 16);
+        double val1 = (latestValidObserve - presentObserve) % Math.pow(2, 16);
 
         double exp15 = Math.pow(2, 15);
         boolean condition1 = val1 < exp15;
 
         double exp14 = Math.pow(2, 14);
-        boolean condition2 = date.getTime() < (this.latestTimestamp.getTime() + exp14);
+        boolean condition2 = date.getTime() < (latestTimestamp.getTime() + exp14);
 
         if (condition1 && condition2) {
-            /*
-             CoAPActivator.logger.debug("Outdated notification, discard");
-             */
+            // CoAPActivator.logger.debug("Outdated notification, discard");
             return false;
         }
 
-        /*
-         CoAPActivator.logger.debug("Fresh notification");
-         */
+        // CoAPActivator.logger.debug("Fresh notification");
         // Update the new values
         latestTimestamp = date;
         latestValidObserve = presentObserve;
-
         return true;
-
-    }
-
-    public void setMaxOfe(long maxOfe) {
-        this.maxOfe = maxOfe;
-    }
-
-    public long getMaxOfe() {
-        return maxOfe;
     }
 }

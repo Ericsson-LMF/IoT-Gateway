@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import com.ericsson.deviceaccess.api.Constants;
 import com.ericsson.deviceaccess.api.service.homeautomation.hvac.TemperatureSensor;
 import com.ericsson.deviceaccess.api.service.homeautomation.hvac.thermostat.ThermostatMode;

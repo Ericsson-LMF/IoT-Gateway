@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.api.genericdevice;
 
-import com.ericsson.commonutil.serialization.View;
+import com.ericsson.common.util.serialization.View;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.util.List;

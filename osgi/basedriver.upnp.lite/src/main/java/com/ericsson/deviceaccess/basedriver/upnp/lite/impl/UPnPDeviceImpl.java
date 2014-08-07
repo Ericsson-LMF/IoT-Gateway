@@ -34,7 +34,7 @@
  */
 package com.ericsson.deviceaccess.basedriver.upnp.lite.impl;
 
-import com.ericsson.commonutil.LegacyUtil;
+import com.ericsson.common.util.LegacyUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
