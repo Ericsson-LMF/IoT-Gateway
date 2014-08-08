@@ -128,11 +128,13 @@ public enum CoAPResponseCode implements CoAPCode {
         }
     }
 
-    public static CoAPResponseCode getResponseName(int no) {
+    public static CoAPResponseCode get(int no) {
         return noMap.get(no);
     }
 
-    public static boolean isValid(int no) {
-        return noMap.containsKey(no);
+    public static boolean isAllowed(int no) {
+        int codeClass = CoAPCode.getCodeClass(no);
+        int detail = CoAPCode.getCodeDetail(no);
+        return 2 <= codeClass && codeClass <= 5 && (codeClass <= 4 || detail < 32);
     }
 }

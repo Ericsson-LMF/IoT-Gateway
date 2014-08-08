@@ -39,6 +39,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import java.net.DatagramPacket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -183,11 +184,10 @@ public class CoAPMessageWriterTest extends TestCase {
         URI uri = new URI("coap://127.0.0.1:/storage/helloworld");
         CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
 
-        int msgCode = 64;
         int version = 1;
         short id = 2;
 
-        CoAPResponse resp = new CoAPResponse(version, type, msgCode, id);
+        CoAPResponse resp = new CoAPResponse(version, type, CoAPResponseCode.CONTENT, id);
 
         CoAPOptionHeader option1 = new CoAPOptionHeader("option_1", "test1".getBytes());
         CoAPOptionHeader option2 = new CoAPOptionHeader(CoAPOptionName.ETAG, "hello".getBytes());
@@ -223,10 +223,10 @@ public class CoAPMessageWriterTest extends TestCase {
 
     public void testEmptyAck() {
         CoAPResponse response = new CoAPResponse(1,
-                CoAPMessageType.CONFIRMABLE, 69, 1234);
+                CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_IMPLEMENTED, 1234);
 
         CoAPResponse emptyAck = response.createAcknowledgement();
-        assertEquals(0, emptyAck.getCode());
+        assertEquals(0, emptyAck.getCode().getNo());
 
     }
 }

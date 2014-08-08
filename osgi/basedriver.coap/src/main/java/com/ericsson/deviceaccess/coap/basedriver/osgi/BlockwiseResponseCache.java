@@ -39,6 +39,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -76,7 +77,7 @@ public class BlockwiseResponseCache {
         cache.clear();
     }
 
-    public void put(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders, byte[] payload, int responseCode) {
+    public void put(InetSocketAddress clientAddress, URI resourceUri, List queryHeaders, byte[] payload, CoAPResponseCode responseCode) {
         SessionKey key = new SessionKey(clientAddress, resourceUri, queryHeaders);
         SessionData data = new SessionData(key, payload, responseCode);
         FunctionalUtil.putAndClean(cache, key, data, v -> v.stopTimer());
@@ -164,10 +165,10 @@ public class BlockwiseResponseCache {
 
         final private SessionKey key;
         final private byte[] payload;
-        final private int responseCode;
+        final private CoAPResponseCode responseCode;
         private TimerTask timerTask = null;
 
-        private SessionData(SessionKey key, byte[] payload, int responseCode) {
+        private SessionData(SessionKey key, byte[] payload, CoAPResponseCode responseCode) {
             this.key = key;
             this.payload = payload;
             this.responseCode = responseCode;
@@ -182,7 +183,7 @@ public class BlockwiseResponseCache {
             return payload;
         }
 
-        public int getResponseCode() {
+        public CoAPResponseCode getResponseCode() {
             return responseCode;
         }
 

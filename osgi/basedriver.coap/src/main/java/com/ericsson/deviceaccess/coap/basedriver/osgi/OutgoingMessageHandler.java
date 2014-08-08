@@ -150,7 +150,7 @@ public class OutgoingMessageHandler {
                     || msg.getMessageType() == CoAPMessageType.NON_CONFIRMABLE) {
                 this.cacheMessage(msg);
             } else if (msg.getMessageType() == CoAPMessageType.ACKNOWLEDGEMENT
-                    && msg.getCode() != 0) {
+                    && msg.getCode().getNo() != 0) {
                 this.cacheMessage(msg);
             }
         }

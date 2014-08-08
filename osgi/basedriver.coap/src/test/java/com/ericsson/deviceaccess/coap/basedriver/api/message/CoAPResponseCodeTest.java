@@ -47,11 +47,11 @@ public class CoAPResponseCodeTest extends TestCase {
 
         System.out.println("code to string:" + CoAPResponseCode.CREATED.toString());
 
-        CoAPResponseCode code = CoAPResponseCode.getResponseName(65);
+        CoAPResponseCode code = CoAPResponseCode.get(65);
 
         System.out.println("code to string:" + code.toString());
 
-        code = CoAPResponseCode.getResponseName(65);
+        code = CoAPResponseCode.get(65);
 
         String responseText = code.toString();
         System.out.println("response text: " + responseText);

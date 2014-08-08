@@ -85,7 +85,7 @@ public abstract class CoAPMessage {
      * are reserved.) In case of a request, the Code field indicates the Request
      * Method; in case of a response a Response Code.
      */
-    private int code;
+    private CoAPCode code;
 
     /**
      * Message ID: 16-bit unsigned integer. Used for the detection of message
@@ -130,7 +130,7 @@ public abstract class CoAPMessage {
      * @param token token
      */
     public CoAPMessage(int version, CoAPMessageType messageType,
-            int methodCode, int messageId, byte[] token) {
+            CoAPCode methodCode, int messageId, byte[] token) {
         this(messageType, methodCode, messageId, token);
         this.version = version;
     }
@@ -143,7 +143,7 @@ public abstract class CoAPMessage {
      * @param messageId message ID
      * @param token token
      */
-    public CoAPMessage(CoAPMessageType messageType, int methodCode,
+    public CoAPMessage(CoAPMessageType messageType, CoAPCode methodCode,
             int messageId, byte[] token) {
         this.token = token;
         this.headers = new ConcurrentHashMap<>();
@@ -217,7 +217,7 @@ public abstract class CoAPMessage {
      *
      * @param code code to set
      */
-    public void setCode(int code) {
+    public void setCode(CoAPCode code) {
         this.code = code;
     }
 
@@ -226,7 +226,7 @@ public abstract class CoAPMessage {
      *
      * @return code of this message
      */
-    public int getCode() {
+    public CoAPCode getCode() {
         return this.code;
     }
 
@@ -625,7 +625,7 @@ public abstract class CoAPMessage {
                     if (((CoAPRequest) this).getUriFromRequest() != null) {
                         logMessage.append("Request URI [").append(((CoAPRequest) this).getUriFromRequest()).append("]\n");
                     }
-                    String name = CoAPMethodCode.getName(getCode());
+                    String name = getCode().toString();
                     if (name != null) {
                         codeDescription = name;
                     }
@@ -634,9 +634,7 @@ public abstract class CoAPMessage {
                     e.printStackTrace();
                 }
             } else {
-                if (CoAPResponseCode.getResponseName(getCode()) != null) {
-                    codeDescription = CoAPResponseCode.getResponseName(getCode()).getDescription();
-                }
+                codeDescription = getCode().getDescription();
             }
             if (getMessageId() > 0) {
                 logMessage.append("Message ID [").append(getMessageId()).append("]\n");
@@ -674,34 +672,25 @@ public abstract class CoAPMessage {
     /**
      * Enum representing the type of the message (as defined in coap core 07)
      */
-    public static enum CoAPMessageType implements CoAPCode {
+    public static enum CoAPMessageType {
 
-        CONFIRMABLE(0, 1, "Confirmable"),
-        NON_CONFIRMABLE(0, 2, "Non-Confirmable"),
-        ACKNOWLEDGEMENT(0, 3, "Acknowledgement"),
-        RESET(0, 4, "Reset");
+        CONFIRMABLE(1, "Confirmable"),
+        NON_CONFIRMABLE(2, "Non-Confirmable"),
+        ACKNOWLEDGEMENT(3, "Acknowledgement"),
+        RESET(4, "Reset");
 
         private final String name;
-        private final int codeClass;
-        private final int detail;
+        private final int no;
 
-        private CoAPMessageType(int codeClass, int detail, String name) {
+        private CoAPMessageType(int no, String name) {
             this.name = name;
-            this.codeClass = codeClass;
-            this.detail = detail;
+            this.no = no;
         }
 
-        @Override
-        public int getCodeClass() {
-            return codeClass;
+        public int getNo() {
+            return no;
         }
 
-        @Override
-        public int getCodeDetail() {
-            return detail;
-        }
-
-        @Override
         public String getPlainDescription() {
             return name;
         }
@@ -712,10 +701,6 @@ public abstract class CoAPMessage {
             } catch (Exception e) {
                 return null;
             }
-        }
-
-        public static boolean isValid(int no) {
-            return CoAPMessageType.values()[no] != null;
         }
     }
 }

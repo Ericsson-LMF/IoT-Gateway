@@ -34,9 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.common.util.BitUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -52,7 +52,7 @@ public class CoAPRequestTest extends TestCase {
 
     public CoAPRequestTest() {
         super("CoAPRequestTest");
-        req = new CoAPRequest(CoAPMessageType.CONFIRMABLE, 1, 1234);
+        req = new CoAPRequest(CoAPMessageType.CONFIRMABLE, CoAPRequestCode.EMPTY, 1234);
         host = "127.0.0.1";
         port = 8080;
         try {

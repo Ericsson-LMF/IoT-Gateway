@@ -34,8 +34,8 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.common.util.BitUtil;
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.util.TokenGenerator;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -65,11 +65,11 @@ public class CoAPRequest extends CoAPMessage {
      * @param methodCode code of the request
      * @param messageId message ID
      */
-    public CoAPRequest(int version, CoAPMessageType messageType, int methodCode, int messageId, byte[] token) {
+    public CoAPRequest(int version, CoAPMessageType messageType, CoAPRequestCode methodCode, int messageId, byte[] token) {
         super(version, messageType, methodCode, messageId, token);
     }
 
-    public CoAPRequest(int version, CoAPMessageType messageType, int methodCode, int messageId) {
+    public CoAPRequest(int version, CoAPMessageType messageType, CoAPRequestCode methodCode, int messageId) {
         super(version, messageType, methodCode, messageId, null);
     }
 
@@ -81,11 +81,11 @@ public class CoAPRequest extends CoAPMessage {
      * @param methodCode code of the request
      * @param messageId message ID
      */
-    public CoAPRequest(CoAPMessageType messageType, int methodCode, int messageId, byte[] token) {
+    public CoAPRequest(CoAPMessageType messageType, CoAPRequestCode methodCode, int messageId, byte[] token) {
         super(messageType, methodCode, messageId, token);
     }
 
-    public CoAPRequest(CoAPMessageType messageType, int methodCode, int messageId) {
+    public CoAPRequest(CoAPMessageType messageType, CoAPRequestCode methodCode, int messageId) {
         super(messageType, methodCode, messageId, null);
     }
 
@@ -175,6 +175,11 @@ public class CoAPRequest extends CoAPMessage {
         } catch (URISyntaxException e) {
             throw new CoAPException(e);
         }
+    }
+
+    @Override
+    public CoAPRequestCode getCode() {
+        return (CoAPRequestCode) super.getCode();
     }
 
     /**

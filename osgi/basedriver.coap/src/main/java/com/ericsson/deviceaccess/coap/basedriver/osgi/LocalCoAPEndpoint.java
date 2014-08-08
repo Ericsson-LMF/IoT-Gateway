@@ -34,12 +34,12 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.IncomingCoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMethodCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
@@ -52,6 +52,7 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_QUERY;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
@@ -59,7 +60,6 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseResponseCache.SessionData;
-import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
 import java.io.ByteArrayOutputStream;
 import java.net.InetSocketAddress;
@@ -206,7 +206,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                  */
                 // Match request codes:
                 CoAPRequest originalReq = resp.getRequest();
-                int originalCode = originalReq.getCode();
+                CoAPRequestCode originalCode = originalReq.getCode();
 
                 if (originalCode != request.getCode()) {
                     outHandler.send(request, false);
@@ -380,9 +380,9 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         //CoAPActivator.logger.debug("handleRequest() : Received [" + request.getMessageType().getName() + "] request");
 
         // look up blockwise response cache if Request is GET and has Block2 option
-        int code = request.getCode();
+        CoAPRequestCode code = request.getCode();
         boolean hasBlock2Option = !request.getOptionHeaders(BLOCK2).isEmpty();
-        if (code == CoAPMethodCode.GET.getNo() && hasBlock2Option) {
+        if (code == CoAPRequestCode.GET && hasBlock2Option) {
             try {
                 SessionData sessionData = outBlockCache.get(request);
                 if (sessionData != null) {
@@ -414,7 +414,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         }
 
         try {
-            if (request.getUriFromRequest().getPath().startsWith(WELLKNOWN_CORE) && request.getCode() == 1) {
+            if (request.getUriFromRequest().getPath().startsWith(WELLKNOWN_CORE) && request.getCode() == CoAPRequestCode.GET) {
                 replyToResourceDiscovery(request);
                 return;
             }
@@ -478,7 +478,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     }
 
     public CoAPRequest createCoAPRequest(CoAPMessageType messageType,
-            int methodCode, InetSocketAddress address, URI uri,
+            CoAPRequestCode methodCode, InetSocketAddress address, URI uri,
             byte[] tokenHeader) throws CoAPException {
         //CoAPActivator.logger.debug("Create CoAP request");
         int messageId = outHandler.generateMessageId();
@@ -593,7 +593,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         }
 
         // Handle empty ack
-        if (resp.getCode() == 0) {
+        if (resp.getCode() == CoAPResponseCode.EMPTY) {
             //CoAPActivator.logger.debug("An empty ACK received");
             CoAPRequestListener listener = originalRequest.getListener();
             if (listener != null) {

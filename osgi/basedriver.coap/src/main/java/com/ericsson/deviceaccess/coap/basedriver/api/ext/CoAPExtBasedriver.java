@@ -38,6 +38,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.IncomingCoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
@@ -138,7 +139,7 @@ public class CoAPExtBasedriver {
      */
     public CoAPRequest createPostRequest(String host, int port, String path,
             CoAPMessageType messageType, byte[] payload) throws CoAPException {
-        CoAPRequest req = this.createRequest(messageType, 2, host, port, path);
+        CoAPRequest req = this.createRequest(messageType, CoAPRequestCode.POST, host, port, path);
         if (payload != null && payload.length > 0) {
             req.setPayload(payload);
         }
@@ -158,7 +159,7 @@ public class CoAPExtBasedriver {
      */
     public CoAPRequest createGetRequest(String host, int port, String path,
             CoAPMessageType messageType) throws CoAPException {
-        return this.createRequest(messageType, 1, host, port, path);
+        return this.createRequest(messageType, CoAPRequestCode.GET, host, port, path);
     }
 
     /**
@@ -175,7 +176,7 @@ public class CoAPExtBasedriver {
      */
     public CoAPRequest createPutRequest(String host, int port, String path,
             CoAPMessageType messageType, byte[] payload) throws CoAPException {
-        CoAPRequest req = this.createRequest(messageType, 3, host, port, path);
+        CoAPRequest req = this.createRequest(messageType, CoAPRequestCode.PUT, host, port, path);
         if (payload != null && payload.length > 0) {
             req.setPayload(payload);
         }
@@ -195,7 +196,7 @@ public class CoAPExtBasedriver {
      */
     public CoAPRequest createDeleteRequest(String host, int port, String path,
             CoAPMessageType messageType) throws CoAPException {
-        return this.createRequest(messageType, 4, host, port, path);
+        return this.createRequest(messageType, CoAPRequestCode.DELETE, host, port, path);
     }
 
     /**
@@ -207,7 +208,7 @@ public class CoAPExtBasedriver {
      * @param path path to the resource to which this request is to be sent
      */
     private CoAPRequest createRequest(CoAPMessageType messageType,
-            int messageCode, String host, int port, String path)
+            CoAPRequestCode messageCode, String host, int port, String path)
             throws CoAPException {
 
         if (path != null && !path.isEmpty() && !path.startsWith("/")) {

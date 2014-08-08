@@ -44,6 +44,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import java.net.DatagramPacket;
@@ -153,10 +154,14 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         position += tokenLength;
 
         CoAPMessageType messageType = CoAPMessageType.getType(type);
-        if (CoAPResponseCode.isValid(code)) {
-            message = new CoAPRequest(version, messageType, code, messageId, token);
-        } else if (CoAPMessageType.isValid(code)) {
-            message = new CoAPResponse(version, messageType, code, messageId, token);
+
+        if (code == 0) {
+            // handle empty messages as responses, only acks can be empty?
+            message = new CoAPResponse(version, messageType, CoAPResponseCode.get(code), messageId, token);
+        } else if (CoAPResponseCode.isAllowed(code)) {
+            message = new CoAPResponse(version, messageType, CoAPResponseCode.get(code), messageId, token);
+        } else if (CoAPRequestCode.isAllowed(code)) {
+            message = new CoAPRequest(version, messageType, CoAPRequestCode.get(code), messageId, token);
         } else {
             // TODO exception handling
             message = null;

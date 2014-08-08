@@ -41,4 +41,12 @@ public interface CoAPCode {
         result.append(detail).append(" ").append(getPlainDescription());
         return result.toString();
     }
+
+    public static int getCodeClass(int no) {
+        return no >> 5;
+    }
+
+    public static int getCodeDetail(int no) {
+        return no & 0b00011111;
+    }
 }

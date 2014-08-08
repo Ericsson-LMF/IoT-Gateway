@@ -203,10 +203,7 @@ public class CoAPResource {
         if (!absolute) {
             linkformat.append("<").append(resourceIdentifier.getPath()).append(">");
         } else {
-            String path = resourceIdentifier.toString();
-            if (!path.startsWith("/")) {
-                path = "/" + path;
-            }
+            String path = StringUtil.ensureWrapping("/", resourceIdentifier.toString(), "");
             String h = "";
             if (resourceIdentifier.getHost() != null) {
                 h = resourceIdentifier.getHost();

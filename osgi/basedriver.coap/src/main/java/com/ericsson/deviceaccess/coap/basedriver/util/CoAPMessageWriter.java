@@ -35,13 +35,14 @@
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
 import com.ericsson.common.util.BitUtil;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import static com.ericsson.common.util.BitUtil.getBitsInIntAsByte;
 import static com.ericsson.common.util.BitUtil.getBitsInIntAsInt;
 import static com.ericsson.common.util.BitUtil.setBitsInByte;
 import static com.ericsson.common.util.BitUtil.splitIntToBytes;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPCode;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -84,7 +85,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
             //MUST NOT be send and MUST be processed as a message format error
             throw new IncorrectMessageException("Wrong token length: " + tokenLength); //TODO: Handle this
         }
-        int messageCode = message.getCode();
+        CoAPCode messageCode = message.getCode();
 
         // First byte with version, message type & option count
         byte headerByte = setBitsInByte(0, VERSION_START,
@@ -102,7 +103,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
         // byte tmpByteCode = ByteBuffer.allocate(1).get();
         byte codeByte = setBitsInByte(0, CODE_START,
                 CODE_LENGTH,
-                getBitsInIntAsByte(messageCode, 0, CODE_LENGTH));
+                getBitsInIntAsByte(messageCode.getNo(), 0, CODE_LENGTH));
 
         outputStream.write(codeByte);
 

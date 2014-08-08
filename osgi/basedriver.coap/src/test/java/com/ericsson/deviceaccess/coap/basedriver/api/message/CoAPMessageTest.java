@@ -34,9 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
 import junit.framework.TestCase;
 
@@ -48,8 +48,8 @@ public class CoAPMessageTest extends TestCase {
 
     public CoAPMessageTest() {
         super("CoAPMessageTest");
-        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, 1, 123);
-        req = new CoAPRequest(1, CoAPMessageType.CONFIRMABLE, 1, 123);
+        resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.EMPTY, 123);
+        req = new CoAPRequest(1, CoAPMessageType.CONFIRMABLE, CoAPRequestCode.EMPTY, 123);
         converter = new CoAPOptionHeaderConverter();
     }
 

@@ -43,6 +43,7 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import java.nio.charset.StandardCharsets;
@@ -168,7 +169,7 @@ public class BlockwiseTransferHandler {
         if (blockOptionHeader.getMFlag()) {
             byte[] tokenHeader = response.getToken();
             CoAPRequest blockRequest = endpoint.createCoAPRequest(
-                    request.getMessageType(), 1, request.getSocketAddress(),
+                    request.getMessageType(), CoAPRequestCode.GET, request.getSocketAddress(),
                     request.getUriFromRequest(), tokenHeader);
             // blockRequest.setListener(request.getListener());
             int nextBlockNumber = blockOptionHeader.getBlockNumber() + 1;

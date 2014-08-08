@@ -94,11 +94,8 @@ public class CoAPObservationResource extends CoAPResource {
         // based on the formula in draft-ietf-core-observe-03
         double val1 = (latestValidObserve - presentObserve) % Math.pow(2, 16);
 
-        double exp15 = Math.pow(2, 15);
-        boolean condition1 = val1 < exp15;
-
-        double exp14 = Math.pow(2, 14);
-        boolean condition2 = date.getTime() < (latestTimestamp.getTime() + exp14);
+        boolean condition1 = val1 < Math.pow(2, 15);
+        boolean condition2 = date.getTime() < (latestTimestamp.getTime() + Math.pow(2, 14));
 
         if (condition1 && condition2) {
             // CoAPActivator.logger.debug("Outdated notification, discard");

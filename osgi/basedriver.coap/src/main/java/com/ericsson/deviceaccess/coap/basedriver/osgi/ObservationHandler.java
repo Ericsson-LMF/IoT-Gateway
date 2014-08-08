@@ -34,17 +34,18 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPObservationResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
-import com.ericsson.common.util.BitUtil;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -181,7 +182,7 @@ public class ObservationHandler {
 
             CoAPRequest req = endpoint.createCoAPRequest(
                     CoAPMessageType.CONFIRMABLE,
-                    1,
+                    CoAPRequestCode.GET,
                     sockaddr,
                     resource.getUri(),
                     null);
@@ -282,7 +283,7 @@ public class ObservationHandler {
         // Add observe option in the request
         CoAPRequest req = endpoint.createCoAPRequest(
                 CoAPMessageType.CONFIRMABLE,
-                1,
+                CoAPRequestCode.GET,
                 sockaddr,
                 uri,
                 null);

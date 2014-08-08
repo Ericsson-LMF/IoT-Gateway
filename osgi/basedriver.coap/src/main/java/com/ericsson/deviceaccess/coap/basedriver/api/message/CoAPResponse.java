@@ -48,11 +48,11 @@ public class CoAPResponse extends CoAPMessage {
      * @param messageId message ID
      * @param token token
      */
-    public CoAPResponse(int version, CoAPMessageType messageType, int responseCode, int messageId, byte[] token) {
+    public CoAPResponse(int version, CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId, byte[] token) {
         super(version, messageType, responseCode, messageId, token);
     }
 
-    public CoAPResponse(int version, CoAPMessageType messageType, int responseCode, int messageId) {
+    public CoAPResponse(int version, CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId) {
         super(version, messageType, responseCode, messageId, null);
     }
 
@@ -64,25 +64,21 @@ public class CoAPResponse extends CoAPMessage {
      * @param messageId
      * @param token token
      */
-    public CoAPResponse(CoAPMessageType messageType, int responseCode, int messageId, byte[] token) {
+    public CoAPResponse(CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId, byte[] token) {
         super(messageType, responseCode, messageId, token);
     }
 
-    public CoAPResponse(CoAPMessageType messageType, int responseCode, int messageId) {
+    public CoAPResponse(CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId) {
         super(messageType, responseCode, messageId, null);
     }
 
-    public CoAPResponse(int version, CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId, byte[] token) {
-        this(version, messageType, responseCode.getNo(), messageId, token);
-    }
-
-    public CoAPResponse(int version, CoAPMessageType messageType, CoAPResponseCode responseCode, int messageId) {
-        this(version, messageType, responseCode.getNo(), messageId, null);
-    }
-
     public CoAPResponse(int version, CoAPRequest request, CoAPMessageType messageType, CoAPResponseCode responseCode) {
-        this(version, messageType, responseCode.getNo(), request.getMessageId(), request.getToken());
+        this(version, messageType, responseCode, request.getMessageId(), request.getToken());
         setSocketAddress(request.getSocketAddress());
+    }
+
+    public CoAPResponseCode getCode() {
+        return (CoAPResponseCode) super.getCode();
     }
 
     /**
@@ -91,7 +87,7 @@ public class CoAPResponse extends CoAPMessage {
      * @return empty ACK for this response
      */
     public CoAPResponse createAcknowledgement() {
-        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.ACKNOWLEDGEMENT, 0, this.getMessageId(), getToken());
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.ACKNOWLEDGEMENT, CoAPResponseCode.EMPTY, this.getMessageId(), getToken());
         resp.setSocketAddress(getSocketAddress());
         return resp;
     }
@@ -104,12 +100,12 @@ public class CoAPResponse extends CoAPMessage {
      * @return a CoAP RST response for this CoAP response
      */
     public CoAPResponse createReset() {
-        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, 0, getMessageId(), getToken());
+        CoAPResponse resp = new CoAPResponse(1, CoAPMessageType.RESET, CoAPResponseCode.EMPTY, getMessageId(), getToken());
         resp.setSocketAddress(getSocketAddress());
         return resp;
     }
 
     public boolean isCacheable() {
-        return CoAPResponseCode.getResponseName(getCode()).isCacheable();
+        return getCode().isCacheable();
     }
 }
