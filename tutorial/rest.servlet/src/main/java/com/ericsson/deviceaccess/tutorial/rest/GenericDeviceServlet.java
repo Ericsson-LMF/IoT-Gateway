@@ -47,6 +47,7 @@ import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
 import com.ericsson.deviceaccess.api.genericdevice.GDService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -122,7 +123,6 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
             e.printStackTrace(new PrintWriter(sw));
             return new NanoHTTPD.Response(HTTP_INTERNALERROR, "text/plain", "Failed to get resource " + uri + " due to " + sw.toString());
         } finally {
-//			logger.log(LogService.LOG_DEBUG, "REST: Returned");
             logger.debug("REST: Returned");
         }
     }
@@ -205,6 +205,19 @@ public class GenericDeviceServlet extends NanoHTTPD implements BundleActivator, 
                     .stream()
                     .map(ref -> context.getService(ref))
                     .collect(Collectors.toMap(dev -> dev.getId(), Function.identity()));
+            //TODO: Remove debug print
+            for (ServiceReference s : context.getAllServiceReferences(null, null)) {
+                System.out.println(s.getBundle().getSymbolicName());
+            }
+            try {
+                //TODO: Figure out can ClassDefNotFoundException be fixed by what class loader
+                Thread.currentThread().setContextClassLoader(devices.getClass().getClassLoader());
+                SerializationUtil.get(Format.JSON)
+                        .writerWithView(View.ID.Ignore.class)
+                        .writeValueAsString(devices);
+            } catch (JsonProcessingException e) {
+                logger.error(e);
+            }
             return SerializationUtil.execute(Format.JSON, mapper -> mapper.writerWithView(View.ID.Ignore.class).writeValueAsString(devices));
         } catch (InvalidSyntaxException | SerializationException e) {
             logger.error(e);

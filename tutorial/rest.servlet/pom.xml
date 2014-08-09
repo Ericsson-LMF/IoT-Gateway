@@ -26,24 +26,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-        <!-- 
-        <dependency>
-            <groupId>com.ericsson.osgi.base</groupId>
-            <artifactId>ag.compendium</artifactId>
-            <version>${osgi.base.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ericsson.osgi.base</groupId>
-            <artifactId>json</artifactId>
-            <version>${osgi.base.version}</version>
-        </dependency>
-        -->
-        <!-- 
-        <dependency>
-          <groupId>com.springsource.org.apache.commons</groupId>
-          <artifactId>logging</artifactId>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.logging</artifactId>
@@ -73,11 +55,6 @@
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk7</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>    
-        <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
             <version>${jackson.version}</version>
@@ -106,6 +83,7 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20140107</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -116,7 +94,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -124,14 +101,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>com.ericsson.deviceaccess.tutorial.rest.GenericDeviceServlet
+                        <Bundle-Activator>
+                            com.ericsson.deviceaccess.tutorial.rest.GenericDeviceServlet
                         </Bundle-Activator>
-                        <Private-Package>
-                            com.ericsson.research.ag.util.*,
-                            com.ericsson.deviceaccess.tutorial.rest,
-                            com.fasterxml.jackson.datatype.jdk7.*,
-                            com.fasterxml.jackson.module.paramnames.*
-                        </Private-Package>
                         <Import-Package>
                             org.osgi.*;version="[1.0,4.0)",
                             com.ericsson.deviceaccess.*,
@@ -143,6 +115,7 @@
                             com.fasterxml.jackson.databind.*,
                             com.fasterxml.jackson.core.*,
                             com.fasterxml.jackson.annotation.*,
+                            com.fasterxml.jackson.module.paramnames.*,
                             org.codehaus.stax2.*
                         </Import-Package>
                     </instructions>

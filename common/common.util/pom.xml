@@ -19,6 +19,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.2</version>
@@ -38,11 +43,6 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk7</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>    
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
@@ -115,10 +115,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Private-Package>
-                            com.fasterxml.jackson.datatype.jdk7.*,
-                            com.fasterxml.jackson.module.paramnames.*
-                        </Private-Package>
                         <Import-Package>
                             com.fasterxml.jackson.module.mrbean.*,
                             com.fasterxml.jackson.module.jaxb.*,
@@ -126,12 +122,15 @@
                             com.fasterxml.jackson.databind.*,
                             com.fasterxml.jackson.core.*,
                             com.fasterxml.jackson.annotation.*,
+                            com.fasterxml.jackson.module.paramnames.*,
                             org.codehaus.stax2.*
                         </Import-Package>
                         <Export-Package>
-                            com.ericsson.common.util.*,
+                            com.ericsson.common.util.*
                         </Export-Package>
                     </instructions>
+                    <Bundle-Name>${project.artifactId}</Bundle-Name>
+                    <Bundle-Version>${project.version}</Bundle-Version>
                 </configuration>
             </plugin>
 
@@ -149,14 +148,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <show>protected</show>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
