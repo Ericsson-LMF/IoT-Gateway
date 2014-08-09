@@ -37,7 +37,6 @@ package com.ericsson.deviceaccess.coap.basedriver.util;
 import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPContentType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.ACCEPT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK1;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.BLOCK2;
@@ -55,6 +54,7 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_QUERY;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This is a helper class to convert option header to string format from byte
@@ -80,30 +80,31 @@ public class CoAPOptionHeaderConverter {
      * @return string representation of the header value
      */
     public String convertOptionHeaderToString(CoAPOptionHeader header) {
+        byte[] bytes = header.getValue();
         switch (header.getOptionName()) {
             case CONTENT_FORMAT:
+                return CoAPContentType.get(BitUtil.shortToUnsignedInt(bytes)).getContentType();
             case URI_PORT:
             case ACCEPT:
             case OBSERVE:
-                return convertShortToString(header);
+                return Integer.toString(BitUtil.shortToUnsignedInt(bytes));
             case MAX_AGE:
-//            case MAX_OFE:
-                return convertIntToString(header);
+                return Long.toString(BitUtil.convertIntToUnsignedLong(bytes));
             case PROXY_URI:
             case URI_HOST:
             case URI_QUERY:
             case URI_PATH:
             case LOCATION_QUERY:
             case LOCATION_PATH:
-                return new String(header.getValue());
+                return new String(bytes, StandardCharsets.UTF_8);
             case ETAG:
-            case IF_MATCH: // TODO etag, token and if-match
+            case IF_MATCH: // TODO etag and if-match
                 // TODO check if the byte array is hex or string??
-                return this.convertHexToString(header);
+                return convertHexToString(bytes);
             case BLOCK1:
             case BLOCK2:
                 // show the value as unsigned int
-                long longValue = this.convertIntToUnsignedLong(header);
+                long longValue = BitUtil.convertIntToUnsignedLong(bytes);
                 // More details for debug (Ryoji)
                 //value = Long.toString(longValue);
                 long num = longValue >> 4;
@@ -127,130 +128,23 @@ public class CoAPOptionHeaderConverter {
         return isHex;
     }
 
+    private static final char[] HEX_CHARS = new char[]{
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     /**
      * Convert value of the option header byte array to a hex string
      *
      * @param header header to be converted
      * @return hex string representation of a byte array
      */
-    private String convertHexToString(CoAPOptionHeader header) {
-        byte[] valueBytes = header.getValue();
-
-        char[] chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-        StringBuilder buff = new StringBuilder(valueBytes.length * 2);
-
-        for (int i = 0; i < valueBytes.length; i++) {
-            buff.insert(i * 2, chars[(valueBytes[i] >> 4) & 0xf]);
-            buff.insert(i * 2 + 1, chars[valueBytes[i] & 0xf]);
+    private String convertHexToString(byte[] bytes) {
+        StringBuilder buff = new StringBuilder(bytes.length * 2);
+        for (int i = 0; i < bytes.length; i++) {
+            buff.insert(i * 2, HEX_CHARS[(bytes[i] >> 4) & 0xf]);
+            buff.insert(i * 2 + 1, HEX_CHARS[bytes[i] & 0xf]);
         }
-
         return buff.toString();
     }
 
-    /**
-     * Convert short (0-2 bytes) to string. First the short will be converted to
-     * unsigned int.
-     *
-     * @param header header value to be converted
-     * @return string representation of the short
-     */
-    private String convertShortToString(CoAPOptionHeader header) {
-        // content type, uri-port and accept headers' length 0-2 bytes
-        String value = "";
-        int unsignedShort = this.shortToUnsignedInt(header);
-        if (header.getOptionName() == CONTENT_FORMAT) {
-            value = CoAPContentType.getContentTypeName(unsignedShort)
-                    .getContentType();
-        } else if (header.getOptionName() == OBSERVE
-                || header.getOptionName() == ACCEPT
-                || header.getOptionName() == URI_PORT) {
-            value = Integer.toString(unsignedShort);
-        }
-        return value;
-    }
-
-    /**
-     * Convert short to unsigned int. Headers Content-Type, Uri-Port, Accept,
-     * and Observe are max two byte uints.
-     *
-     * @param h
-     * @return unsigned int representation of the short
-     */
-    public int shortToUnsignedInt(CoAPOptionHeader h) {
-        int unsignedShort = -1;
-
-        if (h.getOptionName() == CONTENT_FORMAT
-                || h.getOptionName() == URI_PORT
-                || h.getOptionName() == ACCEPT
-                || h.getOptionName() == OBSERVE) {
-
-            byte[] headerBytes = h.getValue();
-            short shortInt = 0;
-            if (headerBytes.length == 1) {
-                shortInt = BitUtil.mergeBytesToShort((byte) 0, headerBytes[0]);
-            } else if (headerBytes.length == 2) {
-                shortInt = BitUtil.mergeBytesToShort(headerBytes[0], headerBytes[1]);
-            }
-            unsignedShort = shortInt & 0xFFFF;
-        }
-        return unsignedShort;
-    }
-
-    /**
-     * Convert integer (max 4 bytes) to string. Max-Age and Max-Ofe headers are
-     * maximum 4 byte uints.
-     *
-     * @param header
-     * @return string representation of the integer value
-     */
-    private String convertIntToString(CoAPOptionHeader header) {
-        String value = "";
-        long unsignedLong = this.convertIntToUnsignedLong(header);
-        value = Long.toString(unsignedLong);
-        return value;
-    }
-
-    /**
-     *
-     * Convert integer (max 4 bytes) to unsigned long. Max-Age and Max-Ofe
-     * headers are maximum 4 byte uints.
-     *
-     * @param h
-     * @return
-     */
-    public long convertIntToUnsignedLong(CoAPOptionHeader h) {
-        long unsignedLong = -1;
-        if (h.getOptionNumber() == MAX_AGE.getNo()
-                || h.getOptionNumber() == CoAPOptionName.BLOCK1.getNo()
-                || h.getOptionNumber() == CoAPOptionName.BLOCK2.getNo()) {
-            byte[] valueBytes = h.getValue();
-
-            int intValue = 0;
-            if (valueBytes.length == 1) {
-                byte[] emptyByte = new byte[1];
-                intValue = BitUtil.mergeBytesToInt(emptyByte[0],
-                        emptyByte[0], emptyByte[0], valueBytes[0]);
-
-            } else if (valueBytes.length == 2) {
-                byte[] emptyByte = new byte[1];
-                intValue = BitUtil.mergeBytesToInt(emptyByte[0],
-                        emptyByte[0], valueBytes[0], valueBytes[1]);
-
-            } else if (valueBytes.length == 3) {
-                byte[] emptyByte = new byte[1];
-                intValue = BitUtil.mergeBytesToInt(emptyByte[0],
-                        valueBytes[0], valueBytes[1], valueBytes[2]);
-
-            } else if (valueBytes.length == 4) {
-                intValue = BitUtil.mergeBytesToInt(valueBytes[0],
-                        valueBytes[1], valueBytes[2], valueBytes[3]);
-
-            }
-            unsignedLong = 0xffffffffL & intValue;
-        }
-
-        return unsignedLong;
-    }
 }

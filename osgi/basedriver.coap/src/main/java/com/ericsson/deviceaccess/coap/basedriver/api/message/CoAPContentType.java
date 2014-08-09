@@ -84,11 +84,11 @@ public enum CoAPContentType {
         }
     }
 
-    public static CoAPContentType getContentTypeNumber(String name) {
+    public static CoAPContentType get(String name) {
         return typeMap.get(name);
     }
 
-    public static CoAPContentType getContentTypeName(int no) {
+    public static CoAPContentType get(int no) {
         return noMap.get(no);
     }
 

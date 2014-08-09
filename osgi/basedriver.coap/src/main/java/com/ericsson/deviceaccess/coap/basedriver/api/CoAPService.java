@@ -583,7 +583,7 @@ public class CoAPService {
              */
             try {
                 // Parse the received message into the list of resources
-                List resources = reader.parseLinkFormatData(payload);
+                List<CoAPResource> resources = reader.parseLinkFormatData(payload);
                 // Let the LinkFormatDirectory class determine if there's
                 // anything new in the response
                 directory.handleResourceDiscoveryResponse(resources, response);

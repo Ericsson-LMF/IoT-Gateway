@@ -206,7 +206,7 @@ public class CoAPMessageTest extends TestCase {
         };
         observeOpt = new CoAPOptionHeader(CoAPOptionName.OBSERVE, shortValue);
 
-        int observeValue = converter.shortToUnsignedInt(observeOpt);
+        int observeValue = BitUtil.shortToUnsignedInt(observeOpt.getValue());
         assertEquals(observeValue, unsignedShortMax);
     }
 

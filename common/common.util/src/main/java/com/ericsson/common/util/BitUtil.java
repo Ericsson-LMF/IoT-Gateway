@@ -500,4 +500,50 @@ public enum BitUtil {
         result.append("}");
         return result.toString();
     }
+
+    /**
+     * Convert short to unsigned int.
+     *
+     * @param bytes
+     * @return unsigned int representation of the short or -1 if invalid
+     */
+    public static int shortToUnsignedInt(byte[] bytes) {
+        short shortInt = -1;
+        switch (bytes.length) {
+            case 1:
+                shortInt = BitUtil.mergeBytesToShort((byte) 0, bytes[0]);
+                break;
+            case 2:
+                shortInt = BitUtil.mergeBytesToShort(bytes[0], bytes[1]);
+                break;
+        }
+        return shortInt & 0xFFFF;
+    }
+
+    /**
+     *
+     * Convert integer (max 4 bytes) to unsigned long.
+     *
+     * @param bytes
+     * @return unsigned long representation of the int or -1 if invalid
+     */
+    public static long convertIntToUnsignedLong(byte[] bytes) {
+        int intValue = -1;
+        byte zeroByte = 0;
+        switch (bytes.length) {
+            case 1:
+                intValue = BitUtil.mergeBytesToInt(zeroByte, zeroByte, zeroByte, bytes[0]);
+                break;
+            case 2:
+                intValue = BitUtil.mergeBytesToInt(zeroByte, zeroByte, bytes[0], bytes[1]);
+                break;
+            case 3:
+                intValue = BitUtil.mergeBytesToInt(zeroByte, bytes[0], bytes[1], bytes[2]);
+                break;
+            case 4:
+                intValue = BitUtil.mergeBytesToInt(bytes[0], bytes[1], bytes[2], bytes[3]);
+                break;
+        }
+        return intValue & 0xffffffffL;
+    }
 }
