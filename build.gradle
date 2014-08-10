@@ -1,68 +1,238 @@
-allprojects {
-    apply plugin: 'java'
+def sourceDirectory = "$rootProject.projectDir/disti/libs/"
+
+def org_osgi_compendium_version = "5.0.0"
+def org_osgi_core_version = "5.0.0"
+def json_version = "20140107"
+def jackson_annotations_version = "2.4.1"
+def jackson_core_version = "2.4.1.1"
+def jackson_databind_version = "2.4.1.1"
+def jackson_datatype_jdk7_version = "2.4.1"
+def jackson_module_parameter_names_version = "2.4.1"
+def jackson_module_mrbean_version = "2.4.1"
+def jackson_dataformat_xml_version = "2.4.1"
+def junit_version = "4.11"
+def jmock_version = "2.6.0-RC2"
+def jmock_legacy_version = "2.6.0-RC2"
+def jmock_junit4_version = "2.6.0-RC2"
+def jsr311_api_version = "1.1-ea"
+def slf4j_api_version = "1.7.7"
+def xmlbeans_version = "2.3.0"
+def commons_logging_version = "1.2"
+def jersey_client_version = "1.18.1"
+def commons_codec_version = "1.9"
+def woodstox_core_asl_version = "4.4.0"
+def kxml2_version = "2.2.2"
+
+def depsSource
+
+
+
+configurations {
+    downloadDeps
 }
 
-subprojects {
-    repositories{
-        mavenCentral()
-    }
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-    compile "org.osgi:org.osgi.compendium:+"
-    compile "org.osgi:org.osgi.core:+"
-    compile "org.json:json:+"
-    compile "javax.servlet:servlet-api:+"
-    compile "javax.ws.rs:jsr311-api:+"
-    compile "org.slf4j:slf4j-api:+"
-    compile "junit:junit:+"
-    compile "org.jmock:jmock:+"
-    compile "org.jmock:jmock-legacy:+"
-    compile "org.jmock:jmock-junit4:+"
-    compile "com.fasterxml.jackson.core:jackson-core:+"
-    compile "com.fasterxml.jackson.core:jackson-annotations:+"
-    compile "com.fasterxml.jackson.core:jackson-databind:+"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk7:+"
-    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:+"
-    compile "com.fasterxml.jackson.module:jackson-module-mrbean:+"
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:+"
-    compile "com.sun.jersey:jersey-client:+"
-    compile "commons-codec:commons-codec:+"
-    compile "commons-logging:commons-logging:+"
-    compile "org.springframework:spring-core:+"
-    compile "org.springframework:spring-test:+"
-    compile "net.sf.kxml:kxml2:+"
-    compile "org.apache.xmlbeans:xmlbeans:+"
-    compile "org.codehaus.woodstox:woodstox-core-asl:+"
+    downloadDeps "org.osgi:org.osgi.compendium:$org_osgi_compendium_version"
+    downloadDeps "org.osgi:org.osgi.core:$org_osgi_core_version"
+    downloadDeps "org.json:json:$json_version"
+    downloadDeps "javax.servlet:servlet-api:+"
+    downloadDeps "javax.ws.rs:jsr311-api:$jsr311_api_version"
+    downloadDeps "org.slf4j:slf4j-api:$slf4j_api_version"
+    downloadDeps "commons-logging:commons-logging:$commons_logging_version"
+    downloadDeps "junit:junit:$junit_version"
+    downloadDeps "org.jmock:jmock:$jmock_version"
+    downloadDeps "org.jmock:jmock-legacy:$jmock_legacy_version"
+    downloadDeps "org.jmock:jmock-junit4:$jmock_junit4_version"
+    downloadDeps "com.fasterxml.jackson.core:jackson-core:$jackson_core_version"
+    downloadDeps "com.fasterxml.jackson.core:jackson-annotations:$jackson_annotations_version"
+    downloadDeps "com.fasterxml.jackson.core:jackson-databind:$jackson_databind_version"
+    downloadDeps "com.fasterxml.jackson.datatype:jackson-datatype-jdk7:$jackson_datatype_jdk7_version"
+    downloadDeps "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson_module_parameter_names_version"
+    downloadDeps "com.fasterxml.jackson.module:jackson-module-mrbean:$jackson_module_mrbean_version"
+    downloadDeps "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jackson_dataformat_xml_version"
+    downloadDeps "com.sun.jersey:jersey-client:$jersey_client_version"
+    downloadDeps "org.codehaus.woodstox:woodstox-core-asl:$woodstox_core_asl_version"
+    downloadDeps "commons-codec:commons-codec:$commons_codec_version" 
+    downloadDeps "net.sf.kxml:kxml2:$kxml2_version"
+    downloadDeps "org.apache.xmlbeans:xmlbeans:$xmlbeans_version"
+    depsSource = configurations.downloadDeps
+}
+
+
+
+def javaProjects() { 
+  return subprojects.findAll { 
+      new File(it.projectDir, "src").exists()
+  }
+}
+
+def osgiProjects() {
+    return subprojects.findAll { 
+      new File(it.projectDir, "src").exists() && !it.name.contains('common')
+  } 
+}
+
+configure(javaProjects()) { 
+    apply plugin: 'java'
+    version = '1.42-SNAPSHOT'
+    buildDir = new File(rootProject.projectDir, "disti/")
+    
+    dependencies {
+
+    }
+}
+
+configure(osgiProjects()) {
+    apply plugin: 'osgi'
+    version = '1.42-SNAPSHOT'
+    buildDir = new File(rootProject.projectDir, "disti/")
+    
+}
+
+task generateXmlBeans {
+    ant.taskdef(name: 'xmlbean', classname: 'org.apache.xmlbeans.impl.tool.XMLBean',
+	classpath: configurations.downloadDeps.asPath)
+    ant.xmlbean(schema: 'osgi/serviceschema.xmlparser/src/main/xsd/services.xsd', 
+	destfile: "disti/libs/serviceschemaXmlParser.jar",
+	classpath: configurations.downloadDeps.asPath)
+}
+
+task copyDeps(type: Copy) {
+        from depsSource
+        into 'disti/libs'
+}
+
+defaultTasks 'copyDeps', 'generateXmlBeans', 'build', 'generateDeviceAccessService', 'build'
+
+project (':common:common.util') {
+    dependencies {
+        compile fileTree(dir: sourceDirectory + "jackson-core-" + jackson_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jackson-annotations-" + jackson_annotations_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jackson-databind-" + jackson_databind_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jackson-datatype-jdk7-" + jackson_datatype_jdk7_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jackson-module-parameter-names-" + jackson_module_parameter_names_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jackson-module-mrbean-" + jackson_module_mrbean_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jackson-dataformat-xml-" + jackson_dataformat_xml_version + ".jar")       
+    }
+}
+
+project (':common:common.osgi.log.util') {
+    dependencies {
+        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "slf4j-api-" + slf4j_api_version + ".jar"),
+        fileTree(dir: sourceDirectory + "junit-" + junit_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jmock-" + jmock_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jmock-legacy-" + jmock_legacy_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jmock-junit4-" + jmock_junit4_version + ".jar"),
+        fileTree(dir: sourceDirectory + "commons-logging-" + commons_logging_version + ".jar")
+    }
+}
+
+project (':common:common.test.util') {
+    dependencies {
         
     }
 }
 
-project(':osgi:adaptor.ruleengine') {
+project (':common:common.server.util') {
+    
+    dependencies {
+        compile fileTree(dir: sourceDirectory + "jersey-client-" + jersey_client_version + ".jar"),
+        fileTree(dir: sourceDirectory + "commons-codec-" + commons_codec_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jsr311-api-" + jsr311_api_version + ".jar")
+    }  
+}
+
+task generateDeviceAccessServices(type: JavaExec) {
+    main = "com.ericsson.deviceaccess.serviceschema.codegenerator.Main"
+    classpath = files("$sourceDirectory/serviceschema.codegenerator-1.42-SNAPSHOT.jar",  "$sourceDirectory/xmlbeans-" + xmlbeans_version + ".jar", "$sourceDirectory/slf4j-api-" + slf4j_api_version + ".jar", "$sourceDirectory/serviceschemaXmlParser.jar")
+    File arguments = file("$rootProject.projectDir/osgi/generic.device.access.services/src/main/resources/services.xml")
+    def out = "$rootProject.projectDir/osgi/generic.device.access.services/src/main/java"
+    args arguments, out
+}
+
+
+project(':osgi:serviceschema.codegenerator') {
+    
+    dependencies {
+        compile project (':common:common.util')
+        compile fileTree(dir: sourceDirectory + "serviceschemaXmlParser.jar"),
+        fileTree(dir: sourceDirectory + "xmlbeans-" + xmlbeans_version + ".jar"),
+        fileTree(dir: sourceDirectory + "slf4j-api-" + slf4j_api_version + ".jar")
+    }
+    
+    
+}
+
+
+project(':osgi:generic.device.access') {
+    dependencies {
+        compile project (':common:common.osgi.log.util'),
+        project (':common:common.util'),
+        project (':common:common.test.util')
+        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar")
+    }
+}
+
+
+
+project (':osgi:generic.device.access.services') {
     dependencies {
         compile project (':osgi:generic.device.access')
     }
 }
 
-project(':osgi:adaptor.upnp') {
-    dependencies {
-        compile project (':common:common.util'), 
-        project (':common:common.osgi.log.util'),
-        project (':osgi:generic.device.access')
-        compile fileTree(dir: "$rootProject.projectDir/osgi/generic.device.spi/target/generic.device.spi-1.42-SNAPSHOT.jar")
-    }
-}
+//project (':osgi:adaptor.upnp') {
+//    dependencies {
+//        compile project (':osgi:generic.device.access'),
+//        project (':common:common.osgi.log.util')
+//        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+//        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+//        fileTree(dir: sourceDirectory + "kxml2-" + kxml2_version + ".jar"),
+//        fileTree(dir: sourceDirectory + "json-" + json_version + ".jar")
+//        //fileTree(dir: sourceDirectory + "generic.device.access-1.42-SNAPSHOT.jar")
+//        
+//    }
+//}
 
-project(':osgi:generic.device.access') {
-    dependencies {
-        compile project (':common:common.util'), 
-        project (':common:common.osgi.log.util'), 
-        project (':common:common.test.util')
-    }
-}
 
-project(':osgi:serviceschema.codegenerator') {
-    dependencies {
-        compile project (':common:common.util') 
-        compile fileTree(dir: "$rootProject.projectDir/osgi/serviceschema.xmlparser/target/serviceschema.xmlparser-1.42-SNAPSHOT.jar")
-    }
-}
+
+//project (':osgi:generic.device.access') {
+//    dependencies {
+//        compile fileTree(dir: targetDirectory + "/org.osgi.core-" + org_osgi_core_version + ".jar"),
+//        fileTree(dir: targetDirectory + "/org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+//        fileTree(dir: targetDirectory + "/common.osgi.log.util-1.42-SNAPSHOT.jar"),
+//        fileTree(dir: targetDirectory + "/common.util-1.42-SNAPSHOT.jar"),
+//        fileTree(dir: targetDirectory + "/jackson-annotations-" + jackson_annotations_version + ".jar")
+//    }
+//    
+//}
+
+//project (':osgi:serviceschema.codegenerator') {
+//  
+//    dependencies {
+//        compile fileTree(dir: "$rootProject.projectDir/disti/libs/common.util-1.42-SNAPSHOT.jar")
+//    }
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
