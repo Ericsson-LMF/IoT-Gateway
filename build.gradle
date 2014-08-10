@@ -140,7 +140,6 @@ project (':common:common.test.util') {
 }
 
 project (':common:common.server.util') {
-    
     dependencies {
         compile fileTree(dir: sourceDirectory + "jersey-client-" + jersey_client_version + ".jar"),
         fileTree(dir: sourceDirectory + "commons-codec-" + commons_codec_version + ".jar"),
