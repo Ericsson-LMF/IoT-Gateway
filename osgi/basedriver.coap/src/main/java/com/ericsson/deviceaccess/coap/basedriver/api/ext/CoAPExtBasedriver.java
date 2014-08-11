@@ -50,7 +50,6 @@ import com.ericsson.deviceaccess.coap.basedriver.osgi.CoAPMessageHandlerFactory;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageHandler;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.LinkFormatDirectory;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.OutgoingMessageHandler;
-import com.ericsson.deviceaccess.coap.basedriver.util.LinkFormatReader;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.DatagramSocket;
@@ -83,7 +82,6 @@ public class CoAPExtBasedriver {
     private CoAPExtEndpoint endpoint;
     private Timer timer;
 
-    protected LinkFormatReader reader;
     protected LinkFormatDirectory directory;
 
     //final private LogTracker logger;
@@ -94,8 +92,6 @@ public class CoAPExtBasedriver {
         this.coapPort = coapPort;
         this.maximumBlockSzx = maximumBlockSzx;
         //this.logger = logger;
-
-        this.reader = new LinkFormatReader();
         this.directory = new LinkFormatDirectory();
 
         this.socket = null;

@@ -45,7 +45,7 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
+import com.ericsson.deviceaccess.coap.basedriver.util.CoAPUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;

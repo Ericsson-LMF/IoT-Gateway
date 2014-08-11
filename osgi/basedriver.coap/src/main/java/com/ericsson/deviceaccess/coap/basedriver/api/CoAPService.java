@@ -95,7 +95,6 @@ public class CoAPService {
     private InetAddress resourceDiscoveryAddress;
     private int resourceDiscoveryPort;
 
-    protected LinkFormatReader reader;
     protected LinkFormatDirectory directory;
 
     /**
@@ -112,8 +111,6 @@ public class CoAPService {
             throws CoAPException {
         this.coapPort = coapPort;
         this.address = address;
-
-        this.reader = new LinkFormatReader();
         this.directory = new LinkFormatDirectory();
         this.maximumBlockSzx = maximumBlockSzx;
     }
@@ -583,7 +580,7 @@ public class CoAPService {
              */
             try {
                 // Parse the received message into the list of resources
-                List<CoAPResource> resources = reader.parseLinkFormatData(payload);
+                List<CoAPResource> resources = LinkFormatReader.parseLinkFormatData(payload);
                 // Let the LinkFormatDirectory class determine if there's
                 // anything new in the response
                 directory.handleResourceDiscoveryResponse(resources, response);

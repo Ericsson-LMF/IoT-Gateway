@@ -107,11 +107,10 @@ public class CoAPRequest extends CoAPMessage {
      * @throws CoAPException if the token cannot be created based on the URI
      */
     public void generateTokenHeader() throws CoAPException {
-        TokenGenerator generator = new TokenGenerator();
         if (uri == null) {
             throw new CoAPException("Token header cannot be created, URI not set for the request");
         }
-        long token = generator.createToken(uri);
+        long token = TokenGenerator.createToken(uri);
         byte[] bytes = BitUtil.splitLongToBytes(token);
 
         setToken(bytes);

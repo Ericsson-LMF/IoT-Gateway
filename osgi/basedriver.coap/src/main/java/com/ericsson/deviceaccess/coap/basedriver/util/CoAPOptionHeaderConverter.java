@@ -53,7 +53,6 @@ import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionNa
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PATH;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_PORT;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName.URI_QUERY;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPUtil;
 import java.nio.charset.StandardCharsets;
 
 /**

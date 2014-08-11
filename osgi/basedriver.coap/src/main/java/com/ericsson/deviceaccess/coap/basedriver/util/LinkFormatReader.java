@@ -38,7 +38,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -47,14 +47,12 @@ import java.util.StringTokenizer;
  * resources. The implementation is based on draft-ietf-core-link-format-07 and
  * RFC 5988, but is not a full implementation of these
  */
-public class LinkFormatReader {
+public enum LinkFormatReader {
 
     /**
-     * Constructor
+     * Singleton
      */
-    public LinkFormatReader() {
-
-    }
+    INSTANCE;
 
     /**
      * This method will parse a string that is of MIME type
@@ -65,12 +63,12 @@ public class LinkFormatReader {
      * @throws URISyntaxException
      * @throws CoAPException
      */
-    public List parseLinkFormatData(String linkFormatString)
+    public static List<CoAPResource> parseLinkFormatData(String linkFormatString)
             throws URISyntaxException, CoAPException {
 
         // multiple link descriptions are separated by commas
         // TODO fix me: if resource description contains a comma!!
-        List<String> lines = new LinkedList();
+        List<String> lines = new ArrayList<>();
         int index = 0;
 
         for (String token : linkFormatString.split(",")) {
@@ -88,14 +86,14 @@ public class LinkFormatReader {
             }
         }
 
-        List resources = new LinkedList();
+        List<CoAPResource> resources = new ArrayList<>();
         for (String line : lines) {
-            resources.add(this.parseLinkFormat(line));
+            resources.add(parseLinkFormat(line));
         }
         return resources;
     }
 
-    private boolean tokenValid(String token) {
+    private static boolean tokenValid(String token) {
         return token.startsWith("<") && token.contains(">");
     }
 
@@ -106,7 +104,7 @@ public class LinkFormatReader {
      * @throws URISyntaxException
      * @throws CoAPException
      */
-    private CoAPResource parseLinkFormat(String linkFormat)
+    private static CoAPResource parseLinkFormat(String linkFormat)
             throws URISyntaxException, CoAPException {
 		// uri is inside angle brackets "<" & ">"
 

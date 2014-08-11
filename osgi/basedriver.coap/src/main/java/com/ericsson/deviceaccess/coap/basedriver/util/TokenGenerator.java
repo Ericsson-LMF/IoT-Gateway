@@ -44,11 +44,12 @@ import java.security.NoSuchAlgorithmException;
  * This class is used for generating a token for a CoAP request.
  *
  */
-public class TokenGenerator {
+public enum TokenGenerator {
 
-    public TokenGenerator() {
-
-    }
+    /**
+     * Singleton
+     */
+    INSTANCE;
 
     /**
      * This method creates a token value for a CoAP request. The token is
@@ -58,7 +59,7 @@ public class TokenGenerator {
      * @return generated token value
      * @throws CoAPException
      */
-    public long createToken(URI uri) throws CoAPException {
+    public static long createToken(URI uri) throws CoAPException {
         long hash = 0L;
         MessageDigest digest;
         try {

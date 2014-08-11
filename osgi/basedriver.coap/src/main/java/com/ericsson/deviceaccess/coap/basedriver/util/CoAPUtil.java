@@ -32,7 +32,7 @@
  * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  *
  */
-package com.ericsson.deviceaccess.coap.basedriver.api.message;
+package com.ericsson.deviceaccess.coap.basedriver.util;
 
 public enum CoAPUtil {
 
