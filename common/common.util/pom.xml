@@ -45,11 +45,6 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-parameter-names</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-mrbean</artifactId>
             <version>${jackson.version}</version>
         </dependency>
@@ -116,13 +111,13 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
+                            org.osgi.*;version="[1.0,4.0)",
                             com.fasterxml.jackson.module.mrbean.*,
                             com.fasterxml.jackson.module.jaxb.*,
                             com.fasterxml.jackson.dataformat.xml.*,
                             com.fasterxml.jackson.databind.*,
                             com.fasterxml.jackson.core.*,
                             com.fasterxml.jackson.annotation.*,
-                            com.fasterxml.jackson.module.paramnames.*,
                             org.codehaus.stax2.*
                         </Import-Package>
                         <Export-Package>

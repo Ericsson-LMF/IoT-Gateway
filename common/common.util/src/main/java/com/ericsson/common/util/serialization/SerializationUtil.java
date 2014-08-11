@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -34,7 +33,6 @@ public enum SerializationUtil {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     static {
-        JSON_MAPPER.registerModule(new ParameterNamesModule());
         JSON_MAPPER.registerModule(new MrBeanModule());
         JSON_MAPPER.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false);
         JSON_MAPPER.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);

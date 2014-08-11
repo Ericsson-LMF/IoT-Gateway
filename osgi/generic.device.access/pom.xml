@@ -108,7 +108,14 @@
                         </Private-Package>
                         <Import-Package>
                             org.osgi.*;version="[1.0,4.0)",
-                            com.ericsson.common.util.*
+                            com.ericsson.common.util.*,
+                            com.fasterxml.jackson.module.mrbean.*,
+                            com.fasterxml.jackson.module.jaxb.*,
+                            com.fasterxml.jackson.dataformat.xml.*,
+                            com.fasterxml.jackson.databind.*,
+                            com.fasterxml.jackson.core.*,
+                            com.fasterxml.jackson.annotation.*,
+                            org.codehaus.stax2.*
                         </Import-Package>
                         <Export-Package>
                             com.ericsson.deviceaccess.*
