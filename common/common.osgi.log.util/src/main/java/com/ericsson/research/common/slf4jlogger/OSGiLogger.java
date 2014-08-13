@@ -76,7 +76,7 @@ public class OSGiLogger extends MarkerIgnoringBase {
                 return "UNKOWN";
         }
     }
-    private boolean detailed;
+    private final boolean detailed;
 
     {
         detailed = Boolean.getBoolean("com.ericsson.osgilogger.detailed");
@@ -351,7 +351,7 @@ public class OSGiLogger extends MarkerIgnoringBase {
 
         StackTraceElement callerInfo = null;
         if (detailed) {
-            callerInfo = new Exception().getStackTrace()[2];
+            callerInfo = Thread.currentThread().getStackTrace()[2];
         }
         if (logservice != null) {
             try {

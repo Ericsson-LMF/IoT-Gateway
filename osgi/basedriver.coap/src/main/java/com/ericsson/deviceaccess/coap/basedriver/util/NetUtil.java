@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public enum NetUtil {
 
@@ -52,7 +54,7 @@ public enum NetUtil {
      * Singleton.
      */
     INSTANCE;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetUtil.class);
     static public final int IPV4_ONLY = 1;
     static public final int IPV6_ONLY = 2;
     static public final int ADDR_FAMILY_PRIORITISED_IPV4 = 3;
@@ -160,7 +162,7 @@ public enum NetUtil {
                 return Inet6Address.getLocalHost();
             }
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            LOGGER.error("Local host was unknown.", e);
         }
         return null; // XXX: What can we do here??
     }
@@ -229,7 +231,7 @@ public enum NetUtil {
             try {
                 eNetIf = NetworkInterface.getNetworkInterfaces();
             } catch (SocketException e) {
-                e.printStackTrace();
+                LOGGER.error("Couldn't get network interfaces.", e);
             }
             if (eNetIf == null) {
                 return result;

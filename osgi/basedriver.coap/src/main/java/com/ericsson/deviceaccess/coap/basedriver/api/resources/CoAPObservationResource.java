@@ -36,6 +36,8 @@ package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 
 import java.net.URI;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is class for representing the resources related to observation
@@ -48,6 +50,7 @@ import java.util.Date;
  */
 public class CoAPObservationResource extends CoAPResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPObservationResource.class);
     private int latestValidObserve; // uint, use integer and lowest 16 bits
     private Date latestTimestamp;
 
@@ -84,7 +87,7 @@ public class CoAPObservationResource extends CoAPResource {
     public boolean isFresh(int presentObserve, Date date) {
         // draft-ietf-core-observe-03
         if (latestTimestamp == null || latestValidObserve == 0) {
-            //CoAPActivator.logger.debug("Initial observe notification");
+            LOGGER.debug("Initial observe notification");
             latestTimestamp = date;
             latestValidObserve = presentObserve;
             return true;
@@ -98,11 +101,11 @@ public class CoAPObservationResource extends CoAPResource {
         boolean condition2 = date.getTime() < (latestTimestamp.getTime() + Math.pow(2, 14));
 
         if (condition1 && condition2) {
-            // CoAPActivator.logger.debug("Outdated notification, discard");
+            LOGGER.debug("Outdated notification, discard");
             return false;
         }
 
-        // CoAPActivator.logger.debug("Fresh notification");
+        LOGGER.debug("Fresh notification");
         // Update the new values
         latestTimestamp = date;
         latestValidObserve = presentObserve;

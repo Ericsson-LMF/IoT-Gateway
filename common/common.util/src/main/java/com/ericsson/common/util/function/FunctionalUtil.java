@@ -88,9 +88,34 @@ public enum FunctionalUtil {
         return Optional.empty();
     }
 
-    public static <T> void acceptIfCan(Class<T> type, Object object, Consumer<T> code) {
+    public static <T> Branch acceptIfCan(Class<T> type, Object object, Consumer<T> code) {
         if (type.isInstance(object)) {
             code.accept((T) object);
+            return new Branch(object, false);
+        }
+        return new Branch(object, true);
+    }
+
+    public static class Branch {
+
+        private final Object object;
+        private boolean unused;
+
+        private Branch(Object object, boolean unused) {
+            this.object = object;
+            this.unused = unused;
+        }
+
+        public <T> Branch orElse(Class<T> type, Consumer<T> code) {
+            if (unused && type.isInstance(object)) {
+                code.accept((T) object);
+                unused = false;
+            }
+            return this;
+        }
+
+        public void orElse(Consumer<Object> code) {
+            code.accept(object);
         }
     }
 

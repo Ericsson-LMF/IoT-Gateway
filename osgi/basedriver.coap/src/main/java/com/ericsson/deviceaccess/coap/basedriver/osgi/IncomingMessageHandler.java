@@ -34,7 +34,9 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
+import com.ericsson.common.util.BitUtil;
 import com.ericsson.common.util.function.FunctionalUtil;
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType.ACKNOWLEDGEMENT;
@@ -47,16 +49,16 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.BAD_OPTION;
 import static com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode.REQUEST_ENTITY_TOO_LARGE;
 import com.ericsson.deviceaccess.coap.basedriver.communication.UDPConstants;
-import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageReader;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the incoming (CoAP) messages, detects duplicates and
@@ -65,6 +67,7 @@ import java.util.logging.Logger;
  */
 public class IncomingMessageHandler implements IncomingMessageListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncomingMessageHandler.class);
     static final long incomingRequestsExpirationTime = 60000; //msec
 
     private IncomingCoAPListener incomingCoAPListener;
@@ -96,7 +99,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
     @Override
     public void messageReceived(DatagramPacket datagram) {
         if (incomingCoAPListener == null) {
-            // CoAPActivator.logger.error("No incoming CoAP listener defined");
+            LOGGER.error("No incoming CoAP listener defined");
             return;
         }
 
@@ -104,13 +107,13 @@ public class IncomingMessageHandler implements IncomingMessageListener {
 
         if (datagram.getLength() > UDPConstants.MAX_DATAGRAM_SIZE) {
             // response with a 4.13 entity too large
-            //CoAPActivator.logger.debug("Too large datagram received, reply with a 4.13 response");
+            LOGGER.debug("Too large datagram received, reply with a 4.13 response");
             OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
             CoAPMessage msg = null;
             try {
                 msg = handler.decodeStart();
             } catch (CoAPMessageFormat.IncorrectMessageException ex) {
-                Logger.getLogger(IncomingMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.debug("Couldn't decode start of message.", ex);
             }
             if (msg instanceof CoAPRequest) {
                 CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, REQUEST_ENTITY_TOO_LARGE);
@@ -126,22 +129,19 @@ public class IncomingMessageHandler implements IncomingMessageListener {
         try {
             msg = handler.decode();
         } catch (CoAPMessageFormat.IncorrectMessageException ex) {
-            Logger.getLogger(IncomingMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.debug("Couldn't decode message.", ex);
         }
 
         // log each message
-        /*
-         String msgStr = "*** Incoming CoAP message ***\n"
-         + msg.logMessage();
-         CoAPActivator.logger.info(msgStr);
-         try {
-         // Write to a file too (interop tests)
-         CoAPActivator.out.write(msgStr);
-         CoAPActivator.out.flush();
-         } catch (IOException e) {
-         e.printStackTrace();
-         }
-         */
+        String msgStr = "*** Incoming CoAP message ***\n" + msg.logMessage();
+        LOGGER.info(msgStr);
+        try {
+            // Write to a file too (interop tests)
+            CoAPActivator.out.write(msgStr);
+            CoAPActivator.out.flush();
+        } catch (IOException e) {
+            LOGGER.debug("Couldn't log message to file.", e);
+        }
         // If there are unrecognized options, reply with a reset message for
         // confirmable response and 4.02 response to a confirmable request
         // (fraft-ietf-core-coap-08)
@@ -149,13 +149,12 @@ public class IncomingMessageHandler implements IncomingMessageListener {
             if (msg.getMessageType() == CONFIRMABLE) {
                 OutgoingMessageHandler outHandler = incomingCoAPListener.getOutgoingMessageHandler();
                 // in case of response, return rst
-                if (msg instanceof CoAPResponse) {
-                    resetMessage((CoAPResponse) msg);
-                } else {
+                FunctionalUtil.acceptIfCan(CoAPResponse.class, msg, res -> {
+                    resetMessage(res);
+                }).orElse(CoAPRequest.class, req -> {
                     // in case of request, return 4.02 bad option
-                    CoAPResponse resp = new CoAPResponse(1, (CoAPRequest) msg, CONFIRMABLE, BAD_OPTION);
-                    outHandler.send(resp, false);
-                }
+                    outHandler.send(new CoAPResponse(1, req, CONFIRMABLE, BAD_OPTION), false);
+                });
             }
         } else {
             try {
@@ -165,7 +164,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
                     handleRequest((CoAPRequest) msg);
                 }
             } catch (CoAPException e) {
-                e.printStackTrace();
+                LOGGER.debug("Couldn't handle message", e);
             }
         }
     }
@@ -244,7 +243,7 @@ public class IncomingMessageHandler implements IncomingMessageListener {
     }
 
     private void ackMessage(CoAPResponse resp) {
-        //CoAPActivator.logger.info("Outgoing request found. Confirmable message received, ack immediately");
+        LOGGER.info("Outgoing request found. Confirmable message received, ack immediately");
         incomingCoAPListener.getOutgoingMessageHandler().send(resp.createAcknowledgement(), false);
     }
 

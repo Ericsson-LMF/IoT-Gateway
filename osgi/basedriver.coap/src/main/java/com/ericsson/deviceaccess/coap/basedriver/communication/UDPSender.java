@@ -43,12 +43,15 @@ import java.net.SocketAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for sending out UDP using either unicast or multicast socket.
  */
 public class UDPSender implements TransportLayerSender, Runnable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UDPSender.class);
     private final UDPTask POISON = new UDPTask(null);
 
     private MulticastSocket multicastSocket;
@@ -134,7 +137,7 @@ public class UDPSender implements TransportLayerSender, Runnable {
                 multicastSocket.send(outgoingDatagram);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Couldn't send content.", e);
         }
     }
 

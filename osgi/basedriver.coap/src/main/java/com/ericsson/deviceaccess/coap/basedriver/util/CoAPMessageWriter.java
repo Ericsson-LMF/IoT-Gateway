@@ -47,6 +47,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for encoding a CoAPMessage (either request or
@@ -54,6 +56,7 @@ import java.util.List;
  */
 public class CoAPMessageWriter implements CoAPMessageFormat {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPMessageWriter.class);
     private final CoAPMessage message;
     private final ByteArrayOutputStream outputStream;
 
@@ -75,7 +78,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
      * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
      */
     public byte[] encode() throws IncorrectMessageException {
-        //CoAPActivator.logger.debug("CoAPMessageWriter: encode a message with message ID " + message.getIdentifier());
+        LOGGER.debug("CoAPMessageWriter: encode a message with message ID " + message.getIdentifier());
         // These are the header that all messages should have
         int version = message.getVersion();
         int messageType = message.getMessageType().getNo();
@@ -100,7 +103,6 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
 
         outputStream.write(headerByte);
 
-        // byte tmpByteCode = ByteBuffer.allocate(1).get();
         byte codeByte = setBitsInByte(0, CODE_START,
                 CODE_LENGTH,
                 getBitsInIntAsByte(messageCode.getNo(), 0, CODE_LENGTH));
@@ -123,7 +125,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
                 outputStream.write(PAYLOAD_MARKER);
                 outputStream.write(message.getPayload());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.debug("Writing payload failed.", e);
             }
         }
 
@@ -133,7 +135,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.debug("Ending message writing failed.", e);
         }
 
         return byteArray;
@@ -215,7 +217,7 @@ public class CoAPMessageWriter implements CoAPMessageFormat {
                 try {
                     outputStream.write(header.getValue());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("Writing header failed.", e);
                 }
             }
         }

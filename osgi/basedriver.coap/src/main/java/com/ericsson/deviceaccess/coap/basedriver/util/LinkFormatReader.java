@@ -41,6 +41,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for parsing received link format data into CoAP
@@ -53,6 +55,7 @@ public enum LinkFormatReader {
      * Singleton
      */
     INSTANCE;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkFormatReader.class);
 
     /**
      * This method will parse a string that is of MIME type
@@ -81,7 +84,7 @@ public enum LinkFormatReader {
                     token = previous + "," + token;
                     lines.add(token);
                 } else {
-                    //CoAPActivator.logger.warn("Could not handle token: " + token);
+                    LOGGER.warn("Could not handle token: " + token);
                 }
             }
         }

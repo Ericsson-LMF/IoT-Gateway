@@ -54,6 +54,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for handling the observation relationships. It
@@ -67,6 +69,7 @@ import java.util.TimerTask;
  */
 public class ObservationHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObservationHandler.class);
     private final Map<URI, CoAPObservationResource> observedResources;
 
     private final Map<URI, CoAPRequest> originalRequests;
@@ -100,7 +103,7 @@ public class ObservationHandler {
      */
     public void handleObserveResponse(CoAPRequest originalRequest, CoAPResponse resp) throws CoAPException {
         // Handle responses related to observe relationships
-        //CoAPActivator.logger.debug("Response is related to an observation relationship");
+        LOGGER.debug("Response is related to an observation relationship");
 
         URI uri = originalRequest.getUriFromRequest();
         CoAPObservationResource res = observedResources.get(uri);
@@ -125,7 +128,7 @@ public class ObservationHandler {
             short test = BitUtil.mergeBytesToShort(bytes[0], bytes[1]);
             int observeValue = test & 0xFFFF;
 
-            //CoAPActivator.logger.debug("Masked observe value in observation handler [" + observeValue + "]");
+            LOGGER.debug("Masked observe value in observation handler [" + observeValue + "]");
             if (resp.getOptionHeaders(CoAPOptionName.BLOCK2).isEmpty()) {
                 // Check if the notification is fresh
                 if (!res.isFresh(observeValue, new java.util.Date())) {
@@ -209,7 +212,7 @@ public class ObservationHandler {
      * @param uri URI to the resource
      */
     protected synchronized void removeCachedResponse(URI uri) {
-        // CoAPActivator.logger.debug("Cached response for URI [" + uri.toString() + " expired, remove from cache");
+        LOGGER.debug("Cached response for URI [" + uri.toString() + " expired, remove from cache");
         cachedResponses.remove(uri);
     }
 
@@ -224,7 +227,7 @@ public class ObservationHandler {
      */
     public CoAPResource createObservationRelationship(URI uri,
             CoAPResourceObserver observer) throws CoAPException {
-        // CoAPActivator.logger.debug("Create observation relationship to URI [" + uri.toString() + "]");
+        LOGGER.debug("Create observation relationship to URI [" + uri + "]");
         CoAPObservationResource resource;
 
         // Check if there already exist observation for this resource
@@ -235,7 +238,7 @@ public class ObservationHandler {
 
             // Notify with a cached response
             if (cachedResponses.containsKey(uri)) {
-                //CoAPActivator.logger.debug("A fresh response still found in cache");
+                LOGGER.debug("A fresh response still found in cache");
                 observer.observeResponseReceived(
                         cachedResponses.get(uri).getResponse(),
                         resource,
@@ -327,17 +330,17 @@ public class ObservationHandler {
 
         @Override
         public void run() {
-            //CoAPActivator.logger.debug("Cached response expired");
+            LOGGER.debug("Cached response expired");
             // If the cached response expires, remove first the cached stuff
             removeCachedResponse(uri);
             // TODO if cached response expires, should send a new GET request!!
             try {
-                //CoAPActivator.logger.debug("Send a new GET request towards the server to refresh the observation");
+                LOGGER.debug("Send a new GET request towards the server to refresh the observation");
                 CoAPRequest req = createObservationRequest(uri);
                 // Do no update the hashmap, keep the original request there
                 endpoint.sendRequest(req);
             } catch (CoAPException e) {
-                e.printStackTrace();
+                LOGGER.warn("Sending new GET request failed.", e);
             }
         }
 

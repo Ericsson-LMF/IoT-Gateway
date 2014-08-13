@@ -37,11 +37,11 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.util.TokenGenerator;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -132,21 +132,13 @@ public class CoAPRequest extends CoAPMessage {
         for (CoAPOptionHeader header : getOptionHeaders()) {
             CoAPOptionName name = header.getOptionName();
             if (name == CoAPOptionName.URI_PATH) {
-                try {
-                    String pathPart = new String(header.getValue(), "UTF8");
-                    if (!pathPart.startsWith("/")) {
-                        pathPart = "/" + pathPart;
-                    }
-                    pathParts.append(pathPart);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                String pathPart = new String(header.getValue(), StandardCharsets.UTF_8);
+                if (!pathPart.startsWith("/")) {
+                    pathPart = "/" + pathPart;
                 }
+                pathParts.append(pathPart);
             } else if (name == CoAPOptionName.URI_HOST) {
-                try {
-                    host = new String(header.getValue(), "UTF8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                host = new String(header.getValue(), StandardCharsets.UTF_8);
             } else if (name == CoAPOptionName.URI_PORT) {
                 short shortInt = BitUtil.mergeBytesToShort(header.getValue()[0], header.getValue()[1]);
                 port = shortInt & 0xFFFF;

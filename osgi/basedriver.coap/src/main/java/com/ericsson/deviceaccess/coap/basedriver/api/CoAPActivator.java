@@ -50,8 +50,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-//import com.ericsson.research.common.slf4jlogger.OSGILogFactory;
 /**
  * This class implements BundleActivator and is responsible for starting the UDP
  * sockets for sending and receiving UDP packets.
@@ -62,7 +63,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class CoAPActivator implements BundleActivator {
 
-    //public static LogTracker logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPActivator.class);
     public static ServiceTracker tracker;
     public static ServiceTracker incomingCoAPTracker;
 
@@ -81,29 +82,19 @@ public class CoAPActivator implements BundleActivator {
     @Override
     public void start(BundleContext context) throws Exception {
         this.context = context;
-
-        //logger = new LogTracker(this.context);
-        //logger.open();
-        //logger.info("Start CoAPActivator, try to register coap service");
-        //OSGILogFactory.initOSGI(context);
+        LOGGER.info("Start CoAPActivator, try to register coap service");
         Bundle bundle = context.getBundle();
         InputStream is = null;
 
-        try {
-            URL url = bundle.getEntry("/META-INF/coap.properties");
-            if (url != null) {
-                try {
-                    is = url.openStream();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+        URL url = bundle.getEntry("/META-INF/coap.properties");
+        if (url != null) {
+            try {
+                is = url.openStream();
+            } catch (IOException ex) {
+                LOGGER.warn("CoAP configuration file cannot be loaded.", ex);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        //logger.debug("Read properties file");
         Properties p = new Properties();
         InetAddress address = null;
         int coapPort = -1;
@@ -113,13 +104,13 @@ public class CoAPActivator implements BundleActivator {
         int maximumBlockSzx = 6;
 
         if (is != null) {
-
+            LOGGER.debug("Read properties file");
             try {
                 p.load(is);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("CoAP configuration file cannot be loaded.", e);
             }
-            //logger.debug("Properties file loaded");
+            LOGGER.debug("Properties file loaded");
 
             String socketAddress = p.getProperty(COAP_ADDRESS);
             String port = p.getProperty("COAP_PORT");
@@ -153,18 +144,15 @@ public class CoAPActivator implements BundleActivator {
                         }
 
                     } catch (NullPointerException e) {
-                        System.out.println("Retrieving Information from NetworkInterface failed");
+                        LOGGER.warn("Retrieving Information from NetworkInterface failed", e);
                     }
 
                     if (address == null) {
                         address = InetAddress.getByName(socketAddress);
                     }
-                    System.out.println("Local address is now [" + address + "]");
-                    //logger.debug("Local address is now [" + address.toString()
-                    //		+ "]");
+                    LOGGER.debug("Local address is now [" + address + "]");
 
                 } catch (UnknownHostException e) {
-                    e.printStackTrace();
                     throw new CoAPException(e);
                 }
             } else {
@@ -178,7 +166,7 @@ public class CoAPActivator implements BundleActivator {
                     coapPort = Integer.parseInt(port);
                     if (coapPort <= 0) {
                         coapPort = -1;
-                        //logger.debug("set port to [" + coapPort + "]");
+                        LOGGER.debug("set port to [" + coapPort + "]");
                     }
                 } catch (NumberFormatException e) {
                     coapPort = 5684;
@@ -217,7 +205,7 @@ public class CoAPActivator implements BundleActivator {
                 discoveryPort = Integer.parseInt(port);
             }
         } else {
-            //logger.debug("Problem reading properties file, use hard coded values");
+            LOGGER.debug("Problem reading properties file, use hard coded values");
             try {
                 address = NetUtil.getMyInetAddress(NetUtil.ADDR_SCOPE_PRIORITISED_IPV6);
                 if (address == null) {
@@ -228,16 +216,15 @@ public class CoAPActivator implements BundleActivator {
                 discovery = InetAddress.getByName("ff02::1:fe00:1");
                 discoveryInterval = 60;
             } catch (UnknownHostException e) {
-                e.printStackTrace();
-                // throw new CoAPException(e);
+                throw new CoAPException(e);
             }
         }
 
-        //logger.info("CoAP driver address: " + address.getHostAddress());
+        LOGGER.info("CoAP driver address: " + address.getHostAddress());
         service = new CoAPService(address, coapPort, maximumBlockSzx);
         serviceRegistration = context.registerService(CoAPService.class, service, null);
 
-        //logger.debug("Service registered");
+        LOGGER.debug("Service registered");
         // Create a tracker for CoAPRequestListener services.
         tracker = new ServiceTracker(context, DeviceInterface.class, null);
         tracker.open();
@@ -245,8 +232,7 @@ public class CoAPActivator implements BundleActivator {
         incomingCoAPTracker = new ServiceTracker(context, IncomingCoAPRequestListener.class, null);
         incomingCoAPTracker.open();
 
-        FileWriter fstream = new FileWriter("coapmessaging.log");
-        out = new BufferedWriter(fstream);
+        out = new BufferedWriter(new FileWriter("coapmessaging.log"));
 
         service.init();
         service.startResourceDiscoveryService(discoveryInterval, discovery, discoveryPort);
@@ -259,12 +245,11 @@ public class CoAPActivator implements BundleActivator {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
-        //logger.debug("Stop CoAPService");
+        LOGGER.debug("Stop CoAPService");
         service.stopService();
 
         service = null;
         tracker.close();
-        //logger.close();
         out.flush();
         out.close();
         out = null;

@@ -35,6 +35,7 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.common.util.BitUtil;
+import com.ericsson.common.util.function.FunctionalUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageWriter;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
@@ -49,9 +50,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a CoAP message. There are two implementations of this
@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
  */
 public abstract class CoAPMessage {
 
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CoAPMessage.class);
     public static final String MESSAGE_ID = "messageID";
     public static final String TOKEN = "token";
     public static final String URI = "uri";
@@ -316,7 +317,7 @@ public abstract class CoAPMessage {
                 && (optionName == CoAPOptionName.URI_HOST
                 || optionName == CoAPOptionName.URI_PATH
                 || optionName == CoAPOptionName.URI_PORT)) {
-            // CoAPActivator.logger.info("Proxy-uri option in the message, not possible to add [" + header.getOptionName() + "] option header");
+            LOGGER.info("Proxy-uri option in the message, not possible to add [" + header.getOptionName() + "] option header");
             return false;
         }
         if (!optionName.isRepeatable() && !get(optionName).isEmpty()) {
@@ -330,7 +331,7 @@ public abstract class CoAPMessage {
             if (path.startsWith("/")) {
                 path = path.substring(1);
             }
-            // CoAPActivator.logger.warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
+            LOGGER.warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
             return !path.contains("/");
         }
 
@@ -338,7 +339,7 @@ public abstract class CoAPMessage {
         // Uri-Port, Uri-Path or Uri-Query options. Thus, remove all these
         // headers first!
         if (optionName == CoAPOptionName.PROXY_URI) {
-            //CoAPActivator.logger.info("Proxy-uri in the message, overwrite Uri-host, Uri-port, Uri-path and Uri-query options");
+            LOGGER.info("Proxy-uri in the message, overwrite Uri-host, Uri-port, Uri-path and Uri-query options");
             headers = headers.keySet().stream()
                     .filter(k -> k != CoAPOptionName.URI_HOST)
                     .filter(k -> k != CoAPOptionName.URI_PORT)
@@ -461,7 +462,7 @@ public abstract class CoAPMessage {
             this.retransmissions++;
             this.timeout *= 2;
         } else if (retransmissions == 4) {
-            //CoAPActivator.logger.debug("Max nof retransmission reached (4), cancel this message");
+            LOGGER.debug("Max nof retransmission reached (4), cancel this message");
         }
     }
 
@@ -538,7 +539,7 @@ public abstract class CoAPMessage {
         try {
             return new CoAPMessageWriter(this).encode();
         } catch (CoAPMessageFormat.IncorrectMessageException ex) {
-            Logger.getLogger(CoAPMessage.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.debug("Encoding failed.", ex);
         }
         return null;
     }
@@ -607,35 +608,33 @@ public abstract class CoAPMessage {
     public String logMessage() {
         StringBuilder logMessage = new StringBuilder("*****************************\n");
         try {
-            String type;
-            if (this instanceof CoAPRequest) {
-                type = "Request ";
-            } else {
-                type = "Response";
-            }
-
+            StringBuilder type = new StringBuilder();
+            FunctionalUtil.acceptIfCan(CoAPRequest.class, this, req -> {
+                type.append("Request");
+            }).orElse(CoAPResponse.class, res -> {
+                type.append("Response");
+            });
             logMessage.append("COAP [").append(type).append("]\n");
 
             if (getSocketAddress() != null) {
                 logMessage.append("Remote socket address [").append(getSocketAddress()).append("]\n");
             }
-            String codeDescription = "";
-            if (this instanceof CoAPRequest) {
+            StringBuilder codeDescription = new StringBuilder();
+            FunctionalUtil.acceptIfCan(CoAPRequest.class, this, req -> {
                 try {
-                    if (((CoAPRequest) this).getUriFromRequest() != null) {
-                        logMessage.append("Request URI [").append(((CoAPRequest) this).getUriFromRequest()).append("]\n");
+                    if (req.getUriFromRequest() != null) {
+                        logMessage.append("Request URI [").append(req.getUriFromRequest()).append("]\n");
                     }
                     String name = getCode().toString();
                     if (name != null) {
-                        codeDescription = name;
+                        codeDescription.append(name);
                     }
-
                 } catch (CoAPException e) {
-                    e.printStackTrace();
+                    logMessage.append(e);
                 }
-            } else {
-                codeDescription = getCode().getDescription();
-            }
+            }).orElse(o -> {
+                codeDescription.append(getCode().getDescription());
+            });
             if (getMessageId() > 0) {
                 logMessage.append("Message ID [").append(getMessageId()).append("]\n");
             }
@@ -644,7 +643,7 @@ public abstract class CoAPMessage {
             }
 
             logMessage.append("Message code [").append(getCode()).append("]\n");
-            if (!codeDescription.isEmpty()) {
+            if (codeDescription.length() > 0) {
                 logMessage.append(type).append(" description [").append(codeDescription).append("]\n");
             }
 
@@ -664,7 +663,7 @@ public abstract class CoAPMessage {
             }
             logMessage.append("*****************************\n");
         } catch (Exception e) {
-            e.printStackTrace();
+            logMessage.append(e);
         }
         return logMessage.toString();
     }

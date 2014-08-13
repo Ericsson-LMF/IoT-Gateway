@@ -69,6 +69,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CoAPService is the access point to the API. A CoAPService can be fetched
@@ -76,6 +78,7 @@ import java.util.TimerTask;
  */
 public class CoAPService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPService.class);
     private TransportLayerReceiver transportLayerReceiver;
     private TransportLayerSender transportLayerSender;
 
@@ -150,7 +153,7 @@ public class CoAPService {
             // Schedule tasks to do resource discovery
             timer.schedule(task, 0, resourceDiscoveryInterval * 1000);
         } else {
-            //CoAPActivator.logger.debug("Resource discovery interval set to 0, do not use resource discovery");
+            LOGGER.debug("Resource discovery interval set to 0, do not use resource discovery");
         }
     }
 
@@ -384,9 +387,7 @@ public class CoAPService {
             // If given address is multicast, use multicast socket
             try {
 
-                /*
-                 CoAPActivator.logger.debug("Join multicast group");
-                 */
+                LOGGER.debug("Join multicast group");
                 multicastSocket = new MulticastSocket(coapPort);
                 multicastSocket.joinGroup(address);
 
@@ -491,11 +492,7 @@ public class CoAPService {
 
         @Override
         public void run() {
-
-            /*
-             CoAPActivator.logger.debug("Send a discovery request to "
-             + resourceDiscoveryAddress.getCanonicalHostName());
-             */
+            LOGGER.debug("Send a discovery request to " + resourceDiscoveryAddress.getCanonicalHostName());
             try {
                 CoAPRequest discoveryReq = createGetRequest(
                         resourceDiscoveryAddress.getCanonicalHostName(),
@@ -519,7 +516,7 @@ public class CoAPService {
                 endpoint.sendRequest(discoveryReq);
 
             } catch (CoAPException | IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Discovery request sending failed,", e);
             }
         }
 
@@ -574,10 +571,7 @@ public class CoAPService {
 
         private void handleResponse(CoAPResponse response) {
             String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
-
-            /*
-             logger.debug("Message payload : [" + payload + "]");
-             */
+            LOGGER.debug("Message payload : [" + payload + "]");
             try {
                 // Parse the received message into the list of resources
                 List<CoAPResource> resources = LinkFormatReader.parseLinkFormatData(payload);
@@ -585,7 +579,7 @@ public class CoAPService {
                 // anything new in the response
                 directory.handleResourceDiscoveryResponse(resources, response);
             } catch (CoAPException | URISyntaxException e) {
-                e.printStackTrace();
+                LOGGER.warn("Response handling failed.", e);
             }
         }
 

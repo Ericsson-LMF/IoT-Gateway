@@ -42,12 +42,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents the UDP thread for listening to incoming UDP
  */
 public class UDPReceiver implements Runnable, TransportLayerReceiver {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UDPReceiver.class);
     private final DatagramSocket socket;
     private final List<IncomingMessageListener> coapListeners = Collections.synchronizedList(new ArrayList<>());
     Thread thread;
@@ -60,7 +63,7 @@ public class UDPReceiver implements Runnable, TransportLayerReceiver {
      * @param socket
      */
     public UDPReceiver(DatagramSocket socket) {
-        //CoAPActivator.logger.debug("UDP receiver with datagram socket");
+        LOGGER.debug("UDP receiver with datagram socket");
         this.socket = socket;
     }
 

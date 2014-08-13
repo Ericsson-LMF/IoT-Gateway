@@ -34,6 +34,7 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.ext;
 
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPService;
 import com.ericsson.deviceaccess.coap.basedriver.api.IncomingCoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.IncomingMessageHandler;
@@ -43,33 +44,34 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoAPExtEndpoint extends LocalCoAPEndpoint {
 
-    //final private LogTracker logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPService.class);
     final private Set<IncomingCoAPRequestListener> reqListenerSet;
 
     public CoAPExtEndpoint(OutgoingMessageHandler outgoingMessageHandler,
             IncomingMessageHandler incomingMessageHandler, URI uri) {
         super(outgoingMessageHandler, incomingMessageHandler, uri);
 
-        //logger.debug(THIS_CLASS_NAME + "()");
-        //this.logger = logger;
+        LOGGER.debug("Constructor");
         reqListenerSet = Collections.synchronizedSet(new HashSet<>());
     }
 
     @Override
     public void handleRequest(CoAPRequest request) {
-        //this.logger.debug(THIS_CLASS_NAME + "::handleRequest()");
+        LOGGER.debug("Handle request");
         reqListenerSet.forEach(listener -> listener.incomingRequestReceived(request));
     }
 
     public void setIncomingCoAPRequestListener(IncomingCoAPRequestListener reqListener) {
-        //this.logger.debug(THIS_CLASS_NAME + "::setIncomingCoAPRequestListener()");
+        LOGGER.debug("Set incoming CoAPRequestListener");
     }
 
     public void unsetIncomingCoAPRequestListener(IncomingCoAPRequestListener reqListener) {
-        //this.logger.debug(THIS_CLASS_NAME + "::unsetIncomingCoAPRequestListener()");
+        LOGGER.debug("Unset incoming CoAPRequestListener");
         reqListenerSet.remove(reqListener);
     }
 

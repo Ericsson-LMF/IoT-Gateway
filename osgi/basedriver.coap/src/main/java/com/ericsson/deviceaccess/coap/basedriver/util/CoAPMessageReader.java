@@ -49,6 +49,8 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for decoding a byte array containing CoAP message
@@ -56,6 +58,7 @@ import java.net.InetSocketAddress;
  */
 public class CoAPMessageReader implements CoAPMessageFormat {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPMessageReader.class);
     // this is the message being decoded
     private CoAPMessage message;
     private final DatagramPacket packet;
@@ -95,8 +98,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
      */
     public CoAPMessage decode() throws IncorrectMessageException {
-
-        // CoAPActivator.logger.debug("CoAPMessageReader: Decode message");
+        LOGGER.debug("CoAPMessageReader: Decode message");
         byte[] bytes = packet.getData();
 
         int position = decodeStartPos(bytes);
@@ -173,7 +175,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             try {
                 m.createUriFromRequest(packet.getSocketAddress());
             } catch (CoAPException e) {
-                e.printStackTrace();
+                LOGGER.debug("Creating URI from request failed.", e);
             }
         });
         return position;
@@ -230,7 +232,7 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             // So apply to CON messages only
             if (!okToAdd && name.isCritical() && message.getMessageType() == CoAPMessageType.CONFIRMABLE) {
                 this.okOptions = false; //TODO: Handle this
-                //CoAPActivator.logger.debug("Unrecognized options in a confirmable message");
+                LOGGER.debug("Unrecognized options in a confirmable message");
             }
 
             if (position >= bytes.length) {

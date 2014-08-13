@@ -56,11 +56,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestCode;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequestListener;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
-import com.ericsson.deviceaccess.coap.basedriver.util.CoAPUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseResponseCache.SessionData;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
+import com.ericsson.deviceaccess.coap.basedriver.util.CoAPUtil;
 import java.io.ByteArrayOutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -75,6 +75,8 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the incoming CoAP Requests and responses. From the
@@ -85,6 +87,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalCoAPEndpoint extends CoAPEndpoint implements
         IncomingCoAPListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalCoAPEndpoint.class);
     private final OutgoingMessageHandler outHandler;
     private final IncomingMessageHandler inHandler;
 
@@ -218,7 +221,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                     return;
                 }
 
-                //CoAPActivator.logger.debug("Option headers match, use cached response");
+                LOGGER.debug("Option headers match, use cached response");
                 CoAPResponse response = resp.getCachedResponse();
 
                 // Remove old headers from the response and replace with updated
@@ -289,10 +292,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param response response to be sent out
      */
     private void sendResponse(CoAPResponse response, boolean dontCache) {
-		// TODO handle different type of requests differently
-		/*
-         CoAPActivator.logger.debug("sendResponse()");
-         */
+        // TODO handle different type of requests differently
+        LOGGER.debug("sendResponse()");
 
         // Check the response options
         //     ETag option: If response message has payload but doesn't have ETag option,
@@ -351,9 +352,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
         /* cache payload if long enough */
         if (!dontCache && request != null && !hasBlock2Option && payload != null && payload.length > CoAPUtil.getBlockSize(szx)) {
-            /*
-             CoAPActivator.logger.debug("Cache blockwise response: ");
-             */
+            LOGGER.debug("Cache blockwise response: ");
             try {
                 outBlockCache.put(request, response);
                 outBlockCache.updateTimer(request);
@@ -376,8 +375,8 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      */
     @Override
     public void handleRequest(CoAPRequest request) {
-	// TODO handle different type of requests differently
-        //CoAPActivator.logger.debug("handleRequest() : Received [" + request.getMessageType().getName() + "] request");
+        // TODO handle different type of requests differently
+        LOGGER.debug("handleRequest() : Received [" + request.getMessageType() + "] request");
 
         // look up blockwise response cache if Request is GET and has Block2 option
         CoAPRequestCode code = request.getCode();
@@ -390,7 +389,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
 
                     byte[] payload = sessionData.getPayload();
                     if (payload != null) {
-                        //CoAPActivator.logger.debug("Cached blockwise response found");
+                        LOGGER.debug("Cached blockwise response found");
                         CoAPMessageType type = request.getMessageType();
                         //TODO: Replace with getResponseType?
                         CoAPMessageType msgType
@@ -409,7 +408,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                     }
                 }
             } catch (CoAPException e) {
-                e.printStackTrace();
+                LOGGER.debug("Handling block2 get request failed.", e);
             }
         }
 
@@ -419,7 +418,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 return;
             }
         } catch (CoAPException e) {
-            e.printStackTrace();
+            LOGGER.debug("Getting well know core failed.", e);
             replyWithNotImplemented(request);
             return;
         }
@@ -454,16 +453,11 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      */
     @Override
     public void handleResponse(CoAPResponse resp) throws CoAPException {
-        //CoAPActivator.logger.info("CoAP response of type [" + resp.getMessageType().toString() + "] received");
+        LOGGER.info("CoAP response of type [" + resp.getMessageType() + "] received");
         resp.getOptionHeaders().forEach(h -> {
             CoAPOptionHeaderConverter converter = new CoAPOptionHeaderConverter();
-            /*
-             String headerValue = "";
-             headerValue = converter.convertOptionHeaderToString(h);
-             CoAPActivator.logger.debug("CoAPOptionHeader ["
-             + h.getOptionName() + "] in the response with value ["
-             + headerValue + "]");
-             */
+            String headerValue = converter.convertOptionHeaderToString(h);
+            LOGGER.debug("CoAPOptionHeader [" + h.getOptionName() + "] in the response with value [" + headerValue + "]");
         });
 
         CoAPMessageType type = resp.getMessageType();
@@ -480,7 +474,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     public CoAPRequest createCoAPRequest(CoAPMessageType messageType,
             CoAPRequestCode methodCode, InetSocketAddress address, URI uri,
             byte[] tokenHeader) throws CoAPException {
-        //CoAPActivator.logger.debug("Create CoAP request");
+        LOGGER.debug("Create CoAP request");
         int messageId = outHandler.generateMessageId();
         CoAPRequest req = new CoAPRequest(messageType, methodCode, messageId, tokenHeader);
         req.setUri(uri);
@@ -566,7 +560,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
     private void handleReset(CoAPResponse resp) throws CoAPException {
         CoAPRequest originalRequest = matchBasedOnIdentifier(resp);
         if (originalRequest == null) {
-            //CoAPActivator.logger.warn("[RESET] Matching request was not found");
+            LOGGER.warn("[RESET] Matching request was not found");
             return;
         }
         if (resp.isCacheable()) {
@@ -588,13 +582,13 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         CoAPRequest originalRequest = matchBasedOnIdentifier(resp);
         if (originalRequest == null) {
             // Reply with a RESET message??
-            //CoAPActivator.logger.warn("[ACK] Matching request was not found");
+            LOGGER.warn("[ACK] Matching request was not found");
             return;
         }
 
         // Handle empty ack
         if (resp.getCode() == CoAPResponseCode.EMPTY) {
-            //CoAPActivator.logger.debug("An empty ACK received");
+            LOGGER.debug("An empty ACK received");
             CoAPRequestListener listener = originalRequest.getListener();
             if (listener != null) {
                 listener.emptyAckReceived(resp, originalRequest);
@@ -650,11 +644,11 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         try {
             originalRequest = matchBasedOnTokens(resp);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.debug("Matching based on tokens failed.", e);
         }
 
         if (!originalRequest.isPresent()) {
-            //CoAPActivator.logger.warn("[ConAndNon] Matching request was not found");
+            LOGGER.warn("[ConAndNon] Matching request was not found");
 
             // If no matching request can be found for a confirmable response,
             // reply with a reset
@@ -739,7 +733,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
      * @param uri URI identifying the response to be removed
      */
     protected void removeCachedResponse(URI uri) {
-        //CoAPActivator.logger.debug("Cached response for resource at [" + uri.toString() + "] expired, remove from cache");
+        LOGGER.debug("Cached response for resource at [" + uri + "] expired, remove from cache");
         inResponseCache.remove(uri);
     }
 
@@ -758,13 +752,13 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
         long maxAge = resp.getMaxAge();
         CachedResponse task = new CachedResponse(resp, originalRequest);
 
-        //CoAPActivator.logger.debug("Cache response for resource at [" + originalRequest.getUriFromRequest().toString() + "] for [" + maxAge + "] seconds");
+        LOGGER.debug("Cache response for resource at [" + originalRequest.getUriFromRequest() + "] for [" + maxAge + "] seconds");
         // Cache response based on the max-age option
         inResponseCache.put(originalRequest.getUriFromRequest(), task);
         try {
             timer.schedule(task, maxAge * 1000);
         } catch (IllegalArgumentException | IllegalStateException e) {
-            e.printStackTrace();
+            LOGGER.debug("Scheduling timer failed.", e);
         }
     }
 
@@ -835,7 +829,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             resp.setSocketAddress(req.getSocketAddress());
             outHandler.send(resp, false);
         } catch (CoAPException e) {
-            e.printStackTrace();
+            LOGGER.debug("Comparing existing CoAP request to gateway requests failed,", e);
         }
     }
 
@@ -888,7 +882,7 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
             try {
                 removeCachedResponse(originalRequest.getUriFromRequest());
             } catch (CoAPException e) {
-                e.printStackTrace();
+                LOGGER.debug("Removing cached request failed.", e);
             }
         }
 

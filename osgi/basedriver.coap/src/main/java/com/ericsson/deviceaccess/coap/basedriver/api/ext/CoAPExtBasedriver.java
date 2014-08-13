@@ -62,9 +62,12 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Timer;
-//import com.ericsson.research.ag.util.LogTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoAPExtBasedriver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPExtBasedriver.class);
 
     private TransportLayerReceiver transportLayerReceiver;
     private TransportLayerSender transportLayerSender;
@@ -84,14 +87,12 @@ public class CoAPExtBasedriver {
 
     protected LinkFormatDirectory directory;
 
-    //final private LogTracker logger;
     public CoAPExtBasedriver(InetAddress address, int coapPort, int maximumBlockSzx) throws CoAPException {
-        //logger.debug(THIS_CLASS_NAME + "(Addr=" + ((address != null) ? address.getHostName() : "NULL") + ",port=" + coapPort + ")");
+        LOGGER.debug("(Addr=" + ((address != null) ? address.getHostName() : "NULL") + ",port=" + coapPort + ")");
 
         this.address = address;
         this.coapPort = coapPort;
         this.maximumBlockSzx = maximumBlockSzx;
-        //this.logger = logger;
         this.directory = new LinkFormatDirectory();
 
         this.socket = null;
@@ -334,8 +335,7 @@ public class CoAPExtBasedriver {
             uri = new URI(null, null, hostAddress, coapPort, null, null, null);
             endpoint = new CoAPExtEndpoint(outgoingMessageHandler, incomingMessageHandler, uri);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-            //logger.error("URI Syntax Error : " + address.getAddress(), e);
+            LOGGER.error("URI Syntax Error : " + address.getAddress(), e);
         }
 
         if (this.maximumBlockSzx != 6) {
@@ -358,12 +358,10 @@ public class CoAPExtBasedriver {
         // multicastsocket
         if (address != null && address.isMulticastAddress() && this.coapPort != -1) {
             // If given address is multicast, use multicast socket
-            //this.logger.debug("Multicast UDP");
+            LOGGER.debug("Multicast UDP");
             try {
 
-                /*
-                 CoAPActivator.logger.debug("Join multicast group");
-                 */
+                LOGGER.debug("Join multicast group");
                 multicastSocket = new MulticastSocket(this.coapPort);
                 multicastSocket.joinGroup(address);
 
@@ -375,22 +373,22 @@ public class CoAPExtBasedriver {
             }
             // Otherwise use normal UDP datagram socket
         } else {
-            //this.logger.debug("Normal UDP");
+            LOGGER.debug("Normal UDP");
             try {
 
                 // If the port is set, use the defined port
                 if (coapPort != -1 && address != null) {
-                    //this.logger.info("UDP1: " + address + ":" + this.coapPort);
+                    LOGGER.info("UDP1: " + address + ":" + this.coapPort);
                     socket = new DatagramSocket(coapPort, address);
                 } else if (coapPort != -1) {
                     socket = new DatagramSocket(coapPort);
                     address = socket.getLocalAddress();
-                    //this.logger.info("UDP2: " + address + ":" + this.coapPort);
+                    LOGGER.info("UDP2: " + address + ":" + this.coapPort);
                 } else {
                     socket = new DatagramSocket();
                     address = socket.getLocalAddress();
                     coapPort = socket.getLocalPort();
-                    //this.logger.info("UDP3: " + address + ":" + this.coapPort);
+                    LOGGER.info("UDP3: " + address + ":" + this.coapPort);
                 }
             } catch (BindException e) {
                 // This could happen
@@ -436,7 +434,7 @@ public class CoAPExtBasedriver {
      * factories etc.
      */
     public void stopService() {
-        //this.logger.debug(THIS_CLASS_NAME + "::stopService()");
+        LOGGER.debug("Stop service");
 
         if (socket != null) {
             socket.close();

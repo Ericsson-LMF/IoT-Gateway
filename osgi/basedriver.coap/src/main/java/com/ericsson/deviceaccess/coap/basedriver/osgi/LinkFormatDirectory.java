@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class reads the resources received in the payload. It will notify the
@@ -62,6 +64,7 @@ import java.util.stream.Collectors;
  */
 public class LinkFormatDirectory {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkFormatDirectory.class);
     // This keeps the already known endpoints
     private final Map<URI, RemoteEndpointRefreshTask> refreshTasks;
     private final Timer timer;
@@ -149,7 +152,7 @@ public class LinkFormatDirectory {
                             address.getPort(), resourceString,
                             null, null));
 
-                    //CoAPActivator.logger.info("A new resource with URI [" + uri.toString() + "]");
+                    LOGGER.info("A new resource with URI [" + res.getUri() + "]");
                     endpoint.addResource(res);
                 }
 
@@ -160,13 +163,7 @@ public class LinkFormatDirectory {
                 }
             } else {
                 // Else reset timer task
-
-                /*
-                 CoAPActivator.logger
-                 .debug("Response received from known device ["
-                 + serverURI.toString()
-                 + "] before expiration, now reset timer!");
-                 */
+                LOGGER.debug("Response received from known device [" + serverURI + "] before expiration, now reset timer!");
                 RemoteEndpointRefreshTask task = refreshTasks.get(serverURI);
                 // cancel the refresh task and update the scheduled time for
                 // expiration
@@ -174,7 +171,7 @@ public class LinkFormatDirectory {
                     refreshTasks.remove(task.uri);
                     task.cancel();
                 } catch (IllegalStateException e) {
-                    //CoAPActivator.logger.warn("Task already cancelled");
+                    LOGGER.warn("Task already cancelled");
                 }
                 int scheduled = (30 + this.resourceDiscoveryInterval) * 1000;
                 RemoteEndpointRefreshTask newTask = new RemoteEndpointRefreshTask(serverURI, endpoint);
@@ -193,11 +190,7 @@ public class LinkFormatDirectory {
     protected synchronized void removeCachedRemoteEndpoint(URI uri) {
         Object[] services = CoAPActivator.tracker.getServices();
 
-        /*
-         CoAPActivator.logger.debug("No response from a server  ["
-         + uri.toString()
-         + "] for a discovery request, remove from cache");
-         */
+        LOGGER.debug("No response from a server  [" + uri.toString() + "] for a discovery request, remove from cache");
         RemoteEndpointRefreshTask task = refreshTasks.get(uri);
         task.cancel();
         refreshTasks.remove(uri);
@@ -231,9 +224,7 @@ public class LinkFormatDirectory {
 
         @Override
         public void run() {
-            /*
-             CoAPActivator.logger.debug("Cached remote endpoint expired");
-             */
+            LOGGER.debug("Cached remote endpoint expired");
             removeCachedRemoteEndpoint(uri);
         }
 
