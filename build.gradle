@@ -1,4 +1,4 @@
-def sourceDirectory = "$rootProject.projectDir/disti/libs/"
+def sourceDirectory = "$rootProject.projectDir/disti/libs/" //this is the Directory where every jar is located.
 
 def org_osgi_compendium_version = "5.0.0"
 def org_osgi_core_version = "5.0.0"
@@ -82,7 +82,7 @@ configure(javaProjects()) {
     buildDir = new File(rootProject.projectDir, "disti/")
     
     dependencies {
-
+        //declare global dependencies here.
     }
 }
 
@@ -103,10 +103,10 @@ task generateXmlBeans {
 
 task copyDeps(type: Copy) {
         from depsSource
-        into 'disti/libs'
+        into sourceDirectory
 }
 
-defaultTasks 'copyDeps', 'generateXmlBeans', 'build', 'generateDeviceAccessService', 'build'
+defaultTasks 'copyDeps', 'generateXmlBeans', 'build'
 
 project (':common:common.util') {
     dependencies {
@@ -147,7 +147,8 @@ project (':common:common.server.util') {
     }  
 }
 
-task generateDeviceAccessServices(type: JavaExec) {
+//TODO find a way to run device access service generator after codegenerator but before device access service build
+task generateDeviceAccessServices(type: JavaExec, dependsOn: ':osgi:serviceschema.codegenerator') {
     main = "com.ericsson.deviceaccess.serviceschema.codegenerator.Main"
     classpath = files("$sourceDirectory/serviceschema.codegenerator-1.42-SNAPSHOT.jar",  "$sourceDirectory/xmlbeans-" + xmlbeans_version + ".jar", "$sourceDirectory/slf4j-api-" + slf4j_api_version + ".jar", "$sourceDirectory/serviceschemaXmlParser.jar")
     File arguments = file("$rootProject.projectDir/osgi/generic.device.access.services/src/main/resources/services.xml")
@@ -156,8 +157,7 @@ task generateDeviceAccessServices(type: JavaExec) {
 }
 
 
-project(':osgi:serviceschema.codegenerator') {
-    
+project(':osgi:serviceschema.codegenerator') {    
     dependencies {
         compile project (':common:common.util')
         compile fileTree(dir: sourceDirectory + "serviceschemaXmlParser.jar"),
@@ -167,7 +167,6 @@ project(':osgi:serviceschema.codegenerator') {
     
     
 }
-
 
 project(':osgi:generic.device.access') {
     dependencies {
@@ -180,58 +179,41 @@ project(':osgi:generic.device.access') {
     }
 }
 
-
-
 project (':osgi:generic.device.access.services') {
     dependencies {
         compile project (':osgi:generic.device.access')
     }
+   
 }
 
-//project (':osgi:adaptor.upnp') {
-//    dependencies {
-//        compile project (':osgi:generic.device.access'),
-//        project (':common:common.osgi.log.util')
-//        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
-//        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
-//        fileTree(dir: sourceDirectory + "kxml2-" + kxml2_version + ".jar"),
-//        fileTree(dir: sourceDirectory + "json-" + json_version + ".jar")
-//        //fileTree(dir: sourceDirectory + "generic.device.access-1.42-SNAPSHOT.jar")
-//        
-//    }
-//}
+project (':osgi:adaptor.upnp') {
+    dependencies {
+        compile project (':osgi:generic.device.access.services'),
+        project (':osgi:serviceschema.codegenerator')
+        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "kxml2-" + kxml2_version + ".jar"),
+        fileTree(dir: sourceDirectory + "json-" + json_version + ".jar"),
+        fileTree(dir: sourceDirectory + "slf4j-api-" + slf4j_api_version + ".jar")
+        
+    }
+}
 
+project (':osgi:basedriver.upnp.lite') {
+    dependencies {
+        compile project (':osgi:generic.device.access')
+        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "kxml2-" + kxml2_version + ".jar")
+    }
+}
 
-
-//project (':osgi:generic.device.access') {
-//    dependencies {
-//        compile fileTree(dir: targetDirectory + "/org.osgi.core-" + org_osgi_core_version + ".jar"),
-//        fileTree(dir: targetDirectory + "/org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
-//        fileTree(dir: targetDirectory + "/common.osgi.log.util-1.42-SNAPSHOT.jar"),
-//        fileTree(dir: targetDirectory + "/common.util-1.42-SNAPSHOT.jar"),
-//        fileTree(dir: targetDirectory + "/jackson-annotations-" + jackson_annotations_version + ".jar")
-//    }
-//    
-//}
-
-//project (':osgi:serviceschema.codegenerator') {
-//  
-//    dependencies {
-//        compile fileTree(dir: "$rootProject.projectDir/disti/libs/common.util-1.42-SNAPSHOT.jar")
-//    }
-//}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+project (':osgi:adaptor.ruleengine') {
+    dependencies {
+        compile project (':osgi:generic.device.access')
+        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "json-" + json_version + ".jar")
+        
+    }
+}
