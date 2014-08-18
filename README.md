@@ -11,7 +11,8 @@ This readme.txt file is organized in the following sections:
 3. Build instructions: Description of the development cycle for this project
 4. Execution: Description of how one can  execute of the project and on what platforms
 5. Terminology: Description main terms used in this file
-6. Setting up environment for this gateway
+6. Setting up environment for this gateway on Raspberry Pi
+7. Setting up environment for this gateway on other OS's
 
 1. Contents
 -----------
@@ -20,7 +21,7 @@ The project contains the following files and folders:
 * ./common
 > This folder contains common bundles used for supporting the GDA framework.
 > It contains a top level maven pom.xml file that builds all the dependent
-> modules.
+> modules and logging.
 
 * ./dist
 > This folder contains a maven pom.xml file that builds the OSGi framework JAR
@@ -29,12 +30,12 @@ The project contains the following files and folders:
 > deployment onto a target machine.
 
 * ./osgi
-> This folder contain the main bundles for the Generic Device Access and a few
-> driver, adaptors and connectors.
+> This folder contain the main bundles for the Generic Device Access and drivers,
+> adaptors and connectors for different technologies, for example CoAP and UPnP.
 
 * ./tutorial
 > This folder contains a maven project for building a set of bundles for a
-> projet tutorial
+> project tutorial.
 
 * ./pom.xml
 > This is the parent Maven POM file for building the whole project. Please note
@@ -65,8 +66,8 @@ The project was built on a host with the following development environment
 * Maven 3.0.4
 * Java 1.8.0_05
 
-Ii is assumed that any host platform that supports Java 1.8 or later and
-Maven 3.0.4 or later would be fine.
+It is assumed that any host platform with Java 1.8 or later and
+Maven 3.0.4 or later will be fine.
 
 ### Building the bare bones project
 
@@ -78,6 +79,8 @@ Maven 3.0.4 or later would be fine.
 * Typically one must install and start the appropriate bundles manually after this step or edit the init.xargs and props.xargs files in order to configure the OSGi environment to install and start the necessary bundles.
 
 ### Building the tutorial
+
+Bare bones project (see above) must be built before building the tutorial.
 
 The pom.xml file in the "dist" folder contains a profile called "tutorial"
 which can be invoked by "mvn -P tutorial clean install". This profile will set
@@ -120,7 +123,7 @@ The "settings.xml" file should contain the following XML code
 Most of the bundles contain platform independent software. However the
 developer would like to communicate with devices over e.g. the serial port of
 the target machine one could use the RXTX JAR file either as a plan JAR file or
-as a bundle. The RXTX bundle  is part java software (native and non-native) and
+as a bundle. The RXTX bundle is part java software (native and non-native) and
 part native libraries which are platform dependent. Please make sure that the
 native libraries of the target platform are included in the RXTX bundle
 otherwise there will be run-time exceptions.
@@ -157,7 +160,7 @@ Please also note that user defined ".xargs" files could also be created. e.g.
 ### Running the tutorial
 
 The tutorial can be run by invoking ./start.sh on a *nix target or start.bat on
-a windows target.
+a Windows target.
 
 The appropriate init.xargs has already been put in place by the build process.
 
@@ -219,7 +222,7 @@ dd if=/path/to/raspbian-image.img of =/dev/“name of the SD-card” bs=2M
 Now you can take out the SD-card with operating system and put it in the Raspberry pi and power it up.
 Make sure Raspberry pi is connected to the internet.
 
-Password for default user pi is raspberry.
+Password for default user pi is "raspberry".
 
 5.
 Update Raspbian default Java version to Java 8 by first removing Java 7 with 
@@ -246,7 +249,7 @@ Now you should have a working platform for iot-gateway.
 7. SETTING UP OTHER OS'S FOR GATEWAY
 --------------------------------------
 
-With Debian Linux, you can just replicate the part 5 of the Raspberry Pi tutorial. With other OS's,
+With Debian/Ubuntu Linux, you can just replicate the part 5 of the Raspberry Pi tutorial. With other OS's,
 we recommend installing Java 8 with the following tutorial: https://wiki.powerfolder.com/display/PFS/Installing+Oracle+Java+on+Linux
 
 With Mac OS X or Microsoft Windows, you can download the correct package for Java 8 from Oracle 
