@@ -171,8 +171,8 @@ registers them the GDA framework as GDA devices.
 One can from a web browser access the webpage "http://localhost:8090/devices"
 to check which UPnP devices are discovered.
 
-If none are discovred an empty JSON string will be displayed "{}", otherwise a
-JSON document with the description of the UPnP devices will be displayed.
+If none are discovered an empty JSON string will be displayed, {}, otherwise you'll see 
+a JSON document with the description of the UPnP devices found.
 
 If one would like to test with simulated UPnP devices one can install XBMC
 http://xbmc.org/
@@ -191,7 +191,7 @@ Target: This is the machine where the compiled Java bytecode executes
 6. SETTING UP RASPBERRY PI FOR GATEWAY
 --------------------------------------
 
-This instruction is for Ubuntu 14.04. It can work on other linux distributions and OS X Mavericks with minor changes.
+This instruction is for Ubuntu 14.04. It can work on other Linux distributions and OS X Mavericks with minor changes.
 
 1.
 On host machine download Raspbian image from: http://downloads.raspberrypi.org/raspbian_latest 
@@ -211,7 +211,7 @@ sudo umount /dev/“name of the SD-card”
 3.
 Go to the folder with Raspbian image and do 
 ```
-dd if=“name of the raspbian image ”.img of =/dev/“name of the SD-card” bs=2M
+dd if=/path/to/raspbian-image.img of =/dev/“name of the SD-card” bs=2M
 ```
 ##### NOTICE: depending on your host machine operating system, last M could be capital or lower case!
 
@@ -222,11 +222,33 @@ Make sure Raspberry pi is connected to the internet.
 Password for default user pi is raspberry.
 
 5.
-Update Raspbian default Java version to Java 8 with 
+Update Raspbian default Java version to Java 8 by first removing Java 7 with 
 ```
 sudo apt-get remove oracle-java7-jdk
 ```
-This command will remove Java 7 and download Java 8.
-Now you should have working platform for iot-gateway
- 
+
+To install Java 8, add the repository and install Java 8 with
+```
+su -
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
+apt-get update
+apt-get install oracle-java8-installer
+exit
+```
+
+Once done, you can confirm your Java version with command "java -version". Java 8 is the version 1.8.x.
+
+Now you should have a working platform for iot-gateway.
+
+
+7. SETTING UP OTHER OS'S FOR GATEWAY
+--------------------------------------
+
+With Debian Linux, you can just replicate the part 5 of the Raspberry Pi tutorial. With other OS's,
+we recommend installing Java 8 with the following tutorial: https://wiki.powerfolder.com/display/PFS/Installing+Oracle+Java+on+Linux
+
+With Mac OS X or Microsoft Windows, you can download the correct package for Java 8 from Oracle 
+at http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html .
 
