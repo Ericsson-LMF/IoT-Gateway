@@ -53,7 +53,6 @@
 -install jackson-dataformat-xml-2.4.1.jar
 -install jackson-module-jaxb-annotations-2.4.1.jar
 -install jackson-module-mrbean-2.4.1.jar
--install jackson-module-parameter-names-2.4.1.jar
 
 -install common.util-1.20-SNAPSHOT.jar
 -install common.osgi.log.util-1.20-SNAPSHOT.jar
@@ -93,7 +92,6 @@
 -start jackson-dataformat-xml-2.4.1.jar
 -start jackson-module-jaxb-annotations-2.4.1.jar
 -start jackson-module-mrbean-2.4.1.jar
--start jackson-module-parameter-names-2.4.1.jar
 
 -start common.util-1.20-SNAPSHOT.jar
 -start common.osgi.log.util-1.20-SNAPSHOT.jar
