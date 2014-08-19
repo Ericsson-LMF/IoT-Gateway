@@ -22,10 +22,10 @@ def jersey_client_version = "1.18.1"
 def commons_codec_version = "1.9"
 def woodstox_core_asl_version = "4.4.0"
 def kxml2_version = "2.2.2"
+def spring_core_version = "4.0.6.RELEASE"
+def spring_test_version = "4.0.6.RELEASE"
 
 def depsSource
-
-
 
 configurations {
     downloadDeps
@@ -56,7 +56,9 @@ dependencies {
     downloadDeps "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jackson_dataformat_xml_version"
     downloadDeps "com.sun.jersey:jersey-client:$jersey_client_version"
     downloadDeps "org.codehaus.woodstox:woodstox-core-asl:$woodstox_core_asl_version"
-    downloadDeps "commons-codec:commons-codec:$commons_codec_version" 
+    downloadDeps "commons-codec:commons-codec:$commons_codec_version"
+    downloadDeps "org.springframework:spring-core:$spring_core_version"
+    downloadDeps "org.springframework:spring-test:$spring_test_version"
     downloadDeps "net.sf.kxml:kxml2:$kxml2_version"
     downloadDeps "org.apache.xmlbeans:xmlbeans:$xmlbeans_version"
     depsSource = configurations.downloadDeps
@@ -81,8 +83,39 @@ configure(javaProjects()) {
     version = '1.42-SNAPSHOT'
     buildDir = new File(rootProject.projectDir, "disti/")
     
+    repositories {
+        mavenCentral()
+    }
+    
     dependencies {
         //declare global dependencies here.
+        compile fileTree(dir: sourceDirectory + "junit-" + junit_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jmock-legacy-" + jmock_legacy_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jmock-junit4-" + jmock_junit4_version + ".jar")
+        testCompile "org.jmock:jmock:$jmock_version"
+        testCompile "org.springframework:spring-test:$spring_test_version"
+        testCompile "org.springframework:spring-core:$spring_core_version"
+        testCompile "junit:junit:$junit_version"
+        testCompile "org.jmock:jmock-legacy:$jmock_legacy_version"
+        testCompile "org.jmock:jmock-junit4:$jmock_junit4_version"
+        testCompile "commons-logging:commons-logging:$commons_logging_version"
+        testCompile "javax.ws.rs:jsr311-api:$jsr311_api_version"
+        testCompile "com.sun.jersey:jersey-client:$jersey_client_version"
+        testCompile "commons-codec:commons-codec:$commons_codec_version"
+        testCompile "org.slf4j:slf4j-api:$slf4j_api_version"
+        testCompile "net.sf.kxml:kxml2:$kxml2_version"
+        testCompile "org.osgi:org.osgi.compendium:$org_osgi_compendium_version"
+        testCompile "org.osgi:org.osgi.core:$org_osgi_core_version"
+        testCompile "org.json:json:$json_version"
+        testCompile "com.fasterxml.jackson.core:jackson-core:$jackson_core_version"
+        testCompile "com.fasterxml.jackson.core:jackson-annotations:$jackson_annotations_version"
+        testCompile "com.fasterxml.jackson.core:jackson-databind:$jackson_databind_version"
+        testCompile "com.fasterxml.jackson.datatype:jackson-datatype-jdk7:$jackson_datatype_jdk7_version"
+        testCompile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jackson_module_parameter_names_version"
+        testCompile "com.fasterxml.jackson.module:jackson-module-mrbean:$jackson_module_mrbean_version"
+        testCompile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jackson_dataformat_xml_version"
+   
+        
     }
 }
 
@@ -125,11 +158,9 @@ project (':common:common.osgi.log.util') {
         compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
         fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
         fileTree(dir: sourceDirectory + "slf4j-api-" + slf4j_api_version + ".jar"),
-        fileTree(dir: sourceDirectory + "junit-" + junit_version + ".jar"),
-        fileTree(dir: sourceDirectory + "jmock-" + jmock_version + ".jar"),
-        fileTree(dir: sourceDirectory + "jmock-legacy-" + jmock_legacy_version + ".jar"),
-        fileTree(dir: sourceDirectory + "jmock-junit4-" + jmock_junit4_version + ".jar"),
-        fileTree(dir: sourceDirectory + "commons-logging-" + commons_logging_version + ".jar")
+        fileTree(dir: sourceDirectory + "commons-logging-" + commons_logging_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jersey-client-" + jersey_client_version + ".jar"),
+        fileTree(dir: sourceDirectory + "commons-codec-" + commons_codec_version + ".jar")
     }
 }
 
@@ -143,12 +174,14 @@ project (':common:common.server.util') {
     dependencies {
         compile fileTree(dir: sourceDirectory + "jersey-client-" + jersey_client_version + ".jar"),
         fileTree(dir: sourceDirectory + "commons-codec-" + commons_codec_version + ".jar"),
-        fileTree(dir: sourceDirectory + "jsr311-api-" + jsr311_api_version + ".jar")
+        fileTree(dir: sourceDirectory + "jsr311-api-" + jsr311_api_version + ".jar"),
+        fileTree(dir: sourceDirectory + "spring-test-" + spring_test_version + ".jar"),
+        fileTree(dir: sourceDirectory + "jersey-core-" + jersey_client_version + ".jar")
     }  
 }
 
 //TODO find a way to run device access service generator after codegenerator but before device access service build
-task generateDeviceAccessServices(type: JavaExec, dependsOn: ':osgi:serviceschema.codegenerator') {
+task generateDeviceAccessServices(type: JavaExec) {
     main = "com.ericsson.deviceaccess.serviceschema.codegenerator.Main"
     classpath = files("$sourceDirectory/serviceschema.codegenerator-1.42-SNAPSHOT.jar",  "$sourceDirectory/xmlbeans-" + xmlbeans_version + ".jar", "$sourceDirectory/slf4j-api-" + slf4j_api_version + ".jar", "$sourceDirectory/serviceschemaXmlParser.jar")
     File arguments = file("$rootProject.projectDir/osgi/generic.device.access.services/src/main/resources/services.xml")
@@ -164,8 +197,6 @@ project(':osgi:serviceschema.codegenerator') {
         fileTree(dir: sourceDirectory + "xmlbeans-" + xmlbeans_version + ".jar"),
         fileTree(dir: sourceDirectory + "slf4j-api-" + slf4j_api_version + ".jar")
     }
-    
-    
 }
 
 project(':osgi:generic.device.access') {
@@ -175,12 +206,15 @@ project(':osgi:generic.device.access') {
         project (':common:common.test.util')
         compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
         fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
-        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar")
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "json-" + json_version + ".jar")
     }
 }
 
 project (':osgi:generic.device.access.services') {
     dependencies {
+        compile project (':osgi:serviceschema.codegenerator')
+        tasks.generateDeviceAccessServices.execute()
         compile project (':osgi:generic.device.access')
     }
    
