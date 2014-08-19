@@ -5,7 +5,7 @@
     <groupId>com.ericsson.deviceaccess.tutorial</groupId>
     <artifactId>rest.servlet</artifactId>
     <packaging>bundle</packaging>
-    <name>Ericsson OSGi device access tutorial: REST servlet</name>
+    <name>Tutorial:  REST servlet for OSGi device access</name>
 
     <parent>
         <groupId>com.ericsson.deviceaccess.tutorial</groupId>

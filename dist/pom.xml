@@ -196,7 +196,12 @@
             <artifactId>util-LIB</artifactId>
             <version>4.1.0</version>
         </dependency>
-
+        
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -296,11 +301,6 @@
             </build>
             <dependencies>
                 <dependency>
-                    <groupId>com.ericsson.research.connectedhome</groupId>
-                    <artifactId>common.util</artifactId>
-                    <version>1.20-SNAPSHOT</version>
-                </dependency>
-                <dependency>
                     <groupId>com.ericsson.deviceaccess</groupId>
                     <artifactId>basedriver.upnp.lite</artifactId>
                     <version>1.42-SNAPSHOT</version>
@@ -308,6 +308,16 @@
                 <dependency>
                     <groupId>com.ericsson.deviceaccess</groupId>
                     <artifactId>adaptor.upnp</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.coap</artifactId>
                     <version>1.42-SNAPSHOT</version>
                 </dependency>
                 <dependency>
