@@ -44,7 +44,7 @@ import javax.ws.rs.core.MediaType;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
@@ -52,7 +52,7 @@ import org.junit.Test;
 
 public class WarpAutenticationManagerTest {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }

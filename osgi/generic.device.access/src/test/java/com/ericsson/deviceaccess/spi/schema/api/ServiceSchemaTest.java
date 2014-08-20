@@ -37,7 +37,7 @@ package com.ericsson.deviceaccess.spi.schema.api;
 import com.ericsson.deviceaccess.spi.schema.ActionSchema;
 import com.ericsson.deviceaccess.spi.schema.ParameterSchema;
 import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -48,7 +48,7 @@ import org.junit.Test;
  */
 public class ServiceSchemaTest {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }

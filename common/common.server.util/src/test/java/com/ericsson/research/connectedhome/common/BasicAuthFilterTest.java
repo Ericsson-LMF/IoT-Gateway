@@ -40,7 +40,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import javax.ws.rs.core.HttpHeaders;
 import static junit.framework.Assert.assertEquals;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -49,7 +49,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public class BasicAuthFilterTest {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }

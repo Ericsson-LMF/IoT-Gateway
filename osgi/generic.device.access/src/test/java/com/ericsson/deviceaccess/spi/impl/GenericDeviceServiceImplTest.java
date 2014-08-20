@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,7 +62,7 @@ import org.junit.Test;
  */
 public class GenericDeviceServiceImplTest {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
