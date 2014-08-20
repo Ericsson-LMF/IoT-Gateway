@@ -154,7 +154,7 @@ public class EventManager implements ServiceListener, Runnable,
      * registered instances)
      */
     private void createTracker() {
-        deviceTracker = new ServiceTracker(context, GenericDevice.class.getName(), this);
+        deviceTracker = new ServiceTracker(context, GenericDevice.class, this);
         deviceTracker.open();
     }
 

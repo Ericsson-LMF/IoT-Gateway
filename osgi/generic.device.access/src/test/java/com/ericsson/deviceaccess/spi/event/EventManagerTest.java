@@ -49,6 +49,7 @@ import org.junit.After;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -103,6 +104,7 @@ public class EventManagerTest {
         listener = context.mock(GDEventListener.class);
         eventManager = new EventManager();
         eventManager.setContext(bundleContext);
+
         timer = new Timer();
         timer.schedule(new ShutdownTask(), 3000);
 
@@ -111,7 +113,8 @@ public class EventManagerTest {
                 oneOf(bundleContext).createFilter(with(aNonNull(String.class)));
                 allowing(bundleContext).addServiceListener(with(any(ServiceListener.class)), with(aNonNull(String.class)));
                 allowing(bundleContext).removeServiceListener(with(any(ServiceListener.class)));
-                allowing(bundleContext).getServiceReferences(with("com.ericsson.deviceaccess.api.GenericDevice"), with(aNull(String.class)));
+                allowing(bundleContext).getServiceReferences(with(any(Class.class)), with(any(String.class)));
+                allowing(bundleContext).getServiceReferences(with(any(String.class)), with(any(String.class)));
             }
         });
 
@@ -128,7 +131,7 @@ public class EventManagerTest {
         eventManager.shutdown();
     }
 
-//    @Test
+    @Test
     public void testNullFilter() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = null;
@@ -157,7 +160,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -216,7 +219,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -270,7 +273,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -329,7 +332,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -384,7 +387,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -432,7 +435,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -480,7 +483,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -511,7 +514,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
@@ -554,7 +557,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
 
@@ -597,7 +600,7 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
 
