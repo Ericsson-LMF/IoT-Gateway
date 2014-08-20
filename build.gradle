@@ -1,4 +1,5 @@
-def sourceDirectory = "$rootProject.projectDir/disti/libs/" //this is the Directory where every jar is located.
+def destinationDir = "disti/"
+def sourceDirectory = "$rootProject.projectDir/" + destinationDir + "libs/" //this is the Directory where every jar is located.
 
 def org_osgi_compendium_version = "5.0.0"
 def org_osgi_core_version = "5.0.0"
@@ -80,8 +81,8 @@ def osgiProjects() {
 
 configure(javaProjects()) { 
     apply plugin: 'java'
-    version = '1.42-SNAPSHOT'
-    buildDir = new File(rootProject.projectDir, "disti/")
+    version = '1.20-SNAPSHOT'
+    buildDir = new File(rootProject.projectDir, destinationDir)
     
     repositories {
         mavenCentral()
@@ -122,7 +123,7 @@ configure(javaProjects()) {
 configure(osgiProjects()) {
     apply plugin: 'osgi'
     version = '1.42-SNAPSHOT'
-    buildDir = new File(rootProject.projectDir, "disti/")
+    buildDir = new File(rootProject.projectDir, destinationDir)
     
 }
 
@@ -130,7 +131,7 @@ task generateXmlBeans {
     ant.taskdef(name: 'xmlbean', classname: 'org.apache.xmlbeans.impl.tool.XMLBean',
 	classpath: configurations.downloadDeps.asPath)
     ant.xmlbean(schema: 'osgi/serviceschema.xmlparser/src/main/xsd/services.xsd', 
-	destfile: "disti/libs/serviceschemaXmlParser.jar",
+	destfile: destinationDir + "libs/serviceschemaXmlParser.jar",
 	classpath: configurations.downloadDeps.asPath)
 }
 
@@ -214,7 +215,6 @@ project(':osgi:generic.device.access') {
 project (':osgi:generic.device.access.services') {
     dependencies {
         compile project (':osgi:serviceschema.codegenerator')
-        tasks.generateDeviceAccessServices.execute()
         compile project (':osgi:generic.device.access')
     }
    
