@@ -79,6 +79,7 @@ def osgiProjects() {
   } 
 }
 
+//This is the configuration for all java projects, includin osgi projects.
 configure(javaProjects()) { 
     apply plugin: 'java'
     version = '1.20-SNAPSHOT'
@@ -120,6 +121,7 @@ configure(javaProjects()) {
     }
 }
 
+//This is the configuration only for osgi projects.
 configure(osgiProjects()) {
     apply plugin: 'osgi'
     version = '1.42-SNAPSHOT'
@@ -127,6 +129,7 @@ configure(osgiProjects()) {
     
 }
 
+//Task for generating XmlBeans
 task generateXmlBeans {
     ant.taskdef(name: 'xmlbean', classname: 'org.apache.xmlbeans.impl.tool.XMLBean',
 	classpath: configurations.downloadDeps.asPath)
@@ -135,12 +138,21 @@ task generateXmlBeans {
 	classpath: configurations.downloadDeps.asPath)
 }
 
+//Task for copying all jar dependency files from Gradles own cache directories to somewhere else
 task copyDeps(type: Copy) {
         from depsSource
         into sourceDirectory
 }
 
-defaultTasks 'copyDeps', 'generateXmlBeans', 'build'
+//Task for code generation.
+//TODO find a way to run device access service generator after codegenerator but before device access service build
+task generateDeviceAccessServices(type: JavaExec) {
+    main = "com.ericsson.deviceaccess.serviceschema.codegenerator.Main"
+    classpath = files("$sourceDirectory/serviceschema.codegenerator-1.42-SNAPSHOT.jar",  "$sourceDirectory/xmlbeans-" + xmlbeans_version + ".jar", "$sourceDirectory/slf4j-api-" + slf4j_api_version + ".jar", "$sourceDirectory/serviceschemaXmlParser.jar")
+    File arguments = file("$rootProject.projectDir/osgi/generic.device.access.services/src/main/resources/services.xml")
+    def out = "$rootProject.projectDir/osgi/generic.device.access.services/src/main/java"
+    args arguments, out
+}
 
 project (':common:common.util') {
     dependencies {
@@ -180,16 +192,6 @@ project (':common:common.server.util') {
         fileTree(dir: sourceDirectory + "jersey-core-" + jersey_client_version + ".jar")
     }  
 }
-
-//TODO find a way to run device access service generator after codegenerator but before device access service build
-task generateDeviceAccessServices(type: JavaExec) {
-    main = "com.ericsson.deviceaccess.serviceschema.codegenerator.Main"
-    classpath = files("$sourceDirectory/serviceschema.codegenerator-1.42-SNAPSHOT.jar",  "$sourceDirectory/xmlbeans-" + xmlbeans_version + ".jar", "$sourceDirectory/slf4j-api-" + slf4j_api_version + ".jar", "$sourceDirectory/serviceschemaXmlParser.jar")
-    File arguments = file("$rootProject.projectDir/osgi/generic.device.access.services/src/main/resources/services.xml")
-    def out = "$rootProject.projectDir/osgi/generic.device.access.services/src/main/java"
-    args arguments, out
-}
-
 
 project(':osgi:serviceschema.codegenerator') {    
     dependencies {
@@ -251,3 +253,10 @@ project (':osgi:adaptor.ruleengine') {
         
     }
 }
+
+//Task for renaming build folder
+//task rename {
+//        file(destinationDir + "libs").renameTo(file("disti/jars"))
+//}
+
+defaultTasks 'copyDeps', 'generateXmlBeans', 'build'
