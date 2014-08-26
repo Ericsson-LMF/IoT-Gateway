@@ -43,19 +43,17 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
 import java.net.DatagramPacket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class CoAPMessageWriterTest extends TestCase {
-
-    public CoAPMessageWriterTest() {
-        super("OutgoingCoAPMessageParserTest");
-    }
+public class CoAPMessageWriterTest {
 
     /*
      * The only public method is the encode method, so test that
      *
      * @throws URISyntaxException
      */
+    @Test
     public void testEncode() throws URISyntaxException {
 
         URI uri = new URI("coap://127.0.0.1:5683/storage/helloworld");
@@ -180,6 +178,7 @@ public class CoAPMessageWriterTest extends TestCase {
          assertEquals(3, req.getOptionCount());*/
     }
 
+    @Test
     public void testFencepostOptions() throws URISyntaxException {
         URI uri = new URI("coap://127.0.0.1:/storage/helloworld");
         CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
@@ -221,6 +220,7 @@ public class CoAPMessageWriterTest extends TestCase {
         assertEquals(2, msg.getOptionHeaders().size());
     }
 
+    @Test
     public void testEmptyAck() {
         CoAPResponse response = new CoAPResponse(1,
                 CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_IMPLEMENTED, 1234);

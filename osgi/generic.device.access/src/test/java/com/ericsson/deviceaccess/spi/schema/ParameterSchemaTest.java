@@ -36,7 +36,6 @@ package com.ericsson.deviceaccess.spi.schema;
 
 import com.ericsson.common.util.serialization.Format;
 import com.ericsson.deviceaccess.api.genericdevice.GDException;
-import junit.framework.Assert;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
@@ -44,6 +43,7 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * ParameterSchema Tester.
@@ -60,7 +60,7 @@ public class ParameterSchemaTest {
     private ParameterSchema stringParameterSchema;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         intParameterSchema = new ParameterSchema.Builder()
                 .setName("intPar")
                 .setType(Integer.class)
@@ -98,7 +98,7 @@ public class ParameterSchemaTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -113,7 +113,7 @@ public class ParameterSchemaTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -128,7 +128,7 @@ public class ParameterSchemaTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 }

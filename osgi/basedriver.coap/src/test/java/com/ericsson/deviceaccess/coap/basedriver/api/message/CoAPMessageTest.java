@@ -38,16 +38,18 @@ import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CoAPMessageTest extends TestCase {
+public class CoAPMessageTest {
 
     private CoAPMessage resp;
     private CoAPRequest req;
     private CoAPOptionHeaderConverter converter;
 
-    public CoAPMessageTest() {
-        super("CoAPMessageTest");
+    @Before
+    public void setup() {
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.EMPTY, 123);
         req = new CoAPRequest(1, CoAPMessageType.CONFIRMABLE, CoAPRequestCode.EMPTY, 123);
         converter = new CoAPOptionHeaderConverter();
@@ -65,6 +67,8 @@ public class CoAPMessageTest extends TestCase {
 //
 //        assertEquals(1, resp.getOptionCount());
 //    }
+    
+    @Test
     public void testAddUriHeaders() {
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.URI_HOST);
         // should be ok to add one token header
@@ -98,6 +102,7 @@ public class CoAPMessageTest extends TestCase {
      * Adding proxy-uri header means that other uri related headers need to be
      * removed
      */
+    @Test
     public void testAddProxyUriHeader() {
         // If proxy-uri header is added, it should remove other uri related
         // headers
@@ -131,6 +136,7 @@ public class CoAPMessageTest extends TestCase {
         assertTrue(resp.addOptionHeader(h));
     }
 
+    @Test
     public void testAddMaxAgeHeader() {
         // max-age only once
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.MAX_AGE);
@@ -140,6 +146,7 @@ public class CoAPMessageTest extends TestCase {
         assertFalse(resp.addOptionHeader(h));
     }
 
+    @Test
     public void testAddEtagHeader() {
 
         // In a response, etag can be present only once
@@ -156,6 +163,7 @@ public class CoAPMessageTest extends TestCase {
         assertTrue(req.addOptionHeader(h));
     }
 
+    @Test
     public void testAddIfNoneMatchHeader() {
         // In a response, etag can be present only once
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.IF_NONE_MATCH);
@@ -167,18 +175,22 @@ public class CoAPMessageTest extends TestCase {
         assertEquals(0, h.getLength());
     }
 
+    @Test
     public void testRetransmissions() {
         assertEquals(resp.getRetransmissions(), 0);
     }
 
+    @Test
     public void testMessageCanceled() {
         assertFalse(resp.messageCanceled());
     }
 
+    @Test
     public void testGetIdentifier() {
         assertNull(resp.getIdentifier());
     }
 
+    @Test
     public void testIsObserveMessage() {
         assertFalse(resp.isObserveMessage());
 
@@ -210,6 +222,7 @@ public class CoAPMessageTest extends TestCase {
         assertEquals(observeValue, unsignedShortMax);
     }
 
+    @Test
     public void testGetMaxAge() {
         try {
             long maxAge = resp.getMaxAge();
@@ -356,6 +369,7 @@ public class CoAPMessageTest extends TestCase {
      * Test for observe option header (draft-ietf-core-observe-03). can be
      * present only once in req/resp
      */
+    @Test
     public void testAddObserveHeader() {
         int value = 20;
         byte[] bytes = BitUtil.splitIntToBytes(value);

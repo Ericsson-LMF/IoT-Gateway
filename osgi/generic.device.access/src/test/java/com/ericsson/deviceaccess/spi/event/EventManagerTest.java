@@ -46,11 +46,10 @@ import org.jmock.api.Invocation;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.After;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -99,7 +98,7 @@ public class EventManagerTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         serviceReference = context.mock(ServiceReference.class, "serviceReference");
         bundleContext = context.mock(BundleContext.class);
         listener = context.mock(GDEventListener.class);

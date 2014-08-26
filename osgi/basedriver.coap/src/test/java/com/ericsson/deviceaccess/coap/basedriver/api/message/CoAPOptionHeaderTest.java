@@ -37,14 +37,12 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 import com.ericsson.common.util.BitUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class CoAPOptionHeaderTest extends TestCase {
+public class CoAPOptionHeaderTest {
 
-    public CoAPOptionHeaderTest() {
-        super("CoAPOptionHeaderTest");
-    }
-
+    @Test
     public void testGetOptionName() {
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_FORMAT);
         assertEquals(h.getOptionNumber(), CoAPOptionName.CONTENT_FORMAT.getNo());
@@ -57,6 +55,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         assertFalse(h.getOptionNumber() == CoAPOptionName.CONTENT_FORMAT.getNo());
     }
 
+    @Test
     public void testIsCritical() {
         // observe header is not critical (even option number)
         assertFalse(CoAPOptionName.OBSERVE.isCritical());
@@ -64,6 +63,7 @@ public class CoAPOptionHeaderTest extends TestCase {
         assertTrue(CoAPOptionName.URI_PATH.isCritical());
     }
 
+    @Test
     public void testGetLength() {
 
         short id = 41; // try with application/xml
@@ -119,6 +119,8 @@ public class CoAPOptionHeaderTest extends TestCase {
 //        // Now the header is not normal length anymore
 //        assertFalse(h.isNormalLength());
 //    }
+    
+    @Test
     public void testSetValue() {
         short id = 41; // try with application/xml
 

@@ -40,7 +40,6 @@ import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import java.util.ArrayList;
 import java.util.List;
-import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.api.ExpectationError;
@@ -49,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *

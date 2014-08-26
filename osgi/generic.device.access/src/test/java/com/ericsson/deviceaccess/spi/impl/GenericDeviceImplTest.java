@@ -45,7 +45,6 @@ import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
 import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.HashMap;
-import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -54,6 +53,7 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * GenericDeviceImpl Tester.
@@ -73,7 +73,7 @@ public class GenericDeviceImplTest {
     private GDPropertyMetadata dummyMeta;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         dummyService = context.mock(GDService.class);
         eventManager = context.mock(EventManager.class);
         dummyProperties = context.mock(GDProperties.class);

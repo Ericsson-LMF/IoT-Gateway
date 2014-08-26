@@ -41,14 +41,13 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class WarpAutenticationManagerTest {
 

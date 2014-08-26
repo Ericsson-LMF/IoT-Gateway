@@ -46,7 +46,6 @@ import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import static junit.framework.Assert.fail;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -55,6 +54,7 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * GenericDeviceServiceImpl Tester.
@@ -78,7 +78,7 @@ public class GenericDeviceServiceImplTest {
     private GDAction action;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         action = context.mock(GDAction.class);
         eventManager = context.mock(EventManager.class);
         device = context.mock(GenericDeviceImpl.class);

@@ -35,14 +35,11 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import java.net.URISyntaxException;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class CoAPResponseCodeTest extends TestCase {
-
-    public CoAPResponseCodeTest() {
-        super("CoAPResponseCodeTest");
-    }
-
+public class CoAPResponseCodeTest {
+    @Test
     public void testResponseCodes() throws URISyntaxException {
 
         System.out.println("code to string:" + CoAPResponseCode.CREATED.toString());
