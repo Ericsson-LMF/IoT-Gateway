@@ -34,6 +34,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'http://www.knopflerfish.org/maven2/' }
 }
 
 dependencies {
@@ -62,6 +63,39 @@ dependencies {
     downloadDeps "org.springframework:spring-test:$spring_test_version"
     downloadDeps "net.sf.kxml:kxml2:$kxml2_version"
     downloadDeps "org.apache.xmlbeans:xmlbeans:$xmlbeans_version"
+    
+    //Knopplerfish
+    downloadDeps "org.knopflerfish.bundle:bundlerepository:3.1.2"
+    downloadDeps "org.knopflerfish.bundle:cm_cmd-IMPL:5.0.1"
+    downloadDeps "org.knopflerfish.bundle:console:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:console-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:crimson:2.1.0.kf4-001"
+    downloadDeps "org.knopflerfish.bundle:device:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:device-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:event:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:frameworkcommands-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:trayicon_fw:4.0.0"
+    downloadDeps "org.knopflerfish.bundle:http:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:http-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:httproot:2.0.2"
+    downloadDeps "org.knopflerfish.bundle:httproot-IMPL:4.0.0"
+    downloadDeps "org.knopflerfish:log:5.0.0"
+    downloadDeps "org.knopflerfish:log-IMPL:5.0.0"
+    downloadDeps "org.knopflerfish.bundle:logcommands-IMPL:5.0.0"
+    downloadDeps "org.knopflerfish.bundle:remotefw-API:4.0.0"
+    downloadDeps "org.knopflerfish.bundle:component:5.0.0"
+    downloadDeps "org.knopflerfish.bundle:scrcommands-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:consoletty-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:consoletelnet-IMPL:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:useradmin:4.0.0"
+    downloadDeps "org.knopflerfish.bundle:useradmin-IMPL:4.0.0"
+    downloadDeps "org.knopflerfish.bundle:cm:5.0.0"
+    downloadDeps "org.knopflerfish.bundle:cm-IMPL:5.0.0"
+    downloadDeps "org.knopflerfish.bundle:kxml-LIB:2.3.0.kf4-001"
+    downloadDeps "org.knopflerfish.bundle:prefs:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:prefs-API:4.0.1"
+    downloadDeps "org.knopflerfish.bundle:util-LIB:4.1.0"
+    
     depsSource = configurations.downloadDeps
 }
 
