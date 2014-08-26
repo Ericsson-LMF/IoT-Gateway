@@ -40,15 +40,15 @@ import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
 import java.util.ArrayList;
 import java.util.List;
-import junit.framework.Assert;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * GenericDevicePropertiesImpl Tester.
@@ -56,7 +56,7 @@ import org.junit.Test;
  */
 public class GenericDevicePropertiesImplTest {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
@@ -66,7 +66,7 @@ public class GenericDevicePropertiesImplTest {
     private GDPropertiesImpl props;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         metadataFloat = context.mock(GDPropertyMetadata.class, "metadataFloat");
         metadataArr = new ArrayList<>();
         metadataArr.add(metadataFloat);
@@ -116,7 +116,7 @@ public class GenericDevicePropertiesImplTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -131,7 +131,7 @@ public class GenericDevicePropertiesImplTest {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
         } catch (JSONException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 }

@@ -35,20 +35,23 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CoAPResponseTest extends TestCase {
+public class CoAPResponseTest {
 
     private CoAPResponse resp;
 
-    public CoAPResponseTest() {
-        super("CoAPResponseTest");
+    @Before
+    public void setup() {
         resp = new CoAPResponse(1, CoAPMessageType.CONFIRMABLE, CoAPResponseCode.CREATED, 1234);
     }
 
     /*
      * This method tests creating an empty acknowledgement for a response
      */
+    @Test
     public void testCreateAcknowledgement() {
         CoAPResponse ack = resp.createAcknowledgement();
         assertEquals(ack.getMessageId(), resp.getMessageId());
@@ -63,6 +66,7 @@ public class CoAPResponseTest extends TestCase {
      * Reset message should contain the same token header as the received
      * response, and it should have the same message id
      */
+    @Test
     public void testCreateReset() {
         CoAPResponse reset = resp.createReset();
 
@@ -75,6 +79,7 @@ public class CoAPResponseTest extends TestCase {
     /*
      * Test the different CoAP response codes
      */
+    @Test
     public void testIsCachable() {
         CoAPResponse reset = resp.createReset();
         assertFalse(reset.isCacheable());

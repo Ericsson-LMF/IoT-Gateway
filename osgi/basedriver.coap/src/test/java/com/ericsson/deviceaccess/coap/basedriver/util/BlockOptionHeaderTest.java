@@ -34,33 +34,20 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
-//import org.jmock.lib.legacy.ClassImposteriser;
 import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseTransferHandler;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class BlockOptionHeaderTest extends TestCase {
+public class BlockOptionHeaderTest {
 
     private BlockwiseTransferHandler handler;
 
-    public BlockOptionHeaderTest() {
-        super("BlockOptionHeaderTest");
-
-        /*Mockery context = new Mockery() {
-         {
-         setImposteriser(ClassImposteriser.INSTANCE);
-         }
-         };
-
-         final LocalCoAPEndpoint ep = context.mock(LocalCoAPEndpoint.class);
-
-         handler = new BlockwiseTransferHandler(ep);*/
-    }
-
+    @Test
     public void test1ByteBlockOptionHeader() {
         BlockOptionHeader blockOption = new BlockOptionHeader(
                 CoAPOptionName.BLOCK2, 0, false, 2);
@@ -120,6 +107,7 @@ public class BlockOptionHeaderTest extends TestCase {
         }
     }
 
+    @Test
     public void test2ByteBlockOptionHeader() {
 
         // Set the block number the maximum
@@ -177,6 +165,7 @@ public class BlockOptionHeaderTest extends TestCase {
         }
     }
 
+    @Test
     public void test3ByteBlockOptionHeader() {
         int szx = 2;
         boolean mFlag = true;

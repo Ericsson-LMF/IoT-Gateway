@@ -45,7 +45,7 @@ import com.ericsson.deviceaccess.spi.schema.ServiceSchema;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
 import java.util.Map;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -53,7 +53,7 @@ import org.junit.Test;
 
 public class TestSerialization {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }

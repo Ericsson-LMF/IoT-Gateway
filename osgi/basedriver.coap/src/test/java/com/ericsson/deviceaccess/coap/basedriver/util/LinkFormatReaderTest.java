@@ -38,14 +38,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import java.net.URISyntaxException;
 import java.util.List;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class LinkFormatReaderTest extends TestCase {
-
-    public LinkFormatReaderTest() {
-        super("LinkFormatReaderTest");
-    }
-
+public class LinkFormatReaderTest {
+    @Test
     public void testParseLinkFormatData() {
 
         String test1 = "</sensors/temp>;rt=\"TemperatureC\";if=\"sensor\",</sensors/light>;rt=\"LightLux\";if=\"sensor\"";

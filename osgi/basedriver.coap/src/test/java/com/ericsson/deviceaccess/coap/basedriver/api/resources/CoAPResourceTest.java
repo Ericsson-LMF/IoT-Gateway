@@ -37,14 +37,16 @@ package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAPResourceType;
 import java.net.URI;
 import java.net.URISyntaxException;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CoAPResourceTest extends TestCase {
+public class CoAPResourceTest {
 
     private CoAPResource resource;
 
-    public CoAPResourceTest() {
-        super("CoAPResourceTest");
+    @Before
+    public void setup() {
         try {
             URI uri = new URI("coap://localhost:5683/test");
 
@@ -54,6 +56,7 @@ public class CoAPResourceTest extends TestCase {
         }
     }
 
+    @Test
     public void testSetUri() {
         try {
             URI uri = new URI("coap://localhost:5683/test2");
@@ -69,6 +72,7 @@ public class CoAPResourceTest extends TestCase {
         }
     }
 
+    @Test
     public void testSetCoAPResourceType() {
         resource.setCoAPResourceType(CoAPResourceType.HELLO_WORLD);
         assertEquals(resource.getCoAPResourceType(),

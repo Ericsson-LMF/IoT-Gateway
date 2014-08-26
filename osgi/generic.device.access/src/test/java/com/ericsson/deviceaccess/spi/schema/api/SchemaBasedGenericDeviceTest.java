@@ -41,7 +41,7 @@ import com.ericsson.deviceaccess.spi.schema.based.SBGenericDevice;
 import com.ericsson.deviceaccess.spi.schema.based.SBService;
 import java.util.ArrayList;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
@@ -55,7 +55,7 @@ import org.junit.Test;
  */
 public class SchemaBasedGenericDeviceTest {
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }

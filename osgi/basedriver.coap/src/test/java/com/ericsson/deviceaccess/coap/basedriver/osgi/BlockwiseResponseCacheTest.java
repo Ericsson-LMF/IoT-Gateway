@@ -42,10 +42,11 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class BlockwiseResponseCacheTest extends TestCase {
-
+public class BlockwiseResponseCacheTest {
+    @Test
     public void testSessionInfo() {
         BlockwiseResponseCache cache = new BlockwiseResponseCache(10000);
 

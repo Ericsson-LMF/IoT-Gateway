@@ -41,14 +41,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.hamcrest.Description;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.jmock.api.Action;
 import org.jmock.api.Invocation;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.After;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -66,7 +67,7 @@ public class EventManagerTest {
         return new ShutdownEventManager(eventManager);
     }
 
-    private Mockery context = new Mockery() {
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
@@ -97,21 +98,23 @@ public class EventManagerTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         serviceReference = context.mock(ServiceReference.class, "serviceReference");
         bundleContext = context.mock(BundleContext.class);
         listener = context.mock(GDEventListener.class);
         eventManager = new EventManager();
         eventManager.setContext(bundleContext);
+
         timer = new Timer();
         timer.schedule(new ShutdownTask(), 3000);
 
         context.checking(new Expectations() {
             {
-                oneOf(bundleContext).createFilter(with(aNonNull(String.class)));
+                //oneOf(bundleContext).createFilter(with(aNonNull(String.class)));
                 allowing(bundleContext).addServiceListener(with(any(ServiceListener.class)), with(aNonNull(String.class)));
                 allowing(bundleContext).removeServiceListener(with(any(ServiceListener.class)));
-                allowing(bundleContext).getServiceReferences(with("com.ericsson.deviceaccess.api.GenericDevice"), with(aNull(String.class)));
+                allowing(bundleContext).getServiceReferences(with(any(Class.class)), with(any(String.class)));
+                allowing(bundleContext).getServiceReferences(with(any(String.class)), with(any(String.class)));
             }
         });
 
@@ -128,7 +131,7 @@ public class EventManagerTest {
         eventManager.shutdown();
     }
 
-//    @Test
+    @Ignore
     public void testNullFilter() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = null;
@@ -157,12 +160,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_specific_device() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(|(temp >= 30)(power <= 100)))";
@@ -216,12 +219,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_all_devices_and_services() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(|(temp >= 30)(power <= 100))";
@@ -270,12 +273,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_specific_service() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(service.name=srv)(|(temp >= 30)(power <= 100)))";
@@ -329,12 +332,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_specific_device_and_service() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(service.name=srv)(|(temp >= 30)(power <= 100)))";
@@ -384,12 +387,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_online_device() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.online=true)(temp =*))";
@@ -432,12 +435,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_protocol_device() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.protocol=banan)(temp =*))";
@@ -480,12 +483,12 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
-
-//    @Test
+    
+    @Ignore
     public void test_Filter_NoMatch() throws InvalidSyntaxException {
         timer.cancel();
         timer = new Timer();
@@ -511,13 +514,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
     }
 
     //Test that the delta filtering works using various datatypes
-//    @Test
+    @Ignore
     public void test_Filter_property_delta_float() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(service.name=srv)(power__delta>=2))";
@@ -554,13 +557,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
 
     }
 
-//    @Test
+    @Ignore
     public void test_Filter_property_delta_int() throws InvalidSyntaxException {
         final String eventManagerRegfilter = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class.getName() + ")";
         final String listenerFilter = "(&(device.id=zwave31)(service.name=srv)(power__delta>=2))";
@@ -597,13 +600,13 @@ public class EventManagerTest {
             }
         });
 
-        eventManager.run();
+        eventManager.start();
 
         context.assertIsSatisfied();
 
     }
 
-//    @Test
+    @Test
     public void testFiltering() throws InvalidSyntaxException {
         Filter filter = FrameworkUtil.createFilter("(&(device.id=zwave31)(|(temp >= 30)(power <= 100)))");
         assertTrue(filter.matches(new HashMap<String, Object>() {
@@ -662,6 +665,10 @@ public class EventManagerTest {
                 put("CurrentPower", 22);
             }
         }));
+        
+        eventManager.start();
+        
+        context.assertIsSatisfied();
     }
 
     static class ShutdownEventManager implements Action {

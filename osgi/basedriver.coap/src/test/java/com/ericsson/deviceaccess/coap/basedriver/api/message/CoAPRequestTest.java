@@ -40,9 +40,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMes
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CoAPRequestTest extends TestCase {
+public class CoAPRequestTest {
 
     private CoAPRequest req;
     private CoAPOptionHeader hostOpt;
@@ -50,8 +52,8 @@ public class CoAPRequestTest extends TestCase {
     private String host;
     private Integer port;
 
-    public CoAPRequestTest() {
-        super("CoAPRequestTest");
+    @Before
+    public void setup() {
         req = new CoAPRequest(CoAPMessageType.CONFIRMABLE, CoAPRequestCode.EMPTY, 1234);
         host = "127.0.0.1";
         port = 8080;
@@ -74,6 +76,7 @@ public class CoAPRequestTest extends TestCase {
      * Test how the URI is formed in different cases. In the beginning a null
      * should be returned.
      */
+    @Test
     public void testGetUriFromRequest() {
         URI uri = null;
         try {
@@ -156,6 +159,7 @@ public class CoAPRequestTest extends TestCase {
      * Test that the list of options returned for matching excludes
      * max-age,token & etag
      */
+    @Test
     public void testOptionsForMatching() {
 
         String path = "testPath";
