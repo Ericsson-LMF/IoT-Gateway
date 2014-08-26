@@ -331,8 +331,11 @@ public abstract class CoAPMessage {
             if (path.startsWith("/")) {
                 path = path.substring(1);
             }
-            LOGGER.warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/'");
-            return !path.contains("/");
+            if (path.contains("/")) {
+                LOGGER.warn("Path-Uri header should contain only one segment of the absolute path, cannot contain '/': " + path);
+                return false;
+            }
+            return true;
         }
 
         // Proxy-uri must take precedence over any of the Uri-Host,

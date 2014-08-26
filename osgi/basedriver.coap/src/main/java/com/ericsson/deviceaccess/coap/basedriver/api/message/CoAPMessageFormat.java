@@ -90,7 +90,7 @@ public interface CoAPMessageFormat {
     int ADDITIONAL_DELTA_2 = 14;
     int PAYLOAD_MARKER = 15;
 
-    int ADDITIONAL_DELTA_MAX = 256 + 13;
+    int ADDITIONAL_DELTA_MAX = 256 + ADDITIONAL_DELTA;
 
     /**
      * Option length.
@@ -102,7 +102,7 @@ public interface CoAPMessageFormat {
     int ADDITIONAL_LENGTH_2 = 14;
     int RESERVED = 15;
 
-    int ADDITIONAL_LENGTH_MAX = 256 + 13;
+    int ADDITIONAL_LENGTH_MAX = 256 + ADDITIONAL_LENGTH;
 
     public class IncorrectMessageException extends IOException {
 

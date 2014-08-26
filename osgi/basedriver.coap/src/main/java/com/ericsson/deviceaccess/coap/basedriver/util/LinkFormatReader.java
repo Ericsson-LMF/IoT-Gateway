@@ -68,7 +68,6 @@ public enum LinkFormatReader {
      */
     public static List<CoAPResource> parseLinkFormatData(String linkFormatString)
             throws URISyntaxException, CoAPException {
-
         // multiple link descriptions are separated by commas
         // TODO fix me: if resource description contains a comma!!
         List<String> lines = new ArrayList<>();

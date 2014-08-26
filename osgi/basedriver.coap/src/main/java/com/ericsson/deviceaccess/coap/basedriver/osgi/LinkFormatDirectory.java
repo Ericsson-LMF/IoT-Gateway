@@ -120,7 +120,23 @@ public class LinkFormatDirectory {
             Object[] services = CoAPActivator.tracker.getServices();
 
             // Notify about new devices
-            if (!refreshTasks.containsKey(serverURI)) {
+            if (refreshTasks.containsKey(serverURI)) {
+                // Else reset timer task
+                LOGGER.debug("Response received from known device [" + serverURI + "] before expiration, now reset timer!");
+                RemoteEndpointRefreshTask task = refreshTasks.get(serverURI);
+                // cancel the refresh task and update the scheduled time for
+                // expiration
+                try {
+                    refreshTasks.remove(task.uri);
+                    task.cancel();
+                } catch (IllegalStateException e) {
+                    LOGGER.warn("Task already cancelled");
+                }
+                int scheduled = (30 + this.resourceDiscoveryInterval) * 1000;
+                RemoteEndpointRefreshTask newTask = new RemoteEndpointRefreshTask(serverURI, endpoint);
+                this.refreshTasks.put(serverURI, newTask);
+                timer.schedule(newTask, scheduled);
+            } else {
 
                 // This is a hack to figure out the type of the server
                 CoAPRemoteEndpointType type = CoAPRemoteEndpointType.OTHER;
@@ -161,22 +177,6 @@ public class LinkFormatDirectory {
                         ((DeviceInterface) s).deviceAdded(endpoint);
                     }
                 }
-            } else {
-                // Else reset timer task
-                LOGGER.debug("Response received from known device [" + serverURI + "] before expiration, now reset timer!");
-                RemoteEndpointRefreshTask task = refreshTasks.get(serverURI);
-                // cancel the refresh task and update the scheduled time for
-                // expiration
-                try {
-                    refreshTasks.remove(task.uri);
-                    task.cancel();
-                } catch (IllegalStateException e) {
-                    LOGGER.warn("Task already cancelled");
-                }
-                int scheduled = (30 + this.resourceDiscoveryInterval) * 1000;
-                RemoteEndpointRefreshTask newTask = new RemoteEndpointRefreshTask(serverURI, endpoint);
-                this.refreshTasks.put(serverURI, newTask);
-                timer.schedule(newTask, scheduled);
             }
         } catch (URISyntaxException e) {
             throw new CoAPException(e);

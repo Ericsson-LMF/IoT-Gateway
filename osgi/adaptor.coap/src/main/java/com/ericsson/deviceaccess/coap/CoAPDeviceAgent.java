@@ -47,9 +47,16 @@ import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPObservationRe
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResourceObserver;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CoAPDeviceAgent
@@ -62,130 +69,106 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class CoAPDeviceAgent implements CoAPResourceObserver {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPDeviceAgent.class);
     private final BundleContext context;
-    //private LogTracker log;
-    private ServiceRegistration devReg;
     private CoAPService coapService;
-    private CoAPDevice coap;
-    private String path = "";
+    private Map<URI, List<CoAPDevice>> coap;
 
     public CoAPDeviceAgent(BundleContext bc, CoAPRemoteEndpoint endpoint) {
         this.context = bc;
-        //this.log = log;
+        coap = new HashMap<>();
+        ServiceReference<CoAPService> reference = context.getServiceReference(CoAPService.class);
+        if (reference != null) {
+            coapService = context.getService(reference);
+        } else {
+            LOGGER.warn("Could still not fetch a reference to CoAPService");
+        }
 
         // Create an iterator to iterate through the resources a device might have attached to it
         endpoint.getResources().keySet().forEach(uri -> {
+            CoAPDevice temp;
             // Check for known resources. This is one of the attributes of the GDA:
             // The matching between the device's resources and the service schemas
             // is currently statically defined.
             switch (uri.getPath()) {
                 case "/weatherResource":
-                    System.out.println("[CoAPDeviceAgent]: FOUND WEATHER RESOURCE!");
+                    LOGGER.debug("[CoAPDeviceAgent]: FOUND WEATHER RESOURCE!");
                     // When a known resource is detected, create a CoAPDevice and attach the resource
-                    coap = new CoAPDevice(uri);
-                    coap.putService(new WeatherResourceImpl(coap));
+                    temp = new CoAPDevice(uri);
+                    temp.putService(new WeatherResourceImpl(temp));
+                    coap.computeIfAbsent(uri, k -> new ArrayList<>()).add(temp);
                     // Interface with basedriver to retrieve data from the resource
                     try {
-                        ServiceReference<CoAPService> reference
-                                = context.getServiceReference(CoAPService.class);
-                        if (reference != null) {
-                            coapService = context.getService(reference);
-                        } else {
-                            //this.log.warn("Could still not fetch a reference to CoAPService");
-                        }
-
                         // Extract the details of the resource from the CoAPResource object
-                        path = uri.getPath();
                         CoAPRequest req = getRequest(uri, CoAPMessageType.CONFIRMABLE);
                         // Create inner classes to handle possible responses to CoAP request
-                        req.setListener(new CoAPAgentListener());
+                        req.setListener(new CoAPAgentListener(temp));
                         // Below commented out as CoAP can only handle one request at a time
                         // This is how CoAP handles QoS
-                        // System.out.println("[CoAPDeviceAgent]: sent message!");
+                        LOGGER.debug("[CoAPDeviceAgent]: sent message!");
                         // coapService.sendRequest(req);
                     } catch (CoAPException e) {
-                        e.printStackTrace();
+                        LOGGER.error("Creating agent listener failed: ", e);
                     }
                     break;
                 case "/helloWorld":
                     // HelloWorld resource is how we test CoAP Observations (subscription/notification)
-                    System.out.println("[CoAPDeviceAgent]: FOUND HELLOWORLD RESOURCE!");
+                    LOGGER.debug("[CoAPDeviceAgent]: FOUND HELLOWORLD RESOURCE!");
                     // can we move the below statement outside of this if/else clause?
                     // When a known resource is detected, create a CoAPDevice and attach the resource
-                    coap = new CoAPDevice(uri);
-                    coap.putService(new HelloWorldImpl(coap));
+                    temp = new CoAPDevice(uri);
+                    temp.putService(new HelloWorldImpl(temp));
+                    coap.computeIfAbsent(uri, k -> new ArrayList<>()).add(temp);
                     try {
-                        createObservationRelationShip(uri);
+                        createObservationRelationship(uri);
                     } catch (CoAPException e) {
-                        System.out.println("an exception has occurred");
+                        LOGGER.debug("an exception has occurred", e);
                     }
                     break;
             }
         });
     }
 
-    private void createObservationRelationShip(URI uri) throws CoAPException {
+    private void createObservationRelationship(URI uri) throws CoAPException {
         // Create Observation relationship between device and the GDA adaptor/basedriver
-        path = "helloWorld";
-        System.out.println("***** SEND OBSERVE REQUEST *****");
-        coapService.createObservationRelationship(uri.getHost(), uri.getPort(), path, this);
+        LOGGER.debug("***** SEND OBSERVE REQUEST *****");
+        coapService.createObservationRelationship(uri.getHost(), uri.getPort(), "helloWorld", this);
     }
 
     public void observeTerminationReceived(CoAPResource resource) {
         // Handle Observation terminations
-        System.out.println("OBSERVER TERMINATION RECEIVED");
-
+        LOGGER.debug("OBSERVER TERMINATION RECEIVED");
     }
 
     public void observeResponseReceived(CoAPResponse response,
             CoAPResource resource) {
         // Handle Observation responses
-        System.out.println("***** OBSERVER RESPONSE RECEIVED *****");
-        // if (logger != null) {
-        //     logger.debug("Observe response received from resource [" + resource
-        // 		 + "]");
-        //     logger.debug("Response type: "
-        // 		 + response.getMessageType().toString());
-        String payload = new String(resource.getContent());
-        coap.deviceUpdate(payload);
-        //logger.debug("Observation message payload : [" + payload + "]");
-    }
+        LOGGER.debug("***** OBSERVER RESPONSE RECEIVED *****");
+        LOGGER.debug("Observe response received from resource [" + resource + "]");
+        LOGGER.debug("Response type: " + response.getMessageType().toString());
+        String payload = new String(resource.getContent(), StandardCharsets.UTF_8);
 
-    public void update() {
-        // String id = info.getPropertyString("deviceid");
-        // if(id != null){
-        // 	dev.setId(id.replaceAll(":", ""));
-        // 	dev.setName(info.getName());
-        // 	dev.setProductClass(info.getPropertyString("model"));
-        // 	dev.setOnline(true);
-        // 	dev.setType(info.getType());
-
-        // 	HashMap services = new HashMap();
-        // //	WeatherResource rc = new WeatherResourceImpl(info);
-        // 	//services.put(rc.getName(), rc);
-        // 	// NOTE: use putService() API call
-        // 	dev.setService(services);
-        // 	dev.setIcon("http://ergo.ericssonresearch.jp:8080/common/res/images/appletv.png");
-        // 	infoMap.put(info.getType(), info);
-        // 	//notifyUpdate("/");
-        // }
+        coap.getOrDefault(resource.getUri(), Collections.emptyList())
+                .forEach(d -> d.deviceUpdate(payload));
+        LOGGER.debug("Observation message payload : [" + payload + "]");
     }
 
     public void start() {
         // Here we actually register the CoAPDevice object to the OSGi framework allowing the rest of the
         // GDA framework to interact with the CoAPDevice
-        //log.info("[CoAPDeviceAgent]: Registering GenericDevImpl");
-        devReg = context.registerService(GenericDevice.class, coap, LegacyUtil.toDictionary(coap.getDeviceProperties()));
-        coap.setServiceRegistration(devReg);
+        LOGGER.info("[CoAPDeviceAgent]: Registering GenericDevImpl");
+        coap.values().forEach(l -> l.forEach(d -> {
+            d.setServiceRegistration(context.registerService(GenericDevice.class, d, LegacyUtil.toDictionary(d.getDeviceProperties())));
+        }));
     }
 
     public void stop() {
-        coap.setOnline(false);
+        coap.values().forEach(l -> l.forEach(d -> d.setOnline(false)));
     }
 
     public void observeTerminationReceived(CoAPRequest arg0, String arg1) {
         // TODO Auto-generated method stub
-        // log.error("This method was missing, so just added a stub. ");
+        LOGGER.error("This method was missing, so just added a stub. ");
     }
 
     @Override
@@ -204,11 +187,15 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
 
     private CoAPRequest getRequest(URI uri, CoAPMessageType type) throws CoAPException {
         return coapService.createGetRequest(uri.getHost(), uri.getPort(), uri.getPath(), type);
+
     }
 
     private class CoAPAgentListener implements CoAPRequestListener {
 
-        CoAPAgentListener() {
+        private final CoAPDevice device;
+
+        private CoAPAgentListener(CoAPDevice device) {
+            this.device = device;
         }
 
         @Override
@@ -233,19 +220,17 @@ public class CoAPDeviceAgent implements CoAPResourceObserver {
         @Override
         public void piggyPackedResponseReceived(
                 CoAPResponse response, CoAPRequest request) {
-            String payload = new String(response.getPayload());
-            // System.out.println("[CoAPDeviceAgent]: Piggypacked message payload: ["
-            // 		 + payload + "]");
+            String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
+            LOGGER.debug("[CoAPDeviceAgent]: Piggypacked message payload: [" + payload + "]");
 
         }
 
         @Override
         public void separateResponseReceived(
                 CoAPResponse response, CoAPRequest request) {
-            String payload = new String(response.getPayload());
-            // System.out.println("[CoAPDeviceAgent]: Separate message payload: ["
-            // 		 + payload + "]");
-            coap.deviceUpdate(payload);
+            String payload = new String(response.getPayload(), StandardCharsets.UTF_8);
+            LOGGER.debug("[CoAPDeviceAgent]: Separate message payload: [" + payload + "]");
+            device.deviceUpdate(payload);
 
         }
 

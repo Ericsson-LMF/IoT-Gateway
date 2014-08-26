@@ -70,7 +70,6 @@ public class CoAPDevice extends SBGenericDevice {
         // setManufacturer(MANUFACTURER);
         // setModelName(currentCostMonitor.getModelName());
         // setProductClass(currentCostMonitor.getModelName());
-        setIcon("http://ergo.ericssonresearch.jp/res/icons/currentcost.jpg");
         // setType("powerMeter");
         // setProtocol(CURRENT_COST);
         //System.out.println("[CoAPDevice]: getServiceNames: " + java.util.Arrays.toString(getServiceNames()));

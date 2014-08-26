@@ -56,7 +56,9 @@
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            com.ericsson.deviceaccess.coap
+                            com.ericsson.deviceaccess.coap,
+                            com.ericsson.research.common.slf4jlogger.*;-split-package:=merge-last,
+                            org.slf4j.*;-split-package:=merge-first
                         </Private-Package>
                         <Import-Package>
                             com.ericsson.deviceaccess.coap.basedriver.api.resources.*,
@@ -67,8 +69,7 @@
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.coap.basedriver.api.*,
                             com.ericsson.common.util.*,
-                            com.ericsson.research.ag.util,
-                            org.osgi.*;version="[1.0,4.0)"
+                            org.osgi.*;version="[1.0,4.2)"
                         </Import-Package>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Bundle-Activator>com.ericsson.deviceaccess.coap.CoAPDeviceFactory</Bundle-Activator>

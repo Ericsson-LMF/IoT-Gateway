@@ -68,7 +68,10 @@ public class GDServiceImpl extends GDService.Stub
 
     public GDServiceImpl(String name,
             List<? extends GDPropertyMetadata> propertyMetadata) {
-        this.propertyMetadata = new ArrayList(propertyMetadata);
+        this.propertyMetadata = new ArrayList();
+        if (propertyMetadata != null) {
+            this.propertyMetadata.addAll(propertyMetadata);
+        }
         this.propertyMetadata.add(new ParameterSchema.Builder(GDPropertiesImpl.LAST_UPDATE_TIME, Long.class).build());
         properties = new GDPropertiesImpl(this.propertyMetadata, this);
         this.name = name;

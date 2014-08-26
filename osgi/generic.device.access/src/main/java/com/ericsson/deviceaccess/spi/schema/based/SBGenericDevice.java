@@ -71,9 +71,10 @@ public abstract class SBGenericDevice extends GenericDeviceImpl {
     @Override
     public void putService(GDService svc) {
         if (!(svc instanceof SBService)) {
-            throw new ServiceSchemaError("Trying to add a service '" + svc.getName() + "', on the device: '" + getName() + "'(id=" + getId() + "), which is not a " + SBService.class);
+            super.putService(svc);
+        } else {
+            addSchemaBasedService((SBService) svc);
         }
-        addSchemaBasedService((SBService) svc);
     }
 
     /**

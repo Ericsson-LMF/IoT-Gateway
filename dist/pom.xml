@@ -284,6 +284,64 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
+                                        <copy file="${basedir}/init_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-nodeps</artifactId>
+                                <version>1.7.0</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.upnp.lite</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.upnp</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+                    <artifactId>rest.servlet</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>upnp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy_init_xargs</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
                                         <copy file="${basedir}/init_upnp_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
                                     </tasks>
                                 </configuration>
@@ -310,6 +368,44 @@
                     <artifactId>adaptor.upnp</artifactId>
                     <version>1.42-SNAPSHOT</version>
                 </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+                    <artifactId>rest.servlet</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>coap</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy_init_xargs</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="${basedir}/init_coap_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-nodeps</artifactId>
+                                <version>1.7.0</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
                 <dependency>
                     <groupId>com.ericsson.deviceaccess</groupId>
                     <artifactId>basedriver.coap</artifactId>

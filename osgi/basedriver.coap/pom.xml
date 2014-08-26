@@ -23,17 +23,15 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Embed-Dependency>commons-collections;scope=compile|runtime</Embed-Dependency>
                         <Private-Package>
-                            org.apache.commons.collections.*,
-                            org.apache.commons.collections.map.*,
+                            com.ericsson.research.common.slf4jlogger.*;-split-package:=merge-last,
+                            org.slf4j.*;-split-package:=merge-first
                         </Private-Package>
                         <Import-Package>
                             com.ericsson.common.util.*,
                             com.ericsson.deviceaccess.*,
                             org.osgi.*;version="[1.0,4.0)"
-                        </Import-Package>
-						
+                        </Import-Package>	
                         <Export-Package>
                             com.ericsson.deviceaccess.coap.basedriver.*,
                             com.ericsson.deviceaccess.coap.basedriver.api.*,
@@ -89,11 +87,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>

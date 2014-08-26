@@ -45,6 +45,7 @@ import java.util.Map;
  */
 public enum CoAPContentType {
 
+    UNKNOWN(-1, "unkown"),
     TEXT_PLAIN(0, "text/plain; charset=utf-8"),
     LINK_FORMAT(40, "application/link-format"),
     APPLICATION_XML(41, "application/xml"),
@@ -85,11 +86,11 @@ public enum CoAPContentType {
     }
 
     public static CoAPContentType get(String name) {
-        return typeMap.get(name);
+        return typeMap.getOrDefault(name, UNKNOWN);
     }
 
     public static CoAPContentType get(int no) {
-        return noMap.get(no);
+        return noMap.getOrDefault(no, UNKNOWN);
     }
 
 }

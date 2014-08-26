@@ -98,12 +98,12 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      * com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat.IncorrectMessageException
      */
     public CoAPMessage decode() throws IncorrectMessageException {
-        LOGGER.debug("CoAPMessageReader: Decode message");
         byte[] bytes = packet.getData();
+        LOGGER.debug("CoAPMessageReader: Decode message");
 
         int position = decodeStartPos(bytes);
 
-        decodeOptions(bytes, position);
+        position = decodeOptions(bytes, position);
 
         // Only payload left
         readPayload(bytes, position);
@@ -188,10 +188,10 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      * @param optionCount option count (determined from the option count header)
      */
     private int decodeOptions(byte[] bytes, int position) throws IncorrectMessageException {
-        byte cur = bytes[position];
+        int cur = bytes[position];
         position++;
-        int delta = getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
-        int length = getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
+        int delta = getBitsInByteAsByte((byte) cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
+        int length = getBitsInByteAsByte((byte) cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         int optionNumber = 0;
         // An Option can be followed by the end of the message, by another Option, or by the Payload Marker and the payload.
         while (delta != PAYLOAD_MARKER) {
@@ -240,12 +240,13 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             }
             cur = bytes[position];
             position++;
-            delta = getBitsInByteAsByte(cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
-            length = getBitsInByteAsByte(cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
+            delta = getBitsInByteAsByte((byte) cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
+            length = getBitsInByteAsByte((byte) cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         }
-        if (length != 0) {
+        System.out.println("pos: " + position + " delta: " + delta + " length: " + length);
+        if (length != PAYLOAD_MARKER) {
             // If the field is set to this value but the entire byte is not the payload marker, this MUST be processed as a message format error.
-            throw new IncorrectMessageException("Payload marker was bad: " + length); //TODO: Handle this
+            throw new IncorrectMessageException("Payload marker was bad: " + length + " at position " + position); //TODO: Handle this
         }
         if (position == bytes.length - 1) {
             // The presence of a marker followed by a zero-length payload MUST be processed as a message format error.
