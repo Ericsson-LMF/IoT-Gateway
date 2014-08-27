@@ -18,7 +18,7 @@ def jmock_junit4_version = "2.6.0-RC2"
 def jsr311_api_version = "1.1-ea"
 def slf4j_api_version = "1.7.7"
 def xmlbeans_version = "2.3.0"
-def commons_logging_version = "1.2"
+def commons_logging_version = "1.1.1"
 def jersey_client_version = "1.18.1"
 def commons_codec_version = "1.9"
 def woodstox_core_asl_version = "4.4.0"
@@ -28,7 +28,6 @@ def spring_test_version = "4.0.6.RELEASE"
 def servlet_api_version = "3.0-alpha-1"
 
 def depsSource
-
 configurations {
     downloadDeps
 }
@@ -110,11 +109,11 @@ def javaProjects() {
 
 def osgiProjects() {
     return subprojects.findAll { 
-      new File(it.projectDir, "src").exists() && !it.name.contains('common')
+      new File(it.projectDir, "src").exists() && !it.name.contains('common') || it.name.contains('generic.device.spi')
   } 
 }
 
-//This is the configuration for all java projects, includin osgi projects.
+//This is the configuration for all java projects, including osgi projects.
 configure(javaProjects()) { 
     apply plugin: 'java'
     version = '1.20-SNAPSHOT'
@@ -162,6 +161,14 @@ configure(osgiProjects()) {
     version = '1.42-SNAPSHOT'
     buildDir = new File(rootProject.projectDir, destinationDir)
     
+    jar {
+        manifest {
+            instruction 'Private-Package',
+                'org.slf4j.*;-split-package:=merge-first'
+            instruction 'Import-Package',
+                'org.osgi.*;version="[1.0,2.0)"'
+        }
+    }
 }
 
 //Task for generating XmlBeans
@@ -247,6 +254,7 @@ project(':osgi:generic.device.access') {
         fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
         fileTree(dir: sourceDirectory + "json-" + json_version + ".jar")
     }
+
 }
 
 project (':osgi:generic.device.access.services') {
@@ -301,7 +309,8 @@ project (':tutorial:rest.servlet') {
         compile project (':osgi:generic.device.access')
         compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
         fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
-        fileTree(dir: sourceDirectory + "servlet-api-" + servlet_api_version + ".jar")
+        fileTree(dir: sourceDirectory + "servlet-api-" + servlet_api_version + ".jar"),
+        fileTree(dir: sourceDirectory + "commons-logging-" + commons_logging_version + ".jar")
         
         
         
