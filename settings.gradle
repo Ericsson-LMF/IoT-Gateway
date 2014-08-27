@@ -1,5 +1,5 @@
 include ':common:common.util', ':common:common.osgi.log.util',
 ':common:common.test.util', ':common:common.server.util', ':osgi:serviceschema.codegenerator', ':osgi:generic.device.access',
 ':osgi:generic.device.access.services', ':osgi:adaptor.upnp', ':osgi:basedriver.upnp.lite',
-':osgi:adaptor.ruleengine'
-//':osgi:generic.device.spi', ':osgi:generic.device.api',
+':osgi:adaptor.ruleengine', ':tutorial:rest.servlet',
+':osgi:generic.device.spi'//, ':osgi:generic.device.api',

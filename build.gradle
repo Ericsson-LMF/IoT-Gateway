@@ -5,8 +5,8 @@ def org_osgi_compendium_version = "5.0.0"
 def org_osgi_core_version = "5.0.0"
 def json_version = "20140107"
 def jackson_annotations_version = "2.4.1"
-def jackson_core_version = "2.4.1.1"
-def jackson_databind_version = "2.4.1.1"
+def jackson_core_version = "2.4.1"
+def jackson_databind_version = "2.4.1"
 def jackson_datatype_jdk7_version = "2.4.1"
 def jackson_module_parameter_names_version = "2.4.1"
 def jackson_module_mrbean_version = "2.4.1"
@@ -25,6 +25,7 @@ def woodstox_core_asl_version = "4.4.0"
 def kxml2_version = "2.2.2"
 def spring_core_version = "4.0.6.RELEASE"
 def spring_test_version = "4.0.6.RELEASE"
+def servlet_api_version = "3.0-alpha-1"
 
 def depsSource
 
@@ -41,7 +42,7 @@ dependencies {
     downloadDeps "org.osgi:org.osgi.compendium:$org_osgi_compendium_version"
     downloadDeps "org.osgi:org.osgi.core:$org_osgi_core_version"
     downloadDeps "org.json:json:$json_version"
-    downloadDeps "javax.servlet:servlet-api:+"
+    downloadDeps "javax.servlet:servlet-api:$servlet_api_version"
     downloadDeps "javax.ws.rs:jsr311-api:$jsr311_api_version"
     downloadDeps "org.slf4j:slf4j-api:$slf4j_api_version"
     downloadDeps "commons-logging:commons-logging:$commons_logging_version"
@@ -103,7 +104,7 @@ dependencies {
 
 def javaProjects() { 
   return subprojects.findAll { 
-      new File(it.projectDir, "src").exists()
+      new File(it.projectDir, "src").exists() || it.name.contains('generic.device.spi')
   }
 }
 
@@ -284,6 +285,25 @@ project (':osgi:adaptor.ruleengine') {
         compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
         fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
         fileTree(dir: sourceDirectory + "json-" + json_version + ".jar")
+        
+    }
+}
+
+project (':osgi:generic.device.spi') {
+    dependencies {
+        compile project (':osgi:generic.device.access'),
+        project (':osgi:generic.device.access.services')
+    }
+}
+
+project (':tutorial:rest.servlet') {
+    dependencies {
+        compile project (':osgi:generic.device.access')
+        compile fileTree(dir: sourceDirectory + "org.osgi.core-" + org_osgi_core_version + ".jar"),
+        fileTree(dir: sourceDirectory + "org.osgi.compendium-" + org_osgi_compendium_version + ".jar"),
+        fileTree(dir: sourceDirectory + "servlet-api-" + servlet_api_version + ".jar")
+        
+        
         
     }
 }
