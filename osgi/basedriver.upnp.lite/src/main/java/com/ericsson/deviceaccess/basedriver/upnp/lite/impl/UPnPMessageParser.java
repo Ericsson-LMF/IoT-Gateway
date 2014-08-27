@@ -88,7 +88,7 @@ public class UPnPMessageParser {
         return device;
     }
 
-    protected static UPnPDeviceImpl parseNotifyMessage(BundleContext context, String message) throws Exception {
+    protected static UPnPDeviceImpl parseNotifyMessage(BundleContext context, String message, UPnPEventHandler eventHandler) throws Exception {
         if (!message.startsWith("NOTIFY * HTTP/1.1")) {
             return null;
         }
@@ -162,7 +162,7 @@ public class UPnPMessageParser {
         }
         String uuid = message.substring(start + 5, end).trim();
 
-        UPnPDeviceImpl device = new UPnPDeviceImpl(context, uuid, location, ip, port, "", null);
+        UPnPDeviceImpl device = new UPnPDeviceImpl(context, uuid, location, ip, port, "", eventHandler);
 
         // Flag the device for removal if it's not an "alive" message (i.e. byebye)
         if (!NTS.equals("ssdp:alive")) {

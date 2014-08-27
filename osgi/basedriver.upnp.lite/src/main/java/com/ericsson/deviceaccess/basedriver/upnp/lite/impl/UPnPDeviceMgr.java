@@ -44,6 +44,7 @@ import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -219,13 +220,14 @@ public class UPnPDeviceMgr {
                             dp.setLength(buf.length);
                             m_listenSocket.receive(dp);
 
-                            UPnPDeviceImpl device = UPnPMessageParser.parseNotifyMessage(context, new String(dp.getData(), 0, dp.getLength()));
+                            UPnPDeviceImpl device = UPnPMessageParser.parseNotifyMessage(context, new String(dp.getData(), 0, dp.getLength(), StandardCharsets.UTF_8), eventHandler);
                             if (device == null) {
                                 continue;
                             }
                             if (device.isAlive()) {
                                 UPnPDeviceImpl oldDevice = getDevice(device.getUuid());
                                 if (oldDevice == null) {
+                                    addUPnPDeviceInstance(device);
                                     // Add this device if it's new
                                     // TODO: Can use this since we can figure out which interface it's coming from: addUPnPDeviceInstance(device);
                                 } else {
