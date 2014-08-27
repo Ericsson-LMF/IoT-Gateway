@@ -42,6 +42,11 @@ The project contains the following files and folders:
 > that this POM file does not build the "dist" module. This module has to be
 > build separately.
 
+There are two experimental Gradle build files: build.gradle and settings.gradle.
+They need some more work to get osgi manifest files and private imports to work properly.
+When working Gradle should be faster and simpler dependency management and build process than Maven.
+
+
 
 2. Installation
 ---------------
