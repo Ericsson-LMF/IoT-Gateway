@@ -46,8 +46,11 @@ There are two experimental Gradle build files: build.gradle and settings.gradle.
 They need some more work to get osgi manifest files and private imports to work properly.
 When working Gradle should be faster and simpler dependency management and build process than Maven.
 They are made for Gradle version 2.0.
-TODO: Manifests and private imports.
-      Make code generation task to run inside build process.
+
+TODO: 
+
+* Manifests and private imports.
+* Make code generation task to run inside build process.
 
 
 
