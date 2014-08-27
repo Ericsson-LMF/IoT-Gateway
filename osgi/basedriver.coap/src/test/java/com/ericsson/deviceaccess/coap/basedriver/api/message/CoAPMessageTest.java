@@ -38,7 +38,10 @@ import com.ericsson.common.util.BitUtil;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.util.CoAPOptionHeaderConverter;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,7 +70,6 @@ public class CoAPMessageTest {
 //
 //        assertEquals(1, resp.getOptionCount());
 //    }
-    
     @Test
     public void testAddUriHeaders() {
         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.URI_HOST);

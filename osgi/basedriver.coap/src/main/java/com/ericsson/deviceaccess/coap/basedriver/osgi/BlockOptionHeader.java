@@ -34,9 +34,6 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import static com.ericsson.common.util.BitUtil.getBitsInByteAsByte;
 import static com.ericsson.common.util.BitUtil.getBitsInIntAsByte;
 import static com.ericsson.common.util.BitUtil.getBitsInIntAsInt;
@@ -45,6 +42,9 @@ import static com.ericsson.common.util.BitUtil.mergeBytesToShort;
 import static com.ericsson.common.util.BitUtil.setBitInByte;
 import static com.ericsson.common.util.BitUtil.setBitsInByte;
 import static com.ericsson.common.util.BitUtil.splitIntToBytes;
+import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -150,7 +150,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
             case 2:
                 firstByte = setBitsInByte((byte) 0, 0, 4, getBitsInIntAsInt(blockValue[0], 4, 4));
 
-                secondByte = setBitsInByte((byte) 0, 4, 4, getBitsInIntAsInt(blockValue[0], 0, 4));
+                secondByte = setBitsInByte(0, 4, 4, getBitsInIntAsInt(blockValue[0], 0, 4));
                 secondByte = setBitsInByte(secondByte, 0, 4, getBitsInIntAsInt(blockValue[1], 4, 4));
 
                 decodedBlockNumber = mergeBytesToShort(firstByte, secondByte);
@@ -158,10 +158,10 @@ public class BlockOptionHeader extends CoAPOptionHeader {
             case 3:
                 firstByte = setBitsInByte((byte) 0, 0, 4, getBitsInIntAsInt(blockValue[0], 4, 4));
 
-                secondByte = setBitsInByte((byte) 0, 4, 4, getBitsInIntAsInt(blockValue[0], 0, 4));
+                secondByte = setBitsInByte(0, 4, 4, getBitsInIntAsInt(blockValue[0], 0, 4));
                 secondByte = setBitsInByte(secondByte, 0, 4, getBitsInIntAsInt(blockValue[1], 4, 4));
 
-                thirdByte = setBitsInByte((byte) 0, 4, 4, getBitsInByteAsByte(blockValue[1], 0, 4));
+                thirdByte = setBitsInByte(0, 4, 4, getBitsInByteAsByte(blockValue[1], 0, 4));
                 thirdByte = setBitsInByte(thirdByte, 0, 4, getBitsInByteAsByte(blockValue[2], 4, 4));
 
                 decodedBlockNumber = mergeBytesToInt((byte) 0, firstByte, secondByte, thirdByte);
@@ -182,7 +182,7 @@ public class BlockOptionHeader extends CoAPOptionHeader {
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = value >> 1;
+            value >>= 1;
         }
 
         if (bitsNeeded <= 4) {

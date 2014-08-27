@@ -77,6 +77,7 @@ public class CoAPResponse extends CoAPMessage {
         setSocketAddress(request.getSocketAddress());
     }
 
+    @Override
     public CoAPResponseCode getCode() {
         return (CoAPResponseCode) super.getCode();
     }

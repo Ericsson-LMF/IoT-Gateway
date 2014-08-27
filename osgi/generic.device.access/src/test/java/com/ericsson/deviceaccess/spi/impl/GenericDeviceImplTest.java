@@ -51,9 +51,9 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * GenericDeviceImpl Tester.

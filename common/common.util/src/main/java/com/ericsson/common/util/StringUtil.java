@@ -72,7 +72,7 @@ public enum StringUtil {
             infix = prefix + infix;
         }
         if (!infix.endsWith(postfix)) {
-            infix = infix + postfix;
+            infix += postfix;
         }
         return infix;
     }

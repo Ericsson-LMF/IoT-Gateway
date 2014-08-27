@@ -37,8 +37,10 @@ package com.ericsson.deviceaccess.coap.basedriver.api.message;
 import com.ericsson.common.util.BitUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class CoAPOptionHeaderTest {
 
@@ -119,7 +121,6 @@ public class CoAPOptionHeaderTest {
 //        // Now the header is not normal length anymore
 //        assertFalse(h.isNormalLength());
 //    }
-    
     @Test
     public void testSetValue() {
         short id = 41; // try with application/xml

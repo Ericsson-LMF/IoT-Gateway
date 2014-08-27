@@ -35,7 +35,10 @@
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
 
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import static org.junit.Assert.*;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,7 +59,7 @@ public class CoAPResponseTest {
         CoAPResponse ack = resp.createAcknowledgement();
         assertEquals(ack.getMessageId(), resp.getMessageId());
         // Token header should match with the original response
-        assertEquals(ack.getToken(), resp.getToken());
+        Assert.assertArrayEquals(ack.getToken(), resp.getToken());
         // Message type should be acknowledgement
         assertEquals(ack.getMessageType(), CoAPMessageType.ACKNOWLEDGEMENT);
         assertEquals(ack.getSocketAddress(), resp.getSocketAddress());
@@ -70,7 +73,7 @@ public class CoAPResponseTest {
     public void testCreateReset() {
         CoAPResponse reset = resp.createReset();
 
-        assertEquals(reset.getToken(), resp.getToken());
+        Assert.assertArrayEquals(reset.getToken(), resp.getToken());
         assertEquals(reset.getSocketAddress(), resp.getSocketAddress());
         assertEquals(reset.getMessageId(), resp.getMessageId());
         assertEquals(reset.getMessageType(), CoAPMessageType.RESET);

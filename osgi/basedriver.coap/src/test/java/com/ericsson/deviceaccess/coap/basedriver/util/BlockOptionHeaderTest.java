@@ -40,8 +40,10 @@ import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.osgi.BlockwiseTransferHandler;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class BlockOptionHeaderTest {
 
@@ -211,7 +213,7 @@ public class BlockOptionHeaderTest {
         int bitsNeeded = 0;
         while (value > 0) {
             bitsNeeded++;
-            value = value >> 1;
+            value >>= 1;
         }
         assertEquals(bitsNeeded, 20);
 

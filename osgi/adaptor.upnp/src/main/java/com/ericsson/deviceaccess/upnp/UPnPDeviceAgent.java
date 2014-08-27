@@ -67,6 +67,7 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     private static final Map<String, BiConsumer<GDProperties, String>> eventTypes = new HashMap<>();
     private static final BiConsumer<GDProperties, String> EMPTY = (a, b) -> {
     };
+
     static {
         eventTypes.put("Volume", (properties, value) -> {
             try {
@@ -108,7 +109,6 @@ public class UPnPDeviceAgent implements UPnPEventListener {
     private ServiceRegistration devReg;
 
     final private Map<String, GDService> idToService = new HashMap<>();
-
 
     public UPnPDeviceAgent(BundleContext bc, UPnPDevice upnpdev) {
         this.context = bc;

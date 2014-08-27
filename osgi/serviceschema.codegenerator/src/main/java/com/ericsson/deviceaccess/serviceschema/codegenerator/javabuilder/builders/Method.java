@@ -3,6 +3,7 @@ package com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.builde
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.AbstractCodeBlock;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.Callable;
 import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.CodeBlock;
+import com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_END;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.BLOCK_START;
 import static com.ericsson.deviceaccess.serviceschema.codegenerator.javabuilder.JavaHelper.LINE_END;
@@ -36,7 +37,17 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
     private final List<String> throwList;
     private final EnumSet<OptionalModifier> modifiers;
     private Javadoc javadoc;
+    private Javadoc resultJavadoc;
     private JavaClass owner;
+
+    /**
+     * Creates new void Method with name
+     *
+     * @param name
+     */
+    public Method(String name) {
+        this(JavaHelper.EMPTY_TYPE, name);
+    }
 
     /**
      * Creates new Method with type and name
@@ -51,7 +62,6 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
         throwList = new ArrayList<>();
         modifiers = EnumSet.noneOf(OptionalModifier.class);
         accessModifier = AccessModifier.PUBLIC;
-        javadoc = null;
     }
 
     /**
@@ -94,6 +104,11 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
 
     @Override
     public Method setJavadoc(Javadoc javadoc) {
+        this.javadoc = javadoc;
+        return this;
+    }
+
+    public Method setResultJavadoc(Javadoc javadoc) {
         this.javadoc = javadoc;
         return this;
     }
@@ -204,6 +219,7 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
     private void addJavadoc(StringBuilder builder, int indent) {
         builder.append(new Javadoc(javadoc)
                 .append(this::parameterJavadocs)
+                .append(this::returnJavadoc)
                 .append(this::throwJavadocs)
                 .build(indent));
     }
@@ -227,6 +243,23 @@ public class Method extends AbstractCodeBlock implements Callable, Modifierable 
      */
     private Javadoc throwJavadocs(Javadoc builder) {
         throwList.forEach(t -> builder.exception(t, ""));
+        return builder;
+    }
+
+    /**
+     * Adds return Javadoc to builder
+     *
+     * @param builder Javadoc builder to add Javadoc to
+     * @return builder
+     */
+    private Javadoc returnJavadoc(Javadoc builder) {
+        if (!type.equals(JavaHelper.EMPTY_TYPE)) {
+            if (resultJavadoc == null) {
+                builder.result(JavaHelper.getLink(type));
+            } else {
+                builder.result(JavaHelper.getLink(type) + " " + resultJavadoc);
+            }
+        }
         return builder;
     }
 

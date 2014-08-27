@@ -260,6 +260,7 @@ public class AsyncActions {
                             }
                         }
                     };
+
                     {
                         runner.start();
                     }

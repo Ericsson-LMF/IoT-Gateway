@@ -38,10 +38,11 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource;
 import java.net.URISyntaxException;
 import java.util.List;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class LinkFormatReaderTest {
+
     @Test
     public void testParseLinkFormatData() {
 

@@ -50,6 +50,18 @@ public enum JavaHelper {
      * Import tag.
      */
     public static final String IMPORT = "import";
+    /**
+     * Empty type.
+     */
+    public static final String EMPTY_TYPE = "void";
+    /**
+     * Link start.
+     */
+    public static final String LINK_START = "{@link ";
+    /**
+     * Link end.
+     */
+    public static final String LINK_END = "}";
 
     /**
      * Start of parameter replacement.
@@ -104,6 +116,10 @@ public enum JavaHelper {
      */
     public static StringBuilder emptyLine(StringBuilder builder) {
         return builder.append(LINE_END);
+    }
+
+    public static String getLink(String type) {
+        return LINK_START + type + LINK_END;
     }
 
 }

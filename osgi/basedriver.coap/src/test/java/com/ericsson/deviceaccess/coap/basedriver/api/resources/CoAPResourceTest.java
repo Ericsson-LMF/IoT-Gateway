@@ -37,7 +37,8 @@ package com.ericsson.deviceaccess.coap.basedriver.api.resources;
 import com.ericsson.deviceaccess.coap.basedriver.api.resources.CoAPResource.CoAPResourceType;
 import java.net.URI;
 import java.net.URISyntaxException;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Test;
 

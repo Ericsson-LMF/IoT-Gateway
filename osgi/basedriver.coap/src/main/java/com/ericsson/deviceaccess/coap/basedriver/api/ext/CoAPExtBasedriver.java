@@ -60,6 +60,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import org.slf4j.Logger;
@@ -335,7 +336,7 @@ public class CoAPExtBasedriver {
             uri = new URI(null, null, hostAddress, coapPort, null, null, null);
             endpoint = new CoAPExtEndpoint(outgoingMessageHandler, incomingMessageHandler, uri);
         } catch (URISyntaxException e) {
-            LOGGER.error("URI Syntax Error : " + address.getAddress(), e);
+            LOGGER.error("URI Syntax Error : " + Arrays.toString(address.getAddress()), e);
         }
 
         if (this.maximumBlockSzx != 6) {

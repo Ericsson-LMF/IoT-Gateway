@@ -173,7 +173,6 @@ public class UPnPUtil {
         return md;
     }
 
-
     public static void setVolume(UPnPDevice dev, String volume)
             throws Exception {
         Properties args = new Properties();
@@ -217,7 +216,6 @@ public class UPnPUtil {
         args.put("SortCriteria", "");
         return args;
     }
-
 
     public static Map<String, String> parseLastChangeEvent(String value) {
         Map<String, String> result = new HashMap<>();
@@ -335,11 +333,11 @@ public class UPnPUtil {
 
         public static String getHeader(String urlStr, String header) throws IOException {
             URL url = new URL(urlStr);
-            
+
             HttpURLConnection urlconn = (HttpURLConnection) url.openConnection();
             urlconn.setRequestMethod("HEAD");
             urlconn.setInstanceFollowRedirects(true);
-            
+
             urlconn.connect();
             String value = urlconn.getHeaderField(header);
             urlconn.disconnect();

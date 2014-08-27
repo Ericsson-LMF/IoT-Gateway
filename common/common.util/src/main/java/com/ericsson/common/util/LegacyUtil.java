@@ -61,7 +61,7 @@ public enum LegacyUtil {
 
         @Override
         public V get(Object key) {
-            return map.get((K) key);
+            return map.get(key);
         }
 
         @Override
@@ -71,7 +71,7 @@ public enum LegacyUtil {
 
         @Override
         public V remove(Object key) {
-            return map.remove((K) key);
+            return map.remove(key);
         }
     }
 

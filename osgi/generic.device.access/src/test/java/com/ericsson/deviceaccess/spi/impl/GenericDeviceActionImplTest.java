@@ -41,14 +41,14 @@ import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
 import java.util.ArrayList;
 import java.util.List;
 import org.jmock.Expectations;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.api.ExpectationError;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

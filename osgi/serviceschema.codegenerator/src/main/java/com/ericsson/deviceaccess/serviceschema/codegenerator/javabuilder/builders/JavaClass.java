@@ -336,7 +336,7 @@ public class JavaClass extends AbstractCodeBlock implements Modifierable {
      */
     private void addJavadoc(StringBuilder builder, int indent) {
         String warning = getGenerationWarning(this.getClass(), source);
-        builder.append(new Javadoc(warning).append(javadoc).build(indent));
+        builder.append(new Javadoc(javadoc).line(warning).build(indent));
     }
 
     /**

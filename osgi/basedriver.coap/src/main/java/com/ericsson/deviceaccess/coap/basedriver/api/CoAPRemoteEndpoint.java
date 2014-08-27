@@ -43,7 +43,6 @@ import java.net.URI;
  */
 public class CoAPRemoteEndpoint extends CoAPEndpoint {
 
-
     private CoAPRemoteEndpointType type;
 
     /**

@@ -337,6 +337,7 @@ public class NanoHTTPD {
      * response.
      */
     private class HTTPSession implements Runnable {
+
         private Socket mySocket;
 
         HTTPSession(Socket s) {

@@ -62,7 +62,7 @@ public interface GDAction extends GDContextNode {
      * @return Name of the action.
      */
     @JsonView(View.ID.class)
-     String getName();
+    String getName();
 
     /**
      * Method to execute the action. An instance of GenericDeviceActionContext
@@ -114,7 +114,7 @@ public interface GDAction extends GDContextNode {
      * @return metadata describing the result
      */
     @JsonProperty("result")
-     Map<String, GDPropertyMetadata> getResultMetadata();
+    Map<String, GDPropertyMetadata> getResultMetadata();
 
     /**
      * Gets metadata describing the arguments.
@@ -122,5 +122,5 @@ public interface GDAction extends GDContextNode {
      * @return metadata describing the arguments
      */
     @JsonProperty("arguments")
-     Map<String, GDPropertyMetadata> getArgumentsMetadata();
+    Map<String, GDPropertyMetadata> getArgumentsMetadata();
 }

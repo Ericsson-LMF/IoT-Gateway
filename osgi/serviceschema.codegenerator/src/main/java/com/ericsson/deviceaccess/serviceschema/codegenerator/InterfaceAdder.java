@@ -125,6 +125,7 @@ public enum InterfaceAdder {
                 method.setJavadoc(new Javadoc("Gets the property '").append(name).append("'.")
                         .line("Property description: ").append(StringUtil.setEndPunctuation(property.getDescription()))
                         .append(b -> getValidValuesJavadoc(b, property)));
+                method.setResultJavadoc(new Javadoc("Property ").append(name));
                 builder.addMethod(method);
             }
         }
@@ -184,7 +185,6 @@ public enum InterfaceAdder {
                 String result = "void";
                 if (action.isSetResults()) {
                     result = name + "Result";
-                    javadoc.result("{@link " + result + "}");
                 }
                 javadoc.line("Execute the action '").append(action.getName()).append("'.");
                 javadoc.line("Action description: ").append(action.getDescription());

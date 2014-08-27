@@ -70,7 +70,7 @@ public interface GDService extends GDContextNode {
      * @return Name of the service.
      */
     @JsonView(View.ID.class)
-     String getName();
+    String getName();
 
     /**
      * Getter for the GenericDeviceProperties object that represents the list of
@@ -86,7 +86,7 @@ public interface GDService extends GDContextNode {
      * @return the metadata for the properties of this service.
      */
     @JsonIgnore
-     List<GDPropertyMetadata> getPropertiesMetadata();
+    List<GDPropertyMetadata> getPropertiesMetadata();
 
     /**
      * Method to return a map from name to action supported by service
@@ -94,7 +94,7 @@ public interface GDService extends GDContextNode {
      * @return map from name to action
      */
     @JsonView(View.Stateless.class)
-     Map<String, GDAction> getActions();
+    Map<String, GDAction> getActions();
 
     /**
      * Serializes the state (i.e. values of all properties in the service) to
