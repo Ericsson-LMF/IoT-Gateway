@@ -44,6 +44,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a CoAP request. A request is carried in a Confirmable
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
  */
 public class CoAPRequest extends CoAPMessage {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPRequest.class);
     private CoAPRequestListener listener;
     private URI uri;
 
@@ -126,7 +129,6 @@ public class CoAPRequest extends CoAPMessage {
     public void createUriFromRequest(SocketAddress socketAddress) throws CoAPException {
         // Get URI path of the message
         String host = "";
-
         StringBuilder pathParts = new StringBuilder();
         int port = 0;
         for (CoAPOptionHeader header : getOptionHeaders()) {

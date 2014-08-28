@@ -99,7 +99,14 @@ public class CoAPMessageReader implements CoAPMessageFormat {
      */
     public CoAPMessage decode() throws IncorrectMessageException {
         byte[] bytes = packet.getData();
-        LOGGER.debug("CoAPMessageReader: Decode message");
+        StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
+        for (int i = 0; i < Byte.SIZE * bytes.length; i++) {
+            if (bytes[i / Byte.SIZE] == 0) {
+                break;
+            }
+            sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
+        }
+        LOGGER.debug("CoAPMessageReader: Decode message: " + sb);
 
         int position = decodeStartPos(bytes);
 
@@ -195,6 +202,9 @@ public class CoAPMessageReader implements CoAPMessageFormat {
         int optionNumber = 0;
         // An Option can be followed by the end of the message, by another Option, or by the Payload Marker and the payload.
         while (delta != PAYLOAD_MARKER) {
+            if (length == 0 && delta == 0) {
+                return position;
+            }
             //Determine option number
             if (delta == ADDITIONAL_DELTA) {
                 delta += bytes[position];
@@ -243,7 +253,6 @@ public class CoAPMessageReader implements CoAPMessageFormat {
             delta = getBitsInByteAsByte((byte) cur, OPTION_DELTA_START, OPTION_DELTA_LENGTH);
             length = getBitsInByteAsByte((byte) cur, OPTION_LENGTH_START, OPTION_LENGTH_LENGTH);
         }
-        System.out.println("pos: " + position + " delta: " + delta + " length: " + length);
         if (length != PAYLOAD_MARKER) {
             // If the field is set to this value but the entire byte is not the payload marker, this MUST be processed as a message format error.
             throw new IncorrectMessageException("Payload marker was bad: " + length + " at position " + position); //TODO: Handle this

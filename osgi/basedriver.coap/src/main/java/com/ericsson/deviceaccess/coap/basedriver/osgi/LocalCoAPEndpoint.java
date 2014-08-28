@@ -39,6 +39,7 @@ import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPEndpoint;
 import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
 import com.ericsson.deviceaccess.coap.basedriver.api.IncomingCoAPRequestListener;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPContentType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
@@ -411,14 +412,12 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                 LOGGER.debug("Handling block2 get request failed.", e);
             }
         }
-
         try {
             if (request.getUriFromRequest().getPath().startsWith(WELLKNOWN_CORE) && request.getCode() == CoAPRequestCode.GET) {
                 replyToResourceDiscovery(request);
                 return;
             }
         } catch (CoAPException e) {
-            LOGGER.debug("Getting well know core failed.", e);
             replyWithNotImplemented(request);
             return;
         }
@@ -806,25 +805,17 @@ public class LocalCoAPEndpoint extends CoAPEndpoint implements
                     }
                 }
             }
-            CoAPResponse resp;
-            if (payloadStr.length() > 0) {
+//            payloadStr.setLength(payloadStr.length() - 1);
+            payloadStr.append("<").append(WELLKNOWN_CORE).append(">");
 
-                // remove the last comma
-                payloadStr.setLength(payloadStr.length() - 1);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(CoAPContentType.LINK_FORMAT.getNo());
 
-                short contentTypeId = 40;
-                byte[] contentTypeBytes = BitUtil.splitShortToBytes(contentTypeId);
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                outputStream.write(contentTypeBytes[1]);
+            CoAPOptionHeader header = new CoAPOptionHeader(CONTENT_FORMAT, outputStream.toByteArray());
+            CoAPResponse resp = new CoAPResponse(1, messageType, CoAPResponseCode.CONTENT, req.getMessageId(), tokenHeader);
 
-                CoAPOptionHeader header = new CoAPOptionHeader(CONTENT_FORMAT, outputStream.toByteArray());
-                resp = new CoAPResponse(1, messageType, CoAPResponseCode.CONTENT, req.getMessageId(), tokenHeader);
-
-                resp.setPayload(payloadStr.toString().getBytes(StandardCharsets.UTF_8));
-                resp.addOptionHeader(header);
-            } else {
-                resp = new CoAPResponse(1, messageType, CoAPResponseCode.NOT_FOUND, req.getMessageId(), tokenHeader);
-            }
+            resp.setPayload(payloadStr.toString().getBytes(StandardCharsets.UTF_8));
+            resp.addOptionHeader(header);
 
             resp.setSocketAddress(req.getSocketAddress());
             outHandler.send(resp, false);

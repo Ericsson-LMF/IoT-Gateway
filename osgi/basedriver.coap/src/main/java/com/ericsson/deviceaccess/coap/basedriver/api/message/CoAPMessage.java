@@ -51,6 +51,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class CoAPMessage {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CoAPMessage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoAPMessage.class);
     public static final String MESSAGE_ID = "messageID";
     public static final String TOKEN = "token";
     public static final String URI = "uri";
