@@ -21,7 +21,9 @@ General
 - Improved reporting on failed Expectations etc.
 - Removed references to mockito (wasn't used and JMock is widely used in project)
 - JUnit 3 style tests & deprecated JUnit stuff => JUnit 4
+
 - Documentation
+
 	- Javadoc has been rewritten, clarified and improved throughout the project
 
 
@@ -29,22 +31,28 @@ common
 ------
 
 -General utility classes are refactored to common.util
+
 	-Some new useful stuff added and redundant removed
 
 dist
 ----
 -Updated xargs
+
 	-Now there is separate profiles/xargs for upnp and coap
+	
 	-Tutorial profile starts both upnp and coap
 
 osgi
 ----
 
 -Codegenerator rewritten using builder pattern
+
 	-Generated code simplified
 -UPnP
 -CoAP
+
 	-Refactored and updated to RFC7252
+	
 	-Commented logger calls uncommented and now uses the new logging system
 
 tutorial
