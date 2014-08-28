@@ -97,7 +97,7 @@ The pom.xml file in the "dist" folder contains a profile called "tutorial"
 which can be invoked by "mvn -P tutorial clean install". This profile will set
 up the appropriate bundles in the "dist/jars" folder and make sure that the
 right init.xargs file is in place for running the tutorial. Please note that
-there are two init*.xargs files which overwrite (depending on the target) the
+there are multiple init*.xargs files which overwrite (depending on the target) the
 init.xargs file which is used by the execution scripts start.sh and start.bat.
 
 ### Troubleshooting
@@ -159,7 +159,7 @@ Typically one must add manually the additional bundles JAR files in the
 dist/jars folder and update these .xargs files to make sure that the OSGi
 environment installs and starts all the desired bundles. However by modifying
 the pom.xml file to follow a similar practice as the tutorial these manual
-steps could be automated a little bit using the power ov Maven to resolve
+steps could be automated a little bit using the power of Maven to resolve
 dependencies.
 
 Please also note that user defined ".xargs" files could also be created. e.g.
@@ -177,13 +177,13 @@ The appropriate init.xargs has already been put in place by the build process.
 
 ### Testing the tutorial
 
-The tutorial uses a UPnP basedriver, UPnP adaptor, and the an HTTP restlet
+The tutorial uses a UPnP basedriver, UPnP adaptor, CoAP basedriver, CoAP adaptor and the an HTTP restlet
 connector which listens for HTTP requests on port localhost:8090. The UPnP
 basedriver discovers UPnP devices in the Local Area Network and the adaptor
-registers them the GDA framework as GDA devices.
+registers them to the GDA framework as GDA devices. CoAP basedriver is set to find devices from localhost, but this can be changed editing configuration file in jar/META-INF/coap.properties, and CoAP adaptor registers then to the GDA framework as GDA devices.
 
 One can from a web browser access the webpage "http://localhost:8090/devices"
-to check which UPnP devices are discovered.
+to check which UPnP/CoAP devices are discovered.
 
 If none are discovered an empty JSON string will be displayed, {}, otherwise you'll see 
 a JSON document with the description of the UPnP devices found.
@@ -192,8 +192,10 @@ If one would like to test with simulated UPnP devices one can install XBMC
 http://xbmc.org/
 
 or the Intel Developer Tools for UPnP:
-
 http://software.intel.com/en-us/articles/intel-tools-for-upnp-technologies
+
+For CoAP you can test using Californium:
+https://github.com/eclipse/californium
 
 5. TERMINOLOGY
 --------------
