@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,91 +29,76 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.*;
-import com.ericsson.deviceaccess.spi.GenericDeviceError;
-
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.genericdevice.GDError;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Checker for checking {@link GenericDeviceProperties} against {@link GenericDevicePropertyMetadata}.
+ * Checker for checking {@link GDProperties} against {@link GDPropertyMetadata}.
  */
-class MetadataUtil {
-    private static MetadataUtil instance = new MetadataUtil();
+public enum MetadataUtil {
 
-    private MetadataUtil() {
-    }
-
-    static MetadataUtil getInstance() {
-        return instance;
-    }
+    /**
+     * Singleton.
+     */
+    INSTANCE;
 
     /**
      * Verifies all the specified properties against the specified metadata.
      *
      * @param props
-     * @param metadataMap name:String -> {@link GenericDevicePropertyMetadata}
-     * @throws GenericDeviceError thrown if value does not adhere to the metadata
+     * @param metadataMap name:String -> {@link GDPropertyMetadata}
+     * @throws GDError thrown if value does not adhere to the metadata
      */
-    void verifyPropertiesAgainstMetadata(GenericDeviceProperties props, Map metadataMap) throws GenericDeviceError {
+    public void verifyPropertiesAgainstMetadata(GDProperties props, Map<String, GDPropertyMetadata> metadataMap) throws GDError {
         if (metadataMap == null) {
             return;
         }
-
-        String[] names = props.getNames();
-        for (int i = 0; i < names.length; i++) {
-            String name = names[i];
-            verifyPropertyAgainstMetadata(metadataMap, name, props.getValue(name));
+        for (String name : props.getProperties().keySet()) {
+            verifyPropertyAgainstMetadata(metadataMap.get(name), name, props.getValue(name));
         }
     }
 
     /**
-     * Verifies the specified property, with the specified name, against the specified metadata.
+     * Verifies the specified property, with the specified name, against the
+     * specified metadata.
      *
-     * @param metadataMap   name:String -> {@link GenericDevicePropertyMetadata}
+     * @param metadata
      * @param propertyName
      * @param propertyValue
-     * @throws GenericDeviceError thrown if value does not adhere to the metadata
+     * @throws GDError thrown if value does not adhere to the metadata
      */
-    void verifyPropertyAgainstMetadata(Map metadataMap, String propertyName, Object propertyValue) throws GenericDeviceError {
-        GenericDevicePropertyMetadata metadata = (GenericDevicePropertyMetadata) metadataMap.get(propertyName);
-        
-        if(metadata == null) return;
-        
-        if (Number.class.isAssignableFrom(metadata.getType())) {
+    public void verifyPropertyAgainstMetadata(GDPropertyMetadata metadata, String propertyName, Object propertyValue) throws GDError {
+        if (metadata == null) {
+            return;
+        }
+
+        Class<?> type = metadata.getType();
+        if (Number.class.isAssignableFrom(type)) {
             if (propertyValue instanceof String) {
                 try {
                     Float.parseFloat((String) propertyValue);
                 } catch (NumberFormatException e) {
-                    throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not parsable to '" + metadata.getType() + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
-            } else if (Float.class.isAssignableFrom(metadata.getType())) {
+            } else if (Float.class.isAssignableFrom(type)) {
                 if (!(propertyValue instanceof Float)) {
-                    throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not assignable to '" + metadata.getType() + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
-            } else if (Long.class.isAssignableFrom(metadata.getType())) {
+            } else if (Long.class.isAssignableFrom(type)) {
                 if (!(propertyValue instanceof Long)) {
-                    throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not assignable to '" + metadata.getType() + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
             } else {
                 if (!(propertyValue instanceof Integer || propertyValue instanceof Short || propertyValue instanceof Byte)) {
-                    throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " is a '" + propertyValue.getClass() +
-                                    "' which not assignable to '" + metadata.getType() + "'");
+                    throwError(propertyName, propertyValue, type);
                 }
             }
 
@@ -131,93 +116,48 @@ class MetadataUtil {
             if (validValues != null) {
                 Arrays.sort(validValues);
                 if (Arrays.binarySearch(validValues, value) < 0) {
-                    throw new GenericDeviceError(
-                            "The property: '" + propertyName + "'=" + propertyValue + " with the value '" + value +
-                                    "' is not among the allowed values '" + arrayToString(validValues) + "'");
+                    throw new GDError(
+                            "The property: '" + propertyName + "'=" + propertyValue + " with the value '" + value
+                            + "' is not among the allowed values '" + Arrays.toString(validValues) + "'");
                 }
             }
         }
     }
 
+    private void throwError(String propertyName, Object propertyValue, Class<?> type) throws GDError {
+        StringBuilder builder = new StringBuilder();
+        builder.append("The property: ")
+                .append("'").append(propertyName).append("'")
+                .append("=")
+                .append(propertyValue)
+                .append(" is a ")
+                .append("'").append(propertyValue.getClass()).append("'")
+                .append(" which not parsable to ")
+                .append("'").append(type).append("'");
+        throw new GDError(builder.toString());
+    }
+
     /**
-     * Checks that the specified value is within the range specified in the metadata.
+     * Checks that the specified value is within the range specified in the
+     * metadata.
      *
      * @param metadata
      * @param propertyName
      * @param propertyValue
      * @param valueToBeChecked
-     * @throws GenericDeviceError thrown if value does not adhere to the metadata
+     * @throws GDError thrown if value does not adhere to the metadata
      */
-    private static void checkRange(GenericDevicePropertyMetadata metadata, String propertyName, Object propertyValue, double valueToBeChecked) throws GenericDeviceError {
+    private static void checkRange(GDPropertyMetadata metadata, String propertyName, Object propertyValue, double valueToBeChecked) throws GDError {
         if (valueToBeChecked > metadata.getMaxValue().doubleValue()) {
-            throw new GenericDeviceError(
-                    "The property: '" + propertyName + "'=" + propertyValue +
-                            " is above the max value '" + metadata.getMaxValue() + "'");
+            throw new GDError(
+                    "The property: '" + propertyName + "'=" + propertyValue
+                    + " is above the max value '" + metadata.getMaxValue() + "'");
         }
 
         if (valueToBeChecked < metadata.getMinValue().doubleValue()) {
-            throw new GenericDeviceError(
-                    "The property: '" + propertyName + "'=" + propertyValue +
-                            " is below the min value '" + metadata.getMinValue() + "'");
+            throw new GDError(
+                    "The property: '" + propertyName + "'=" + propertyValue
+                    + " is below the min value '" + metadata.getMinValue() + "'");
         }
-    }
-
-    /**
-     * Makes a string of the specified array
-     *
-     * @param validValues
-     * @return the array
-     */
-    private static String arrayToString(String[] validValues) {
-        StringBuffer sb = new StringBuffer();
-        sb.append('[');
-        for (int i = 0; i < validValues.length; i++) {
-            String string = validValues[i];
-            sb.append(string).append(',');
-        }
-        if (sb.length() > 1) {
-            sb.setLength(sb.length() - 1);
-        }
-        sb.append(']');
-        return sb.toString();
-    }
-
-    /**
-     * Makes a JSON string of the specified metadata.
-     *
-     * @param path
-     * @param format
-     * @param name
-     * @param metadata
-     * @return JSON string of the specified metadata
-     * @throws GenericDeviceException
-     */
-    String metadataToJson(String path, int format, String name, Collection metadata) throws GenericDeviceException {
-        String retVal = "";
-        if (path == null) {
-            path = "";
-        }
-        if (format == Serializable.FORMAT_JSON || format == Serializable.FORMAT_JSON_WDC) {
-            if (metadata.size() > 0) {
-                StringBuffer sb = new StringBuffer();
-                sb.append('"').append(name).append("\": {");
-                for (Iterator iterator = metadata.iterator(); iterator.hasNext(); ) {
-                    GenericDevicePropertyMetadata md = (GenericDevicePropertyMetadata) iterator.next();
-                    if (path.indexOf(Constants.PATH_DELIMITER) > 0) {
-                        sb.append('"').append(md.getName()).append("\":").append(md.getSerializedNode(path.substring(path.indexOf(Constants.PATH_DELIMITER)), format));
-                    } else {
-                        sb.append('"').append(md.getName()).append("\":").append(md.getSerializedNode("", format));
-                    }
-                    sb.append(',');
-                }
-                sb.setLength(sb.length() - 1);
-                sb.append('}');
-                retVal = sb.toString();
-            }
-        } else {
-            throw new GenericDeviceException(405, "No such format supported");
-        }
-
-        return retVal;
     }
 }

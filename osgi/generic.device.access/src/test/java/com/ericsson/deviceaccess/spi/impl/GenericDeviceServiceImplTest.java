@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,141 +29,205 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.*;
-import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.deviceaccess.api.genericdevice.GDAction;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.event.EventManager;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDPropertiesImpl;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDServiceImpl;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
-import junit.framework.Assert;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Properties;
-
-import static junit.framework.Assert.fail;
-
 
 /**
  * GenericDeviceServiceImpl Tester.
  *
  */
 public class GenericDeviceServiceImplTest {
-    private Mockery context = new Mockery() {
+
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
     };
     private EventManager eventManager;
     private GenericDeviceImpl device;
-    private GenericDeviceServiceImpl service;
-    private GenericDevicePropertyMetadata[] metadataArr;
-    private GenericDevicePropertiesImpl props;
-    private GenericDevicePropertyMetadata metadataString;
-    private GenericDevicePropertyMetadata metadataInt;
-    private GenericDevicePropertyMetadata metadataFloat;
-    private GenericDeviceAction action;
+    private GDServiceImpl service;
+    private List<GDPropertyMetadata> metadataArr;
+    private GDPropertiesImpl props;
+    private GDPropertyMetadata metadataString;
+    private GDPropertyMetadata metadataInt;
+    private GDPropertyMetadata metadataFloat;
+    private GDAction action;
 
     @Before
-    public void setUp() throws Exception {
-        action = context.mock(GenericDeviceAction.class);
+    public void setup() throws Exception {
+        action = context.mock(GDAction.class);
         eventManager = context.mock(EventManager.class);
         device = context.mock(GenericDeviceImpl.class);
-        metadataFloat = context.mock(GenericDevicePropertyMetadata.class, "metadataFloat");
-        metadataInt = context.mock(GenericDevicePropertyMetadata.class, "metadataInt");
-        metadataString = context.mock(GenericDevicePropertyMetadata.class, "metadataString");
-        metadataArr = new GenericDevicePropertyMetadata[]{metadataFloat, metadataInt, metadataString};
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        metadataFloat = context.mock(GDPropertyMetadata.class, "metadataFloat");
+        metadataInt = context.mock(GDPropertyMetadata.class, "metadataInt");
+        metadataString = context.mock(GDPropertyMetadata.class, "metadataString");
+        metadataArr = new ArrayList<>();
+        metadataArr.add(metadataFloat);
+        metadataArr.add(metadataInt);
+        metadataArr.add(metadataString);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
 
-        context.checking(new Expectations(){{
-            allowing(device).getId();will(returnValue("devId"));
-            allowing(device).getURN();will(returnValue("devUrn"));
-            allowing(device).getName();will(returnValue("dev"));
-            allowing(device).getProtocol();will(returnValue("prot"));
-            allowing(device).isOnline();will(returnValue(true));
+        context.checking(new Expectations() {
+            {
+                allowing(device).getId();
+                will(returnValue("devId"));
+                allowing(device).getURN();
+                will(returnValue("devUrn"));
+                allowing(device).getName();
+                will(returnValue("dev"));
+                allowing(device).getProtocol();
+                will(returnValue("prot"));
+                allowing(device).isOnline();
+                will(returnValue(true));
 
-            allowing(metadataFloat).getDefaultNumberValue();will(returnValue(42.0f));
-            allowing(metadataFloat).getDefaultStringValue();will(returnValue("42.0"));
-            allowing(metadataFloat).getName();will(returnValue("fProp"));
-            allowing(metadataFloat).getType();will(returnValue(Float.class));
-            allowing(metadataFloat).getMinValue();will(returnValue(Float.NEGATIVE_INFINITY));
-            allowing(metadataFloat).getMaxValue();will(returnValue(Float.POSITIVE_INFINITY));
-            allowing(metadataFloat).serialize(GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"float\"}"));
+                allowing(metadataFloat).getDefaultNumberValue();
+                will(returnValue(42.0f));
+                allowing(metadataFloat).getDefaultStringValue();
+                will(returnValue("42.0"));
+                allowing(metadataFloat).getName();
+                will(returnValue("fProp"));
+                allowing(metadataFloat).getType();
+                will(returnValue(Float.class));
+                allowing(metadataFloat).getTypeName();
+                will(returnValue("Float"));
+                allowing(metadataFloat).getValidValues();
+                will(returnValue(null));
+                allowing(metadataFloat).getMinValue();
+                will(returnValue(Float.NEGATIVE_INFINITY));
+                allowing(metadataFloat).getMaxValue();
+                will(returnValue(Float.POSITIVE_INFINITY));
+                allowing(metadataFloat).serialize(Format.JSON);
+                will(returnValue("{\"type\":\"float\"}"));
 
-            allowing(metadataInt).getDefaultNumberValue();will(returnValue(42));
-            allowing(metadataInt).getDefaultStringValue();will(returnValue("42"));
-            allowing(metadataInt).getName();will(returnValue("iProp"));
-            allowing(metadataInt).getType();will(returnValue(Integer.class));
-            allowing(metadataInt).getMinValue();will(returnValue(Integer.MIN_VALUE));
-            allowing(metadataInt).getMaxValue();will(returnValue(Integer.MAX_VALUE));
-            allowing(metadataInt).serialize(GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"int\"}"));
+                allowing(metadataInt).getDefaultNumberValue();
+                will(returnValue(42));
+                allowing(metadataInt).getDefaultStringValue();
+                will(returnValue("42"));
+                allowing(metadataInt).getName();
+                will(returnValue("iProp"));
+                allowing(metadataInt).getType();
+                will(returnValue(Integer.class));
+                allowing(metadataInt).getTypeName();
+                will(returnValue("Integer"));
+                allowing(metadataInt).getValidValues();
+                will(returnValue(null));
+                allowing(metadataInt).getMinValue();
+                will(returnValue(Integer.MIN_VALUE));
+                allowing(metadataInt).getMaxValue();
+                will(returnValue(Integer.MAX_VALUE));
+                allowing(metadataInt).serialize(Format.JSON);
+                will(returnValue("{\"type\":\"int\"}"));
 
-            allowing(metadataString).getDefaultStringValue();will(returnValue("Forty-two"));
-            allowing(metadataString).getName();will(returnValue("sProp"));
-            allowing(metadataString).getType();will(returnValue(String.class));
-            allowing(metadataString).getValidValues();will(returnValue(null));
-            allowing(metadataString).serialize(GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"string\"}"));
+                allowing(metadataString).getDefaultNumberValue();
+                will(returnValue(null));
+                allowing(metadataString).getDefaultStringValue();
+                will(returnValue("Forty-two"));
+                allowing(metadataString).getName();
+                will(returnValue("sProp"));
+                allowing(metadataString).getType();
+                will(returnValue(String.class));
+                allowing(metadataString).getTypeName();
+                will(returnValue("String"));
+                allowing(metadataString).getValidValues();
+                will(returnValue(null));
+                allowing(metadataString).getMinValue();
+                will(returnValue(null));
+                allowing(metadataString).getMaxValue();
+                will(returnValue(null));
+                allowing(metadataString).serialize(Format.JSON);
+                will(returnValue("{\"type\":\"string\"}"));
 
-            allowing(action).getName();will(returnValue("action1"));
-            allowing(action).updatePath(with(aNonNull(String.class)));
-        }});
+                allowing(action).getName();
+                will(returnValue("action1"));
+                allowing(action).updatePath(with(aNonNull(String.class)));
+                allowing(action).getArgumentsMetadata();
+                will(returnValue(new HashMap<>()));
+                allowing(action).getResultMetadata();
+                will(returnValue(new HashMap<>()));
+            }
+        });
 
-        service = new GenericDeviceServiceImpl("srv", metadataArr);
+        service = new GDServiceImpl("srv", metadataArr);
         service.setParentDevice(device);
         service.putAction(action);
 
-        props = new GenericDevicePropertiesImpl(metadataArr, service);
+        props = new GDPropertiesImpl(metadataArr, service);
     }
 
     @After
     public void tearDown() throws Exception {
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", null);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", null);
     }
 
     @Test
     public void testFloatEvents() {
-        context.checking(new Expectations(){{
-            oneOf(device).notifyEvent(with("srv"), with(new Properties() {{
-                put("fProp", 23.0f);
-            }}));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(device).notifyEvent(with("srv"), with(new HashMap() {
+                    {
+                        put("fProp", 23.0f);
+                    }
+                }));
+            }
+        });
 
         props.setFloatValue("fProp", 23);
-
 
         context.assertIsSatisfied();
     }
 
     @Test
     public void testIntEvents() {
-        context.checking(new Expectations(){{
-            oneOf(device).notifyEvent(with("srv"), with(new Properties() {{
-                put("iProp", 23);
-            }}));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(device).notifyEvent(with("srv"), with(new HashMap() {
+                    {
+                        put("iProp", 23);
+                    }
+                }));
+            }
+        });
 
         props.setIntValue("iProp", 23);
-
 
         context.assertIsSatisfied();
     }
 
     @Test
     public void testStringEvents() {
-        context.checking(new Expectations(){{
-            oneOf(device).notifyEvent(with("srv"), with(new Properties() {{
-                put("sProp", "apa");
-            }}));
-        }});
+        context.checking(new Expectations() {
+            {
+                oneOf(device).notifyEvent(with("srv"), with(new HashMap() {
+                    {
+                        put("sProp", "apa");
+                    }
+                }));
+            }
+        });
 
         props.setStringValue("sProp", "apa");
 
@@ -171,19 +235,22 @@ public class GenericDeviceServiceImplTest {
     }
 
     @Test
-    public void testSerialize() throws GenericDeviceException, JSONException {
-        context.checking(new Expectations() {{
-            oneOf(action).serialize(GenericDevice.FORMAT_JSON);
-            will(returnValue("{\"name\":\"action1\"}"));
-        }});
-        String json = service.serialize(GenericDevice.FORMAT_JSON);
+    public void testSerialize() throws GDException, JSONException {
+        context.checking(new Expectations() {
+            {
+                allowing(action).serialize(Format.JSON);
+                will(returnValue("{\"name\":\"action1\"}"));
+            }
+        });
+        String json = service.serialize(Format.JSON);
+        System.out.println(json);
 
         context.assertIsSatisfied();
         // Just check that JSON parsing works
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             fail(e.getMessage());
         }
     }
@@ -198,8 +265,8 @@ public class GenericDeviceServiceImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (JSONException e) {
+            fail(e.getMessage());
         }
     }
 }

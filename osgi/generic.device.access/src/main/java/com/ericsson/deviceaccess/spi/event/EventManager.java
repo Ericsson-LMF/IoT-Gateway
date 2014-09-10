@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,20 +29,31 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.spi.event;
 
+import com.ericsson.deviceaccess.api.GenericDevice;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_ID;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_NAME;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_PROTOCOL;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_STATE;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.DEVICE_URN;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.GENERICDEVICE_FILTER;
+import static com.ericsson.deviceaccess.api.genericdevice.GDEventListener.SERVICE_NAME;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener.Type;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Properties;
-
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -56,434 +67,408 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-
 /**
  * Event manager that handles issuing if events at changes in properties.
- * Matches events against listeners filter (see
- * {@link GenericDeviceEventListener} for details).
- * 
+ * Matches events against listeners filter (see {@link GDEventListener} for
+ * details).
+ *
  */
 public class EventManager implements ServiceListener, Runnable,
-		ServiceTrackerCustomizer {
-	private static final Logger logger = LoggerFactory
-			.getLogger(EventManager.class);
-	private BundleContext context;
-	private boolean shutdown = false;
-	private final HashMap listeners = new HashMap();
-	private final LinkedList events = new LinkedList();
-	private final HashMap deltaValues = new HashMap();
-	private ServiceTracker deviceTracker;
-	private HashMap devices = new HashMap();
+        ServiceTrackerCustomizer<GenericDevice, Object> {
 
-	private static final String REGEX_DELTA = "/state/([^/]+)$";
+    private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
+    private static final String LISTENER_FILTER = "(" + Constants.OBJECTCLASS + "=" + GDEventListener.class
+            .getName() + ")";
+    private static final Pattern DELTA_PATTERN = Pattern.compile("\\((([^(]*)__delta)");
+    private BundleContext context;
+    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final Map<GDEventListener, Filter> listeners = new ConcurrentHashMap<>();
+    private final BlockingQueue<GenericDeviceEvent> events = new LinkedBlockingQueue<>();
+    private final Map<String, Object> deltaValues = new HashMap<>();
+    private ServiceTracker deviceTracker;
+    private final Map<String, GenericDevice> devices = new ConcurrentHashMap<>();
 
-	private Thread thread = null;
+    private Thread thread;
+    private final GenericDeviceEvent POISON = new GenericDeviceEvent(null, null, null, null);
+    private Filter ALLOW_ALL = new Filter() {
 
-	public EventManager() {
-		super();
-	}
+        @Override
+        public boolean match(ServiceReference reference) {
+            return true;
+        }
 
-	public void setContext(BundleContext context) {
-		this.context = context;
-	}
+        @Override
+        public boolean match(Dictionary dictionary) {
+            return true;
+        }
 
-	/**
-	 * Thread body that consumes the event queue and issues events to listeners.
-	 */
-	public void run() {
-		// Start listening to GenericDeviceEventListener service registrations
-		try {
-			String filter = "(" + Constants.OBJECTCLASS + "="
-					+ GenericDeviceEventListener.class.getName() + ")";
-			context.addServiceListener(this, filter);
+        @Override
+        public boolean matchCase(Dictionary dictionary) {
+            return true;
+        }
 
-			// Check if there are already registered listeners
-			ServiceReference[] srl = context.getServiceReferences(null, filter);
-			for (int i = 0; srl != null && i < srl.length; i++) {
-				serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, srl[i]));
-			}
-		} catch (InvalidSyntaxException e) {
-			e.printStackTrace();
-		}
+        @Override
+        public boolean matches(Map<String, ?> map) {
+            return true;
+        }
+    };
 
-		// Track GenericDevice service registrations (used to only allow events
-		// from registered instances)
-		deviceTracker = new ServiceTracker(context,
-				GenericDevice.class.getName(), this);
-		deviceTracker.open();
+    public EventManager() {
+        super();
+    }
 
-		// Wait for a GenericDeviceEvent to be received and forward this to all
-		// listeners
-		while (!shutdown) {
-			GenericDeviceEvent event = null;
-			synchronized (events) {
-				if (events.size() == 0) {
-					try {
-						events.wait();
-					} catch (InterruptedException e) {
-						continue;
-					}
-				}
-				if (events.size() > 0) {
-					event = (GenericDeviceEvent) events.remove(0);
-				}
-			}
+    public void setContext(BundleContext context) {
+        this.context = context;
+    }
 
-			if (event != null) {
-				String deviceId = event.deviceId;
-				String serviceName = event.serviceId;
-				Properties matchingProperties = new Properties();
-				;
-				boolean propertyEvent = event.propertyEvent;
+    /**
+     * Thread body that consumes the event queue and issues events to listeners.
+     */
+    @Override
+    public void run() {
+        startListenGenericDeviceEvents();
+        createTracker();
 
-				if (serviceName == null || deviceId == null
-						|| (event.properties == null && !propertyEvent))
-					continue;
+        GenericDeviceEvent event;
+        while (running.get()) {
+            try {
+                // Wait for a GenericDeviceEvent to be received and forward this to all listeners
+                event = events.take();
+            } catch (InterruptedException ex) {
+                continue;
+            }
+            //POISON is invalid and because running is set to false this exits.
+            if (isEventInvalid(event)) {
+                continue;
+            }
+            Map<String, Object> matching = new HashMap<>();
+            if (!event.propertyEvent) {
+                addForChangeEvent(event, matching);
+            }
+            invokeListeners(event, matching);
+        }
+    }
 
-				if (!propertyEvent) {
-					matchingProperties.put(
-							GenericDeviceEventListener.DEVICE_ID, deviceId);
-					matchingProperties.put(
-							GenericDeviceEventListener.SERVICE_NAME,
-							serviceName);
-					matchingProperties.put(
-							GenericDeviceEventListener.DEVICE_PROTOCOL,
-							event.device.getProtocol());
-					matchingProperties.put(
-							GenericDeviceEventListener.DEVICE_URN,
-							event.device.getURN());
-					matchingProperties.put(
-							GenericDeviceEventListener.DEVICE_NAME,
-							event.device.getName());
-					for (Enumeration i = event.properties.keys(); i
-							.hasMoreElements();) {
-						String key = (String) i.nextElement();
-						matchingProperties.put(key, event.properties.get(key));
-					}
-				}
+    /**
+     * Track GenericDevice service registrations (used to only allow events from
+     * registered instances)
+     */
+    private void createTracker() {
+        deviceTracker = new ServiceTracker(context, GenericDevice.class, this);
+        deviceTracker.open();
+    }
 
-				synchronized (listeners) {
-					for (Iterator i = listeners.keySet().iterator(); i
-							.hasNext();) {
-						GenericDeviceEventListener listener = (GenericDeviceEventListener) i
-								.next();
+    /**
+     * Checks if event is invalid
+     *
+     * @param event
+     * @return is invalid?
+     */
+    private boolean isEventInvalid(GenericDeviceEvent event) {
+        if (event.serviceId == null || event.deviceId == null) {
+            return true;
+        }
+        return event.properties == null && !event.propertyEvent;
+    }
 
-						Filter filter = (Filter) listeners.get(listener);
+    /**
+     * Adds properties needed in state change events
+     *
+     * @param event
+     * @param matching
+     */
+    private void addForChangeEvent(GenericDeviceEvent event, Map<String, Object> matching) {
+        matching.put(DEVICE_ID, event.deviceId);
+        matching.put(SERVICE_NAME, event.serviceId);
+        matching.put(DEVICE_PROTOCOL, event.device.getProtocol());
+        matching.put(DEVICE_URN, event.device.getURN());
+        matching.put(DEVICE_NAME, event.device.getName());
+        matching.putAll(event.properties);
+    }
 
-						// Check to see if there are any delta-properties
-						if (filter != null
-								&& filter.toString().indexOf("__delta") > 0) {
-							// Ugly parse to get the name of property with the
-							// __delta suffix
-							String filterstring = filter.toString();
-							filterstring = filterstring.substring(0,
-									filterstring.indexOf("__delta"));
-							String deltaProperty = filterstring
-									.substring(filterstring.lastIndexOf("(") + 1);
+    /**
+     * Invokes listeners that listen this kind of event
+     *
+     * @param event
+     * @param matchingProperties
+     */
+    private void invokeListeners(GenericDeviceEvent event, Map<String, Object> matchingProperties) {
+        String deviceId = event.deviceId;
+        String serviceName = event.serviceId;
+        listeners.forEach((listener, filter) -> {
+            checkForDeltaProperty(filter, event, matchingProperties);
+            if (event.propertyEvent) {
+                listener.notifyGDPropertyEvent(event.type, deviceId, serviceName, event.propertyId);
+            } else if (filter.matches(matchingProperties)) {
+                System.out.println(event);
+                listener.notifyGDEvent(deviceId, serviceName, event.properties);
+            }
+        });
+    }
 
-							// Is this an event update for the delta property?
-							if (event.properties.get(deltaProperty) != null) {
-								// Any old values saved to calculate delta from?
-								if (deltaValues.get(event.deviceId
-										+ event.serviceId + deltaProperty) != null) {
-									if (matchingProperties.get(deltaProperty) instanceof Integer) {
-										int oldValue = ((Integer) deltaValues
-												.get(event.deviceId
-														+ event.serviceId
-														+ deltaProperty))
-												.intValue();
-										int newValue = ((Integer) matchingProperties
-												.get(deltaProperty)).intValue();
-										int delta = oldValue - newValue;
+    /**
+     * Registers EventManager to listen generic device events
+     */
+    private void startListenGenericDeviceEvents() {
+        try {
+            context.addServiceListener(this, LISTENER_FILTER);
 
-										if (delta < 0)
-											delta = delta * -1; // Delta should
-																// always be
-																// positive
+            // Check if there are already registered listeners
+            context.getServiceReferences(GDEventListener.class, null)
+                    .forEach(reference -> serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, reference)));
+        } catch (InvalidSyntaxException e) {
+            logger.warn("Filter format was hardcoded wrong", e);
+        }
+    }
 
-										event.properties
-												.put(deltaProperty + "__delta",
-														new Integer(delta));
-										matchingProperties
-												.put(deltaProperty + "__delta",
-														new Integer(delta));
-									} else if (matchingProperties
-											.get(deltaProperty) instanceof Float) {
-										Float oldValue = (Float) deltaValues
-												.get(event.deviceId
-														+ event.serviceId
-														+ deltaProperty);
-										Float newValue = (Float) matchingProperties
-												.get(deltaProperty);
+    /**
+     * If filter and event is for delta property, this then updates it
+     *
+     * @param filter
+     * @param event
+     * @param matchingProperties
+     */
+    private void checkForDeltaProperty(Filter filter, GenericDeviceEvent event, Map<String, Object> matchingProperties) {
+        if (filter != null) {
+            String deltaProperty = filter.toString();
+            Matcher matcher = DELTA_PATTERN.matcher(deltaProperty);
+            if (matcher.find()) {
+                deltaProperty = matcher.group(2);
+                // Is this an event update for the delta property?
+                if (event.properties.get(deltaProperty) != null) {
+                    updateDelta(matchingProperties, deltaProperty, event, matcher);
+                }
+            }
+        }
+    }
 
-										if (newValue != null) {
+    /**
+     * Updates delta property
+     *
+     * @param matchingProperties
+     * @param deltaProperty
+     * @param event
+     * @param matcher
+     */
+    private void updateDelta(Map<String, Object> matchingProperties, String deltaProperty, GenericDeviceEvent event, Matcher matcher) {
+        Object newProperty = matchingProperties.get(deltaProperty);
+        String id = event.deviceId + event.serviceId + deltaProperty;
+        // Any old values saved to calculate delta from?
+        if (deltaValues.containsKey(id)) {
+            Object delta = calculateDelta(newProperty, deltaValues.get(id));
+            if (delta != null) {
+                String deltaString = matcher.group(1);
+                event.properties.put(deltaString, delta);
+                matchingProperties.put(deltaString, delta);
+            }
+        }
+        deltaValues.put(id, newProperty);
+    }
 
-											// Hack to get around bit errors
-											// when doing subtract of floats
-											float delta = (float) (Math
-													.round(oldValue
-															.floatValue() * 1000) - Math
-													.round(newValue
-															.floatValue() * 1000));
-											delta = delta / 1000;
+    /**
+     * Calculates delta value between new and old values
+     *
+     * @param newPropert
+     * @param oldProperty
+     * @return delta
+     */
+    private Object calculateDelta(Object newPropert, Object oldProperty) {
+        if (newPropert instanceof Integer) {
+            return Math.abs((Integer) oldProperty - (Integer) newPropert);
+        } else if (newPropert instanceof Float) {
+            return Math.abs(substract((Float) oldProperty, (Float) newPropert));
+        }
+        return null;
+    }
 
-											if (delta < 0)
-												delta = delta * -1; // Delta
-																	// should
-																	// always be
-																	// positive
+    /**
+     * Hack to get around bit errors when doing subtract of floats
+     *
+     * @param a
+     * @param b
+     * @return a - b
+     */
+    private float substract(float a, float b) {
+        float delta = Math.round(a * 1000) - Math.round(b * 1000);
+        return delta / 1000;
+    }
 
-											event.properties.put(deltaProperty
-													+ "__delta", new Float(
-													delta));
-											matchingProperties.put(
-													deltaProperty + "__delta",
-													new Float(delta));
-										}
-									}
-								}
-								deltaValues.put(event.deviceId
-										+ event.serviceId + deltaProperty,
-										matchingProperties.get(deltaProperty));
-							}
-						}
+    /**
+     * Handle notifications of new/removed GenericDeviceEventListeners
+     *
+     * @param event
+     */
+    @Override
+    public void serviceChanged(ServiceEvent event) {
+        ServiceReference reference = event.getServiceReference();
+        GDEventListener listener = (GDEventListener) context.getService(reference);
+        switch (event.getType()) {
+            case ServiceEvent.REGISTERED:
+                Object filter = reference.getProperty(GENERICDEVICE_FILTER);
+                listeners.put(listener, getFilter(filter));
+                break;
+            case ServiceEvent.MODIFIED:
+                break;
+            case ServiceEvent.UNREGISTERING:
+                listeners.remove(listener);
+                break;
+        }
+    }
 
-						try {
-							// TODO: Prevent this from hanging
-							if (propertyEvent) {
-								if (event.propertyAdded)
-									listener.notifyGenericDevicePropertyAddedEvent(
-											deviceId, serviceName,
-											event.propertyId);
-								else
-									listener.notifyGenericDevicePropertyRemovedEvent(
-											deviceId, serviceName,
-											event.propertyId);
-							} else {
-								if (filter == null
-										|| filter.match(matchingProperties))
-									listener.notifyGenericDeviceEvent(deviceId,
-											serviceName, event.properties);
-							}
-						} catch (Throwable t) {
-							logger.warn(
-									"Exception when invoking event listener", t);
-						}
-					}
-				}
-			}
+    /**
+     * Gets filter from an object
+     *
+     * @param object
+     * @return filter
+     */
+    private Filter getFilter(Object object) {
+        if (object instanceof String) {
+            try {
+                return FrameworkUtil.createFilter((String) object);
+            } catch (InvalidSyntaxException e) {
+                throw new IllegalArgumentException("The filter string could not be parsed into a filter", e);
+            }
+        } else if (object instanceof Filter) {
+            return (Filter) object;
+        } else if (object == null) {
+            return ALLOW_ALL;
+        } else {
+            throw new IllegalArgumentException("The filter must be null, string or Filter");
+        }
+    }
 
-			// Event was received, forward it to all listeners
-		}
-	}
+    /**
+     * Starts the event manager.
+     */
+    public void start() {
+        synchronized (running) {
+            if (!running.compareAndSet(false, true)) {
+                throw new IllegalStateException("There is thread already running");
+            }
+            thread = new Thread(this);
+            try {
+                thread.start();
+            } catch (Throwable e) {
+                logger.warn("Failed to start Event Manager: " + e);
+                running.set(false);
+                thread = null;
+            }
+        }
+    }
 
-	/**
-	 * Handle notifications of new/removed GenericDeviceEventListeners
-	 * 
-	 * @param event
-	 */
-	public void serviceChanged(ServiceEvent event) {
-		ServiceReference sr = event.getServiceReference();
-		GenericDeviceEventListener listener = (GenericDeviceEventListener) context
-				.getService(sr);
-		Object filterObj = sr
-				.getProperty(GenericDeviceEventListener.GENERICDEVICE_FILTER);
-		Filter filter = null;
-		if (filterObj instanceof String) {
-			String filterString = (String) filterObj;
-			try {
-				if (filterString != null) {
-					filter = FrameworkUtil.createFilter(filterString);
-				}
-			} catch (InvalidSyntaxException e) {
-				throw new IllegalArgumentException(
-						"The filter string could not be parsed into a filter. "
-								+ e);
-			}
-		} else if (filter == null || filterObj instanceof Filter) {
-			filter = (Filter) filterObj;
-		} else {
-			throw new IllegalArgumentException(
-					"The filter must either be a string or " + Filter.class);
-		}
+    /**
+     * Shuts the event manager.
+     */
+    public void shutdown() {
+        synchronized (running) {
+            if (!running.compareAndSet(true, false)) {
+                throw new IllegalStateException("There wasn't thread running to shutdown");
+            }
+            events.add(POISON);
+            thread = null;
+            if (deviceTracker != null) {
+                deviceTracker.close();
+            }
+        }
+    }
 
-		switch (event.getType()) {
-		case ServiceEvent.REGISTERED:
-			synchronized (listeners) {
-				listeners.put(listener, filter);
-			}
-			break;
-		case ServiceEvent.MODIFIED:
-			break;
-		case ServiceEvent.UNREGISTERING:
-			synchronized (listeners) {
-				listeners.remove(listener);
-			}
-			break;
-		}
-	}
+    /**
+     * Notify about a changed state. To be called by protocol adaptors.
+     *
+     * @param deviceId
+     * @param serviceId
+     * @param properties
+     */
+    public void addPropertyEvent(String deviceId, String serviceId, Map<String, Object> properties) {
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, properties));
+    }
 
-	/**
-	 * Starts the event manager
-	 */
-	synchronized public void start() {
-		this.thread = new Thread(this);
-		this.shutdown = false;
-		try {
-			this.thread.start();
-		} catch (Throwable e) {
-			logger.warn("Failed to start Event Manager.");
-			this.shutdown = true;
-		}
-	}
+    public void addStateEvent(String deviceId, String serviceId, String propertyId, Type type) {
+        addEvent(deviceId, device -> new GenericDeviceEvent(device, deviceId, serviceId, propertyId, type));
+    }
 
-	/**
-	 * Shuts down the event manager.
-	 */
-	synchronized public void shutdown() {
-		shutdown = true;
-		if (this.thread != null) {
-			this.thread.interrupt();
-			this.thread = null;
-		}
-		synchronized (events) {
-			events.notifyAll();
-		}
+    /**
+     * Adds event to be received by listeners from existing devices only
+     *
+     * @param deviceId
+     * @param func
+     */
+    private void addEvent(String deviceId, Function<GenericDevice, GenericDeviceEvent> func) {
+        if (running.get()) {
+            logger.warn("Tried to notify event on closed event manager, dropping it!");
+            return;
+        }
+        // Ignore events from devices that are not registered yet
+        GenericDevice device = devices.get(deviceId);
+        if (device != null) {
+            events.add(func.apply(device));
+            System.out.println(events);
+        } else {
+            logger.warn("There was no device registered with deviceID: " + deviceId);
+        }
+    }
 
-		if (deviceTracker != null)
-			deviceTracker.close();
-	}
+    @Override
+    public Object addingService(ServiceReference<GenericDevice> reference) {
+        GenericDevice device = context.getService(reference);
+        devices.put(device.getId(), device);
 
-	/**
-	 * Notify about a changed state. To be called by protocol adaptors.
-	 * 
-	 * @param deviceId
-	 * @param serviceId
-	 * @param properties
-	 */
-	public void notifyGenericDeviceEvent(String deviceId, String serviceId,
-			Dictionary properties) {
-		if (shutdown) {
-			logger.warn("Tried to notify event on closed event manager, dropping it!");
-			return;
-		}
+        // Always generate a state event when a new device is registered
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(DEVICE_STATE, device.getState());
+        addPropertyEvent(device.getId(), "DeviceProperties", properties);
+        return device;
+    }
 
-		// Ignore events from devices that are not registered yet
-		GenericDevice device = (GenericDevice) devices.get(deviceId);
-		if (device == null)
-			return;
+    @Override
+    public void modifiedService(ServiceReference<GenericDevice> reference, Object service) {
+    }
 
-		synchronized (events) {
-			events.add(new GenericDeviceEvent(device, deviceId, serviceId,
-					properties));
-			events.notifyAll();
-		}
-	}
+    @Override
+    public void removedService(ServiceReference<GenericDevice> reference, Object service) {
+        devices.remove(context.getService(reference).getId());
+    }
 
-	public void notifyGenericDeviceEventRemoved(String deviceId,
-			String serviceId, String propertyId) {
-		if (shutdown) {
-			logger.warn("Tried to notify event on closed event manager, dropping it!");
-			return;
-		}
+    /**
+     * Internal class to hold an event
+     */
+    private class GenericDeviceEvent {
 
-		// Ignore events from devices that are not registered yet
-		GenericDevice device = (GenericDevice) devices.get(deviceId);
-		if (device == null)
-			return;
+        public String deviceId;
+        public String serviceId;
+        public Map<String, Object> properties;
+        public boolean propertyEvent;
+        public String propertyId;
+        public Type type;
+        public GenericDevice device;
 
-		synchronized (events) {
-			events.add(new GenericDeviceEvent(device, deviceId, serviceId,
-					propertyId, false));
-			events.notifyAll();
-		}
-	}
+        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, Map<String, Object> properties) {
+            propertyEvent = false;
+            this.device = device;
+            this.deviceId = deviceId;
+            this.serviceId = serviceId;
+            this.properties = properties;
+        }
 
-	public void notifyGenericDeviceEventAdded(String deviceId,
-			String serviceId, String propertyId) {
-		if (shutdown) {
-			logger.warn("Tried to notify event on closed event manager, dropping it!");
-			return;
-		}
+        GenericDeviceEvent(GenericDevice device, String deviceId, String serviceId, String propertyId, Type type) {
+            propertyEvent = true;
+            this.device = device;
+            this.deviceId = deviceId;
+            this.serviceId = serviceId;
+            this.propertyId = propertyId;
+            this.type = type;
+            this.properties = new HashMap<>();
+            properties.put(DEVICE_ID, deviceId);
+            properties.put(propertyId, new Object());
+            properties.put(SERVICE_NAME, serviceId);
+        }
 
-		// Ignore events from devices that are not registered yet
-		GenericDevice device = (GenericDevice) devices.get(deviceId);
-		if (device == null)
-			return;
-
-		synchronized (events) {
-			events.add(new GenericDeviceEvent(device, deviceId, serviceId,
-					propertyId, true));
-			events.notifyAll();
-		}
-	}
-
-	/**
-	 * Internal class to hold an event
-	 */
-	private class GenericDeviceEvent {
-		public String deviceId;
-		public String serviceId;
-		public Dictionary properties;
-		public boolean propertyEvent = false;
-		public String propertyId;
-		public boolean propertyAdded;
-		public GenericDevice device;
-
-		public GenericDeviceEvent(GenericDevice device, String deviceId,
-				String serviceId, Dictionary properties) {
-			propertyEvent = false;
-			this.device = device;
-			this.deviceId = deviceId;
-			this.serviceId = serviceId;
-			this.properties = properties;
-		}
-
-		public GenericDeviceEvent(GenericDevice device, String deviceId,
-				String serviceId, String propertyId, boolean propertyAdded) {
-			propertyEvent = true;
-			this.device = device;
-			this.deviceId = deviceId;
-			this.serviceId = serviceId;
-			this.propertyId = propertyId;
-			this.propertyAdded = propertyAdded;
-			this.properties = new Hashtable();
-			properties.put(GenericDeviceEventListener.DEVICE_ID, deviceId);
-			properties.put(propertyId, new Object());
-			properties.put(GenericDeviceEventListener.SERVICE_NAME, serviceId);
-		}
-	}
-
-	public Object addingService(ServiceReference reference) {
-		synchronized (devices) {
-			final GenericDevice device = (GenericDevice) context
-					.getService(reference);
-			devices.put(device.getId(), device);
-
-			// Always generate a state event when a new device is registered
-			final Properties properties = new Properties() {
-				{
-					put(GenericDeviceEventListener.DEVICE_STATE,
-							device.getState());
-				}
-			};
-			notifyGenericDeviceEvent(device.getId(), "DeviceProperties",
-					properties);
-
-			return device;
-		}
-	}
-
-	public void modifiedService(ServiceReference reference, Object service) {
-	}
-
-	public void removedService(ServiceReference reference, Object service) {
-		synchronized (devices) {
-			GenericDevice device = (GenericDevice) context
-					.getService(reference);
-			devices.remove(device.getId());
-		}
-	}
+        @Override
+        public String toString() {
+            if (propertyId == null) {
+                return deviceId + " " + serviceId + " " + properties;
+            }
+            return deviceId + " " + serviceId + " " + propertyId + " " + type;
+        }
+    }
 }

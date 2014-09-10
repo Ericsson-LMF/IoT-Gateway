@@ -596,23 +596,23 @@
                         <parameter name="interval" type="Integer">
                             <description>Determines what interval of data is requested and is defined in seconds between the datapoints (from 0 to 86400). There is a limit of ~1000 data points per request.</description>
                         </parameter>
-		                <parameter name="mode" type="String">
-		                    <description>If set to "Discrete" the data logger will return the values for the fixed times given by "start" and "interval", else it will return the raw data point values.</description>
-		                    <default>Values</default>
-		                    <values>
-		                        <value>Values</value>
-		                        <value>Discrete</value>
-		                    </values>
-		                </parameter>
-		                <parameter name="firstPoint" type="String">
-		                    <description>If "Before" the data logger returns the first point prior to the given start date else the first point after the give start date.</description>
-		                    <default>Before</default>
-		                    <values>
-		                        <value>Before</value>
-		                        <value>After</value>
-		                    </values>
-		                </parameter>
-                        </arguments>
+                        <parameter name="mode" type="String">
+                            <description>If set to "Discrete" the data logger will return the values for the fixed times given by "start" and "interval", else it will return the raw data point values.</description>
+                            <default>Values</default>
+                            <values>
+                                <value>Values</value>
+                                <value>Discrete</value>
+                            </values>
+                        </parameter>
+                        <parameter name="firstPoint" type="String">
+                            <description>If "Before" the data logger returns the first point prior to the given start date else the first point after the give start date.</description>
+                            <default>Before</default>
+                            <values>
+                                <value>Before</value>
+                                <value>After</value>
+                            </values>
+                        </parameter>
+                    </arguments>
                     <results>
                         <parameter name="dataPoints" type="String">
                             <description>A JSON encoded list of data points and time values.</description>
@@ -1004,14 +1004,14 @@
                 <action name="turnOn">
                     <description>Turns on the siren.</description>
                     <arguments>
-		                <parameter name="type" type="String">
-		                    <description>The type of siren sound.</description>
-		                    <default>Alarm</default>
-		                    <values>
-		                        <value>Alarm</value>
-		                        <value>Warn</value>
-		                    </values>
-		                </parameter>
+                        <parameter name="type" type="String">
+                            <description>The type of siren sound.</description>
+                            <default>Alarm</default>
+                            <values>
+                                <value>Alarm</value>
+                                <value>Warn</value>
+                            </values>
+                        </parameter>
                     </arguments>
                 </action>
                 <action name="turnOff">
@@ -1127,7 +1127,7 @@
                         </parameter>
                         <parameter name="userCode" type="String">
                             <description>The user code as a string of two figure hex values.
-                            Example: "0A318EFE" or "31323334" (which would correspond to the ASCII values '1','2','3','4')</description>
+                                Example: "0A318EFE" or "31323334" (which would correspond to the ASCII values '1','2','3','4')</description>
                         </parameter>
                     </arguments>
                 </action>
@@ -1147,7 +1147,7 @@
                 </parameter>
                 <parameter name="registeredUserCodes" type="String">
                     <description>The set of user codes registered in this device, as a JSON object:
-                    {"1":"31313434", "2":"8E100A330000"}</description>
+                        {"1":"31313434", "2":"8E100A330000"}</description>
                 </parameter>
             </properties>
         </service>
@@ -1173,19 +1173,19 @@
                 <action name="setMode" optional="true">
                     <description>Sets the mode for the door</description>
                     <arguments>
-		                <parameter name="mode" type="String">
-		                    <description>Door mode</description>
-		                    <default>Unsecured</default>
-		                    <values>
-		                        <value>Unsecured</value>
-		                        <value>UnsecuredWithTimeout</value>
-		                        <value>UnsecuredInside</value>
-		                        <value>UnsecuredInsideWithTimeout</value>
-		                        <value>UnsecuredOutside</value>
-		                        <value>UnsecuredOutsideWithTimeout</value>
-		                        <value>Secured</value>
-		                    </values>
-		                </parameter>
+                        <parameter name="mode" type="String">
+                            <description>Door mode</description>
+                            <default>Unsecured</default>
+                            <values>
+                                <value>Unsecured</value>
+                                <value>UnsecuredWithTimeout</value>
+                                <value>UnsecuredInside</value>
+                                <value>UnsecuredInsideWithTimeout</value>
+                                <value>UnsecuredOutside</value>
+                                <value>UnsecuredOutsideWithTimeout</value>
+                                <value>Secured</value>
+                            </values>
+                        </parameter>
                     </arguments>
                 </action>
             </actions>
@@ -1204,7 +1204,7 @@
                 </parameter>
                 <parameter name="registeredUserCodes" type="String">
                     <description>The set of user codes registered in this device, as a JSON object:
-                    {"1":"31313434", "2":"8E100A330000"}</description>
+                        {"1":"31313434", "2":"8E100A330000"}</description>
                 </parameter>
             </properties>
         </service>
@@ -1499,35 +1499,35 @@
                     <description>The reports for each channel/end point queried using 'executeEncapsulatedCommand'.
                         A JSON object
                         {
-                            "&lt;channel&gt;":
-                            {
-                                "&lt;command class&gt;":
-                                {
-                                    "&lt;command&gt;" : [ &lt;command parameter&gt;* ]
-                                }*
-                            }*
+                        "&lt;channel&gt;":
+                        {
+                        "&lt;command class&gt;":
+                        {
+                        "&lt;command&gt;" : [ &lt;command parameter&gt;* ]
+                        }*
+                        }*
                         },
                         Example:
                         {
-                            "1":
-                            {
-                                "42":
-                                {
-                                    "3" : [0,1,2,3,4],
-                                }
-                            },
-                            "2":
-                            {
-                                "49":
-                                {
-                                    "3" : [0,1,2,3,4],
-                                    "5" : [5,6,7,8]
-                                },
-                                "52":
-                                {
-                                    "2 : [0,1]
-                                }
-                            },
+                        "1":
+                        {
+                        "42":
+                        {
+                        "3" : [0,1,2,3,4],
+                        }
+                        },
+                        "2":
+                        {
+                        "49":
+                        {
+                        "3" : [0,1,2,3,4],
+                        "5" : [5,6,7,8]
+                        },
+                        "52":
+                        {
+                        "2 : [0,1]
+                        }
+                        },
                         }
                     </description>
                 </parameter>

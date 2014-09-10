@@ -34,12 +34,10 @@
  */
 package com.ericsson.deviceaccess.coap.basedriver.api;
 
-
 /**
- * This Java interface is the callback interface between the CoAP basedriver & adaptor.
- * It will notify the listeners
+ * This Java interface is the callback interface between the CoAP basedriver &
+ * adaptor. It will notify the listeners
  */
-
 public interface DeviceInterface {
 
     /**
@@ -48,8 +46,7 @@ public interface DeviceInterface {
      *
      * @param endpoint new CoAP remote endpoint discovered in the network.
      */
-    public void deviceAdded(CoAPRemoteEndpoint endpoint);
-
+    void deviceAdded(CoAPRemoteEndpoint endpoint);
 
     /**
      * This method will be called when a CoAP endpoint is removed from the
@@ -58,6 +55,6 @@ public interface DeviceInterface {
      *
      * @param endpoint which has been become unavailable in the network.
      */
-    public void deviceRemoved(CoAPRemoteEndpoint endpoint);
+    void deviceRemoved(CoAPRemoteEndpoint endpoint);
 
 }

@@ -1,250 +1,250 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <XMI verified="false" xmi.version="1.2" timestamp="2011-07-08T14:20:44" xmlns:UML="http://schema.omg.org/spec/UML/1.3">
- <XMI.header>
-  <XMI.documentation>
-   <XMI.exporter>umbrello uml modeller http://uml.sf.net</XMI.exporter>
-   <XMI.exporterVersion>1.5.8</XMI.exporterVersion>
-   <XMI.exporterEncoding>UnicodeUTF8</XMI.exporterEncoding>
-  </XMI.documentation>
-  <XMI.metamodel xmi.version="1.3" href="UML.xml" xmi.name="UML"/>
- </XMI.header>
- <XMI.content>
-  <UML:Model isSpecification="false" isAbstract="false" isLeaf="false" xmi.id="m1" isRoot="false" name="UML Model">
-   <UML:Namespace.ownedElement>
-    <UML:Stereotype visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="folder" name="folder"/>
-    <UML:Stereotype visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="datatype" name="datatype"/>
-    <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Logical View" name="Logical View">
-     <UML:Namespace.ownedElement>
-      <UML:Package stereotype="folder" visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Datatypes" name="Datatypes">
-       <UML:Namespace.ownedElement>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="AXGbbVfPFonr" name="int"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="vturDrSjsTyu" name="char"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="iecpteL1BZak" name="bool"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="4FAJ4x8xo2p0" name="float"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="rFjiifcOKEBB" name="double"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="sWC13nm80wP4" name="short"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="rY0dYpdO2L6i" name="long"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="0i4IuFRljcmm" name="unsigned int"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="NYsNSIQHoQtM" name="unsigned short"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="DUkFpqvoWz4R" name="unsigned long"/>
-        <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="EUAv6wfRTYmt" name="string"/>
-       </UML:Namespace.ownedElement>
-      </UML:Package>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Vh7wDuq16xbh" name="BundleActivator"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="zXUREVlkQpkJ" name="CoAPEndpoint"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="PakPFD4MAHE0" name="CoAPEndpointFactory"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="C2NuRc7VyHkB" name="JavaBundle"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="m7Vn4YnSMJaM" name="RemoteCoAPEndpoint"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="gcW0AtN7Vyqm" name="LocalCoAPEndpoint"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Tk1fViOUIASU" name="CoAPSensor"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="FYOyz6yfbe35" name="IncomingCoAPMessageListener"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="rwTJZnKZ6KiL" name="TransportLayerReceiver"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="vXMb2gwLqKVF" name="MessageHandlerFactory"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="zNm2mxk3htxI" name="IncomingMessageHandler"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="ZDOkdadAuEDa" name="OutgoingMessageHandler"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="twsaSnOaPscb" name="TransportLayerSender"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="qwVUzPPDqICL" name="CoAPService"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="JvgK6RSuOvML" name="LocalService"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="C8D0tRFWcRGr" name="CoAPRequest"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="KeZtzX9FBrQN" name="UDP"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="leTkcSJ9GKoW" name="CoAPMessageWriter"/>
-     </UML:Namespace.ownedElement>
-     <XMI.extension xmi.extender="umbrello">
-      <diagrams>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="class diagram" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="964" canvaswidth="1714" localid="" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="W33E3Fik9E1Y" documentation="" showscope="1" snapgrid="0" showatts="1" type="1">
-        <widgets/>
-        <messages/>
-        <associations/>
-       </diagram>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="IncomingCoAPMessage" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="964" canvaswidth="1427" localid="Je43QTyOZRfp" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="Uh2KVv62u8R6" documentation="" showscope="1" snapgrid="0" showatts="1" type="3">
-        <widgets>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="292" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="GJvr0sMSJbx3" width="151" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="PakPFD4MAHE0" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="0" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="ZMdqPrbMP4V9" width="118" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="Vh7wDuq16xbh" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="452" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="XM5eaRYT0NEp" width="107" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="zXUREVlkQpkJ" height="24" drawasactor="0"/>
-         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="52" showstereotype="1" y="400" text="Start UDP threads" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="117" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="8ZOWEw3zbFbR" height="18"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="568" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="vPGZB6ORKVB3" width="161" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="rwTJZnKZ6KiL" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="931" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="9V892nN54rOU" width="138" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="gcW0AtN7Vyqm" height="24" drawasactor="0"/>
-         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="840" showstereotype="1" y="484" text="how to keep track of requests" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="188" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="UzTASfkAYfbK" height="18"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="125" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="9WQT1d5y1p1n" width="164" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="vXMb2gwLqKVF" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="740" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="HrEKqyHmV9t9" width="177" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="zNm2mxk3htxI" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="1090" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="Je43QTyOZRfp" width="50" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="KeZtzX9FBrQN" height="24" drawasactor="0"/>
-         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="1055" showstereotype="1" y="841" text="Call on the listeners (registered in the api access sequence)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="368" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="k5i7XtPI9k71" height="18"/>
-        </widgets>
-        <messages>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="GJvr0sMSJbx3" textid="ZpmqZhK83vzQ" operation="createLocalCoAPEndpoint(outgoingmessagehandler, incomingmessageHandler)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="279" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="316" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="V73mCzD9GNut" height="113" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="64" showstereotype="1" y="261" text=": createLocalCoAPEndpoint(outgoingmessagehandler, incomingmessageHandler)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="497" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="ZpmqZhK83vzQ" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="XM5eaRYT0NEp" textid="csLPyomYGMXl" operation="createLocalCoAPEndpoint" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="367" showstereotype="1" y="333" widgetaid="GJvr0sMSJbx3" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="146" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="1cmyE1addST6" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="372" showstereotype="1" y="315" text=": createLocalCoAPEndpoint" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="170" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="csLPyomYGMXl" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9WQT1d5y1p1n" textid="Wmu4vQSNQ5SO" operation="getIncomingMessageHandler" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="164" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="156" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="RdmiCx4wbeaj" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="64" showstereotype="1" y="146" text=": getIncomingMessageHandler" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="191" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="Wmu4vQSNQ5SO" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9WQT1d5y1p1n" textid="tumyA9qBGUb0" operation="getOutgoingMessageHandler" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="223" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="156" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="oRgIDbM9zoUN" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="64" showstereotype="1" y="205" text=": getOutgoingMessageHandler" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="190" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="tumyA9qBGUb0" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="ZMdqPrbMP4V9" textid="mwwWu6eiHuBs" operation="create UDP threads" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="57" showstereotype="1" y="106" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="EfFsxSRHZP51" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="62" showstereotype="1" y="88" text=": create UDP threads" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="133" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="mwwWu6eiHuBs" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="r2DE1V1IKDbA" operation="addIncomingCoAPListener(localEndpoint)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="489" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="777" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="q8311u3YkMzM" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="95" showstereotype="1" y="471" text=": addIncomingCoAPListener(localEndpoint)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="266" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="r2DE1V1IKDbA" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="vPGZB6ORKVB3" textid="MrJq9FWH8pOp" operation="addIncomingMessageListener(incomingmessageHandler)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="424" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="597" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="bxBmMypl06AU" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="282" showstereotype="1" y="406" text=": addIncomingMessageListener(incomingmessageHandler)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="361" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="MrJq9FWH8pOp" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="vPGZB6ORKVB3" textid="0Fnrd8BHAChe" operation="datagramReceived (&quot;2.01 created&quot; response)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="649" showstereotype="1" y="556" widgetaid="Je43QTyOZRfp" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="465" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="PlshOY127s1c" height="8" sequencemessagetype="1001">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="654" showstereotype="1" y="538" text=": datagramReceived (&quot;2.01 created&quot; response)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="290" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="0Fnrd8BHAChe" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="e9teMeVzneGv" operation="messageReceived" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="648" showstereotype="1" y="591" widgetaid="vPGZB6ORKVB3" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="188" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="i0m7jem7BnAI" height="349" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="653" showstereotype="1" y="573" text=": messageReceived" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="122" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="e9teMeVzneGv" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="uZZ5LhLxqEZB" operation="check for duplicates" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="826" showstereotype="1" y="609" widgetaid="HrEKqyHmV9t9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="qvZyzkVhiHnR" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="831" showstereotype="1" y="591" text=": check for duplicates" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="138" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="uZZ5LhLxqEZB" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="pxxYDiz7HWAa" operation="cache the message" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="826" showstereotype="1" y="677" widgetaid="HrEKqyHmV9t9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="t2AehPZVI7SH" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="831" showstereotype="1" y="659" text=": cache the message" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="133" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="pxxYDiz7HWAa" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9V892nN54rOU" textid="phKddFBqx8vD" operation="handleResponse" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="828" showstereotype="1" y="760" widgetaid="HrEKqyHmV9t9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="180" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="i4DZ7NBmkkF3" height="106" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="833" showstereotype="1" y="742" text=": handleResponse" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="113" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="phKddFBqx8vD" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9V892nN54rOU" textid="iKOQCROzldqu" operation="match request-response" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="998" showstereotype="1" y="792" widgetaid="9V892nN54rOU" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="jPHGYy3rSnGu" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="1003" showstereotype="1" y="774" text=": match request-response" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="163" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="iKOQCROzldqu" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9V892nN54rOU" operation="" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="998" showstereotype="1" y="833" widgetaid="9V892nN54rOU" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="q4CDVPerMPSA" height="32" sequencemessagetype="1000"/>
-        </messages>
-        <associations/>
-       </diagram>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="API_Access" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="916" canvaswidth="1178" localid="xNLp8whF91XL" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="osuy5fBPg3ux" documentation="" showscope="1" snapgrid="0" showatts="1" type="3">
-        <widgets>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="280" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="b5dpsDyho6fr" width="96" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="qwVUzPPDqICL" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="89" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="KkZ82lTco4Pf" width="97" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="JvgK6RSuOvML" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="537" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="pYHh7Ig8gWU2" width="118" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="Vh7wDuq16xbh" height="24" drawasactor="0"/>
-         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="475" showstereotype="1" y="206" text="" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="8" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="zVLtAixdidtG" height="18"/>
-         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="351" showstereotype="1" y="176" text="TODO: The way how access to localcoapendpoint is fetched needs to be changed to be the same as used in other bundles" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="746" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="nUeietaUI8w8" height="18"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="770" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="To282McSFznt" width="138" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="gcW0AtN7Vyqm" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="1003" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="xNLp8whF91XL" width="100" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="C8D0tRFWcRGr" height="24" drawasactor="0"/>
-        </widgets>
-        <messages>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="b5dpsDyho6fr" textid="0QsOLDidvHmv" operation="new CoAPService()" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="113" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="199" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="HLM6P1vgub0y" height="76" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="95" text=": new CoAPService()" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="129" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="0QsOLDidvHmv" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="pYHh7Ig8gWU2" textid="5V2gIYyzeEdm" operation="getEndpoint: LocalCoAPEndpoint" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="328" showstereotype="1" y="122" widgetaid="b5dpsDyho6fr" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="276" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="cRNWSb1FruhO" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="333" showstereotype="1" y="104" text=": getEndpoint: LocalCoAPEndpoint" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="215" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="5V2gIYyzeEdm" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="b5dpsDyho6fr" textid="NgrzMUsxw83s" operation="createPostRequest(socketaddress)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="220" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="199" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="ol1WieEJWStN" height="88" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="202" text=": createPostRequest(socketaddress)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="223" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="NgrzMUsxw83s" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="To282McSFznt" textid="mboQ36kVsnds" operation="createRequest(POST, socketaddress)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="328" showstereotype="1" y="246" widgetaid="b5dpsDyho6fr" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="519" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="onGGdDCkE2zI" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="333" showstereotype="1" y="228" text=": createRequest(POST, socketaddress)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="237" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="mboQ36kVsnds" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="xNLp8whF91XL" textid="zggnZJbUgwJo" operation="addOptionHeader(&quot;storage/helloWorld&quot;)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="347" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="924" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="7iJ0AYXkylbS" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="329" text=": addOptionHeader(&quot;storage/helloWorld&quot;)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="255" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="zggnZJbUgwJo" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="xNLp8whF91XL" textid="4OiUNPB9wSkR" operation="setCoAPRequestListener(this)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="399" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="924" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="z0YI7Ga8O6d9" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="381" text=": setCoAPRequestListener(this)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="192" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="4OiUNPB9wSkR" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="To282McSFznt" textid="fLu4SVBUutzF" operation="sendRequest(request)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="464" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="710" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="8fiuVhvVhRlm" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="446" text=": sendRequest(request)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="149" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="fLu4SVBUutzF" height="18"/>
-         </messagewidget>
-        </messages>
-        <associations/>
-       </diagram>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="OutgoingCoAPMessage" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="916" canvaswidth="1178" localid="KogfHXDRWExs" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="0VymU32qn6Wt" documentation="" showscope="1" snapgrid="0" showatts="1" type="3">
-        <widgets>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="96" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="kOzh8wyn0xIy" width="138" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="gcW0AtN7Vyqm" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="284" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="Ynn4gRSwKywJ" width="176" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="ZDOkdadAuEDa" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="747" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="h7UORaexi7lp" width="154" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="twsaSnOaPscb" height="24" drawasactor="0"/>
-         <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="537" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="KogfHXDRWExs" width="139" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="leTkcSJ9GKoW" height="24" drawasactor="0"/>
-        </widgets>
-        <messages>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="nOJU8JBe4zji" operation="send(Request)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="165" showstereotype="1" y="126" widgetaid="kOzh8wyn0xIy" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="215" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="WrSEFRvLNs8N" height="461" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="170" showstereotype="1" y="108" text=": send(Request)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="103" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="nOJU8JBe4zji" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="C9nbdbDVLAnv" operation="if message is confirmable, create retransmission timers and keep track" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="370" showstereotype="1" y="188" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="E2FI1w0P5eAB" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="375" showstereotype="1" y="170" text=": if message is confirmable, create retransmission timers and keep track" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="444" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="C9nbdbDVLAnv" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="feaoP9R1MxKU" operation="cache message (at the moment con,non-con &amp; ack)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="370" showstereotype="1" y="254" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="7GY8Tq9QoXTQ" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="375" showstereotype="1" y="236" text=": cache message (at the moment con,non-con &amp; ack)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="331" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="feaoP9R1MxKU" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="KogfHXDRWExs" textid="69gNSUrmJVRY" operation="encodeMessage" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="372" showstereotype="1" y="376" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="242" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="p7D6NID8xeqZ" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="377" showstereotype="1" y="358" text=": encodeMessage" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="111" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="69gNSUrmJVRY" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="tuUqYKNdR3yt" operation="check retransmission counter " linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="370" showstereotype="1" y="315" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="3dyXpvPd1cjO" height="32" sequencemessagetype="1000">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="375" showstereotype="1" y="297" text=": check retransmission counter " font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="199" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="tuUqYKNdR3yt" height="18"/>
-         </messagewidget>
-         <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="h7UORaexi7lp" textid="qpvohRbLEsOa" operation="send(bytestream,length,socketaddress)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="373" showstereotype="1" y="436" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="450" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="7Gooehj6XFOs" height="8" sequencemessagetype="1001">
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="378" showstereotype="1" y="418" text=": send(bytestream,length,socketaddress)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="257" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="qpvohRbLEsOa" height="18"/>
-         </messagewidget>
-        </messages>
-        <associations/>
-       </diagram>
-      </diagrams>
-     </XMI.extension>
-    </UML:Model>
-    <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Use Case View" name="Use Case View">
-     <UML:Namespace.ownedElement/>
-    </UML:Model>
-    <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Component View" name="Component View">
-     <UML:Namespace.ownedElement/>
-    </UML:Model>
-    <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Deployment View" name="Deployment View">
-     <UML:Namespace.ownedElement/>
-    </UML:Model>
-    <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Entity Relationship Model" name="Entity Relationship Model">
-     <UML:Namespace.ownedElement/>
-    </UML:Model>
-   </UML:Namespace.ownedElement>
-  </UML:Model>
- </XMI.content>
- <XMI.extensions xmi.extender="umbrello">
-  <docsettings viewid="0VymU32qn6Wt" uniqueid="qpvohRbLEsOa" documentation=""/>
-  <listview>
-   <listitem open="1" type="800" id="Views">
-    <listitem open="1" type="801" id="Logical View">
-     <listitem open="0" type="807" id="W33E3Fik9E1Y" label="class diagram"/>
-     <listitem open="0" type="810" id="osuy5fBPg3ux" label="API_Access"/>
-     <listitem open="0" type="810" id="Uh2KVv62u8R6" label="IncomingCoAPMessage"/>
-     <listitem open="0" type="810" id="0VymU32qn6Wt" label="OutgoingCoAPMessage"/>
-     <listitem open="1" type="813" id="Vh7wDuq16xbh"/>
-     <listitem open="1" type="813" id="zXUREVlkQpkJ"/>
-     <listitem open="1" type="813" id="PakPFD4MAHE0"/>
-     <listitem open="1" type="813" id="leTkcSJ9GKoW"/>
-     <listitem open="1" type="813" id="C8D0tRFWcRGr"/>
-     <listitem open="1" type="813" id="Tk1fViOUIASU"/>
-     <listitem open="1" type="813" id="qwVUzPPDqICL"/>
-     <listitem open="1" type="813" id="FYOyz6yfbe35"/>
-     <listitem open="1" type="813" id="zNm2mxk3htxI"/>
-     <listitem open="1" type="813" id="C2NuRc7VyHkB"/>
-     <listitem open="1" type="813" id="gcW0AtN7Vyqm"/>
-     <listitem open="1" type="813" id="JvgK6RSuOvML"/>
-     <listitem open="1" type="813" id="vXMb2gwLqKVF"/>
-     <listitem open="1" type="813" id="ZDOkdadAuEDa"/>
-     <listitem open="1" type="813" id="m7Vn4YnSMJaM"/>
-     <listitem open="1" type="813" id="rwTJZnKZ6KiL"/>
-     <listitem open="1" type="813" id="twsaSnOaPscb"/>
-     <listitem open="1" type="813" id="KeZtzX9FBrQN"/>
-     <listitem open="0" type="830" id="Datatypes">
-      <listitem open="1" type="829" id="iecpteL1BZak"/>
-      <listitem open="1" type="829" id="vturDrSjsTyu"/>
-      <listitem open="1" type="829" id="rFjiifcOKEBB"/>
-      <listitem open="1" type="829" id="4FAJ4x8xo2p0"/>
-      <listitem open="1" type="829" id="AXGbbVfPFonr"/>
-      <listitem open="1" type="829" id="rY0dYpdO2L6i"/>
-      <listitem open="1" type="829" id="sWC13nm80wP4"/>
-      <listitem open="1" type="829" id="EUAv6wfRTYmt"/>
-      <listitem open="1" type="829" id="0i4IuFRljcmm"/>
-      <listitem open="1" type="829" id="DUkFpqvoWz4R"/>
-      <listitem open="1" type="829" id="NYsNSIQHoQtM"/>
-     </listitem>
-    </listitem>
-    <listitem open="1" type="802" id="Use Case View"/>
-    <listitem open="1" type="821" id="Component View"/>
-    <listitem open="1" type="827" id="Deployment View"/>
-    <listitem open="1" type="836" id="Entity Relationship Model"/>
-   </listitem>
-  </listview>
-  <codegeneration>
-   <codegenerator language="C++"/>
-  </codegeneration>
- </XMI.extensions>
+    <XMI.header>
+        <XMI.documentation>
+            <XMI.exporter>umbrello uml modeller http://uml.sf.net</XMI.exporter>
+            <XMI.exporterVersion>1.5.8</XMI.exporterVersion>
+            <XMI.exporterEncoding>UnicodeUTF8</XMI.exporterEncoding>
+        </XMI.documentation>
+        <XMI.metamodel xmi.version="1.3" href="UML.xml" xmi.name="UML"/>
+    </XMI.header>
+    <XMI.content>
+        <UML:Model isSpecification="false" isAbstract="false" isLeaf="false" xmi.id="m1" isRoot="false" name="UML Model">
+            <UML:Namespace.ownedElement>
+                <UML:Stereotype visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="folder" name="folder"/>
+                <UML:Stereotype visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="datatype" name="datatype"/>
+                <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Logical View" name="Logical View">
+                    <UML:Namespace.ownedElement>
+                        <UML:Package stereotype="folder" visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Datatypes" name="Datatypes">
+                            <UML:Namespace.ownedElement>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="AXGbbVfPFonr" name="int"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="vturDrSjsTyu" name="char"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="iecpteL1BZak" name="bool"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="4FAJ4x8xo2p0" name="float"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="rFjiifcOKEBB" name="double"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="sWC13nm80wP4" name="short"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="rY0dYpdO2L6i" name="long"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="0i4IuFRljcmm" name="unsigned int"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="NYsNSIQHoQtM" name="unsigned short"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="DUkFpqvoWz4R" name="unsigned long"/>
+                                <UML:DataType stereotype="datatype" visibility="public" isSpecification="false" namespace="Datatypes" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="EUAv6wfRTYmt" name="string"/>
+                            </UML:Namespace.ownedElement>
+                        </UML:Package>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Vh7wDuq16xbh" name="BundleActivator"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="zXUREVlkQpkJ" name="CoAPEndpoint"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="PakPFD4MAHE0" name="CoAPEndpointFactory"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="C2NuRc7VyHkB" name="JavaBundle"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="m7Vn4YnSMJaM" name="RemoteCoAPEndpoint"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="gcW0AtN7Vyqm" name="LocalCoAPEndpoint"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Tk1fViOUIASU" name="CoAPSensor"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="FYOyz6yfbe35" name="IncomingCoAPMessageListener"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="rwTJZnKZ6KiL" name="TransportLayerReceiver"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="vXMb2gwLqKVF" name="MessageHandlerFactory"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="zNm2mxk3htxI" name="IncomingMessageHandler"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="ZDOkdadAuEDa" name="OutgoingMessageHandler"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="twsaSnOaPscb" name="TransportLayerSender"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="qwVUzPPDqICL" name="CoAPService"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="JvgK6RSuOvML" name="LocalService"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="C8D0tRFWcRGr" name="CoAPRequest"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="KeZtzX9FBrQN" name="UDP"/>
+                        <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="leTkcSJ9GKoW" name="CoAPMessageWriter"/>
+                    </UML:Namespace.ownedElement>
+                    <XMI.extension xmi.extender="umbrello">
+                        <diagrams>
+                            <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="class diagram" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="964" canvaswidth="1714" localid="" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="W33E3Fik9E1Y" documentation="" showscope="1" snapgrid="0" showatts="1" type="1">
+                                <widgets/>
+                                <messages/>
+                                <associations/>
+                            </diagram>
+                            <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="IncomingCoAPMessage" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="964" canvaswidth="1427" localid="Je43QTyOZRfp" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="Uh2KVv62u8R6" documentation="" showscope="1" snapgrid="0" showatts="1" type="3">
+                                <widgets>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="292" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="GJvr0sMSJbx3" width="151" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="PakPFD4MAHE0" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="0" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="ZMdqPrbMP4V9" width="118" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="Vh7wDuq16xbh" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="452" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="XM5eaRYT0NEp" width="107" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="zXUREVlkQpkJ" height="24" drawasactor="0"/>
+                                    <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="52" showstereotype="1" y="400" text="Start UDP threads" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="117" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="8ZOWEw3zbFbR" height="18"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="568" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="vPGZB6ORKVB3" width="161" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="rwTJZnKZ6KiL" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="931" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="9V892nN54rOU" width="138" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="gcW0AtN7Vyqm" height="24" drawasactor="0"/>
+                                    <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="840" showstereotype="1" y="484" text="how to keep track of requests" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="188" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="UzTASfkAYfbK" height="18"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="125" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="9WQT1d5y1p1n" width="164" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="vXMb2gwLqKVF" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="740" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="HrEKqyHmV9t9" width="177" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="zNm2mxk3htxI" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="1090" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="Je43QTyOZRfp" width="50" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="KeZtzX9FBrQN" height="24" drawasactor="0"/>
+                                    <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="1055" showstereotype="1" y="841" text="Call on the listeners (registered in the api access sequence)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="368" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="k5i7XtPI9k71" height="18"/>
+                                </widgets>
+                                <messages>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="GJvr0sMSJbx3" textid="ZpmqZhK83vzQ" operation="createLocalCoAPEndpoint(outgoingmessagehandler, incomingmessageHandler)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="279" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="316" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="V73mCzD9GNut" height="113" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="64" showstereotype="1" y="261" text=": createLocalCoAPEndpoint(outgoingmessagehandler, incomingmessageHandler)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="497" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="ZpmqZhK83vzQ" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="XM5eaRYT0NEp" textid="csLPyomYGMXl" operation="createLocalCoAPEndpoint" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="367" showstereotype="1" y="333" widgetaid="GJvr0sMSJbx3" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="146" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="1cmyE1addST6" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="372" showstereotype="1" y="315" text=": createLocalCoAPEndpoint" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="170" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="csLPyomYGMXl" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9WQT1d5y1p1n" textid="Wmu4vQSNQ5SO" operation="getIncomingMessageHandler" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="164" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="156" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="RdmiCx4wbeaj" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="64" showstereotype="1" y="146" text=": getIncomingMessageHandler" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="191" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="Wmu4vQSNQ5SO" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9WQT1d5y1p1n" textid="tumyA9qBGUb0" operation="getOutgoingMessageHandler" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="223" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="156" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="oRgIDbM9zoUN" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="64" showstereotype="1" y="205" text=": getOutgoingMessageHandler" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="190" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="tumyA9qBGUb0" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="ZMdqPrbMP4V9" textid="mwwWu6eiHuBs" operation="create UDP threads" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="57" showstereotype="1" y="106" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="EfFsxSRHZP51" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="62" showstereotype="1" y="88" text=": create UDP threads" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="133" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="mwwWu6eiHuBs" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="r2DE1V1IKDbA" operation="addIncomingCoAPListener(localEndpoint)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="489" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="777" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="q8311u3YkMzM" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="95" showstereotype="1" y="471" text=": addIncomingCoAPListener(localEndpoint)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="266" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="r2DE1V1IKDbA" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="vPGZB6ORKVB3" textid="MrJq9FWH8pOp" operation="addIncomingMessageListener(incomingmessageHandler)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="59" showstereotype="1" y="424" widgetaid="ZMdqPrbMP4V9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="597" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="bxBmMypl06AU" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="282" showstereotype="1" y="406" text=": addIncomingMessageListener(incomingmessageHandler)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="361" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="MrJq9FWH8pOp" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="vPGZB6ORKVB3" textid="0Fnrd8BHAChe" operation="datagramReceived (&quot;2.01 created&quot; response)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="649" showstereotype="1" y="556" widgetaid="Je43QTyOZRfp" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="465" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="PlshOY127s1c" height="8" sequencemessagetype="1001">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="654" showstereotype="1" y="538" text=": datagramReceived (&quot;2.01 created&quot; response)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="290" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="0Fnrd8BHAChe" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="e9teMeVzneGv" operation="messageReceived" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="648" showstereotype="1" y="591" widgetaid="vPGZB6ORKVB3" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="188" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="i0m7jem7BnAI" height="349" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="653" showstereotype="1" y="573" text=": messageReceived" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="122" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="e9teMeVzneGv" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="uZZ5LhLxqEZB" operation="check for duplicates" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="826" showstereotype="1" y="609" widgetaid="HrEKqyHmV9t9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="qvZyzkVhiHnR" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="831" showstereotype="1" y="591" text=": check for duplicates" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="138" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="uZZ5LhLxqEZB" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="HrEKqyHmV9t9" textid="pxxYDiz7HWAa" operation="cache the message" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="826" showstereotype="1" y="677" widgetaid="HrEKqyHmV9t9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="t2AehPZVI7SH" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="831" showstereotype="1" y="659" text=": cache the message" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="133" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="pxxYDiz7HWAa" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9V892nN54rOU" textid="phKddFBqx8vD" operation="handleResponse" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="828" showstereotype="1" y="760" widgetaid="HrEKqyHmV9t9" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="180" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="i4DZ7NBmkkF3" height="106" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="833" showstereotype="1" y="742" text=": handleResponse" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="113" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="phKddFBqx8vD" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9V892nN54rOU" textid="iKOQCROzldqu" operation="match request-response" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="998" showstereotype="1" y="792" widgetaid="9V892nN54rOU" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="jPHGYy3rSnGu" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="1003" showstereotype="1" y="774" text=": match request-response" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="163" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="iKOQCROzldqu" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="9V892nN54rOU" operation="" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="998" showstereotype="1" y="833" widgetaid="9V892nN54rOU" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="q4CDVPerMPSA" height="32" sequencemessagetype="1000"/>
+                                </messages>
+                                <associations/>
+                            </diagram>
+                            <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="API_Access" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="916" canvaswidth="1178" localid="xNLp8whF91XL" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="osuy5fBPg3ux" documentation="" showscope="1" snapgrid="0" showatts="1" type="3">
+                                <widgets>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="280" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="b5dpsDyho6fr" width="96" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="qwVUzPPDqICL" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="89" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="KkZ82lTco4Pf" width="97" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="JvgK6RSuOvML" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="537" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="pYHh7Ig8gWU2" width="118" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="Vh7wDuq16xbh" height="24" drawasactor="0"/>
+                                    <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="475" showstereotype="1" y="206" text="" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="8" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="zVLtAixdidtG" height="18"/>
+                                    <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="351" showstereotype="1" y="176" text="TODO: The way how access to localcoapendpoint is fetched needs to be changed to be the same as used in other bundles" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="700" width="746" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="nUeietaUI8w8" height="18"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="770" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="To282McSFznt" width="138" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="gcW0AtN7Vyqm" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="1003" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="xNLp8whF91XL" width="100" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="C8D0tRFWcRGr" height="24" drawasactor="0"/>
+                                </widgets>
+                                <messages>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="b5dpsDyho6fr" textid="0QsOLDidvHmv" operation="new CoAPService()" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="113" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="199" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="HLM6P1vgub0y" height="76" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="95" text=": new CoAPService()" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="129" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="0QsOLDidvHmv" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="pYHh7Ig8gWU2" textid="5V2gIYyzeEdm" operation="getEndpoint: LocalCoAPEndpoint" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="328" showstereotype="1" y="122" widgetaid="b5dpsDyho6fr" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="276" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="cRNWSb1FruhO" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="333" showstereotype="1" y="104" text=": getEndpoint: LocalCoAPEndpoint" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="215" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="5V2gIYyzeEdm" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="b5dpsDyho6fr" textid="NgrzMUsxw83s" operation="createPostRequest(socketaddress)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="220" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="199" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="ol1WieEJWStN" height="88" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="202" text=": createPostRequest(socketaddress)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="223" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="NgrzMUsxw83s" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="To282McSFznt" textid="mboQ36kVsnds" operation="createRequest(POST, socketaddress)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="328" showstereotype="1" y="246" widgetaid="b5dpsDyho6fr" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="519" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="onGGdDCkE2zI" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="333" showstereotype="1" y="228" text=": createRequest(POST, socketaddress)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="237" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="mboQ36kVsnds" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="xNLp8whF91XL" textid="zggnZJbUgwJo" operation="addOptionHeader(&quot;storage/helloWorld&quot;)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="347" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="924" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="7iJ0AYXkylbS" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="329" text=": addOptionHeader(&quot;storage/helloWorld&quot;)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="255" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="zggnZJbUgwJo" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="xNLp8whF91XL" textid="4OiUNPB9wSkR" operation="setCoAPRequestListener(this)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="399" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="924" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="z0YI7Ga8O6d9" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="381" text=": setCoAPRequestListener(this)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="192" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="4OiUNPB9wSkR" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="To282McSFznt" textid="fLu4SVBUutzF" operation="sendRequest(request)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="137" showstereotype="1" y="464" widgetaid="KkZ82lTco4Pf" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="710" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="8fiuVhvVhRlm" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="142" showstereotype="1" y="446" text=": sendRequest(request)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="149" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="fLu4SVBUutzF" height="18"/>
+                                    </messagewidget>
+                                </messages>
+                                <associations/>
+                            </diagram>
+                            <diagram showopsig="1" linecolor="#ff0000" snapx="10" showattribassocs="1" snapy="10" linewidth="0" showattsig="1" showpubliconly="1" showpackage="1" showstereotype="1" name="OutgoingCoAPMessage" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="916" canvaswidth="1178" localid="KogfHXDRWExs" snapcsgrid="0" showgrid="0" showops="1" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="0VymU32qn6Wt" documentation="" showscope="1" snapgrid="0" showatts="1" type="3">
+                                <widgets>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="96" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="kOzh8wyn0xIy" width="138" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="gcW0AtN7Vyqm" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="284" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="Ynn4gRSwKywJ" width="176" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="ZDOkdadAuEDa" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="747" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="h7UORaexi7lp" width="154" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="twsaSnOaPscb" height="24" drawasactor="0"/>
+                                    <objectwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="none" usesdiagramusefillcolor="1" instancename="" x="537" decon="0" showstereotype="1" y="48" font="Sans Serif,9,-1,0,50,0,1,0,0,0" localid="KogfHXDRWExs" width="139" isinstance="0" multipleinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="leTkcSJ9GKoW" height="24" drawasactor="0"/>
+                                </widgets>
+                                <messages>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="nOJU8JBe4zji" operation="send(Request)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="165" showstereotype="1" y="126" widgetaid="kOzh8wyn0xIy" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="215" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="WrSEFRvLNs8N" height="461" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="170" showstereotype="1" y="108" text=": send(Request)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="103" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="nOJU8JBe4zji" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="C9nbdbDVLAnv" operation="if message is confirmable, create retransmission timers and keep track" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="370" showstereotype="1" y="188" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="E2FI1w0P5eAB" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="375" showstereotype="1" y="170" text=": if message is confirmable, create retransmission timers and keep track" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="444" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="C9nbdbDVLAnv" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="feaoP9R1MxKU" operation="cache message (at the moment con,non-con &amp; ack)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="370" showstereotype="1" y="254" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="7GY8Tq9QoXTQ" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="375" showstereotype="1" y="236" text=": cache message (at the moment con,non-con &amp; ack)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="331" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="feaoP9R1MxKU" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="KogfHXDRWExs" textid="69gNSUrmJVRY" operation="encodeMessage" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="372" showstereotype="1" y="376" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="242" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="p7D6NID8xeqZ" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="377" showstereotype="1" y="358" text=": encodeMessage" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="111" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="69gNSUrmJVRY" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="Ynn4gRSwKywJ" textid="tuUqYKNdR3yt" operation="check retransmission counter " linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="370" showstereotype="1" y="315" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="50" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="3dyXpvPd1cjO" height="32" sequencemessagetype="1000">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="375" showstereotype="1" y="297" text=": check retransmission counter " font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="705" width="199" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="tuUqYKNdR3yt" height="18"/>
+                                    </messagewidget>
+                                    <messagewidget linecolor="none" usesdiagramfillcolor="1" widgetbid="h7UORaexi7lp" textid="qpvohRbLEsOa" operation="send(bytestream,length,socketaddress)" linewidth="none" seqnum="" usesdiagramusefillcolor="1" x="373" showstereotype="1" y="436" widgetaid="Ynn4gRSwKywJ" font="Sans Serif,9,-1,0,50,0,0,0,0,0" width="450" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="7Gooehj6XFOs" height="8" sequencemessagetype="1001">
+                                        <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="378" showstereotype="1" y="418" text=": send(bytestream,length,socketaddress)" font="Sans Serif,9,-1,0,50,0,0,0,0,0" pretext="" role="704" width="257" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="qpvohRbLEsOa" height="18"/>
+                                    </messagewidget>
+                                </messages>
+                                <associations/>
+                            </diagram>
+                        </diagrams>
+                    </XMI.extension>
+                </UML:Model>
+                <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Use Case View" name="Use Case View">
+                    <UML:Namespace.ownedElement/>
+                </UML:Model>
+                <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Component View" name="Component View">
+                    <UML:Namespace.ownedElement/>
+                </UML:Model>
+                <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Deployment View" name="Deployment View">
+                    <UML:Namespace.ownedElement/>
+                </UML:Model>
+                <UML:Model stereotype="folder" visibility="public" isSpecification="false" namespace="m1" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Entity Relationship Model" name="Entity Relationship Model">
+                    <UML:Namespace.ownedElement/>
+                </UML:Model>
+            </UML:Namespace.ownedElement>
+        </UML:Model>
+    </XMI.content>
+    <XMI.extensions xmi.extender="umbrello">
+        <docsettings viewid="0VymU32qn6Wt" uniqueid="qpvohRbLEsOa" documentation=""/>
+        <listview>
+            <listitem open="1" type="800" id="Views">
+                <listitem open="1" type="801" id="Logical View">
+                    <listitem open="0" type="807" id="W33E3Fik9E1Y" label="class diagram"/>
+                    <listitem open="0" type="810" id="osuy5fBPg3ux" label="API_Access"/>
+                    <listitem open="0" type="810" id="Uh2KVv62u8R6" label="IncomingCoAPMessage"/>
+                    <listitem open="0" type="810" id="0VymU32qn6Wt" label="OutgoingCoAPMessage"/>
+                    <listitem open="1" type="813" id="Vh7wDuq16xbh"/>
+                    <listitem open="1" type="813" id="zXUREVlkQpkJ"/>
+                    <listitem open="1" type="813" id="PakPFD4MAHE0"/>
+                    <listitem open="1" type="813" id="leTkcSJ9GKoW"/>
+                    <listitem open="1" type="813" id="C8D0tRFWcRGr"/>
+                    <listitem open="1" type="813" id="Tk1fViOUIASU"/>
+                    <listitem open="1" type="813" id="qwVUzPPDqICL"/>
+                    <listitem open="1" type="813" id="FYOyz6yfbe35"/>
+                    <listitem open="1" type="813" id="zNm2mxk3htxI"/>
+                    <listitem open="1" type="813" id="C2NuRc7VyHkB"/>
+                    <listitem open="1" type="813" id="gcW0AtN7Vyqm"/>
+                    <listitem open="1" type="813" id="JvgK6RSuOvML"/>
+                    <listitem open="1" type="813" id="vXMb2gwLqKVF"/>
+                    <listitem open="1" type="813" id="ZDOkdadAuEDa"/>
+                    <listitem open="1" type="813" id="m7Vn4YnSMJaM"/>
+                    <listitem open="1" type="813" id="rwTJZnKZ6KiL"/>
+                    <listitem open="1" type="813" id="twsaSnOaPscb"/>
+                    <listitem open="1" type="813" id="KeZtzX9FBrQN"/>
+                    <listitem open="0" type="830" id="Datatypes">
+                        <listitem open="1" type="829" id="iecpteL1BZak"/>
+                        <listitem open="1" type="829" id="vturDrSjsTyu"/>
+                        <listitem open="1" type="829" id="rFjiifcOKEBB"/>
+                        <listitem open="1" type="829" id="4FAJ4x8xo2p0"/>
+                        <listitem open="1" type="829" id="AXGbbVfPFonr"/>
+                        <listitem open="1" type="829" id="rY0dYpdO2L6i"/>
+                        <listitem open="1" type="829" id="sWC13nm80wP4"/>
+                        <listitem open="1" type="829" id="EUAv6wfRTYmt"/>
+                        <listitem open="1" type="829" id="0i4IuFRljcmm"/>
+                        <listitem open="1" type="829" id="DUkFpqvoWz4R"/>
+                        <listitem open="1" type="829" id="NYsNSIQHoQtM"/>
+                    </listitem>
+                </listitem>
+                <listitem open="1" type="802" id="Use Case View"/>
+                <listitem open="1" type="821" id="Component View"/>
+                <listitem open="1" type="827" id="Deployment View"/>
+                <listitem open="1" type="836" id="Entity Relationship Model"/>
+            </listitem>
+        </listview>
+        <codegeneration>
+            <codegenerator language="C++"/>
+        </codegeneration>
+    </XMI.extensions>
 </XMI>

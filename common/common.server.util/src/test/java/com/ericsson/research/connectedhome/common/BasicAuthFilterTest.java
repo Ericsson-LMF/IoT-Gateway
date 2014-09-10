@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,28 +29,27 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.research.connectedhome.common;
 
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.HttpHeaders;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.ws.rs.core.HttpHeaders;
-
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class BasicAuthFilterTest {
-    private Mockery context = new Mockery() {
+
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
@@ -69,20 +68,22 @@ public class BasicAuthFilterTest {
 
         headers = new MultivaluedMapImpl();
 
-        context.checking(new Expectations() {{
-            allowing(clientRequest).getMetadata();
-            will(returnValue(headers));
-            allowing(dummy).handle(with(aNonNull(ClientRequest.class)));
-            will(returnValue(null));
-        }});
+        context.checking(new Expectations() {
+            {
+                allowing(clientRequest).getHeaders();
+                will(returnValue(headers));
+                allowing(dummy).handle(with(aNonNull(ClientRequest.class)));
+                will(returnValue(null));
+            }
+        });
     }
 
     @Test
     public void test() {
         authFilter.handle(clientRequest);
 
-        assertTrue(""+headers.get(HttpHeaders.AUTHORIZATION), headers.get(HttpHeaders.AUTHORIZATION).contains(
-            "Basic YWRtaW46bGFtZXBhc3M="));
+        assertTrue("" + headers.get(HttpHeaders.AUTHORIZATION), headers.get(HttpHeaders.AUTHORIZATION).contains(
+                "Basic YWRtaW46bGFtZXBhc3M="));
     }
 
     @Test
@@ -92,7 +93,7 @@ public class BasicAuthFilterTest {
         authFilter.handle(clientRequest);
 
         assertTrue(!headers.get(HttpHeaders.AUTHORIZATION).contains(
-            "Basic YWRtaW46bGFtZXBhc3M="));
+                "Basic YWRtaW46bGFtZXBhc3M="));
     }
 
     @Test

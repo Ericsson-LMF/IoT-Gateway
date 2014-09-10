@@ -1,7 +1,7 @@
 
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -10,12 +10,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -30,8 +30,8 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.osgi;
 
@@ -41,20 +41,12 @@ import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSen
  * A singleton factory for CoAPMessageHandler (takes care of incoming/outgoing
  * CoAP message handlers)
  */
-public class CoAPMessageHandlerFactory {
-
-    private static CoAPMessageHandlerFactory coapMessageHandlerFactory;
-    private IncomingMessageHandler incomingMessageHandler;
-    private OutgoingMessageHandler outgoingMessageHandler;
+public enum CoAPMessageHandlerFactory {
 
     /**
-     * Constructor is private, use getInstance method to fetch an instance of
-     * the CoAPMessageHandlerFactory
+     * Singleton.
      */
-    private CoAPMessageHandlerFactory() {
-        incomingMessageHandler = null;
-        outgoingMessageHandler = null;
-    }
+    INSTANCE;
 
     /**
      * Get an instance of the CoAPMessageHandlerFactory. Creates one, if no
@@ -63,12 +55,25 @@ public class CoAPMessageHandlerFactory {
      *
      * @return an instance of CoAPMessageHandlerFactory
      */
-    public static synchronized CoAPMessageHandlerFactory getInstance() {
-        if (coapMessageHandlerFactory == null) {
-            coapMessageHandlerFactory = new CoAPMessageHandlerFactory();
-        }
-        return coapMessageHandlerFactory;
+    public static CoAPMessageHandlerFactory getInstance() {
+        return INSTANCE;
     }
+
+    /**
+     * This method is called when the bundle is stopped. The message handlers
+     * are set to null.
+     */
+    public static synchronized void stopService() {
+        InHandlerHolder.INSTANCE.inHandler = null;
+        INSTANCE.outHandler = null;
+    }
+
+    private enum InHandlerHolder {
+
+        INSTANCE;
+        IncomingMessageHandler inHandler = new IncomingMessageHandler();
+    }
+    private volatile OutgoingMessageHandler outHandler;
 
     /**
      * Returns a singleton instance of the IncomingMessageHandler. Creates one,
@@ -78,14 +83,7 @@ public class CoAPMessageHandlerFactory {
      * @return an instance of IncomingMessageHandler
      */
     public IncomingMessageHandler getIncomingCoAPMessageHandler() {
-        if (incomingMessageHandler == null) {
-            synchronized (this) {
-                if (incomingMessageHandler == null) {
-                    incomingMessageHandler = new IncomingMessageHandler();
-                }
-            }
-        }
-        return incomingMessageHandler;
+        return InHandlerHolder.INSTANCE.inHandler;
     }
 
     /**
@@ -93,27 +91,17 @@ public class CoAPMessageHandlerFactory {
      * if no instance has been created yet. If one has been created already,
      * return that one.
      *
-     * @param sender instance of a TransportLayerSender needed for sending messages
+     * @param sender instance of a TransportLayerSender needed for sending
+     * messages
      * @return an instance of OutgoingMessageHandler
      */
-    public OutgoingMessageHandler getOutgoingCoAPMessageHandler(
-            TransportLayerSender sender) {
-        if (outgoingMessageHandler == null) {
-            synchronized (this) {
-                if (outgoingMessageHandler == null) {
-                    outgoingMessageHandler = new OutgoingMessageHandler(sender);
-                }
+    public OutgoingMessageHandler getOutgoingCoAPMessageHandler(TransportLayerSender sender) {
+        synchronized (this) {
+            if (outHandler == null) {
+                outHandler = new OutgoingMessageHandler(sender);
             }
         }
-        return outgoingMessageHandler;
+        return outHandler;
     }
 
-    /**
-     * This method is called when the bundle is stopped. The message handlers
-     * are set to null.
-     */
-    public static synchronized void stopService() {
-        coapMessageHandlerFactory.outgoingMessageHandler = null;
-        coapMessageHandlerFactory.incomingMessageHandler = null;
-    }
 }

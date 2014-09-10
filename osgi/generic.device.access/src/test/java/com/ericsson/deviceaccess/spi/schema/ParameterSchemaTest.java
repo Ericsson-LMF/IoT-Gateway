@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,28 +29,28 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.spi.schema;
 
-import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import junit.framework.Assert;
-import org.jmock.Mockery;
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
 
 /**
  * ParameterSchema Tester.
  */
 public class ParameterSchemaTest {
-    private Mockery context = new Mockery() {
+
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
@@ -60,24 +60,27 @@ public class ParameterSchemaTest {
     private ParameterSchema stringParameterSchema;
 
     @Before
-    public void setUp() throws Exception {
-        intParameterSchema = new ParameterSchema.Builder("intPar").
-                setType(Integer.class).
-                setDefaultValue(10).
-                setMinValue("-10").
-                setMaxValue("10").
-                build();
-        floatParameterSchema = new ParameterSchema.Builder("floatPar").
-                setType(Float.class).
-                setDefaultValue(42.0f).
-                setMinValue("-10.0").
-                setMaxValue("10.0").
-                build();
-        stringParameterSchema = new ParameterSchema.Builder("stringPar").
-                setType(String.class).
-                setDefaultValue("apa").
-                setValidValues(new String[]{"apa", "banan"}).
-                build();
+    public void setup() throws Exception {
+        intParameterSchema = new ParameterSchema.Builder()
+                .setName("intPar")
+                .setType(Integer.class)
+                .setDefault("10")
+                .setMinValue("-10")
+                .setMaxValue("10")
+                .build();
+        floatParameterSchema = new ParameterSchema.Builder()
+                .setName("floatPar")
+                .setType(Float.class)
+                .setDefault("42.0f")
+                .setMinValue("-10.0")
+                .setMaxValue("10.0")
+                .build();
+        stringParameterSchema = new ParameterSchema.Builder()
+                .setName("stringPar")
+                .setType(String.class)
+                .setDefault("apa")
+                .setValidValues("apa", "banan")
+                .build();
     }
 
     @After
@@ -85,8 +88,8 @@ public class ParameterSchemaTest {
     }
 
     @Test
-    public void testSerializeInt() throws GenericDeviceException {
-        String json = intParameterSchema.serialize(GenericDevice.FORMAT_JSON);
+    public void testSerializeInt() throws GDException {
+        String json = intParameterSchema.serialize(Format.JSON);
         System.out.println(json);
 
         context.assertIsSatisfied();
@@ -94,14 +97,14 @@ public class ParameterSchemaTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (JSONException e) {
+            fail(e.getMessage());
         }
     }
 
     @Test
-    public void testSerializeFloat() throws GenericDeviceException {
-        String json = floatParameterSchema.serialize(GenericDevice.FORMAT_JSON);
+    public void testSerializeFloat() throws GDException {
+        String json = floatParameterSchema.serialize(Format.JSON);
         System.out.println(json);
 
         context.assertIsSatisfied();
@@ -109,14 +112,14 @@ public class ParameterSchemaTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (JSONException e) {
+            fail(e.getMessage());
         }
     }
 
     @Test
-    public void testSerializeString() throws GenericDeviceException {
-        String json = stringParameterSchema.serialize(GenericDevice.FORMAT_JSON);
+    public void testSerializeString() throws GDException {
+        String json = stringParameterSchema.serialize(Format.JSON);
         System.out.println(json);
 
         context.assertIsSatisfied();
@@ -124,8 +127,8 @@ public class ParameterSchemaTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (JSONException e) {
+            fail(e.getMessage());
         }
     }
 }

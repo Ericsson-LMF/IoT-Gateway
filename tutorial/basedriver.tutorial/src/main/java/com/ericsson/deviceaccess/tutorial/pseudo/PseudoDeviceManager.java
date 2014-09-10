@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,17 +29,14 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.tutorial.pseudo;
 
-
 public class PseudoDeviceManager {
-    private static PseudoDeviceManager self;
 
-    private PseudoDeviceManager() {
-    }
+    private static PseudoDeviceManager self;
 
     public static PseudoDeviceManager getInstance() {
         if (self == null) {
@@ -48,35 +45,28 @@ public class PseudoDeviceManager {
         return self;
     }
 
+    private PseudoDeviceManager() {
+    }
+
     public void setDeviceDiscoveryListener(final PseudoDeviceDiscoveryListener listener) {
-        new Thread(new Runnable() {
-            /*
-                * Device discovery emulation code.
-                * It emulates a device is discovered 2 seconds after the bundle is started,
-                * and removed 20 seconds after that.
-                */
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
 
-            public void run() {
-                try {
-                    Thread.sleep(2000);
+                PseudoDevice dev = new PseudoDevice();
+                listener.deviceDiscovered(dev);
 
-                    PseudoDevice dev = new PseudoDevice();
-                    listener.deviceDiscovered(dev);
+                Thread.sleep(10 * 60 * 1000);
 
-                    Thread.sleep(10*60*1000);
+                listener.deviceRemoved(dev);
+                Thread.sleep(3000);
 
-                    listener.deviceRemoved(dev);
-                    Thread.sleep(3000);
-
-                    listener.deviceDiscovered(dev);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                listener.deviceDiscovered(dev);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-
         }).start();
-
 
     }
 }

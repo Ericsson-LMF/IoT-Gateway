@@ -1,249 +1,246 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <version>1.42-SNAPSHOT</version>
+    <version>1.42-SNAPSHOT</version>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.ericsson.deviceaccess</groupId>
-  <artifactId>dependency.resolver</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.ericsson.deviceaccess</groupId>
+    <artifactId>dependency.resolver</artifactId>
 
-  <repositories>
-    <repository>
-      <id>knopflerfish</id>
-      <url>http://www.knopflerfish.org/maven2/</url>
-    </repository>
-  </repositories>
+    <repositories>
+        <repository>
+            <id>knopflerfish</id>
+            <url>http://www.knopflerfish.org/maven2/</url>
+        </repository>
+    </repositories>
 
-  <name>Knopflerfish dependency resolver</name>
-  <packaging>pom</packaging>
+    <name>Knopflerfish dependency resolver</name>
+    <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>bundlerepository</artifactId>
-      <version>3.1.2</version>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>bundlerepository</artifactId>
+            <version>3.1.2</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>cm_cmd-IMPL</artifactId>
-      <version>3.0.2</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>cm_cmd-IMPL</artifactId>
+            <version>5.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>console</artifactId>
-      <version>3.0.4</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>console</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>console-IMPL</artifactId>
-      <version>3.0.4</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>console-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>crimson</artifactId>
-      <version>2.1.0.kf3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>crimson</artifactId>
+            <version>2.1.0.kf4-001</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>device</artifactId>
-      <version>3.0.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>device</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>device-IMPL</artifactId>
-      <version>3.0.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>device-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>event</artifactId>
-      <version>3.0.8</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>event</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>frameworkcommands-IMPL</artifactId>
-      <version>3.2.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>frameworkcommands-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>trayicon_fw</artifactId>
-      <version>3.0.2</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>trayicon_fw</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>http</artifactId>
-      <version>3.1.2</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>http</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>http-IMPL</artifactId>
-      <version>3.1.2</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>http-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>httproot</artifactId>
-      <version>2.0.2</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>httproot</artifactId>
+            <version>2.0.2</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>httproot-IMPL</artifactId>
-      <version>3.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>httproot-IMPL</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish</groupId>
-      <artifactId>log</artifactId>
-      <version>3.1.3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish</groupId>
+            <artifactId>log</artifactId>
+            <version>5.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish</groupId>
-      <artifactId>log-IMPL</artifactId>
-      <version>3.1.3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish</groupId>
+            <artifactId>log-IMPL</artifactId>
+            <version>5.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>logcommands-IMPL</artifactId>
-      <version>3.1.1</version>      
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>logcommands-IMPL</artifactId>
+            <version>5.0.0</version>      
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>remotefw-API</artifactId>
-      <version>2.0.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>remotefw-API</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>component</artifactId>
-      <version>3.1.14</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>component</artifactId>
+            <version>5.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>scrcommands-IMPL</artifactId>
-      <version>1.1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>scrcommands-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>consoletty-IMPL</artifactId>
-      <version>3.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>consoletty-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>consoletelnet-IMPL</artifactId>
-      <version>3.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>consoletelnet-IMPL</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>useradmin</artifactId>
-      <version>3.0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>useradmin</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>useradmin-IMPL</artifactId>
-      <version>3.0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>useradmin-IMPL</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>cm</artifactId>
-      <version>3.0.4</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>cm</artifactId>
+            <version>5.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>cm-IMPL</artifactId>
-      <version>3.0.4</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>cm-IMPL</artifactId>
+            <version>5.0.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>kxml-LIB</artifactId>
-      <version>2.3.0.kf3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>kxml-LIB</artifactId>
+            <version>2.3.0.kf4-001</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>prefs</artifactId>
-      <version>3.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>prefs</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>prefs-API</artifactId>
-      <version>3.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>prefs-API</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.knopflerfish.bundle</groupId>
-      <artifactId>util-LIB</artifactId>
-      <version>2.0.1</version>
-    </dependency>
+        <dependency>
+            <groupId>org.knopflerfish.bundle</groupId>
+            <artifactId>util-LIB</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-dependency-plugin</artifactId>
-	<version>2.7</version>
-	<executions>
-	  <execution>
-	    <id>copy-dependencies</id>
-	    <phase>package</phase>
-	    <goals>
-	      <goal>copy-dependencies</goal>
-	    </goals>
-	    <configuration>
-	      <outputDirectory>jars</outputDirectory>
-	    </configuration>
-	  </execution>
-	</executions>
-      </plugin>
-
-      <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-dependency-plugin</artifactId>
-	<version>2.7</version>
-	<executions>
-	  <execution>
-	    <id>copy</id>
-	    <phase>package</phase>
-	    <goals>
-	      <goal>copy</goal>
-	    </goals>
-	    <configuration>
-	      <artifactItems>
-		<artifactItem>
-		  <groupId>org.knopflerfish</groupId>
-		  <artifactId>framework</artifactId>
-		  <version>5.3.3</version>
-		  <outputDirectory>.</outputDirectory>
-		</artifactItem>
-	      </artifactItems>
-	    </configuration>
-	  </execution>
-	</executions>
-      </plugin>
-           <plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>jars</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.knopflerfish</groupId>
+                                    <artifactId>framework</artifactId>
+                                    <version>7.0.1</version>
+                                    <outputDirectory>.</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -268,63 +265,164 @@
                 </dependencies>
             </plugin>
 
-    </plugins>
-  </build>
+        </plugins>
+    </build>
 
-  <profiles>
-     <profile>
+    <profiles>
+        <profile>
             <id>tutorial</id>
             <build>
-            <plugins>
-           <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy_init_xargs</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/init_upnp_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-nodeps</artifactId>
-                        <version>1.7.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            </plugins>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy_init_xargs</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="${basedir}/init_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-nodeps</artifactId>
+                                <version>1.7.0</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
             </build>
             <dependencies>
                 <dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20090211</version>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.upnp.lite</artifactId>
+                    <version>1.42-SNAPSHOT</version>
                 </dependency>
                 <dependency>
-			<groupId>com.ericsson.deviceaccess</groupId>
-			<artifactId>basedriver.upnp.lite</artifactId>
-			<version>1.42-SNAPSHOT</version>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.upnp</artifactId>
+                    <version>1.42-SNAPSHOT</version>
                 </dependency>
                 <dependency>
-			<groupId>com.ericsson.deviceaccess</groupId>
-			<artifactId>adaptor.upnp</artifactId>
-			<version>1.42-SNAPSHOT</version>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
                 </dependency>
                 <dependency>
-			<groupId>com.ericsson.deviceaccess.tutorial</groupId>
-			<artifactId>rest.servlet</artifactId>
-			<version>1.42-SNAPSHOT</version>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+                    <artifactId>rest.servlet</artifactId>
+                    <version>1.42-SNAPSHOT</version>
                 </dependency>
             </dependencies>
-	</profile>
-	</profiles>
+        </profile>
+        <profile>
+            <id>upnp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy_init_xargs</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="${basedir}/init_upnp_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-nodeps</artifactId>
+                                <version>1.7.0</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.upnp.lite</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.upnp</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+                    <artifactId>rest.servlet</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>coap</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy_init_xargs</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="${basedir}/init_coap_tutorial.xargs" tofile="${basedir}/init.xargs" overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.ant</groupId>
+                                <artifactId>ant-nodeps</artifactId>
+                                <version>1.7.0</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>basedriver.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess</groupId>
+                    <artifactId>adaptor.coap</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.ericsson.deviceaccess.tutorial</groupId>
+                    <artifactId>rest.servlet</artifactId>
+                    <version>1.42-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>

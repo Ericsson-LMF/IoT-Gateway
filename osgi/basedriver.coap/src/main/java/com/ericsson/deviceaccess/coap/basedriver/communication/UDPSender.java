@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,164 +29,139 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.communication;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPActivator;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
-
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.MulticastSocket;
+import java.net.SocketAddress;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for sending out UDP using either unicast or multicast socket.
  */
 public class UDPSender implements TransportLayerSender, Runnable {
 
-	protected class UDPTask implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UDPSender.class);
+    private final UDPTask POISON = new UDPTask(null);
 
-		private CoAPMessage message;
-		private Thread thread;
+    private MulticastSocket multicastSocket;
 
-		protected UDPTask(CoAPMessage message) {
-			this.message = message;
-		}
+    private DatagramSocket socket;
 
-		public void run() {
-			byte[] encoded = message.encoded();
-			send(encoded, encoded.length, message.getSocketAddress());
-		}
+    private BlockingQueue<UDPTask> queue;
 
-		public void stop() {
-			Thread t = this.thread;
-			this.thread = null;
-			
-			// XXX: Quick & Dirty, otherwise it will end up with NullPointerException
-			if (t != null) {
-				t.interrupt();
-			}
-		}
-	}
+    private volatile AtomicBoolean running = new AtomicBoolean(false);
 
-	private MulticastSocket multicastSocket;
+    private Thread thread;
 
-	private DatagramSocket socket;
+    /**
+     * Constructor with multicast socket used for sending
+     *
+     * @param multicastSocket multicast socket to be used for sending
+     */
+    public UDPSender(MulticastSocket multicastSocket) {
+        this.multicastSocket = multicastSocket;
+        this.queue = new LinkedBlockingQueue<>();
+    }
 
-	private UDPQueue queue;
+    /**
+     * Constructor with unicast socket used for sending
+     *
+     * @param socket socket to be used for sending
+     */
+    public UDPSender(DatagramSocket socket) {
+        this.socket = socket;
+        this.queue = new LinkedBlockingQueue<>();
+    }
 
-	private boolean running;
+    @Override
+    public void start() {
+        running.set(true);
+        thread = new Thread(this);
+        thread.start();
+    }
 
-	private Thread thread;
+    @Override
+    public void run() {
+        UDPTask task;
+        while (running.get()) {
+            try {
+                task = queue.take();
+            } catch (InterruptedException ex) {
+                continue;
+            }
+            if (task == POISON) {
+                break;
+            }
+            task.run();
+        }
 
-	/**
-	 * Constructor with multicast socket used for sending
-	 * 
-	 * @param multicastSocket
-	 *            multicast socket to be used for sending
-	 */
-	public UDPSender(MulticastSocket multicastSocket) {
-		this.multicastSocket = multicastSocket;
-		this.queue = new UDPQueue();
-		this.running = true;
-		this.start();
-	}
+        if (multicastSocket != null) {
+            multicastSocket.close();
+        }
+        if (socket != null) {
+            socket.close();
+        }
+        queue = null;
+        thread = null;
+    }
 
-	/**
-	 * Constructor with unicast socket used for sending
-	 * 
-	 * @param socket
-	 *            socket to be used for sending
-	 */
-	public UDPSender(DatagramSocket socket) {
-		this.socket = socket;
-		this.queue = new UDPQueue();
-		this.running = true;
-		this.start();
-	}
+    @Override
+    public void sendMessage(CoAPMessage message) {
+        queue.add(new UDPTask(message));
+    }
 
-	private void start() {
-		this.thread = new Thread(this);
-		this.thread.start();
-	}
+    /**
+     * Send given content to the given address
+     *
+     * @param content content to be sent
+     * @param contentLength length of content to be sent
+     * @param socketAddress address to where the content should be sent
+     */
+    public void send(byte[] content, int contentLength, SocketAddress socketAddress) {
+        try {
+            DatagramPacket outgoingDatagram = new DatagramPacket(content, content.length, socketAddress);
+            if (socket != null) {
+                socket.send(outgoingDatagram);
+            } else {
+                multicastSocket.send(outgoingDatagram);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Couldn't send content.", e);
+        }
+    }
 
-	public void run() {
+    /**
+     * This method will stop the running threads and close the sockets.
+     */
+    @Override
+    public void stopService() {
+        running.set(false);
+        queue.add(POISON);
+    }
 
-		while (running) {
-			UDPTask task = (UDPTask) this.queue.dequeue();
-			if (task != null) {
-				task.run();
-			}
-		}
+    protected class UDPTask implements Runnable {
 
-	}
+        private final CoAPMessage message;
 
-	public synchronized void sendMessage(CoAPMessage message) {
-		UDPTask task = new UDPTask(message);
-		queue.enqueue(task);
-	}
+        protected UDPTask(CoAPMessage message) {
+            this.message = message;
+        }
 
-	/**
-	 * Send given content to the given address
-	 * 
-	 * @param content
-	 *            content to be sent
-	 * @param contentLength
-	 *            length of content to be sent
-	 * @param socketAddress
-	 *            address to where the content should be sent
-	 */
-	public synchronized void send(byte[] content, int contentLength,
-			SocketAddress socketAddress) {
-
-		try {
-			DatagramPacket outgoingDatagram = new DatagramPacket(content,
-					content.length, socketAddress);
-			if (this.socket != null) {
-
-				/*
-					CoAPActivator.logger.debug("Use datagram socket send to "
-							+ socketAddress.toString());
-				*/
-
-				this.socket.send(outgoingDatagram);
-			} else {
-				/*
-					CoAPActivator.logger.debug("use multicast socket send to "
-							+ socketAddress.toString());
-				*/
-				this.multicastSocket.send(outgoingDatagram);
-			}
-		} catch (SocketException e) {
-			e.printStackTrace();
-			return;
-		} catch (IOException ie) {
-			ie.printStackTrace();
-			return;
-		}
-	}
-
-	/**
-	 * This method will stop the running threads and close the sockets.
-	 */
-	public void stopService() {
-		this.running = false;
-
-		this.queue.stop();
-
-		if (this.multicastSocket != null) {
-			this.multicastSocket.close();
-
-		}
-		if (this.socket != null) {
-			this.socket.close();
-		}
-
-		Thread t = this.thread;
-		this.thread = null;
-
-		t.interrupt();
-		this.queue = null;
-	}
+        @Override
+        public void run() {
+            byte[] encoded = message.encoded();
+            send(encoded, encoded.length, message.getSocketAddress());
+        }
+    }
 }

@@ -37,6 +37,11 @@
             <artifactId>generic.device.access.services</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,12 +51,14 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>2.5.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            com.ericsson.deviceaccess.coap
+                            com.ericsson.deviceaccess.coap,
+                            com.ericsson.research.common.slf4jlogger.*;-split-package:=merge-last,
+                            org.slf4j.*;-split-package:=merge-first
                         </Private-Package>
                         <Import-Package>
                             com.ericsson.deviceaccess.coap.basedriver.api.resources.*,
@@ -61,8 +68,8 @@
                             com.ericsson.deviceaccess.spi.misc.*,
                             com.ericsson.deviceaccess.spi.*,
                             com.ericsson.deviceaccess.coap.basedriver.api.*,
-                            com.ericsson.research.ag.util,
-                            org.osgi.*;version="[1.0,4.0)"
+                            com.ericsson.common.util.*,
+                            org.osgi.*;version="[1.0,4.2)"
                         </Import-Package>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Bundle-Activator>com.ericsson.deviceaccess.coap.CoAPDeviceFactory</Bundle-Activator>

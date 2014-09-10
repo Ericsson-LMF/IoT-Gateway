@@ -27,29 +27,28 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <!-- 
-		<dependency>
-			<groupId>org.kxml2</groupId>
-			<artifactId>kxml2</artifactId>
-		</dependency>
-		-->
-		<dependency>
-			<groupId>net.sf.kxml</groupId>
-			<artifactId>kxml2</artifactId>
-		</dependency>
+        <dependency>
+                <groupId>org.kxml2</groupId>
+                <artifactId>kxml2</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>net.sf.kxml</groupId>
+            <artifactId>kxml2</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.ericsson.research.connectedhome</groupId>
             <artifactId>common.osgi.log.util</artifactId>
-            <version>${connectedhome.version}</version>
         </dependency>
-  		<dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
+            <groupId>com.ericsson.research.connectedhome</groupId>
+            <artifactId>common.util</artifactId>
+            <version>1.20-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -63,7 +62,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>2.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -75,10 +74,11 @@
                             com.ericsson.deviceaccess.basedriver.upnp.lite.*
                         </Private-Package>
                         <Import-Package>
-							org.xmlpull.v1.*,
-							org.kxml2.io.*,
+                            org.xmlpull.v1.*,
+                            org.kxml2.io.*,
                             org.osgi.*;version="[1.0,4.0)",
-              				javax.servlet.*
+                            com.ericsson.common.util.*,
+                            javax.servlet.*
                         </Import-Package>
                     </instructions>
                     <Bundle-Name>${project.artifactId}</Bundle-Name>

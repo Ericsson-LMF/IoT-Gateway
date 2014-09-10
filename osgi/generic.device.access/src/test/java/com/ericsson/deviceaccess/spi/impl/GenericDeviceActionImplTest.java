@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,79 +29,123 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
+import com.ericsson.deviceaccess.spi.impl.genericdevice.GDActionImpl;
+import java.util.ArrayList;
+import java.util.List;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.api.ExpectationError;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ericsson.deviceaccess.api.GenericDevicePropertyMetadata;
-
-import static junit.framework.Assert.fail;
-
 /**
- * 
+ *
  */
 public class GenericDeviceActionImplTest {
-    private Mockery context = new Mockery() {
+
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
     };
 
-    private GenericDevicePropertyMetadata floatPropMetadata;
-    private GenericDevicePropertyMetadata stringPropMetadata;
-    private GenericDevicePropertyMetadata intPropMetadata;
-    private GenericDeviceActionImpl action;
+    private GDPropertyMetadata floatPropMetadata;
+    private GDPropertyMetadata stringPropMetadata;
+    private GDPropertyMetadata intPropMetadata;
+    private GDActionImpl action;
 
     @Before
-    public void setup() throws GenericDeviceException {
-        floatPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "floatPropMetadata");
-        intPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "intPropMetadata");
-        stringPropMetadata = context.mock(GenericDevicePropertyMetadata.class, "stringPropMetadata");
-        GenericDevicePropertyMetadata[] resultMetadata = new GenericDevicePropertyMetadata[] {
-                floatPropMetadata, 
-                intPropMetadata, 
-                stringPropMetadata, 
-            };
-        GenericDevicePropertyMetadata[] argumentsMetadata = new GenericDevicePropertyMetadata[] { 
-                floatPropMetadata, 
-                intPropMetadata, 
-                stringPropMetadata, 
-            };
-        context.checking(new Expectations() {{
-            allowing(intPropMetadata).getName();will(returnValue("int"));
-            allowing(intPropMetadata).getSerializedNode("",GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"int\"}"));
-            allowing(floatPropMetadata).getName();will(returnValue("float"));
-            allowing(floatPropMetadata).getSerializedNode("",GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"float\"}"));
-            allowing(stringPropMetadata).getName();will(returnValue("string"));
-            allowing(stringPropMetadata).getSerializedNode("",GenericDevice.FORMAT_JSON);will(returnValue("{\"type\":\"string\"}"));
+    public void setup() throws GDException {
+        floatPropMetadata = context.mock(GDPropertyMetadata.class, "floatPropMetadata");
+        intPropMetadata = context.mock(GDPropertyMetadata.class, "intPropMetadata");
+        stringPropMetadata = context.mock(GDPropertyMetadata.class, "stringPropMetadata");
+        List<GDPropertyMetadata> resultMetadata = new ArrayList<>();
+        resultMetadata.add(floatPropMetadata);
+        resultMetadata.add(intPropMetadata);
+        resultMetadata.add(stringPropMetadata);
+        List<GDPropertyMetadata> argumentsMetadata = new ArrayList<>();
+        argumentsMetadata.add(floatPropMetadata);
+        argumentsMetadata.add(intPropMetadata);
+        argumentsMetadata.add(stringPropMetadata);
+        context.checking(new Expectations() {
+            {
+                allowing(intPropMetadata).getName();
+                will(returnValue("int"));
+                allowing(intPropMetadata).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(intPropMetadata).getMaxValue();
+                will(returnValue(null));
+                allowing(intPropMetadata).getMinValue();
+                will(returnValue(null));
+                allowing(intPropMetadata).getTypeName();
+                will(returnValue("Integer"));
+                allowing(intPropMetadata).getValidValues();
+                will(returnValue(null));
+                allowing(intPropMetadata).getSerializedNode("", Format.JSON);
+                will(returnValue("{\"type\":\"int\"}"));
 
-        }});
-    
-        action = new GenericDeviceActionImpl("action", argumentsMetadata, resultMetadata);
+                allowing(floatPropMetadata).getName();
+                will(returnValue("float"));
+                allowing(floatPropMetadata).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(floatPropMetadata).getMaxValue();
+                will(returnValue(null));
+                allowing(floatPropMetadata).getMinValue();
+                will(returnValue(null));
+                allowing(floatPropMetadata).getTypeName();
+                will(returnValue("Float"));
+                allowing(floatPropMetadata).getValidValues();
+                will(returnValue(null));
+                allowing(floatPropMetadata).getSerializedNode("", Format.JSON);
+                will(returnValue("{\"type\":\"float\"}"));
+
+                allowing(stringPropMetadata).getName();
+                will(returnValue("string"));
+                allowing(stringPropMetadata).getSerializedNode("", Format.JSON);
+                will(returnValue("{\"type\":\"string\"}"));
+                allowing(stringPropMetadata).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(stringPropMetadata).getMaxValue();
+                will(returnValue(null));
+                allowing(stringPropMetadata).getMinValue();
+                will(returnValue(null));
+                allowing(stringPropMetadata).getTypeName();
+                will(returnValue("String"));
+                allowing(stringPropMetadata).getValidValues();
+                will(returnValue(null));
+            }
+        });
+
+        action = new GDActionImpl("action", argumentsMetadata, resultMetadata);
     }
-    
+
     @Test
-    public void testSerialize() throws GenericDeviceException, JSONException {
-        String json = action.serialize(GenericDevice.FORMAT_JSON);
+    public void testSerialize() throws GDException, JSONException {
+        String json = null;
+        try {
+            json = action.serialize(Format.JSON);
+        } catch (ExpectationError ex) {
+            System.out.println(ex.invocation);
+        }
 
         context.assertIsSatisfied();
         // Just check that JSON parsing works
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             fail(e.getMessage());
         }
     }

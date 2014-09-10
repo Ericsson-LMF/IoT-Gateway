@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,10 +29,12 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.api.message;
+
+import java.io.IOException;
 
 /**
  * Defines information about the CoAP message format, for example the length of
@@ -43,52 +45,69 @@ public interface CoAPMessageFormat {
     /**
      * Version (Ver): 2-bit unsigned integer. Indicates the CoAP version number.
      * Implementations of this specification MUST set this field to 1. Other
-     * values are reserved for future versions
+     * values are reserved for future versions. Messages with unknown version
+     * numbers MUST be silently ignored.
      */
-    public static final int VERSION_BYTE = 0;
-    public static final int VERSION_LENGTH = 2;
-    public static final int VERSION_START = 6;
+    int VERSION_LENGTH = 2;
+    int VERSION_START = 6;
 
     /**
      * Type (T): 2-bit unsigned integer. Indicates if this message is of type
      * Confirmable (0), Non-Confirmable (1), Acknowledgement (2) or Reset (3).
      */
-    public static final int TYPE_BYTE = 0;
-    public static final int TYPE_LENGTH = 2;
-    public static final int TYPE_START = 4;
+    int TYPE_LENGTH = 2;
+    int TYPE_START = 4;
 
     /**
-     * Option Count (OC): 4-bit unsigned integer. Indicates the number of
-     * options after the header. If set to 0, there are no options and the
-     * payload (if any) immediately follows the header. The format of options is
-     * defined below.
+     * Token Length (TKL): 4-bit unsigned integer. Indicates the length of the
+     * variable-length Token field (0-8 bytes). Lengths 9-15 are reserved, MUST
+     * NOT be sent, and MUST be processed as a message format error.
      */
-    public static final int OPTION_BYTE = 0;
-    public static final int OPTION_COUNT_LENGTH = 4;
-    public static final int OPTION_COUNT_START = 0;
+    int TOKEN_LENGTH_LENGTH = 4;
+    int TOKEN_LENGTH_START = 0;
 
     /**
-     * Code: 8-bit unsigned integer. Indicates if the message carries a request
-     * (1-31) or a response (64-191), or is empty (0). (All other code values
-     * are reserved.) In case of a request, the Code field indicates the Request
-     * Method; in case of a response a Response Code. Possible values are
-     * maintained in the CoAP Code Registry (Section 11.1). See Section 5 for
-     * the semantics of requests and responses.
+     * Code: 8-bit unsigned integer. It's split into a 3-bit class (most
+     * significant bits) and a 5-bit detail (least significant bits), documented
+     * as "c.dd" where "c" is a digit from 0 to 7 for the 3-bit subfield and
+     * "dd" are two digits from 00 to 31 for the 5-bit subfield. The class can
+     * indicate a request (0), a success response (2), a client error response
+     * (4), or a server error response (5). (All other class values are
+     * reserved.) As a special case, Code 0.00 indicates an Empty message. In
+     * case of a request, the Code field indicates the Request Method; in case
+     * of a response, a Response Code.
      */
-    public static final int CODE_BYTE = 1;
-    public static final int CODE_LENGTH = 8;
-    public static final int CODE_START = 0;
+    int CODE_LENGTH = 8;
+    int CODE_START = 0;
 
     /**
      * Option delta.
      */
-    public static final int OPTION_DELTA_LENGTH = 4;
-    public static final int OPTION_DELTA_START = 4;
+    int OPTION_DELTA_LENGTH = 4;
+    int OPTION_DELTA_START = 4;
+
+    int ADDITIONAL_DELTA = 13;
+    int ADDITIONAL_DELTA_2 = 14;
+    int PAYLOAD_MARKER = 15;
+
+    int ADDITIONAL_DELTA_MAX = 256 + ADDITIONAL_DELTA;
 
     /**
-     * Option length
+     * Option length.
      */
-    public static final int OPTION_LENGTH_LENGTH = 4;
-    public static final int OPTION_LENGTH_START = 0;
+    int OPTION_LENGTH_LENGTH = 4;
+    int OPTION_LENGTH_START = 0;
 
+    int ADDITIONAL_LENGTH = 13;
+    int ADDITIONAL_LENGTH_2 = 14;
+    int RESERVED = 15;
+
+    int ADDITIONAL_LENGTH_MAX = 256 + ADDITIONAL_LENGTH;
+
+    public class IncorrectMessageException extends IOException {
+
+        public IncorrectMessageException(String description) {
+            super(description);
+        }
+    }
 }

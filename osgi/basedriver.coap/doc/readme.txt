@@ -1,15 +1,10 @@
 INSTALL & CONFIGURATION 
 
-- follow instructions from CF related to Device Access API to install & start it
-- Do configuration of OSGi modules in deviceaccess/trunk/distribution/framework/configs/config.json
-- Disable e.g. the upnp & tutorial & bonjour modules to avoid extra logging in the console
-- Set start for basedriver.coap to false for now!
-- Start knoplerfish "mvn exec:java"
-- When knoplerfish is running, run "start basedriver.coap"
-- Install testbundle.coap with "install <path_to_testbundle_jar>"
-- Start testbundle.coap with "start testbundle.coap"
-- When testbundle.coap is started, it sends requests towards localhost 5863
-- Use the CoAP demonstration server from https://github.com/mkovatsc/Californium to reply to the requests (simulates a node having resources)
+- Follow instructions in README.md
+- Instead of "mvn -P tutorial clean install" run "mvn -P coap clean install"
+- Start as usual
+- CoAP sends requests towards localhost 5863
+- Use the CoAP demonstration server from https://github.com/eclipse/californium to reply to the requests (simulates a node having resources)
 - you can see logging when typing log (most of the logging will be there, some std.out printouts still there)
 
 
@@ -29,15 +24,8 @@ API
 - endpoint takes care of creating requests that are sent out towards CoAP
 - endpoint takes care of caching the incoming responses
 
-TODO list
-- error handling tbd! it should be studied how other osgi bundles are handling it
-- link format
-- if observation framework requires that gw is able to handle requests, how to respond ? Do we need anything from the local services etc..
-... 
-
 KNOWN ISSUES
 
 - one package per host at time (defined in the core 07 draft)
 - stack is no way finished yet, basic functionality towards Californium working
 - package ordering not handled!
-+ lots of other stuff

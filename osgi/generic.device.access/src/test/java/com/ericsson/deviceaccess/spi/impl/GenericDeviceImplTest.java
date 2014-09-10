@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,61 +29,90 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.spi.impl;
 
-import com.ericsson.deviceaccess.api.GenericDevice;
-import com.ericsson.deviceaccess.api.GenericDeviceEventListener;
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.spi.GenericDeviceActivator;
-import com.ericsson.deviceaccess.spi.GenericDeviceService;
+import com.ericsson.common.util.serialization.Format;
+import com.ericsson.deviceaccess.api.genericdevice.GDEventListener;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties;
+import com.ericsson.deviceaccess.api.genericdevice.GDProperties.Data;
+import com.ericsson.deviceaccess.api.genericdevice.GDPropertyMetadata;
 import com.ericsson.deviceaccess.spi.event.EventManager;
+import com.ericsson.deviceaccess.spi.genericdevice.GDActivator;
+import com.ericsson.deviceaccess.spi.genericdevice.GDService;
 import com.ericsson.research.common.testutil.ReflectionTestUtil;
-import junit.framework.Assert;
+import java.util.HashMap;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Properties;
-
-import static junit.framework.Assert.fail;
-
 
 /**
  * GenericDeviceImpl Tester.
  *
  */
 public class GenericDeviceImplTest {
-    private Mockery context = new Mockery() {
+
+    private JUnit4Mockery context = new JUnit4Mockery() {
         {
             setImposteriser(ClassImposteriser.INSTANCE);
         }
     };
     private EventManager eventManager;
     private GenericDeviceImpl device;
-    private GenericDeviceService dummyService;
+    private GDService dummyService;
+    private GDProperties dummyProperties;
+    private GDPropertyMetadata dummyMeta;
 
     @Before
-    public void setUp() throws Exception {
-        dummyService = context.mock(GenericDeviceService.class);
+    public void setup() throws Exception {
+        dummyService = context.mock(GDService.class);
         eventManager = context.mock(EventManager.class);
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", eventManager);
+        dummyProperties = context.mock(GDProperties.class);
+        dummyMeta = context.mock(GDPropertyMetadata.class);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", eventManager);
         device = new GenericDeviceImpl() {
         };
 
-        context.checking(new Expectations(){{
-            allowing(dummyService).getName();will(returnValue("serv"));
-            allowing(dummyService).updatePath(with(any(String.class)));
-            allowing(dummyService).setParentDevice(device);
-        }});
+        context.checking(new Expectations() {
+            {
+                allowing(dummyService).getName();
+                will(returnValue("serv"));
+                allowing(dummyService).updatePath(with(any(String.class)));
+                allowing(dummyService).setParentDevice(device);
+                allowing(dummyService).getActions();
+                will(returnValue(new HashMap<>()));
+                allowing(dummyService).getProperties();
+                will(returnValue(dummyProperties));
+                allowing(dummyService).getPath();
+                will(returnValue(""));
+                allowing(dummyProperties).getProperties();
+                will(returnValue(new HashMap<String, Data>() {
+                    {
+                        put("prop", new Data(dummyMeta).set(10));
+                    }
+                }
+                ));
+                allowing(dummyMeta).getDefaultStringValue();
+                will(returnValue(""));
+                allowing(dummyMeta).getMaxValue();
+                will(returnValue(null));
+                allowing(dummyMeta).getMinValue();
+                will(returnValue(null));
+                allowing(dummyMeta).getTypeName();
+                will(returnValue(null));
+                allowing(dummyMeta).getValidValues();
+                will(returnValue(new String[0]));
+            }
+        });
 
         device.setId("devId");
         device.setURN("devUrn");
@@ -95,21 +124,27 @@ public class GenericDeviceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        ReflectionTestUtil.setField(GenericDeviceActivator.class, "eventManager", null);
+        ReflectionTestUtil.setField(GDActivator.class, "eventManager", null);
     }
 
     @Test
     public void testEvents() {
 
-        context.checking(new Expectations(){{
-            oneOf(eventManager).notifyGenericDeviceEvent("devId", "DeviceProperties", new Properties(){{
-                put(GenericDeviceEventListener.DEVICE_ONLINE, true);
-            }});
+        context.checking(new Expectations() {
+            {
+                oneOf(eventManager).addPropertyEvent("devId", "DeviceProperties", new HashMap() {
+                    {
+                        put(GDEventListener.DEVICE_ONLINE, true);
+                    }
+                });
 
-            oneOf(eventManager).notifyGenericDeviceEvent("devId", "DeviceProperties", new Properties(){{
-                put(GenericDeviceEventListener.DEVICE_NAME, "banan");
-            }});
-        }});
+                oneOf(eventManager).addPropertyEvent("devId", "DeviceProperties", new HashMap() {
+                    {
+                        put(GDEventListener.DEVICE_NAME, "banan");
+                    }
+                });
+            }
+        });
 
         device.setOnline(true);
         device.setOnline(true);
@@ -120,28 +155,30 @@ public class GenericDeviceImplTest {
     }
 
     @Test
-    public void testSerialize() throws GenericDeviceException, JSONException {
-        context.checking(new Expectations(){{
-            oneOf(dummyService).serialize(GenericDevice.FORMAT_JSON);will(returnValue("{\"name\":\"serv\"}"));
-        }});
-
-        String json = device.serialize(GenericDevice.FORMAT_JSON);
+    public void testSerialize() throws GDException, JSONException {
+        context.checking(new Expectations() {
+            {
+            }
+        });
+        String json = device.serialize(Format.JSON);
+        System.out.println(json);
 
         context.assertIsSatisfied();
         // Just check that JSON parsing works
         try {
             JSONObject jsonObject = new JSONObject(json);
-        } catch (Exception e) {
+            System.out.println(jsonObject);
+        } catch (JSONException e) {
             fail(e.getMessage());
         }
     }
 
     @Test
-    public void testSerializeState() throws GenericDeviceException {
-        context.checking(new Expectations(){{
-            oneOf(dummyService).serializeState();will(returnValue("{\"name\":\"serv\"}"));
-        }});
-
+    public void testSerializeState() throws GDException {
+        context.checking(new Expectations() {
+            {
+            }
+        });
         String json = device.serializeState();
         System.out.println(json);
 
@@ -150,8 +187,8 @@ public class GenericDeviceImplTest {
         try {
             JSONObject jsonObject = new JSONObject(json);
             System.out.println(jsonObject);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (JSONException e) {
+            fail(e.getMessage());
         }
     }
 

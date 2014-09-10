@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,223 +29,205 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
 package com.ericsson.deviceaccess.coap.basedriver.util;
 
-import com.ericsson.deviceaccess.coap.basedriver.api.CoAPException;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPRequest;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessageFormat;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionHeader;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPOptionName;
 import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponse;
-import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPMessage.CoAPMessageType;
-import com.ericsson.deviceaccess.coap.basedriver.communication.TransportLayerSender;
-import com.ericsson.deviceaccess.coap.basedriver.osgi.*;
-import com.ericsson.deviceaccess.coap.basedriver.util.BitOperations;
-import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageReader;
-import com.ericsson.deviceaccess.coap.basedriver.util.CoAPMessageWriter;
-import junit.framework.TestCase;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-//import org.jmock.lib.legacy.ClassImposteriser;
+import com.ericsson.deviceaccess.coap.basedriver.api.message.CoAPResponseCode;
+import java.net.DatagramPacket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.net.*;
-import java.util.Iterator;
-import java.util.LinkedList;
+public class CoAPMessageWriterTest {
 
-public class CoAPMessageWriterTest extends TestCase {
+    /*
+     * The only public method is the encode method, so test that
+     *
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testEncode() throws URISyntaxException {
 
-	public CoAPMessageWriterTest() {
-		super("OutgoingCoAPMessageParserTest");
-	}
+        URI uri = new URI("coap://127.0.0.1:5683/storage/helloworld");
+        CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
 
-	/*
-	 * The only public method is the encode method, so test that
-	 * 
-	 * @throws URISyntaxException
-	 */
-	public void testEncode() throws URISyntaxException {
+        int msgCode = 2;
+        int version = 1;
+        short id = 2;
 
-		URI uri = null;
-		uri = new URI("coap://127.0.0.1:5683/storage/helloworld");
-		CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
-
-		int msgCode = 2;
-		int version = 1;
-		short id = 2;
-
-		//FIXME fix dependency to mock..
+        //FIXME fix dependency to mock..
 		/*Mockery context = new Mockery() {
-			{
-				setImposteriser(ClassImposteriser.INSTANCE);
-			}
-		};
+         {
+         setImposteriser(ClassImposteriser.INSTANCE);
+         }
+         };
 
-		final TransportLayerSender sender = context
-				.mock(TransportLayerSender.class);
-		context.checking(new Expectations() {
-			{
-				allowing(sender).sendMessage(with(aNonNull(CoAPMessage.class)));
-			}
-		});
-		*
+         final TransportLayerSender sender = context
+         .mock(TransportLayerSender.class);
+         context.checking(new Expectations() {
+         {
+         allowing(sender).sendMessage(with(aNonNull(CoAPMessage.class)));
+         }
+         });
+         *
 
-		CoAPEndpointFactory endpointFactory = CoAPEndpointFactory.getInstance();
-		CoAPMessageHandlerFactory messageHandlerFactory = CoAPMessageHandlerFactory
-				.getInstance();
+         CoAPEndpointFactory endpointFactory = CoAPEndpointFactory.getInstance();
+         CoAPMessageHandlerFactory messageHandlerFactory = CoAPMessageHandlerFactory
+         .getInstance();
 
-		OutgoingMessageHandler handler = messageHandlerFactory
-				.getOutgoingCoAPMessageHandler(sender);
-		IncomingMessageHandler incomingMessageHandler = messageHandlerFactory
-				.getIncomingCoAPMessageHandler();
+         OutgoingMessageHandler handler = messageHandlerFactory
+         .getOutgoingCoAPMessageHandler(sender);
+         IncomingMessageHandler incomingMessageHandler = messageHandlerFactory
+         .getIncomingCoAPMessageHandler();
 
-		InetAddress address = null;
-		int coapPort = 5683;
-		String socketAddress = "127.0.0.1";
-		LocalCoAPEndpoint endpoint = null;
-		
-		InetSocketAddress sockaddr = null;
-		try {
-			address = InetAddress.getByName(socketAddress);
-			sockaddr = new InetSocketAddress(address, coapPort);
-			endpoint = endpointFactory.createLocalCoAPEndpoint(
-					handler, incomingMessageHandler, address, coapPort);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+         InetAddress address = null;
+         int coapPort = 5683;
+         String socketAddress = "127.0.0.1";
+         LocalCoAPEndpoint endpoint = null;
 
-		String path = uri.getPath();
-		String[] inputSegments = path.split("/");
-		CoAPRequest req = null;
-		try {
-			req = endpoint
-					.createCoAPRequest(type, msgCode, sockaddr, uri, null);
-			req.generateTokenHeader();
-		} catch (CoAPException e) {
-			e.printStackTrace();
-		}
+         InetSocketAddress sockaddr = null;
+         try {
+         address = InetAddress.getByName(socketAddress);
+         sockaddr = new InetSocketAddress(address, coapPort);
+         endpoint = endpointFactory.createLocalCoAPEndpoint(
+         handler, incomingMessageHandler, address, coapPort);
+         } catch (Exception e) {
+         e.printStackTrace();
+         }
 
-		int optionCount = 0;
+         String path = uri.getPath();
+         String[] inputSegments = path.split("/");
+         CoAPRequest req = null;
+         try {
+         req = endpoint
+         .createCoAPRequest(type, msgCode, sockaddr, uri, null);
+         req.generateTokenHeader();
+         } catch (CoAPException e) {
+         e.printStackTrace();
+         }
 
-		short contentTypeId = 41; // try with application/xml
+         int optionCount = 0;
 
-		byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		outputStream.write(contentTypeBytes[1]);
+         short contentTypeId = 41; // try with application/xml
 
-		CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE,
+         byte[] contentTypeBytes = BitOperations.splitShortToBytes(id);
+         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+         outputStream.write(contentTypeBytes[1]);
 
-		outputStream.toByteArray());
-		req.addOptionHeader(h);
+         CoAPOptionHeader h = new CoAPOptionHeader(CoAPOptionName.CONTENT_TYPE,
 
-		optionCount++;
-		context.assertIsSatisfied();
-		assertNotNull(handler);
+         outputStream.toByteArray());
+         req.addOptionHeader(h);
 
-		endpoint.sendRequest(req);
+         optionCount++;
+         context.assertIsSatisfied();
+         assertNotNull(handler);
 
-		CoAPMessageWriter writer = new CoAPMessageWriter(req);
-		byte[] stream = writer.encode();
+         endpoint.sendRequest(req);
 
-		DatagramPacket packet = new DatagramPacket(stream, stream.length);
-		packet.setSocketAddress(sockaddr);
+         CoAPMessageWriter writer = new CoAPMessageWriter(req);
+         byte[] stream = writer.encode();
 
-		CoAPMessageReader reader = new CoAPMessageReader(packet);
-		CoAPMessage msg = reader.decode();
+         DatagramPacket packet = new DatagramPacket(stream, stream.length);
+         packet.setSocketAddress(sockaddr);
 
-		assertEquals(msg.getOptionCount(), 6);
-		assertEquals(msg.getCode(), msgCode);
-		assertEquals(msg.getMessageType(), type);
+         CoAPMessageReader reader = new CoAPMessageReader(packet);
+         CoAPMessage msg = reader.decode();
 
-		LinkedList<CoAPOptionHeader> options = msg.getOptionHeaders();
-		Iterator<CoAPOptionHeader> it = options.iterator();
-		int i = 0;
-		// Go through different option numbers
-		while (it.hasNext()) {
+         assertEquals(msg.getOptionCount(), 6);
+         assertEquals(msg.getCode(), msgCode);
+         assertEquals(msg.getMessageType(), type);
 
-			CoAPOptionHeader header = (CoAPOptionHeader) it.next();
-			String value = new String(header.getValue());
+         LinkedList<CoAPOptionHeader> options = msg.getOptionHeaders();
+         Iterator<CoAPOptionHeader> it = options.iterator();
+         int i = 0;
+         // Go through different option numbers
+         while (it.hasNext()) {
 
-			if (header.getOptionNumber() == 3) {
-				assertEquals(header.getOptionName(), "Proxy-Uri");
-				assertEquals(value, "testserver");
-			} else if (header.getOptionNumber() == 9) {
-				assertEquals(header.getOptionName(), "Uri-Path");
-				if (i == 1) {
-					assertEquals("storage", value);
-				} else if (i == 2) {
-					assertEquals("helloworld", value);
-				}
-			}
-			i++;
-		}
+         CoAPOptionHeader header = (CoAPOptionHeader) it.next();
+         String value = new String(header.getValue());
 
-		// This should remove proxy-port, proxy-path & proxy-host headers
-		CoAPOptionHeader test = new CoAPOptionHeader(
-				CoAPOptionName.PROXY_URI.getNo(),
-				CoAPOptionName.PROXY_URI.getName(), "testserver".getBytes());
-		req.addOptionHeader(test);
+         if (header.getOptionNumber() == 3) {
+         assertEquals(header.getOptionName(), "Proxy-Uri");
+         assertEquals(value, "testserver");
+         } else if (header.getOptionNumber() == 9) {
+         assertEquals(header.getOptionName(), "Uri-Path");
+         if (i == 1) {
+         assertEquals("storage", value);
+         } else if (i == 2) {
+         assertEquals("helloworld", value);
+         }
+         }
+         i++;
+         }
 
-		assertEquals(3, req.getOptionCount());*/
+         // This should remove proxy-port, proxy-path & proxy-host headers
+         CoAPOptionHeader test = new CoAPOptionHeader(
+         CoAPOptionName.PROXY_URI.getNo(),
+         CoAPOptionName.PROXY_URI.getName(), "testserver".getBytes());
+         req.addOptionHeader(test);
 
+         assertEquals(3, req.getOptionCount());*/
+    }
 
-	}
+    @Test
+    public void testFencepostOptions() throws URISyntaxException {
+        URI uri = new URI("coap://127.0.0.1:/storage/helloworld");
+        CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
 
-	public void testFencepostOptions() throws URISyntaxException {
-		URI uri = null;
-		uri = new URI("coap://127.0.0.1:/storage/helloworld");
-		CoAPMessageType type = CoAPMessageType.NON_CONFIRMABLE;
+        int version = 1;
+        short id = 2;
 
-		int msgCode = 64;
-		int version = 1;
-		short id = 2;
+        CoAPResponse resp = new CoAPResponse(version, type, CoAPResponseCode.CONTENT, id);
 
-		CoAPResponse resp = new CoAPResponse(version, type, msgCode, id);
+        CoAPOptionHeader option1 = new CoAPOptionHeader("option_1", "test1".getBytes());
+        CoAPOptionHeader option2 = new CoAPOptionHeader(CoAPOptionName.ETAG, "hello".getBytes());
 
-		CoAPOptionHeader option1 = new CoAPOptionHeader(0, "option_1",
-				"test1".getBytes());
-		CoAPOptionHeader option2 = new CoAPOptionHeader(CoAPOptionName.MAX_OFE,
-				"hello".getBytes());
+        resp.addOptionHeader(option1);
+        resp.addOptionHeader(option2);
 
-		resp.addOptionHeader(option1);
-		resp.addOptionHeader(option2);
+        assertEquals(2, resp.getOptionCount());
 
-		assertEquals(2, resp.getOptionCount());
+        CoAPMessageWriter writer = new CoAPMessageWriter(resp);
+        byte[] stream;
+        try {
+            stream = writer.encode();
+        } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+            fail("Problem with encoding; " + ex);
+            return;
+        }
 
-		CoAPMessageWriter writer = new CoAPMessageWriter(resp);
-		byte[] stream = writer.encode();
+        DatagramPacket packet = new DatagramPacket(stream, stream.length);
 
-		DatagramPacket packet = new DatagramPacket(stream, stream.length);
+        CoAPMessageReader reader = new CoAPMessageReader(packet);
+        CoAPResponse msg;
+        try {
+            msg = (CoAPResponse) reader.decode();
+        } catch (CoAPMessageFormat.IncorrectMessageException ex) {
+            fail("Problem with decoding; " + ex);
+            return;
+        }
+        assertEquals(1, msg.getOptionHeaders(CoAPOptionName.ETAG).size());
+        assertEquals(1, msg.getOptionHeaders(CoAPOptionName.UNKNOWN).size());
+        assertEquals(2, msg.getOptionHeaders().size());
+    }
 
-		CoAPMessageReader reader = new CoAPMessageReader(packet);
-		CoAPResponse msg = (CoAPResponse) reader.decode();
+    @Test
+    public void testEmptyAck() {
+        CoAPResponse response = new CoAPResponse(1,
+                CoAPMessageType.CONFIRMABLE, CoAPResponseCode.NOT_IMPLEMENTED, 1234);
 
-		LinkedList<CoAPOptionHeader> options = msg.getOptionHeaders();
-		Iterator<CoAPOptionHeader> keyIterator = options.iterator();
+        CoAPResponse emptyAck = response.createAcknowledgement();
+        assertEquals(0, emptyAck.getCode().getNo());
 
-		int i = 0;
-		while (keyIterator.hasNext()) {
-			CoAPOptionHeader key = keyIterator.next();
-			if (i == 0) {
-				assertEquals("unknown", key.getOptionName());
-			} else if (i == 1) {
-				assertEquals(CoAPOptionName.MAX_OFE.getName(),
-						key.getOptionName());
-			}
-			i++;
-		}
-		assertEquals(i, 2);
-	}
-
-	public void testEmptyAck() {
-		CoAPResponse response = new CoAPResponse(1,
-				CoAPMessageType.CONFIRMABLE, 69, 1234);
-
-		CoAPResponse emptyAck = response.createAcknowledgement();
-		assertEquals(0, emptyAck.getCode());
-
-	}
+    }
 }

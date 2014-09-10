@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,88 +29,76 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.upnp;
 
-import java.util.Properties;
-
+import com.ericsson.common.util.LegacyUtil;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
+import com.ericsson.deviceaccess.spi.service.homeautomation.power.SwitchPowerBase;
+import java.util.HashMap;
+import java.util.Map;
 import org.osgi.service.upnp.UPnPAction;
 import org.osgi.service.upnp.UPnPDevice;
 import org.osgi.service.upnp.UPnPException;
 import org.osgi.service.upnp.UPnPService;
 import org.slf4j.Logger;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
-import com.ericsson.deviceaccess.api.GenericDeviceProperties;
-import com.ericsson.deviceaccess.spi.service.homeautomation.power.SwitchPowerBase;
-
 public class SwitchPowerUPnPImpl extends SwitchPowerBase implements UPnPDeviceAgent.UpdatePropertyInterface {
 
-	final private UPnPDevice upnpDev;
-	final private Logger logger;
-
-	public SwitchPowerUPnPImpl(UPnPDevice upnpDev, UPnPService upnpService, Logger logger) {
-		this.upnpDev = upnpDev;
-		this.logger = logger;
-	}
-	
-	// @Override
-	public void executeSetTarget(int target) throws GenericDeviceException {
-		// TODO Auto-generated method stub
-		UPnPAction action = null;
-		try {
-			action = SwitchPowerUPnPImpl.getUPnPAction(this.upnpDev, "SetTarget");
-			Properties args = new Properties();
-			if (target == 0) {
-				args.put("newTargetValue", "False");
-			} else {
-				args.put("newTargetValue", "True");				
-			}
-			action.invoke(args);
-		} catch (UPnPException e) {
-			e.printStackTrace();
-			return;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}		
-	}
-
-	// @Override
-	protected void refreshProperties() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	// @Override
-	public void updateProperty(String name, Object value) {
-		logger.debug("updateProperty(" + name + ")");
-		
-		GenericDeviceProperties properties = this.getProperties();
-		if ("Status".equalsIgnoreCase(name)) {
-			if (value instanceof Boolean) {
-				logger.debug("updateCurrentTarget(" + (Boolean)value + ")");
-				this.updateCurrentTarget(((Boolean)value).booleanValue() ? 1 : 0);
-			}
-		} else {
-			// NOP
-		}		
-	}
-	
-    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName)
-            throws UPnPException {
-        UPnPService[] services = device.getServices();
-
-        for (int i = 0; i < services.length; ++i) {
-            UPnPAction action = services[i].getAction(actionName);
+    private static UPnPAction getUPnPAction(UPnPDevice device, String actionName) throws UPnPException {
+        for (UPnPService service : device.getServices()) {
+            UPnPAction action = service.getAction(actionName);
             if (action != null) {
                 return action;
             }
         }
-        throw new UPnPException(UPnPException.INVALID_ACTION,
-                "No such action supported " + actionName);
+        throw new UPnPException(UPnPException.INVALID_ACTION, "No such action supported " + actionName);
     }
+
+    private final UPnPDevice upnpDev;
+    private final Logger logger;
+
+    public SwitchPowerUPnPImpl(UPnPDevice upnpDev, UPnPService upnpService, Logger logger) {
+        this.upnpDev = upnpDev;
+        this.logger = logger;
+    }
+
+    @Override
+    public void executeSetTarget(int target) throws GDException {
+        try {
+            UPnPAction action = SwitchPowerUPnPImpl.getUPnPAction(this.upnpDev, "SetTarget");
+            Map<String, Object> args = new HashMap<>();
+            args.put("newTargetValue", target == 1 ? "True" : "False");
+            action.invoke(LegacyUtil.toDictionary(args));
+        } catch (UPnPException ex) {
+            logger.error("Exception: " + ex);
+        } catch (Exception ex) {
+            logger.error("Exception: " + ex);
+        }
+
+    }
+
+    // @Override
+    @Override
+    protected void refreshProperties() {
+        // TODO Auto-generated method stub
+
+    }
+
+    // @Override
+    @Override
+    public void updateProperty(String name, Object value) {
+        logger.debug("updateProperty(" + name + ")");
+        if ("Status".equalsIgnoreCase(name)) {
+            if (value instanceof Boolean) {
+                logger.debug("updateCurrentTarget(" + value + ")");
+                this.updateCurrentTarget(((Boolean) value) ? 1 : 0);
+            }
+        } else {
+            // NOP
+        }
+    }
+
 }

@@ -1,0 +1,112 @@
+# Updated by Ericsson. Original was
+# Generated from template.xargs
+# Knopflerfish release 3.5.0
+#
+
+# load common properties
+-xargs props.xargs
+
+# Semicolon seprated list of base URLs for searching (completing)
+# bundle URLs in "-install URL" command line options and in the console.
+-Forg.knopflerfish.gosg.jars=file:jars/
+
+## Basic KF bundles
+-initlevel 1
+-install log-5.0.0.jar
+-install cm-5.0.0.jar
+-install console-4.0.1.jar
+-install component-5.0.0.jar
+-install event-4.0.1.jar
+-install prefs-4.0.1.jar
+
+## Some library bundles
+-initlevel 2
+-install util-LIB-4.1.0.jar
+-install crimson-2.1.0.kf4-001.jar
+-install jsdk-API-2.5.0.kf3-2.jar
+-install kxml-LIB-2.3.0.kf4-001.jar
+
+# The Bundle repo commands and desktop plugin
+#-install bundlerepository-3.1.2.jar
+
+## More basic KF bundles
+-initlevel 3
+-install device-4.0.1.jar
+-install useradmin-4.0.0.jar
+
+-initlevel 4
+-install http-4.0.1.jar
+
+## console command bundles
+-initlevel 5
+-install frameworkcommands-IMPL-4.0.1.jar
+-install logcommands-IMPL-5.0.0.jar
+-install cm_cmd-IMPL-5.0.1.jar
+
+-install consoletty-IMPL-4.0.1.jar
+
+-install stax2-api-3.1.4.jar
+
+-install jackson-core-2.4.1.jar
+-install jackson-annotations-2.4.1.jar
+-install jackson-databind-2.4.1.jar
+-install jackson-dataformat-xml-2.4.1.jar
+-install jackson-module-jaxb-annotations-2.4.1.jar
+-install jackson-module-mrbean-2.4.1.jar
+
+-install common.util-1.20-SNAPSHOT.jar
+-install common.osgi.log.util-1.20-SNAPSHOT.jar
+-install generic.device.access-1.42-SNAPSHOT.jar
+-install generic.device.access.services-1.42-SNAPSHOT.jar
+-install generic.device.spi-1.42-SNAPSHOT.jar
+-install basedriver.coap-1.42-SNAPSHOT.jar
+-install adaptor.coap-1.42-SNAPSHOT.jar
+-install com.springsource.org.apache.commons.logging-1.1.1.jar
+-install com.springsource.org.apache.log4j-1.2.15.jar
+-install org.osgi.compendium-5.0.0.jar
+-install rest.servlet-1.42-SNAPSHOT.jar
+
+# Start of these bundles are delayed since this makes start
+# order dependencies much easier
+
+-start log-5.0.0.jar
+-start cm-5.0.0.jar
+-start console-4.0.1.jar
+-start useradmin-4.0.0.jar
+-start consoletty-IMPL-4.0.1.jar
+-start frameworkcommands-IMPL-4.0.1.jar
+-start logcommands-IMPL-5.0.0.jar
+
+-start cm_cmd-IMPL-5.0.1.jar
+-start device-4.0.1.jar
+-start http-4.0.1.jar
+-start prefs-4.0.1.jar
+-start event-4.0.1.jar
+-start component-5.0.0.jar
+
+-start stax2-api-3.1.4.jar
+
+-start jackson-core-2.4.1.jar
+-start jackson-annotations-2.4.1.jar
+-start jackson-databind-2.4.1.jar
+-start jackson-dataformat-xml-2.4.1.jar
+-start jackson-module-jaxb-annotations-2.4.1.jar
+-start jackson-module-mrbean-2.4.1.jar
+
+-start common.util-1.20-SNAPSHOT.jar
+-start common.osgi.log.util-1.20-SNAPSHOT.jar
+-start generic.device.access-1.42-SNAPSHOT.jar
+-start generic.device.access.services-1.42-SNAPSHOT.jar
+-start generic.device.spi-1.42-SNAPSHOT.jar
+-start basedriver.coap-1.42-SNAPSHOT.jar
+-start adaptor.coap-1.42-SNAPSHOT.jar
+-start com.springsource.org.apache.commons.logging-1.1.1.jar
+-start com.springsource.org.apache.log4j-1.2.15.jar
+-start org.osgi.compendium-5.0.0.jar
+-start rest.servlet-1.42-SNAPSHOT.jar
+
+-startlevel 8
+
+-launch
+
+

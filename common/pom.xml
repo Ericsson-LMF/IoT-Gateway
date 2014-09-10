@@ -11,6 +11,9 @@
         <android.version>1.5_r4</android.version>
         <gwt.version>2.2.0</gwt.version>
         <jersey.version>1.1.4</jersey.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <additionalparam>-Xdoclint:none</additionalparam>
     </properties>
     <modules>
         <module>common.util</module>
@@ -35,15 +38,15 @@
                         <execution>
                             <id>default-compile</id>
                             <configuration>
-                                <source>1.6</source>
-                                <target>1.6</target>
+                                <source>1.8</source>
+                                <target>1.8</target>
                             </configuration>
                         </execution>
                         <execution>
                             <id>default-testCompile</id>
                             <configuration>
-                                <source>1.6</source>
-                                <target>1.6</target>
+                                <source>1.8</source>
+                                <target>1.8</target>
                             </configuration>
                         </execution>
                     </executions>
@@ -93,7 +96,7 @@
                 <version>2.3</version>
             </plugin>
             <!-- The Resources Plugin handles the copying of project resources to
-         the output directory -->
+            the output directory -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.4</version>
@@ -102,7 +105,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
                         <phase>deploy</phase>
@@ -174,25 +177,25 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.8.1</version>
+                <version>4.11</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jmock</groupId>
                 <artifactId>jmock</artifactId>
-                <version>2.5.1</version>
+                <version>2.6.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jmock</groupId>
                 <artifactId>jmock-legacy</artifactId>
-                <version>2.5.1</version>
+                <version>2.6.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jmock</groupId>
                 <artifactId>jmock-junit4</artifactId>
-                <version>2.5.1</version>
+                <version>2.6.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

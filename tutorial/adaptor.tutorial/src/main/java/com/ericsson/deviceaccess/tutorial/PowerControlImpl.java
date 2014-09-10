@@ -1,6 +1,6 @@
 /*
  * Copyright Ericsson AB 2011-2014. All Rights Reserved.
- * 
+ *
  * The contents of this file are subject to the Lesser GNU Public License,
  *  (the "License"), either version 2.1 of the License, or
  * (at your option) any later version.; you may not use this file except in
@@ -9,12 +9,12 @@
  * retrieved online at https://www.gnu.org/licenses/lgpl.html. Moreover
  * it could also be requested from Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
  * WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
  * EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
  * OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY KIND,
- 
+
  * EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  * PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
@@ -29,13 +29,12 @@
  * (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
  * INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE
  * OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH
- * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
- * 
+ * HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ *
  */
-
 package com.ericsson.deviceaccess.tutorial;
 
-import com.ericsson.deviceaccess.api.GenericDeviceException;
+import com.ericsson.deviceaccess.api.genericdevice.GDException;
 import com.ericsson.deviceaccess.spi.service.util.PowerControlBase;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDevice;
 import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceException;
@@ -44,6 +43,7 @@ import com.ericsson.deviceaccess.tutorial.pseudo.PseudoDeviceException;
  * Adaptor specific implementation of the <i>PowerControl</i> service.
  */
 public class PowerControlImpl extends PowerControlBase {
+
     PseudoDevice dev;
 
     public PowerControlImpl(PseudoDevice dev) {
@@ -57,12 +57,13 @@ public class PowerControlImpl extends PowerControlBase {
      * <p/>
      * It will be called by the base class when a client invokes the action.
      */
-    public void executeOn() throws GenericDeviceException {
+    @Override
+    public void executeOn() throws GDException {
         try {
             dev.powerOn();
             updateCurrentState(VALUE_PROP_CurrentState_On);
         } catch (PseudoDeviceException e) {
-            throw new GenericDeviceException(500, "Failed to execute: " + e.getMessage());
+            throw new GDException(500, "Failed to execute: " + e.getMessage());
         }
     }
 
@@ -73,15 +74,17 @@ public class PowerControlImpl extends PowerControlBase {
      * <p/>
      * It will be called by the base class when a client invokes the action.
      */
-    public void executeOff() throws GenericDeviceException {
+    @Override
+    public void executeOff() throws GDException {
         try {
             dev.powerOff();
             updateCurrentState(VALUE_PROP_CurrentState_Off);
         } catch (PseudoDeviceException e) {
-            throw new GenericDeviceException(500, "Failed to execute: " + e.getMessage());
+            throw new GDException(500, "Failed to execute: " + e.getMessage());
         }
     }
 
+    @Override
     protected void refreshProperties() {
         // NOP
     }
