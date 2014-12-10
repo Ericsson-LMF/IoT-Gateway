@@ -78,7 +78,8 @@ The project was built on a host with the following development environment
 * Java 1.8.0_05
 
 It is assumed that any host platform with Java 1.8 or later and
-Maven 3.0.4 or later will be fine.
+Maven 3.0.4 or later will be fine. Note! For Maven to work, you need to set the JAVA_HOME 
+environment variable to point to the correct JDK version. 
 
 ### Building the bare bones project
 
